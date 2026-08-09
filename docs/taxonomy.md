@@ -15,7 +15,7 @@
 | [Video inpainting](tasks/video-inpainting.md) | 视频与 mask | 补全区域 | 遮挡、运动传播和背景一致性 |
 | [Story / multi-shot generation](tasks/story-multishot.md) | 剧本、分镜、参考素材 | 多镜头序列 | 角色、场景、因果和镜头连续性 |
 | [Action-conditioned prediction](tasks/action-conditioned-prediction.md) | 观测与动作 | 动作后的未来 | 动作可控性和反事实准确性 |
-| [Interactive world generation](tasks/interactive-world-generation.md) | 初始世界与实时动作 | 持续生成的环境 | 低延迟、记忆、3D 和闭环稳定性 |
+| [Interactive world generation [[7]](#ref-7)](tasks/interactive-world-generation.md) | 初始世界与实时动作 | 持续生成的环境 | 低延迟、记忆、3D 和闭环稳定性 |
 
 每个任务的完整技术演化见 [生成任务深度路线图](tasks/index.md)。
 
@@ -25,9 +25,9 @@
 
 直接生成 RGB 像素。信息完整，但计算和存储成本高；模型还要花大量容量重建对决策无关的细节。
 
-### Motion space
+### Motion space [[1]](#ref-1)
 
-预测光流、仿射变换、深度、轨迹或 deformation，再通过 warping 得到视频。控制性强，但在新出现区域和复杂非刚体运动上容易失败。
+预测光流 [[2]](#ref-2)、仿射变换、深度、轨迹或 deformation，再通过 warping 得到视频。控制性强，但在新出现区域和复杂非刚体运动上容易失败。
 
 ### Continuous latent space
 
@@ -35,7 +35,7 @@
 
 ### Discrete token space
 
-使用 VQ-VAE、VQGAN 或视频 tokenizer 将视频转换为离散 token，再用 autoregressive 或 masked Transformer 生成。优点是能借用语言模型的建模方式，缺点是 token 数量巨大且 tokenizer 会引入不可逆失真。
+使用 VQ-VAE [[3]](#ref-3)、VQGAN 或视频 tokenizer 将视频转换为离散 token，再用 autoregressive 或 masked Transformer 生成。优点是能借用语言模型的建模方式，缺点是 token 数量巨大且 tokenizer 会引入不可逆失真。
 
 ### Structured / object-centric state
 
@@ -55,7 +55,7 @@
 
 判别器推动生成器产生锐利、真实的视频。GAN 曾是高质量视频生成的主线，但训练不稳定、mode collapse 和大规模扩展困难。
 
-### Autoregressive generation
+### Autoregressive generation [[4]](#ref-4)
 
 把视频表示成序列并建模：
 
@@ -65,11 +65,11 @@ $$
 
 它具有明确似然并天然支持变长输出，但采样串行，长期误差可能逐步积累。
 
-### Masked generation
+### Masked generation [[5]](#ref-5)
 
 从全部或部分 mask 的 token 开始，多轮并行填充。通常比逐 token 自回归更快，也适合视频补全和多任务条件生成。
 
-### Diffusion and flow
+### Diffusion and flow [[6]](#ref-6)
 
 从噪声或简单分布出发，通过迭代去噪或连续概率流到达数据分布。它们在画质、覆盖度和条件控制上表现突出，但需要解决多步推理和超长时序一致性。
 
@@ -123,3 +123,19 @@ availability: paper | code | weights | api
 ```
 
 这套记录方式比单纯按公司或发布时间整理更容易发现真正的技术演化。
+
+## 参考文献
+
+<a id="ref-1"></a>[1] Bruce D. Lucas, and Takeo Kanade. [An Iterative Image Registration Technique with an Application to Stereo Vision](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Proceedings of the 7th International Joint Conference on Artificial Intelligence (IJCAI), 1981.
+
+<a id="ref-2"></a>[2] Berthold K.P. Horn, and Brian G. Schunck. [Determining optical flow](https://doi.org/10.1016/0004-3702(81)90024-2). Artificial Intelligence, 1981.
+
+<a id="ref-3"></a>[3] Aaron van den Oord, Oriol Vinyals, and Koray Kavukcuoglu. [Neural Discrete Representation Learning](https://arxiv.org/abs/1711.00937). arXiv preprint, 2017.
+
+<a id="ref-4"></a>[4] Wilson Yan, Yunzhi Zhang, Pieter Abbeel, and Aravind Srinivas. [VideoGPT: Video Generation using VQ-VAE and Transformers](https://arxiv.org/abs/2104.10157). arXiv preprint, 2021.
+
+<a id="ref-5"></a>[5] Lijun Yu, Yong Cheng, Kihyuk Sohn, José Lezama, Han Zhang, Huiwen Chang, et al. [MAGVIT: Masked Generative Video Transformer](https://arxiv.org/abs/2212.05199). arXiv preprint, 2022.
+
+<a id="ref-6"></a>[6] Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, and David J. Fleet. [Video Diffusion Models](https://arxiv.org/abs/2204.03458). arXiv preprint, 2022.
+
+<a id="ref-7"></a>[7] Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). arXiv preprint, 2024.

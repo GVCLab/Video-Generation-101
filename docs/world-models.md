@@ -64,7 +64,7 @@ $$
 
 ### Latent dynamics model
 
-在压缩状态中预测未来，只重建必要观测或直接预测价值。PlaNet、Dreamer 和许多机器人模型属于这一路线。
+在压缩状态中预测未来，只重建必要观测或直接预测价值。PlaNet [[2]](#ref-2)、Dreamer [[3]](#ref-3) 和许多机器人模型属于这一路线。
 
 ### Latent predictive representation
 
@@ -80,21 +80,21 @@ $$
 
 ## 5. 代表案例应该怎样理解
 
-### Sora / Veo 等视频基础模型
+### Sora [[5]](#ref-5) / Veo 等视频基础模型
 
 重要性在于规模化生成训练可能带来隐式的 3D、运动、物理属性和视觉推理能力。它们为 world model 提供强大的视觉先验，但“涌现视觉能力”不自动等于“拥有可验证的动作动力学”。
 
-### Genie 系列
+### Genie 系列 [[6]](#ref-6)
 
-代表“从被动互联网视频中学习潜在动作，再生成可交互环境”的路线。Genie 3 进一步强调实时导航、较长的一致性和 promptable world events。
+代表“从被动互联网视频中学习潜在动作，再生成可交互环境”的路线。Genie 3 [[8]](#ref-8) 进一步强调实时导航、较长的一致性和 promptable world events。
 
-### GWM-1
+### GWM-1 [[9]](#ref-9)
 
 把可探索环境、实时角色和机器人动作条件视频作为不同 post-training 方向，强调相机、语音和机器人命令等动作接口。
 
-### Cosmos 系列
+### Cosmos 系列 [[10]](#ref-10)
 
-面向 Physical AI，将数据治理、视频 tokenizer、生成、物理推理、动作预测和机器人策略放入同一平台。Cosmos 3 进一步尝试统一语言、视觉、声音和动作。
+面向 Physical AI，将数据治理、视频 tokenizer、生成、物理推理、动作预测和机器人策略放入同一平台。Cosmos 3 [[11]](#ref-11) 进一步尝试统一语言、视觉、声音和动作。
 
 ## 6. World model 的关键评测
 
@@ -141,3 +141,29 @@ $$
 > 该模型在大规模视频生成中表现出若干世界建模能力，包括 X 和 Y；但其动作条件、反事实准确性、长期状态持久性及闭环规划价值仍需通过 Z 类实验验证。
 
 这种写法既不会低估生成预训练的潜力，也不会把视觉真实性误当成完整的物理或因果理解。
+
+## 参考文献
+
+<a id="ref-1"></a>[1] David Ha, and Jürgen Schmidhuber. [World Models](https://arxiv.org/abs/1803.10122). Advances in Neural Information Processing Systems 31, 2018.
+
+<a id="ref-2"></a>[2] Danijar Hafner, Timothy Lillicrap, Ian Fischer, Ruben Villegas, David Ha, Honglak Lee, et al. [Learning Latent Dynamics for Planning from Pixels](https://arxiv.org/abs/1811.04551). arXiv preprint, 2018.
+
+<a id="ref-3"></a>[3] Danijar Hafner, Timothy Lillicrap, Jimmy Ba, and Mohammad Norouzi. [Dream to Control: Learning Behaviors by Latent Imagination](https://arxiv.org/abs/1912.01603). arXiv preprint, 2019.
+
+<a id="ref-4"></a>[4] Danijar Hafner, Jurgis Pasukonis, Jimmy Ba, and Timothy Lillicrap. [Mastering Diverse Domains through World Models](https://arxiv.org/abs/2301.04104). arXiv preprint, 2023.
+
+<a id="ref-5"></a>[5] OpenAI. [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). Technical report, 2024.
+
+<a id="ref-6"></a>[6] Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). arXiv preprint, 2024.
+
+<a id="ref-7"></a>[7] Dani Valevski, Yaniv Leviathan, Moab Arar, and Shlomi Fruchter. [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837). arXiv preprint, 2024.
+
+<a id="ref-8"></a>[8] Google DeepMind. [Genie 3: A New Frontier for World Models](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/). Project report, 2025.
+
+<a id="ref-9"></a>[9] Runway. [Introducing Runway GWM-1](https://runway.com/research/introducing-runway-gwm-1). Project report, 2025.
+
+<a id="ref-10"></a>[10] NVIDIA, Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, et al. [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). arXiv preprint, 2025.
+
+<a id="ref-11"></a>[11] NVIDIA. [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800). arXiv preprint, 2026.
+
+<a id="ref-12"></a>[12] Mahmoud Assran, Adrien Bardes, David Fan, Quentin Garrido, Russell Howes, Mojtaba Komeili, et al. [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). arXiv preprint, 2025.

@@ -8,35 +8,35 @@
 
 ## 最小阅读集：8 篇建立全局观
 
-1. **Video Textures** — Schödl et al., 2000
+1. **Video Textures [[1]](#ref-1)** — Schödl et al., 2000
 
    [Paper](https://dl.acm.org/doi/10.1145/344779.345012) · 理解数据驱动视频合成在深度学习之前如何工作。
 
-2. **Deep Multi-Scale Video Prediction Beyond Mean Square Error** — Mathieu et al., 2015
+2. **Deep Multi-Scale Video Prediction Beyond Mean Square Error [[2]](#ref-2)** — Mathieu et al., 2015
 
    [Paper](https://arxiv.org/abs/1511.05440) · 理解为什么像素 MSE 会导致模糊。
 
-3. **Unsupervised Learning for Physical Interaction through Video Prediction** — Finn et al., 2016
+3. **Unsupervised Learning for Physical Interaction [[3]](#ref-3) through Video Prediction** — Finn et al., 2016
 
    [Paper](https://arxiv.org/abs/1605.07157) · 理解动作条件、像素变换和机器人视频预测。
 
-4. **VideoGPT: Video Generation using VQ-VAE and Transformers** — Yan et al., 2021
+4. **VideoGPT [[4]](#ref-4): Video Generation using VQ-VAE and Transformers** — Yan et al., 2021
 
    [Paper](https://arxiv.org/abs/2104.10157) · 理解视频 tokenizer 和自回归 Transformer。
 
-5. **Video Diffusion Models** — Ho et al., 2022
+5. **Video Diffusion Models [[5]](#ref-5)** — Ho et al., 2022
 
    [Paper](https://arxiv.org/abs/2204.03458) · 理解 diffusion 如何扩展到时间维。
 
-6. **Video Generation Models as World Simulators** — OpenAI, 2024
+6. **Video Generation Models as World Simulators [[6]](#ref-6)** — OpenAI, 2024
 
    [Technical report](https://openai.com/index/video-generation-models-as-world-simulators/) · 理解 spacetime patch、规模化和“world simulator”主张。
 
-7. **World Models** — Ha & Schmidhuber, 2018
+7. **World Models [[7]](#ref-7)** — Ha & Schmidhuber, 2018
 
    [Paper](https://arxiv.org/abs/1803.10122) · 理解决策型 world model 的 latent imagination 路线。
 
-8. **Genie: Generative Interactive Environments** — Bruce et al., 2024
+8. **Genie [[8]](#ref-8): Generative Interactive Environments** — Bruce et al., 2024
 
    [Paper](https://arxiv.org/abs/2402.15391) · 理解无动作标签视频、latent action 与交互生成的结合。
 
@@ -152,3 +152,99 @@ text / image / video / audio / camera / action
 ## Historical role
 它改变了表示、架构、规模、控制还是评测？
 ```
+
+## 参考文献
+
+<a id="ref-1"></a>[1] Arno Schödl, Richard Szeliski, David H. Salesin, and Irfan Essa. [Video textures](https://doi.org/10.1145/344779.345012). Proceedings of the 27th annual conference on Computer graphics and interactive techniques - SIGGRAPH '00, 2000.
+
+<a id="ref-2"></a>[2] Michael Mathieu, Camille Couprie, and Yann LeCun. [Deep multi-scale video prediction beyond mean square error](https://arxiv.org/abs/1511.05440). arXiv preprint, 2015.
+
+<a id="ref-3"></a>[3] Chelsea Finn, Ian Goodfellow, and Sergey Levine. [Unsupervised Learning for Physical Interaction through Video Prediction](https://arxiv.org/abs/1605.07157). arXiv preprint, 2016.
+
+<a id="ref-4"></a>[4] Wilson Yan, Yunzhi Zhang, Pieter Abbeel, and Aravind Srinivas. [VideoGPT: Video Generation using VQ-VAE and Transformers](https://arxiv.org/abs/2104.10157). arXiv preprint, 2021.
+
+<a id="ref-5"></a>[5] Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, and David J. Fleet. [Video Diffusion Models](https://arxiv.org/abs/2204.03458). arXiv preprint, 2022.
+
+<a id="ref-6"></a>[6] OpenAI. [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). Technical report, 2024.
+
+<a id="ref-7"></a>[7] David Ha, and Jürgen Schmidhuber. [World Models](https://arxiv.org/abs/1803.10122). Advances in Neural Information Processing Systems 31, 2018.
+
+<a id="ref-8"></a>[8] Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). arXiv preprint, 2024.
+
+<a id="ref-9"></a>[9] Bruce D. Lucas, and Takeo Kanade. [An Iterative Image Registration Technique with an Application to Stereo Vision](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Proceedings of the 7th International Joint Conference on Artificial Intelligence (IJCAI), 1981.
+
+<a id="ref-10"></a>[10] Berthold K.P. Horn, and Brian G. Schunck. [Determining optical flow](https://doi.org/10.1016/0004-3702(81)90024-2). Artificial Intelligence, 1981.
+
+<a id="ref-11"></a>[11] Gianfranco Doretto, Alessandro Chiuso, Ying Nian Wu, and Stefano Soatto. [Dynamic Textures](https://doi.org/10.1023/A:1021669406132). International Journal of Computer Vision, 2003.
+
+<a id="ref-12"></a>[12] Xingjian Shi, Zhourong Chen, Hao Wang, Dit-Yan Yeung, Wai-kin Wong, and Wang-chun Woo. [Convolutional LSTM Network: A Machine Learning Approach for Precipitation Nowcasting](https://arxiv.org/abs/1506.04214). arXiv preprint, 2015.
+
+<a id="ref-13"></a>[13] William Lotter, Gabriel Kreiman, and David Cox. [Deep Predictive Coding Networks for Video Prediction and Unsupervised Learning](https://arxiv.org/abs/1605.08104). arXiv preprint, 2016.
+
+<a id="ref-14"></a>[14] Sergey Tulyakov, Ming-Yu Liu, Xiaodong Yang, and Jan Kautz. [MoCoGAN: Decomposing Motion and Content for Video Generation](https://arxiv.org/abs/1707.04993). arXiv preprint, 2017.
+
+<a id="ref-15"></a>[15] Remi Denton, and Rob Fergus. [Stochastic Video Generation with a Learned Prior](https://arxiv.org/abs/1802.07687). arXiv preprint, 2018.
+
+<a id="ref-16"></a>[16] Aidan Clark, Jeff Donahue, and Karen Simonyan. [Adversarial Video Generation on Complex Datasets](https://arxiv.org/abs/1907.06571). arXiv preprint, 2019.
+
+<a id="ref-17"></a>[17] Aaron van den Oord, Oriol Vinyals, and Koray Kavukcuoglu. [Neural Discrete Representation Learning](https://arxiv.org/abs/1711.00937). arXiv preprint, 2017.
+
+<a id="ref-18"></a>[18] Ruben Villegas, Mohammad Babaeizadeh, Pieter-Jan Kindermans, Hernan Moraldo, Han Zhang, Mohammad Taghi Saffar, et al. [Phenaki: Variable Length Video Generation From Open Domain Textual Description](https://arxiv.org/abs/2210.02399). arXiv preprint, 2022.
+
+<a id="ref-19"></a>[19] Lijun Yu, Yong Cheng, Kihyuk Sohn, José Lezama, Han Zhang, Huiwen Chang, et al. [MAGVIT: Masked Generative Video Transformer](https://arxiv.org/abs/2212.05199). arXiv preprint, 2022.
+
+<a id="ref-20"></a>[20] Lijun Yu, José Lezama, Nitesh B. Gundavarapu, Luca Versari, Kihyuk Sohn, David Minnen, et al. [Language Model Beats Diffusion -- Tokenizer is Key to Visual Generation](https://arxiv.org/abs/2310.05737). arXiv preprint, 2023.
+
+<a id="ref-21"></a>[21] Jonathan Ho, Ajay Jain, and Pieter Abbeel. [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239). arXiv preprint, 2020.
+
+<a id="ref-22"></a>[22] Uriel Singer, Adam Polyak, Thomas Hayes, Xi Yin, Jie An, Songyang Zhang, et al. [Make-A-Video: Text-to-Video Generation without Text-Video Data](https://arxiv.org/abs/2209.14792). arXiv preprint, 2022.
+
+<a id="ref-23"></a>[23] Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey Gritsenko, et al. [Imagen Video: High Definition Video Generation with Diffusion Models](https://arxiv.org/abs/2210.02303). arXiv preprint, 2022.
+
+<a id="ref-24"></a>[24] Andreas Blattmann, Robin Rombach, Huan Ling, Tim Dockhorn, Seung Wook Kim, Sanja Fidler, et al. [Align your Latents: High-Resolution Video Synthesis with Latent Diffusion Models](https://arxiv.org/abs/2304.08818). arXiv preprint, 2023.
+
+<a id="ref-25"></a>[25] Yuwei Guo, Ceyuan Yang, Anyi Rao, Zhengyang Liang, Yaohui Wang, Yu Qiao, et al. [AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning](https://arxiv.org/abs/2307.04725). arXiv preprint, 2023.
+
+<a id="ref-26"></a>[26] Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). arXiv preprint, 2023.
+
+<a id="ref-27"></a>[27] Omer Bar-Tal, Hila Chefer, Omer Tov, Charles Herrmann, Roni Paiss, Shiran Zada, et al. [Lumiere: A Space-Time Diffusion Model for Video Generation](https://arxiv.org/abs/2401.12945). arXiv preprint, 2024.
+
+<a id="ref-28"></a>[28] Danijar Hafner, Timothy Lillicrap, Ian Fischer, Ruben Villegas, David Ha, Honglak Lee, et al. [Learning Latent Dynamics for Planning from Pixels](https://arxiv.org/abs/1811.04551). arXiv preprint, 2018.
+
+<a id="ref-29"></a>[29] Danijar Hafner, Timothy Lillicrap, Jimmy Ba, and Mohammad Norouzi. [Dream to Control: Learning Behaviors by Latent Imagination](https://arxiv.org/abs/1912.01603). arXiv preprint, 2019.
+
+<a id="ref-30"></a>[30] Julian Schrittwieser, Ioannis Antonoglou, Thomas Hubert, Karen Simonyan, Laurent Sifre, Simon Schmitt, et al. [Mastering Atari, Go, chess and shogi by planning with a learned model](https://doi.org/10.1038/s41586-020-03051-4). Nature, 2020.
+
+<a id="ref-31"></a>[31] Danijar Hafner, Jurgis Pasukonis, Jimmy Ba, and Timothy Lillicrap. [Mastering Diverse Domains through World Models](https://arxiv.org/abs/2301.04104). arXiv preprint, 2023.
+
+<a id="ref-32"></a>[32] Anthony Hu, Lloyd Russell, Hudson Yeo, Zak Murez, George Fedoseev, Alex Kendall, et al. [GAIA-1: A Generative World Model for Autonomous Driving](https://arxiv.org/abs/2309.17080). arXiv preprint, 2023.
+
+<a id="ref-33"></a>[33] Dani Valevski, Yaniv Leviathan, Moab Arar, and Shlomi Fruchter. [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837). arXiv preprint, 2024.
+
+<a id="ref-34"></a>[34] NVIDIA, Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, et al. [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). arXiv preprint, 2025.
+
+<a id="ref-35"></a>[35] Google DeepMind. [Genie 3: A New Frontier for World Models](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/). Project report, 2025.
+
+<a id="ref-36"></a>[36] Runway. [Introducing Runway GWM-1](https://runway.com/research/introducing-runway-gwm-1). Project report, 2025.
+
+<a id="ref-37"></a>[37] NVIDIA. [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800). arXiv preprint, 2026.
+
+<a id="ref-38"></a>[38] Yann LeCun. [A Path Towards Autonomous Machine Intelligence](https://openreview.net/forum?id=BZ5a1r-kVsf). Position paper, version 0.9.2, 2022.
+
+<a id="ref-39"></a>[39] Mahmoud Assran, Quentin Duval, Ishan Misra, Piotr Bojanowski, Pascal Vincent, Michael Rabbat, et al. [Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture](https://arxiv.org/abs/2301.08243). arXiv preprint, 2023.
+
+<a id="ref-40"></a>[40] Adrien Bardes, Jean Ponce, and Yann LeCun. [MC-JEPA: A Joint-Embedding Predictive Architecture for Self-Supervised Learning of Motion and Content Features](https://arxiv.org/abs/2307.12698). arXiv preprint, 2023.
+
+<a id="ref-41"></a>[41] Adrien Bardes, Quentin Garrido, Jean Ponce, Xinlei Chen, Michael Rabbat, Yann LeCun, et al. [Revisiting Feature Prediction for Learning Visual Representations from Video](https://arxiv.org/abs/2404.08471). arXiv preprint, 2024.
+
+<a id="ref-42"></a>[42] Mahmoud Assran, Adrien Bardes, David Fan, Quentin Garrido, Russell Howes, Mojtaba Komeili, et al. [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). arXiv preprint, 2025.
+
+<a id="ref-43"></a>[43] Lorenzo Mur-Labadia, Matthew Muckley, Amir Bar, Mahmoud Assran, Koustuv Sinha, Michael Rabbat, et al. [V-JEPA 2.1: Unlocking Dense Features in Video Self-Supervised Learning](https://arxiv.org/abs/2603.14482). arXiv preprint, 2026.
+
+<a id="ref-44"></a>[44] Randall Balestriero, and Yann LeCun. [LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics](https://arxiv.org/abs/2511.08544). arXiv preprint, 2025.
+
+<a id="ref-45"></a>[45] Lucas Maes, Quentin Le Lidec, Damien Scieur, Yann LeCun, and Randall Balestriero. [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312). arXiv preprint, 2026.
+
+<a id="ref-46"></a>[46] Basile Terver, Randall Balestriero, Megi Dervishi, David Fan, Quentin Garrido, Tushar Nagarajan, et al. [A Lightweight Library for Energy-Based Joint-Embedding Predictive Architectures](https://arxiv.org/abs/2602.03604). arXiv preprint, 2026.
+
+<a id="ref-47"></a>[47] Marco Bagatella, Matteo Pirotta, Ahmed Touati, Alessandro Lazaric, and Andrea Tirinzoni. [TD-JEPA: Latent-predictive Representations for Zero-Shot Reinforcement Learning](https://arxiv.org/abs/2510.00739). arXiv preprint, 2025.

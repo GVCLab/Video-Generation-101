@@ -12,7 +12,7 @@ $$
 \hat{x}_{t+1:T}=f_\theta(x_{1:t})
 $$
 
-这类方法直观，但未来具有多模态性。一个人可以向左走，也可以向右走；单一 MSE 目标容易把多个合理未来平均成模糊画面。后来的 VAE、GAN、diffusion 和 flow，本质上都在解决“如何表达多个可能未来”。
+这类方法直观，但未来具有多模态性。一个人可以向左走，也可以向右走；单一 MSE 目标容易把多个合理未来平均成模糊画面 [[1]](#ref-1)。后来的 VAE、GAN、diffusion 和 flow，本质上都在解决“如何表达多个可能未来”。
 
 ## 2. VAE 路线：用 latent 表达不确定性
 
@@ -26,8 +26,8 @@ $$
 
 代表工作：
 
-- **Stochastic Video Generation with a Learned Prior**：用 learned prior 生成多种可能未来，强调 stochastic prediction。
-- **MoCoGAN**：虽然是 GAN，但它的内容 latent 与运动 latent 解耦思想也常被放入 VAE/GAN 共同脉络中理解。
+- **Stochastic Video Generation with a Learned Prior [[3]](#ref-3)**：用 learned prior 生成多种可能未来，强调 stochastic prediction。
+- **MoCoGAN [[2]](#ref-2)**：虽然是 GAN，但它的内容 latent 与运动 latent 解耦思想也常被放入 VAE/GAN 共同脉络中理解。
 
 阅读时重点看三件事：latent 是全局还是逐帧采样，时间 dynamics 如何建模，评测是否覆盖多模态未来而不只是平均误差。
 
@@ -45,7 +45,7 @@ $$
 
 - **Generating Videos with Scene Dynamics**：用时空卷积 GAN 生成短视频，并显式区分前景和背景。
 - **MoCoGAN**：把内容和运动分离，形成早期视频生成的重要基线。
-- **DVD-GAN**：展示大型视频 GAN 在复杂数据集上的能力。
+- **DVD-GAN [[4]](#ref-4)**：展示大型视频 GAN 在复杂数据集上的能力。
 
 GAN 的核心短板也很清楚：训练不稳定、mode collapse、覆盖度难评估，以及很难像 diffusion 那样稳定吃下更大的数据和模型规模。
 
@@ -65,10 +65,10 @@ $$
 
 代表工作：
 
-- **Video Diffusion Models**：系统展示 diffusion 可以用于视频生成、预测和插帧。
-- **Make-A-Video / Imagen Video**：把大规模文本图像模型扩展到文本视频。
-- **Align Your Latents / Stable Video Diffusion**：推动 latent video diffusion 与开放权重基线。
-- **Lumiere**：用 Space-Time U-Net 直接覆盖完整视频时间范围。
+- **Video Diffusion Models [[6]](#ref-6)**：系统展示 diffusion 可以用于视频生成、预测和插帧。
+- **Make-A-Video [[7]](#ref-7) / Imagen Video [[8]](#ref-8)**：把大规模文本图像模型扩展到文本视频。
+- **Align Your Latents [[9]](#ref-9) / Stable Video Diffusion [[11]](#ref-11)**：推动 latent video diffusion 与开放权重基线。
+- **Lumiere [[12]](#ref-12)**：用 Space-Time U-Net 直接覆盖完整视频时间范围。
 - **Sora**：用 spacetime patch 和 Transformer diffusion 扩展到更长、更复杂的视频生成。
 
 Diffusion 成为主线的原因不是它最便宜，而是它在质量、覆盖、多条件控制和规模化稳定性上形成了很强的组合优势。
@@ -101,4 +101,32 @@ Flow matching、rectified flow、consistency model 等方法试图把多步去�
 3. **DVD-GAN**：理解视频 GAN 的扩展尝试。
 4. **Video Diffusion Models**：理解 diffusion 如何进入视频。
 5. **Stable Video Diffusion**：理解开放 latent video diffusion baseline。
-6. **Sora technical report**：理解大规模视频生成与 world simulator 讨论的连接点。
+6. **Sora technical report [[13]](#ref-13)**：理解大规模视频生成与 world simulator 讨论的连接点。
+
+## 参考文献
+
+<a id="ref-1"></a>[1] Michael Mathieu, Camille Couprie, and Yann LeCun. [Deep multi-scale video prediction beyond mean square error](https://arxiv.org/abs/1511.05440). arXiv preprint, 2015.
+
+<a id="ref-2"></a>[2] Sergey Tulyakov, Ming-Yu Liu, Xiaodong Yang, and Jan Kautz. [MoCoGAN: Decomposing Motion and Content for Video Generation](https://arxiv.org/abs/1707.04993). arXiv preprint, 2017.
+
+<a id="ref-3"></a>[3] Remi Denton, and Rob Fergus. [Stochastic Video Generation with a Learned Prior](https://arxiv.org/abs/1802.07687). arXiv preprint, 2018.
+
+<a id="ref-4"></a>[4] Aidan Clark, Jeff Donahue, and Karen Simonyan. [Adversarial Video Generation on Complex Datasets](https://arxiv.org/abs/1907.06571). arXiv preprint, 2019.
+
+<a id="ref-5"></a>[5] Jonathan Ho, Ajay Jain, and Pieter Abbeel. [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239). arXiv preprint, 2020.
+
+<a id="ref-6"></a>[6] Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, and David J. Fleet. [Video Diffusion Models](https://arxiv.org/abs/2204.03458). arXiv preprint, 2022.
+
+<a id="ref-7"></a>[7] Uriel Singer, Adam Polyak, Thomas Hayes, Xi Yin, Jie An, Songyang Zhang, et al. [Make-A-Video: Text-to-Video Generation without Text-Video Data](https://arxiv.org/abs/2209.14792). arXiv preprint, 2022.
+
+<a id="ref-8"></a>[8] Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey Gritsenko, et al. [Imagen Video: High Definition Video Generation with Diffusion Models](https://arxiv.org/abs/2210.02303). arXiv preprint, 2022.
+
+<a id="ref-9"></a>[9] Andreas Blattmann, Robin Rombach, Huan Ling, Tim Dockhorn, Seung Wook Kim, Sanja Fidler, et al. [Align your Latents: High-Resolution Video Synthesis with Latent Diffusion Models](https://arxiv.org/abs/2304.08818). arXiv preprint, 2023.
+
+<a id="ref-10"></a>[10] Yuwei Guo, Ceyuan Yang, Anyi Rao, Zhengyang Liang, Yaohui Wang, Yu Qiao, et al. [AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning](https://arxiv.org/abs/2307.04725). arXiv preprint, 2023.
+
+<a id="ref-11"></a>[11] Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). arXiv preprint, 2023.
+
+<a id="ref-12"></a>[12] Omer Bar-Tal, Hila Chefer, Omer Tov, Charles Herrmann, Roni Paiss, Shiran Zada, et al. [Lumiere: A Space-Time Diffusion Model for Video Generation](https://arxiv.org/abs/2401.12945). arXiv preprint, 2024.
+
+<a id="ref-13"></a>[13] OpenAI. [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). Technical report, 2024.

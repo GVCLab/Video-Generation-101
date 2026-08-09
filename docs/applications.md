@@ -8,14 +8,14 @@
 
 典型任务：
 
-- 文本到视频，用于概念短片、广告草图和动态分镜。
-- 图像到视频，让角色设定、产品图或场景概念动起来。
-- 多镜头生成，保持角色、场景、服装和故事连续性。
+- 文本到视频 [[1]](#ref-1)，用于概念短片、广告草图和动态分镜。
+- 图像到视频 [[4]](#ref-4)，让角色设定、产品图或场景概念动起来。
+- 多镜头生成 [[3]](#ref-3)，保持角色、场景、服装和故事连续性。
 - 风格迁移和镜头语言探索，例如相机运动、光照和画幅变化。
 
 核心要求不是单帧漂亮，而是可控、可改、可重复。专业创作更关心角色一致性、镜头衔接、局部编辑和版本管理。
 
-## 2. 视频编辑与后期制作
+## 2. 视频编辑 [[5]](#ref-5)与后期制作
 
 常见应用：
 
@@ -28,18 +28,18 @@
 
 ## 3. 动画、游戏与交互环境
 
-视频生成正在进入实时交互场景：
+视频生成正在进入实时交互场景 [[6]](#ref-6)：
 
 - 生成可导航的 2D/3D 风格环境。
 - 根据按键、手柄或文本事件实时改变场景。
 - 为游戏原型生成角色动作、背景循环和过场动画。
-- 用神经模拟器替代或补充传统渲染管线。
+- 用神经模拟器 [[7]](#ref-7)替代或补充传统渲染管线。
 
 这类应用把模型从 open-loop generation 推向 closed-loop interaction。延迟、状态记忆和可预测控制比纯画质更重要。
 
-## 4. 机器人与自动驾驶
+## 4. 机器人与自动驾驶 [[8]](#ref-8)
 
-在 Physical AI 中，视频模型常用于：
+在 Physical AI [[9]](#ref-9) 中，视频模型常用于：
 
 - 预测不同动作后的视觉后果。
 - 生成罕见场景或危险边界案例。
@@ -94,3 +94,23 @@
 6. 成功指标是主观质量、下游任务收益，还是闭环控制表现？
 
 这些问题能帮助读者把论文能力翻译成真实系统需求。
+
+## 参考文献
+
+<a id="ref-1"></a>[1] Uriel Singer, Adam Polyak, Thomas Hayes, Xi Yin, Jie An, Songyang Zhang, et al. [Make-A-Video: Text-to-Video Generation without Text-Video Data](https://arxiv.org/abs/2209.14792). arXiv preprint, 2022.
+
+<a id="ref-2"></a>[2] Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey Gritsenko, et al. [Imagen Video: High Definition Video Generation with Diffusion Models](https://arxiv.org/abs/2210.02303). arXiv preprint, 2022.
+
+<a id="ref-3"></a>[3] OpenAI. [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). Technical report, 2024.
+
+<a id="ref-4"></a>[4] Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). arXiv preprint, 2023.
+
+<a id="ref-5"></a>[5] Yuwei Guo, Ceyuan Yang, Anyi Rao, Zhengyang Liang, Yaohui Wang, Yu Qiao, et al. [AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning](https://arxiv.org/abs/2307.04725). arXiv preprint, 2023.
+
+<a id="ref-6"></a>[6] Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). arXiv preprint, 2024.
+
+<a id="ref-7"></a>[7] Dani Valevski, Yaniv Leviathan, Moab Arar, and Shlomi Fruchter. [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837). arXiv preprint, 2024.
+
+<a id="ref-8"></a>[8] Anthony Hu, Lloyd Russell, Hudson Yeo, Zak Murez, George Fedoseev, Alex Kendall, et al. [GAIA-1: A Generative World Model for Autonomous Driving](https://arxiv.org/abs/2309.17080). arXiv preprint, 2023.
+
+<a id="ref-9"></a>[9] NVIDIA, Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, et al. [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). arXiv preprint, 2025.

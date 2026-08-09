@@ -63,13 +63,13 @@ flowchart LR
 
 | 年份 | 工作 | 主要预测对象 | 历史角色 |
 |---:|---|---|---|
-| 2022 | [A Path Towards Autonomous Machine Intelligence](https://openreview.net/forum?id=BZ5a1r-kVsf) | 分层抽象状态与行动结果 | 提出以 JEPA、能量模型和分层规划构造自主智能体的研究蓝图 |
-| 2023 | [I-JEPA](https://arxiv.org/abs/2301.08243) | 图像中被遮挡区域的 embedding | 证明不重建像素也能学习强图像语义表征 |
-| 2023 | [MC-JEPA](https://arxiv.org/abs/2307.12698) | 内容表征与光流 | 将“是什么”和“如何移动”放入共享 encoder |
-| 2024 | [V-JEPA](https://arxiv.org/abs/2404.08471) | 视频中缺失时空区域的 embedding | 将 masked latent prediction 系统扩展到视频 |
-| 2025 | [V-JEPA 2](https://arxiv.org/abs/2506.09985) | 大规模视频的时空表征 | 从视频表征学习走向物理理解、预测和规划 |
-| 2025 | [V-JEPA 2-AC](https://arxiv.org/abs/2506.09985) | 给定动作后的未来 latent | 用少量机器人数据把被动视频预训练连接到动作条件规划 |
-| 2026 | [V-JEPA 2.1](https://arxiv.org/abs/2603.14482) | 更密集、更稳定的图像与视频特征 | 用 dense predictive loss、deep self-supervision 等方法强化 dense feature |
+| 2022 | A Path Towards Autonomous Machine Intelligence [[1]](#ref-1) | 分层抽象状态与行动结果 | 提出以 JEPA、能量模型和分层规划构造自主智能体的研究蓝图 |
+| 2023 | I-JEPA [[2]](#ref-2) | 图像中被遮挡区域的 embedding | 证明不重建像素也能学习强图像语义表征 |
+| 2023 | MC-JEPA [[3]](#ref-3) | 内容表征与光流 | 将“是什么”和“如何移动”放入共享 encoder |
+| 2024 | V-JEPA [[4]](#ref-4) | 视频中缺失时空区域的 embedding | 将 masked latent prediction 系统扩展到视频 |
+| 2025 | V-JEPA 2 [[5]](#ref-5) | 大规模视频的时空表征 | 从视频表征学习走向物理理解、预测和规划 |
+| 2025 | V-JEPA 2-AC [[5]](#ref-5) | 给定动作后的未来 latent | 用少量机器人数据把被动视频预训练连接到动作条件规划 |
+| 2026 | V-JEPA 2.1 [[6]](#ref-6) | 更密集、更稳定的图像与视频特征 | 用 dense predictive loss、deep self-supervision 等方法强化 dense feature |
 
 ## 3. 2022：JEPA 作为自主智能架构蓝图
 
@@ -153,7 +153,7 @@ V-JEPA 的训练目标有几个重要边界：
 
 ## 9. 训练稳定性与可规划分支
 
-### LeJEPA：用显式分布约束替代 teacher–student 启发式
+### LeJEPA [[7]](#ref-7)：用显式分布约束替代 teacher–student 启发式
 
 [LeJEPA](https://arxiv.org/abs/2511.08544) 重新讨论 representation collapse。它提出 Sketched Isotropic Gaussian Regularization（SIGReg），直接约束 embedding 接近各向同性高斯分布，从而减少 stop-gradient、EMA teacher 和复杂 scheduler 等机制依赖。
 
@@ -162,7 +162,7 @@ V-JEPA 的训练目标有几个重要边界：
 - Paper：[`balestriero2025lejepa`](../bibliography/references.bib)
 - Official code：[galilai-group/lejepa](https://github.com/galilai-group/lejepa)
 
-### LeWorldModel：从 raw pixels 端到端学习 latent dynamics
+### LeWorldModel [[8]](#ref-8)：从 raw pixels 端到端学习 latent dynamics
 
 [LeWorldModel](https://arxiv.org/abs/2603.19312) 将 JEPA prediction 与 SIGReg 用于动作条件 world model。模型从原始像素训练 encoder 和 dynamics，用 future latent prediction 支持 model predictive control，而不需要像素 decoder 参与规划。
 
@@ -171,14 +171,14 @@ V-JEPA 的训练目标有几个重要边界：
 - Paper：[`maes2026leworldmodel`](../bibliography/references.bib)
 - Official code：[lucas-maes/le-wm](https://github.com/lucas-maes/le-wm)
 
-### EB-JEPA：把架构拆成可复现教学组件
+### EB-JEPA [[9]](#ref-9)：把架构拆成可复现教学组件
 
 [EB-JEPA](https://arxiv.org/abs/2602.03604) 是 Meta FAIR 发布的轻量库，覆盖图像表征、Moving MNIST 视频多步预测和动作条件导航规划。它的价值不在于刷新大规模 benchmark，而在于用单卡、数小时级实验展示 context encoder、predictor、collapse regularization 和 latent planning 如何连接。
 
 - Paper：[`terver2026lightweight`](../bibliography/references.bib)
 - Official code：[facebookresearch/eb_jepa](https://github.com/facebookresearch/eb_jepa)
 
-### TD-JEPA：用 temporal difference 学长期策略动力学
+### TD-JEPA [[10]](#ref-10)：用 temporal difference 学长期策略动力学
 
 [TD-JEPA](https://arxiv.org/abs/2510.00739) 面向 reward-free offline transitions 和 zero-shot reinforcement learning。它不只做单步 future embedding prediction，而是通过 temporal-difference 目标学习多策略下的长期 latent dynamics，并在测试时适配新的 reward function。
 
@@ -259,3 +259,25 @@ V-JEPA 的训练目标有几个重要边界：
 6. [LeWorldModel](https://arxiv.org/abs/2603.19312)：理解 latent prediction 如何真正进入规划。
 
 论文与仓库核验记录保存在 [JEPA research audit](../sources/papers_20260809_jepa_lineage.md)。
+
+## 参考文献
+
+<a id="ref-1"></a>[1] Yann LeCun. [A Path Towards Autonomous Machine Intelligence](https://openreview.net/forum?id=BZ5a1r-kVsf). Position paper, version 0.9.2, 2022.
+
+<a id="ref-2"></a>[2] Mahmoud Assran, Quentin Duval, Ishan Misra, Piotr Bojanowski, Pascal Vincent, Michael Rabbat, et al. [Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture](https://arxiv.org/abs/2301.08243). arXiv preprint, 2023.
+
+<a id="ref-3"></a>[3] Adrien Bardes, Jean Ponce, and Yann LeCun. [MC-JEPA: A Joint-Embedding Predictive Architecture for Self-Supervised Learning of Motion and Content Features](https://arxiv.org/abs/2307.12698). arXiv preprint, 2023.
+
+<a id="ref-4"></a>[4] Adrien Bardes, Quentin Garrido, Jean Ponce, Xinlei Chen, Michael Rabbat, Yann LeCun, et al. [Revisiting Feature Prediction for Learning Visual Representations from Video](https://arxiv.org/abs/2404.08471). arXiv preprint, 2024.
+
+<a id="ref-5"></a>[5] Mahmoud Assran, Adrien Bardes, David Fan, Quentin Garrido, Russell Howes, Mojtaba Komeili, et al. [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). arXiv preprint, 2025.
+
+<a id="ref-6"></a>[6] Lorenzo Mur-Labadia, Matthew Muckley, Amir Bar, Mahmoud Assran, Koustuv Sinha, Michael Rabbat, et al. [V-JEPA 2.1: Unlocking Dense Features in Video Self-Supervised Learning](https://arxiv.org/abs/2603.14482). arXiv preprint, 2026.
+
+<a id="ref-7"></a>[7] Randall Balestriero, and Yann LeCun. [LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics](https://arxiv.org/abs/2511.08544). arXiv preprint, 2025.
+
+<a id="ref-8"></a>[8] Lucas Maes, Quentin Le Lidec, Damien Scieur, Yann LeCun, and Randall Balestriero. [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312). arXiv preprint, 2026.
+
+<a id="ref-9"></a>[9] Basile Terver, Randall Balestriero, Megi Dervishi, David Fan, Quentin Garrido, Tushar Nagarajan, et al. [A Lightweight Library for Energy-Based Joint-Embedding Predictive Architectures](https://arxiv.org/abs/2602.03604). arXiv preprint, 2026.
+
+<a id="ref-10"></a>[10] Marco Bagatella, Matteo Pirotta, Ahmed Touati, Alessandro Lazaric, and Andrea Tirinzoni. [TD-JEPA: Latent-predictive Representations for Zero-Shot Reinforcement Learning](https://arxiv.org/abs/2510.00739). arXiv preprint, 2025.

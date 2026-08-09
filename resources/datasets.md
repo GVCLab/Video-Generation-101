@@ -6,10 +6,10 @@
 
 | 数据集 | 内容 | 常见用途 | 入口 |
 |---|---|---|---|
-| Moving MNIST | 移动数字的合成序列 | ConvLSTM、长期预测入门 | [Reference](https://arxiv.org/abs/1502.04681) |
+| Moving MNIST [[1]](#ref-1) | 移动数字的合成序列 | ConvLSTM [[2]](#ref-2)、长期预测入门 | [Reference](https://arxiv.org/abs/1502.04681) |
 | KTH Actions | 六类人体动作 | 早期预测与生成 | [Dataset](https://www.csc.kth.se/cvap/actions/) |
-| BAIR Robot Pushing | 机器人推动物体 | 动作条件视频预测 | [TensorFlow Datasets](https://www.tensorflow.org/datasets/catalog/bair_robot_pushing_small) |
-| UCF-101 | 人类动作视频 | 类别条件视频生成 | [Dataset](https://www.crcv.ucf.edu/data/UCF101.php) |
+| BAIR Robot Pushing [[3]](#ref-3) | 机器人推动物体 | 动作条件视频预测 | [TensorFlow Datasets](https://www.tensorflow.org/datasets/catalog/bair_robot_pushing_small) |
+| UCF-101 [[4]](#ref-4) | 人类动作视频 | 类别条件视频生成 | [Dataset](https://www.crcv.ucf.edu/data/UCF101.php) |
 
 这些数据规模小、视觉分布窄，适合教学和机制验证，不适合证明开放世界生成能力。
 
@@ -49,10 +49,10 @@
 - episode 边界、任务、成功和失败标签。
 - 观测延迟和动作延迟。
 
-## 5. 驾驶与具身环境
+## 5. 驾驶与具身环境 [[6]](#ref-6)
 
 - [Waymo Open Dataset](https://github.com/waymo-research/waymo-open-dataset)：感知、运动和驾驶研究。
-- [nuScenes](https://www.nuscenes.org/)：多传感器自动驾驶数据。
+- [nuScenes](https://www.nuscenes.org/)：多传感器自动驾驶 [[5]](#ref-5)数据。
 - [BDD100K](https://github.com/bdd100k/bdd100k)：多样化道路视频与标注。
 - [Habitat](https://aihabitat.org/)：具身导航 simulator 和数据生态。
 - [Procgen](https://github.com/openai/procgen)：用于泛化研究的程序化游戏环境。
@@ -86,3 +86,19 @@ known_limitations:
 - 构建发布日期晚于训练截止时间的新测试集。
 - 使用程序生成、可精确控制的物理与反事实测试。
 - 披露无法确认训练数据时的风险，而不是默认没有污染。
+
+## 参考文献
+
+<a id="ref-1"></a>[1] Nitish Srivastava, Elman Mansimov, and Ruslan Salakhutdinov. [Unsupervised Learning of Video Representations using LSTMs](https://arxiv.org/abs/1502.04681). arXiv preprint, 2015.
+
+<a id="ref-2"></a>[2] Xingjian Shi, Zhourong Chen, Hao Wang, Dit-Yan Yeung, Wai-kin Wong, and Wang-chun Woo. [Convolutional LSTM Network: A Machine Learning Approach for Precipitation Nowcasting](https://arxiv.org/abs/1506.04214). arXiv preprint, 2015.
+
+<a id="ref-3"></a>[3] Chelsea Finn, Ian Goodfellow, and Sergey Levine. [Unsupervised Learning for Physical Interaction through Video Prediction](https://arxiv.org/abs/1605.07157). arXiv preprint, 2016.
+
+<a id="ref-4"></a>[4] Sergey Tulyakov, Ming-Yu Liu, Xiaodong Yang, and Jan Kautz. [MoCoGAN: Decomposing Motion and Content for Video Generation](https://arxiv.org/abs/1707.04993). arXiv preprint, 2017.
+
+<a id="ref-5"></a>[5] Anthony Hu, Lloyd Russell, Hudson Yeo, Zak Murez, George Fedoseev, Alex Kendall, et al. [GAIA-1: A Generative World Model for Autonomous Driving](https://arxiv.org/abs/2309.17080). arXiv preprint, 2023.
+
+<a id="ref-6"></a>[6] Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). arXiv preprint, 2024.
+
+<a id="ref-7"></a>[7] Danijar Hafner, Jurgis Pasukonis, Jimmy Ba, and Timothy Lillicrap. [Mastering Diverse Domains through World Models](https://arxiv.org/abs/2301.04104). arXiv preprint, 2023.

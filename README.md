@@ -47,10 +47,10 @@ flowchart LR
 
 | 主线 | 典型表示 | 生成或预测机制 | 代表工作 | 主要瓶颈 |
 |---|---|---|---|---|
-| 传统与预测 | 光流、运动场、像素或 latent | Warping、状态空间、CNN/RNN | Video Textures、ConvLSTM、CDNA | 多模态未来与误差累积 |
-| 生成模型 | 连续 latent、随机变量、噪声 | VAE、GAN、Diffusion、Flow | MoCoGAN、DVD-GAN、Video Diffusion、Sora | 训练稳定性、采样成本、长程一致性 |
-| 大模型 | 时空 token、spacetime patch、多模态 latent | Transformer、masked modeling、foundation model post-training | VideoGPT、MAGVIT、Sora、Cosmos | 数据治理、上下文长度、可控性 |
-| 应用与 World Model | 状态、动作、记忆、交互环境 | 条件 rollout、编辑闭环、规划、仿真 | Dreamer、Genie、GameNGen、GWM-1、Cosmos | 因果性、状态持久性、闭环可靠性 |
+| 传统与预测 | 光流、运动场、像素或 latent | Warping、状态空间、CNN/RNN | Video Textures [[1]](#ref-1)、ConvLSTM [[3]](#ref-3)、CDNA [[4]](#ref-4) | 多模态未来与误差累积 |
+| 生成模型 | 连续 latent、随机变量、噪声 | VAE、GAN、Diffusion、Flow | MoCoGAN [[5]](#ref-5)、DVD-GAN [[6]](#ref-6)、Video Diffusion [[10]](#ref-10)、Sora [[14]](#ref-14) | 训练稳定性、采样成本、长程一致性 |
+| 大模型 | 时空 token、spacetime patch、多模态 latent | Transformer、masked modeling、foundation model post-training | VideoGPT [[7]](#ref-7)、MAGVIT [[9]](#ref-9)、Sora、Cosmos [[19]](#ref-19) | 数据治理、上下文长度、可控性 |
+| 应用与 World Model | 状态、动作、记忆、交互环境 | 条件 rollout、编辑闭环、规划、仿真 | Dreamer、Genie [[15]](#ref-15)、GameNGen [[16]](#ref-16)、GWM-1 [[18]](#ref-18)、Cosmos | 因果性、状态持久性、闭环可靠性 |
 
 ## 必须分清的三个概念
 
@@ -86,12 +86,12 @@ $$
 
 ## 里程碑速览
 
-- **2000–2003**：Video Textures、Dynamic Textures，用重组与线性动力系统合成可持续运动。
+- **2000–2003**：Video Textures、Dynamic Textures [[2]](#ref-2)，用重组与线性动力系统合成可持续运动。
 - **2014–2016**：LSTM、ConvLSTM、Beyond MSE、CDNA，把视频预测变成端到端学习问题。
 - **2016–2019**：Video GAN、MoCoGAN、DVD-GAN 探索内容—运动解耦和高分辨率生成。
-- **2021–2023**：VideoGPT、Phenaki、MAGVIT 将视频压缩成视觉 token 后用 Transformer 建模。
-- **2022–2024**：Video Diffusion、Imagen Video、Make-A-Video、Lumiere、Sora 推动 diffusion 成为主流。
-- **2024–2025**：Genie、GameNGen、Genie 3、GWM-1 把焦点推向潜在动作、物理预测和实时交互。
+- **2021–2023**：VideoGPT、Phenaki [[8]](#ref-8)、MAGVIT 将视频压缩成视觉 token 后用 Transformer 建模。
+- **2022–2024**：Video Diffusion、Imagen Video [[12]](#ref-12)、Make-A-Video [[11]](#ref-11)、Lumiere [[13]](#ref-13)、Sora 推动 diffusion 成为主流。
+- **2024–2025**：Genie、GameNGen、Genie 3 [[17]](#ref-17)、GWM-1 把焦点推向潜在动作、物理预测和实时交互。
 - **2025–2026**：GWM-1、Cosmos 系列等开始统一视频、声音、动作、规划和 Physical AI。
 
 详细版本见 [技术时间线](docs/timeline.md)。
@@ -167,3 +167,43 @@ $$
 ## License
 
 本仓库以 [MIT License](LICENSE) 发布。论文、数据集、模型及第三方材料仍遵循各自的许可证和使用条款。
+
+## 参考文献
+
+<a id="ref-1"></a>[1] Arno Schödl, Richard Szeliski, David H. Salesin, and Irfan Essa. [Video textures](https://doi.org/10.1145/344779.345012). Proceedings of the 27th annual conference on Computer graphics and interactive techniques - SIGGRAPH '00, 2000.
+
+<a id="ref-2"></a>[2] Gianfranco Doretto, Alessandro Chiuso, Ying Nian Wu, and Stefano Soatto. [Dynamic Textures](https://doi.org/10.1023/A:1021669406132). International Journal of Computer Vision, 2003.
+
+<a id="ref-3"></a>[3] Xingjian Shi, Zhourong Chen, Hao Wang, Dit-Yan Yeung, Wai-kin Wong, and Wang-chun Woo. [Convolutional LSTM Network: A Machine Learning Approach for Precipitation Nowcasting](https://arxiv.org/abs/1506.04214). arXiv preprint, 2015.
+
+<a id="ref-4"></a>[4] Chelsea Finn, Ian Goodfellow, and Sergey Levine. [Unsupervised Learning for Physical Interaction through Video Prediction](https://arxiv.org/abs/1605.07157). arXiv preprint, 2016.
+
+<a id="ref-5"></a>[5] Sergey Tulyakov, Ming-Yu Liu, Xiaodong Yang, and Jan Kautz. [MoCoGAN: Decomposing Motion and Content for Video Generation](https://arxiv.org/abs/1707.04993). arXiv preprint, 2017.
+
+<a id="ref-6"></a>[6] Aidan Clark, Jeff Donahue, and Karen Simonyan. [Adversarial Video Generation on Complex Datasets](https://arxiv.org/abs/1907.06571). arXiv preprint, 2019.
+
+<a id="ref-7"></a>[7] Wilson Yan, Yunzhi Zhang, Pieter Abbeel, and Aravind Srinivas. [VideoGPT: Video Generation using VQ-VAE and Transformers](https://arxiv.org/abs/2104.10157). arXiv preprint, 2021.
+
+<a id="ref-8"></a>[8] Ruben Villegas, Mohammad Babaeizadeh, Pieter-Jan Kindermans, Hernan Moraldo, Han Zhang, Mohammad Taghi Saffar, et al. [Phenaki: Variable Length Video Generation From Open Domain Textual Description](https://arxiv.org/abs/2210.02399). arXiv preprint, 2022.
+
+<a id="ref-9"></a>[9] Lijun Yu, Yong Cheng, Kihyuk Sohn, José Lezama, Han Zhang, Huiwen Chang, et al. [MAGVIT: Masked Generative Video Transformer](https://arxiv.org/abs/2212.05199). arXiv preprint, 2022.
+
+<a id="ref-10"></a>[10] Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, and David J. Fleet. [Video Diffusion Models](https://arxiv.org/abs/2204.03458). arXiv preprint, 2022.
+
+<a id="ref-11"></a>[11] Uriel Singer, Adam Polyak, Thomas Hayes, Xi Yin, Jie An, Songyang Zhang, et al. [Make-A-Video: Text-to-Video Generation without Text-Video Data](https://arxiv.org/abs/2209.14792). arXiv preprint, 2022.
+
+<a id="ref-12"></a>[12] Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey Gritsenko, et al. [Imagen Video: High Definition Video Generation with Diffusion Models](https://arxiv.org/abs/2210.02303). arXiv preprint, 2022.
+
+<a id="ref-13"></a>[13] Omer Bar-Tal, Hila Chefer, Omer Tov, Charles Herrmann, Roni Paiss, Shiran Zada, et al. [Lumiere: A Space-Time Diffusion Model for Video Generation](https://arxiv.org/abs/2401.12945). arXiv preprint, 2024.
+
+<a id="ref-14"></a>[14] OpenAI. [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). Technical report, 2024.
+
+<a id="ref-15"></a>[15] Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). arXiv preprint, 2024.
+
+<a id="ref-16"></a>[16] Dani Valevski, Yaniv Leviathan, Moab Arar, and Shlomi Fruchter. [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837). arXiv preprint, 2024.
+
+<a id="ref-17"></a>[17] Google DeepMind. [Genie 3: A New Frontier for World Models](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/). Project report, 2025.
+
+<a id="ref-18"></a>[18] Runway. [Introducing Runway GWM-1](https://runway.com/research/introducing-runway-gwm-1). Project report, 2025.
+
+<a id="ref-19"></a>[19] NVIDIA, Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, et al. [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). arXiv preprint, 2025.
