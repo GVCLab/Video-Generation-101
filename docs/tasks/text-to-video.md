@@ -9,14 +9,14 @@ Text-to-video（T2V）输入自然语言描述，输出符合语义、动作、�
 | 阶段 | 代表方法 | 技术核心 | 主要变化 |
 |---|---|---|---|
 | 模板与检索 | 视频检索、模板动画、procedural animation | 用文本匹配已有片段或参数化动画 | 生成性弱，可控但不开放 |
-| 文本条件 GAN | TGAN / text-conditioned video GAN 变体 | 文本 embedding + 时空生成器 | 能生成短片，但质量和语义有限 |
-| Transformer token | Phenaki、VideoPoet、MAGVIT 系列 | video tokenizer + masked / autoregressive generation | 支持变长、组合语义和多任务条件 |
-| Diffusion | Make-A-Video、Imagen Video、ModelScope、AnimateDiff、Lumiere | 文本编码器 + temporal U-Net / DiT | 画质和 prompt following 快速提升 |
-| 大规模基础模型 | Sora、Veo、Kling、Seedance、Cosmos | spacetime patch、长上下文、多模态训练 | 强化长视频、物理、镜头和音视频同步 |
+| 文本条件 GAN | TGAN / text-conditioned video GAN 变体、Video GAN [@vondrick2016generating] | 文本 embedding + 时空生成器 | 能生成短片，但质量和语义有限 |
+| Transformer token | Phenaki [@villegas2022phenaki]、MAGVIT 系列 [@yu2022magvit; @yu2023language] | video tokenizer + masked / autoregressive generation | 支持变长、组合语义和多任务条件 |
+| Diffusion | Make-A-Video [@singer2022make]、Imagen Video [@ho2022imagen]、AnimateDiff [@guo2023animatediff]、Lumiere [@bartal2024lumiere] | 文本编码器 + temporal U-Net / DiT | 画质和 prompt following 快速提升 |
+| 大规模基础模型 | Sora [@openai2024sora]、Cosmos [@nvidia2025cosmos] | spacetime patch、长上下文、多模态训练 | 强化长视频、物理、镜头和音视频同步 |
 
 ## 技术演化逻辑
 
-T2V 的难点不是“把文字变成几帧图像”，而是把语言中的动作、时间顺序、物体关系和镜头语言转成连续视觉事件。早期方法通常只能生成短、粗糙、语义较弱的视频。Diffusion 以后，模型可以复用图像生成的语义能力，再通过 temporal layer 或时空注意力学习运动。基础模型阶段则进一步把不同长度、分辨率和宽高比的视频统一成时空 token 或 patch。
+T2V 的难点不是“把文字变成几帧图像”，而是把语言中的动作、时间顺序、物体关系和镜头语言转成连续视觉事件。早期方法通常只能生成短、粗糙、语义较弱的视频 [@vondrick2016generating]。Phenaki 和 MAGVIT 将视频压缩为 token，使变长和 masked generation 成为主线之一 [@villegas2022phenaki; @yu2022magvit]。Diffusion 以后，模型可以复用图像生成的语义能力，再通过 temporal layer 或时空注意力学习运动 [@singer2022make; @ho2022imagen; @bartal2024lumiere]。基础模型阶段则进一步把不同长度、分辨率和宽高比的视频统一成时空 token 或 patch [@openai2024sora; @nvidia2025cosmos]。
 
 ## 最新趋势
 
@@ -40,10 +40,16 @@ T2V 的难点不是“把文字变成几帧图像”，而是把语言中的动�
 3. 物理合理性来自数据规模、架构偏置还是外部模拟器约束？
 4. 安全、版权、肖像和水印如何与生成质量一起设计？
 
-## 推荐阅读
+## 参考文献
 
-- Make-A-Video、Imagen Video：大规模 T2V diffusion 的早期代表。
-- Phenaki、MAGVIT、VideoPoet：token / Transformer 路线。
-- Lumiere：完整时间范围的 Space-Time U-Net。
-- Sora technical report：大规模视频生成与 world simulator 讨论。
-- 2024-2026 T2V survey：用于补充产品和开放模型谱系。
+- [@vondrick2016generating] Generating Videos with Scene Dynamics：早期视频 GAN，可作为文本条件视频生成前史。
+- [@villegas2022phenaki] Phenaki：开放域文本到变长视频。
+- [@yu2022magvit] MAGVIT：masked video token generation。
+- [@yu2023language] MAGVIT-v2 / tokenizer-is-key：视觉 tokenizer 与 LM 路线。
+- [@singer2022make] Make-A-Video：无文本视频对的大规模 T2V。
+- [@ho2022imagen] Imagen Video：级联 diffusion T2V。
+- [@guo2023animatediff] AnimateDiff：可复用 motion module。
+- [@bartal2024lumiere] Lumiere：完整时间范围生成。
+- [@openai2024sora] Sora technical report：大规模视频生成与 world simulator 讨论。
+- [@nvidia2025cosmos] Cosmos：world foundation model 平台。
+- [Sora as a World Model? A Complete Survey on Text-to-Video Generation](https://arxiv.org/html/2403.05131v3)：2024-2026 T2V 与 world model survey。

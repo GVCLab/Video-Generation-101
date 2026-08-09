@@ -9,15 +9,15 @@ Video inpainting 输入视频和 mask，补全被遮挡、删除或缺失的区�
 | 阶段 | 代表方法 | 技术核心 | 局限 |
 |---|---|---|---|
 | 传统补全 | exemplar-based inpainting、patch match | 从邻域或其他帧复制纹理 | 语义生成弱 |
-| Flow-guided | optical flow propagation、FGVC | 传播可见区域再补洞 | 依赖 flow 与可见参考 |
+| Flow-guided | optical flow propagation [@lucas1981iterative; @horn1981determining]、FGVC | 传播可见区域再补洞 | 依赖 flow 与可见参考 |
 | 深度修复 | 3D CNN、attention、transformer inpainting | 学习时空上下文 | 大 mask 和长视频困难 |
-| Diffusion inpainting | text-guided video inpainting、DiffuEraser | 强生成先验 + mask 条件 | 计算贵、时间一致性问题 |
+| Diffusion inpainting | text-guided video inpainting、DiffuEraser、Video Diffusion Models [@ho2022video] | 强生成先验 + mask 条件 | 计算贵、时间一致性问题 |
 | DiT inpainting | VideoPainter、DiTPainter、EraserDiT | diffusion transformer 与长程注意力 | 长视频 memory 与效率 |
 | 统一长视频 | long video inpainting/outpainting | overlapping windows、memory、global consistency | 边界融合和状态漂移 |
 
 ## 技术演化逻辑
 
-传统 inpainting 假设缺失区域可以从附近复制；深度模型开始学习语义补全；diffusion 则把“补洞”变成条件生成。视频比图像更难，因为补全区域必须在时间上稳定，还要处理被删除对象后的背景、光照、遮挡和运动连续性。
+传统 inpainting 假设缺失区域可以从附近复制；视频版本还需要光流或轨迹把可见内容沿时间传播 [@lucas1981iterative; @horn1981determining]。深度模型开始学习语义补全；diffusion 则把“补洞”变成条件生成 [@ho2022video]。视频比图像更难，因为补全区域必须在时间上稳定，还要处理被删除对象后的背景、光照、遮挡和运动连续性。
 
 ## 最新趋势
 
@@ -41,9 +41,13 @@ Video inpainting 输入视频和 mask，补全被遮挡、删除或缺失的区�
 3. 对象删除后，被遮挡过的区域是否应该遵循物理和几何？
 4. 如何评估没有 ground truth 的创作型补全？
 
-## 推荐阅读
+## 参考文献
 
-- PatchMatch / exemplar inpainting：传统补全思想。
-- Flow-guided video completion：显式运动传播。
-- VideoPainter、DiTPainter、EraserDiT：DiT video inpainting。
-- Unified long video inpainting/outpainting：长视频统一修复趋势。
+- [@lucas1981iterative] Lucas-Kanade：光流传播基础。
+- [@horn1981determining] Horn-Schunck：密集光流。
+- [@ho2022video] Video Diffusion Models：扩散视频补全的生成基础。
+- [VideoPainter](https://arxiv.org/html/2503.05639v1)：任意长度 text-guided video inpainting / editing。
+- [DiTPainter](https://arxiv.org/html/2504.15661v3)：efficient video inpainting with diffusion transformers。
+- [EraserDiT](https://arxiv.org/html/2506.12853v1)：fast DiT video inpainting。
+- [FloED](https://arxiv.org/html/2412.00857v3)：flow-guided efficient diffusion。
+- [Unified Long Video Inpainting and Outpainting](https://arxiv.org/html/2511.03272v1)：长视频统一修复趋势。

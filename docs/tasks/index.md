@@ -6,6 +6,8 @@
 
 本轮补充的手动核验记录保存在 [video generation tasks research audit](../../sources/research_20260809_video_generation_tasks_manual.md)。仓库已有正式 BibTeX 与 GitHub star 快照仍以 [引用与代码索引](../bibliography.md) 为准。
 
+各子文档正文采用 `[@yan2021videogpt]` 这类 cite key 标注文献；这些 cite key 对应 [完整 BibTeX](../../bibliography/references.bib)。少数尚未纳入正式 BibTeX 的最新工作，会在对应文档的“参考文献”中以论文链接列出。
+
 ## 子文档
 
 | 任务 | 子文档 | 核心问题 |
@@ -37,3 +39,10 @@ flowchart LR
 ```
 
 一个实用的判断规则：越靠右，模型越不能只靠“看起来合理”来评估；它必须越来越多地接受反事实、状态保持和闭环控制测试。
+
+## 参考文献
+
+- [@yan2021videogpt] VideoGPT：示例 cite key，说明本文档集的引用格式。
+- [@ho2022video] Video Diffusion Models：覆盖多类生成任务的基础参考。
+- [@openai2024sora] Sora technical report：视频基础模型与 world simulator 讨论。
+- [video generation tasks research audit](../../sources/research_20260809_video_generation_tasks_manual.md)：本目录补充来源的手动核验记录。

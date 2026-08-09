@@ -8,16 +8,16 @@ Image-to-video（I2V）输入一张或多张参考图，生成保持主体、身
 
 | 阶段 | 代表方法 | 技术核心 | 主要难点 |
 |---|---|---|---|
-| 传统动画 | morphing、optical flow、image warping | 手工或估计运动场 | 大运动和新出现区域困难 |
+| 传统动画 | morphing、optical flow [@lucas1981iterative; @horn1981determining]、image warping | 手工或估计运动场 | 大运动和新出现区域困难 |
 | 运动迁移 | pose / keypoint / flow conditioned animation | 姿态、关键点、轨迹驱动 | 依赖特定类别或模板 |
-| GAN / VAE | image animation GAN、motion-content disentanglement | 静态内容 + 动态 latent | 身份保持和复杂运动不足 |
-| Diffusion I2V | Stable Video Diffusion、DynamiCrafter、I2VGen-XL | 首帧条件 + temporal diffusion | 运动可控性与细节保持冲突 |
+| GAN / VAE | MoCoGAN [@tulyakov2017mocogan]、SVG [@denton2018stochastic] | 静态内容 + 动态 latent | 身份保持和复杂运动不足 |
+| Diffusion I2V | Stable Video Diffusion [@blattmann2023stable]、DynamiCrafter、I2VGen-XL | 首帧条件 + temporal diffusion | 运动可控性与细节保持冲突 |
 | Foundation I2V | 多参考、轨迹、相机和音频条件模型 | 统一视觉条件接口 | 多条件冲突、长时漂移 |
 | 轻量与实时 | MobileI2V、蒸馏/剪枝/少步采样 | 小模型和低延迟生成 | 质量、速度和分辨率三角权衡 |
 
 ## 技术演化逻辑
 
-I2V 的核心矛盾是“保留静态信息”和“创造动态变化”。保留太强，视频只是轻微抖动；运动太强，主体身份、纹理和布局会漂移。早期 warping 方法可控但不擅长 hallucinate 新区域；diffusion 模型能补全不可见区域，但容易改变原图身份。现代 I2V 因此越来越强调 motion control、camera control、reference preservation 和 temporal consistency。
+I2V 的核心矛盾是“保留静态信息”和“创造动态变化”。保留太强，视频只是轻微抖动；运动太强，主体身份、纹理和布局会漂移。早期 warping 方法依赖光流和图像配准，控制性强但不擅长 hallucinate 新区域 [@lucas1981iterative; @horn1981determining]。MoCoGAN 和 SVG 等工作把静态内容与动态 latent 的分离推到深度生成框架中 [@tulyakov2017mocogan; @denton2018stochastic]。Stable Video Diffusion 以后，I2V diffusion 能补全不可见区域，但也带来身份漂移与运动控制问题 [@blattmann2023stable]。现代 I2V 因此越来越强调 motion control、camera control、reference preservation 和 temporal consistency。
 
 ## 最新趋势
 
@@ -41,9 +41,14 @@ I2V 的核心矛盾是“保留静态信息”和“创造动态变化”。保�
 3. 是否需要显式 3D 表示才能解决相机绕行和遮挡？
 4. I2V 与 V2V、inpainting、story generation 的边界会不会逐渐消失？
 
-## 推荐阅读
+## 参考文献
 
-- Latent Motion Diffusion：把 I2V 视作 motion latent 生成。
-- Stable Video Diffusion：开放 I2V baseline。
-- DynamiCrafter / I2VGen-XL：开放域图像动画。
-- AnyI2V、MobileI2V：运动控制与轻量化方向。
+- [@lucas1981iterative] Lucas-Kanade optical flow：传统运动估计基础。
+- [@horn1981determining] Horn-Schunck optical flow：密集光流基础。
+- [@tulyakov2017mocogan] MoCoGAN：内容与运动 latent 解耦。
+- [@denton2018stochastic] Stochastic Video Generation with a Learned Prior：随机未来与视频 latent。
+- [@blattmann2023stable] Stable Video Diffusion：开放 I2V baseline。
+- [Latent Motion Diffusion for Image-Conditional Video Generation](https://arxiv.org/html/2304.11603v2)：把 I2V 视作 motion latent 生成。
+- [Unified Text-Image-to-Video Generation](https://arxiv.org/html/2505.20629v3)：TI2V 统一条件接口。
+- [AnyI2V](https://arxiv.org/html/2507.02857v1)：任意条件图像与运动控制。
+- [MobileI2V](https://arxiv.org/html/2511.21475v1)：移动端 I2V 与轻量化。
