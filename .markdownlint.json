@@ -3,5 +3,8 @@
   "MD024": {
     "siblings_only": true
   },
+  "MD033": {
+    "allowed_elements": ["a"]
+  },
   "MD060": false
 }

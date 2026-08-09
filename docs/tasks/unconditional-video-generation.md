@@ -8,16 +8,16 @@
 
 | 阶段 | 代表方法 | 技术核心 | 局限 |
 |---|---|---|---|
-| 传统合成 | Video Textures [@schodl2000video]、Dynamic Textures [@doretto2003dynamic] | 重组相似帧或学习线性动态系统 | 适合循环纹理，不适合开放语义 |
-| 早期深度生成 | Video GAN [@vondrick2016generating]、MoCoGAN [@tulyakov2017mocogan] | 时空卷积、内容/运动 latent 解耦 | 分辨率低、训练不稳定 |
-| 大型 GAN | DVD-GAN [@clark2019adversarial]、DIGAN | 多尺度判别器、隐式动态建模 | mode collapse、难扩展到开放世界 |
-| Token / AR | VQ-VAE [@oord2017neural]、VideoGPT [@yan2021videogpt]、MAGVIT [@yu2022magvit] | video tokenizer + Transformer | token 数量大，采样慢 |
-| Diffusion / DiT | DDPM [@ho2020denoising]、Video Diffusion Models [@ho2022video]、latent video diffusion [@blattmann2023align] | 从噪声迭代还原视频分布 | 推理成本高，长程一致性难 |
-| Foundation model | Sora [@openai2024sora]、Cosmos [@nvidia2025cosmos] | 大规模视频数据、spacetime patch、多任务后训练 | 数据治理、评测和可解释性复杂 |
+| 传统合成 | Video Textures [[1]](#ref-1)、Dynamic Textures [[2]](#ref-2) | 重组相似帧或学习线性动态系统 | 适合循环纹理，不适合开放语义 |
+| 早期深度生成 | Video GAN [[3]](#ref-3)、MoCoGAN [[4]](#ref-4) | 时空卷积、内容/运动 latent 解耦 | 分辨率低、训练不稳定 |
+| 大型 GAN | DVD-GAN [[5]](#ref-5)、DIGAN | 多尺度判别器、隐式动态建模 | mode collapse、难扩展到开放世界 |
+| Token / AR | VQ-VAE [[6]](#ref-6)、VideoGPT [[7]](#ref-7)、MAGVIT [[8]](#ref-8) | video tokenizer + Transformer | token 数量大，采样慢 |
+| Diffusion / DiT | DDPM [[9]](#ref-9)、Video Diffusion Models [[10]](#ref-10)、latent video diffusion [[11]](#ref-11) | 从噪声迭代还原视频分布 | 推理成本高，长程一致性难 |
+| Foundation model | Sora [[12]](#ref-12)、Cosmos [[13]](#ref-13) | 大规模视频数据、spacetime patch、多任务后训练 | 数据治理、评测和可解释性复杂 |
 
 ## 技术演化逻辑
 
-早期无条件生成主要关心“视频是否像真实数据”。Video Textures 和 Dynamic Textures 代表了深度学习前的数据重组与状态空间路线 [@schodl2000video; @doretto2003dynamic]。GAN 时代通过判别器获得锐利样本，但覆盖度与稳定性较弱 [@vondrick2016generating; @tulyakov2017mocogan; @clark2019adversarial]。Tokenizer 与 Transformer 把视频转为序列，使似然建模和大规模自回归成为可能 [@yan2021videogpt; @yu2022magvit]。Diffusion 则把训练稳定性、样本质量和多样性推到新的水平，成为现代视频基础模型的主要底座 [@ho2022video; @blattmann2023stable; @bartal2024lumiere]。
+早期无条件生成主要关心“视频是否像真实数据”。Video Textures 和 Dynamic Textures 代表了深度学习前的数据重组与状态空间路线 [[1]](#ref-1), [[2]](#ref-2)。GAN 时代通过判别器获得锐利样本，但覆盖度与稳定性较弱 [[3]](#ref-3), [[4]](#ref-4), [[5]](#ref-5)。Tokenizer 与 Transformer 把视频转为序列，使似然建模和大规模自回归成为可能 [[7]](#ref-7), [[8]](#ref-8)。Diffusion 则把训练稳定性、样本质量和多样性推到新的水平，成为现代视频基础模型的主要底座 [[10]](#ref-10), [[14]](#ref-14), [[15]](#ref-15)。
 
 今天无条件生成通常不再作为产品入口出现，因为纯随机视频很难控制；但它仍然是理解生成模型本体能力的关键：模型能否学到运动先验、场景统计、对象持久性和物理规律。
 
@@ -37,17 +37,32 @@
 
 ## 参考文献
 
-- [@schodl2000video] Video Textures：传统数据驱动视频重组。
-- [@doretto2003dynamic] Dynamic Textures：线性动态系统视频纹理。
-- [@vondrick2016generating] Generating Videos with Scene Dynamics：早期视频 GAN。
-- [@tulyakov2017mocogan] MoCoGAN：内容与运动解耦。
-- [@clark2019adversarial] DVD-GAN：大型视频 GAN。
-- [@oord2017neural] VQ-VAE：离散视觉 token 基础。
-- [@yan2021videogpt] VideoGPT：VQ-VAE + Transformer 视频生成。
-- [@yu2022magvit] MAGVIT：masked generative video transformer。
-- [@ho2020denoising] DDPM：现代 diffusion 基础。
-- [@ho2022video] Video Diffusion Models：diffusion 视频生成。
-- [@blattmann2023stable] Stable Video Diffusion：开放 latent video diffusion baseline。
-- [@bartal2024lumiere] Lumiere：Space-Time U-Net。
-- [@openai2024sora] Sora technical report：spacetime patch 与 world simulator 讨论。
-- [@nvidia2025cosmos] Cosmos：Physical AI world foundation model。
+<a id="ref-1"></a>[1] Arno Schödl, Richard Szeliski, David H. Salesin, and Irfan Essa. [Video textures](https://doi.org/10.1145/344779.345012). Proceedings of the 27th annual conference on Computer graphics and interactive techniques - SIGGRAPH '00, 2000.
+
+<a id="ref-2"></a>[2] Gianfranco Doretto, Alessandro Chiuso, Ying Nian Wu, and Stefano Soatto. [Dynamic Textures](https://doi.org/10.1023/A:1021669406132). International Journal of Computer Vision, 2003.
+
+<a id="ref-3"></a>[3] Carl Vondrick, Hamed Pirsiavash, and Antonio Torralba. [Generating Videos with Scene Dynamics](https://arxiv.org/abs/1609.02612). arXiv preprint, 2016.
+
+<a id="ref-4"></a>[4] Sergey Tulyakov, Ming-Yu Liu, Xiaodong Yang, and Jan Kautz. [MoCoGAN: Decomposing Motion and Content for Video Generation](https://arxiv.org/abs/1707.04993). arXiv preprint, 2017.
+
+<a id="ref-5"></a>[5] Aidan Clark, Jeff Donahue, and Karen Simonyan. [Adversarial Video Generation on Complex Datasets](https://arxiv.org/abs/1907.06571). arXiv preprint, 2019.
+
+<a id="ref-6"></a>[6] Aaron van den Oord, Oriol Vinyals, and Koray Kavukcuoglu. [Neural Discrete Representation Learning](https://arxiv.org/abs/1711.00937). arXiv preprint, 2017.
+
+<a id="ref-7"></a>[7] Wilson Yan, Yunzhi Zhang, Pieter Abbeel, and Aravind Srinivas. [VideoGPT: Video Generation using VQ-VAE and Transformers](https://arxiv.org/abs/2104.10157). arXiv preprint, 2021.
+
+<a id="ref-8"></a>[8] Lijun Yu, Yong Cheng, Kihyuk Sohn, José Lezama, Han Zhang, Huiwen Chang, et al. [MAGVIT: Masked Generative Video Transformer](https://arxiv.org/abs/2212.05199). arXiv preprint, 2022.
+
+<a id="ref-9"></a>[9] Jonathan Ho, Ajay Jain, and Pieter Abbeel. [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239). arXiv preprint, 2020.
+
+<a id="ref-10"></a>[10] Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, and David J. Fleet. [Video Diffusion Models](https://arxiv.org/abs/2204.03458). arXiv preprint, 2022.
+
+<a id="ref-11"></a>[11] Andreas Blattmann, Robin Rombach, Huan Ling, Tim Dockhorn, Seung Wook Kim, Sanja Fidler, et al. [Align your Latents: High-Resolution Video Synthesis with Latent Diffusion Models](https://arxiv.org/abs/2304.08818). arXiv preprint, 2023.
+
+<a id="ref-12"></a>[12] OpenAI. [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). Technical report, 2024.
+
+<a id="ref-13"></a>[13] NVIDIA, Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, et al. [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). arXiv preprint, 2025.
+
+<a id="ref-14"></a>[14] Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). arXiv preprint, 2023.
+
+<a id="ref-15"></a>[15] Omer Bar-Tal, Hila Chefer, Omer Tov, Charles Herrmann, Roni Paiss, Shiran Zada, et al. [Lumiere: A Space-Time Diffusion Model for Video Generation](https://arxiv.org/abs/2401.12945). arXiv preprint, 2024.

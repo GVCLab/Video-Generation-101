@@ -6,7 +6,7 @@
 
 本轮补充的手动核验记录保存在 [video generation tasks research audit](../../sources/research_20260809_video_generation_tasks_manual.md)。仓库已有正式 BibTeX 与 GitHub star 快照仍以 [引用与代码索引](../bibliography.md) 为准。
 
-各子文档正文采用 `[@yan2021videogpt]` 这类 cite key 标注文献；这些 cite key 对应 [完整 BibTeX](../../bibliography/references.bib)。少数尚未纳入正式 BibTeX 的最新工作，会在对应文档的“参考文献”中以论文链接列出。
+各子文档正文采用 `[[1]](#ref-1)` 这类可跳转编号引用；文末参考文献采用 CVPR-like 的编号格式。正式条目来自 [完整 BibTeX](../../bibliography/references.bib)，少数尚未纳入 BibTeX 的最新工作会以论文链接列出。
 
 ## 子文档
 
@@ -42,7 +42,10 @@ flowchart LR
 
 ## 参考文献
 
-- [@yan2021videogpt] VideoGPT：示例 cite key，说明本文档集的引用格式。
-- [@ho2022video] Video Diffusion Models：覆盖多类生成任务的基础参考。
-- [@openai2024sora] Sora technical report：视频基础模型与 world simulator 讨论。
-- [video generation tasks research audit](../../sources/research_20260809_video_generation_tasks_manual.md)：本目录补充来源的手动核验记录。
+<a id="ref-1"></a>[1] Wilson Yan, Yunzhi Zhang, Pieter Abbeel, and Aravind Srinivas. [VideoGPT: Video Generation using VQ-VAE and Transformers](https://arxiv.org/abs/2104.10157). arXiv preprint, 2021.
+
+<a id="ref-2"></a>[2] Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, and David J. Fleet. [Video Diffusion Models](https://arxiv.org/abs/2204.03458). arXiv preprint, 2022.
+
+<a id="ref-3"></a>[3] OpenAI. [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). Technical report, 2024.
+
+<a id="ref-4"></a>[4] [video generation tasks research audit](../../sources/research_20260809_video_generation_tasks_manual.md). 本目录补充来源的手动核验记录.

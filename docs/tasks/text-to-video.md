@@ -9,14 +9,14 @@ Text-to-video（T2V）输入自然语言描述，输出符合语义、动作、�
 | 阶段 | 代表方法 | 技术核心 | 主要变化 |
 |---|---|---|---|
 | 模板与检索 | 视频检索、模板动画、procedural animation | 用文本匹配已有片段或参数化动画 | 生成性弱，可控但不开放 |
-| 文本条件 GAN | TGAN / text-conditioned video GAN 变体、Video GAN [@vondrick2016generating] | 文本 embedding + 时空生成器 | 能生成短片，但质量和语义有限 |
-| Transformer token | Phenaki [@villegas2022phenaki]、MAGVIT 系列 [@yu2022magvit; @yu2023language] | video tokenizer + masked / autoregressive generation | 支持变长、组合语义和多任务条件 |
-| Diffusion | Make-A-Video [@singer2022make]、Imagen Video [@ho2022imagen]、AnimateDiff [@guo2023animatediff]、Lumiere [@bartal2024lumiere] | 文本编码器 + temporal U-Net / DiT | 画质和 prompt following 快速提升 |
-| 大规模基础模型 | Sora [@openai2024sora]、Cosmos [@nvidia2025cosmos] | spacetime patch、长上下文、多模态训练 | 强化长视频、物理、镜头和音视频同步 |
+| 文本条件 GAN | TGAN / text-conditioned video GAN 变体、Video GAN [[1]](#ref-1) | 文本 embedding + 时空生成器 | 能生成短片，但质量和语义有限 |
+| Transformer token | Phenaki [[2]](#ref-2)、MAGVIT 系列 [[3]](#ref-3), [[4]](#ref-4) | video tokenizer + masked / autoregressive generation | 支持变长、组合语义和多任务条件 |
+| Diffusion | Make-A-Video [[5]](#ref-5)、Imagen Video [[6]](#ref-6)、AnimateDiff [[7]](#ref-7)、Lumiere [[8]](#ref-8) | 文本编码器 + temporal U-Net / DiT | 画质和 prompt following 快速提升 |
+| 大规模基础模型 | Sora [[9]](#ref-9)、Cosmos [[10]](#ref-10) | spacetime patch、长上下文、多模态训练 | 强化长视频、物理、镜头和音视频同步 |
 
 ## 技术演化逻辑
 
-T2V 的难点不是“把文字变成几帧图像”，而是把语言中的动作、时间顺序、物体关系和镜头语言转成连续视觉事件。早期方法通常只能生成短、粗糙、语义较弱的视频 [@vondrick2016generating]。Phenaki 和 MAGVIT 将视频压缩为 token，使变长和 masked generation 成为主线之一 [@villegas2022phenaki; @yu2022magvit]。Diffusion 以后，模型可以复用图像生成的语义能力，再通过 temporal layer 或时空注意力学习运动 [@singer2022make; @ho2022imagen; @bartal2024lumiere]。基础模型阶段则进一步把不同长度、分辨率和宽高比的视频统一成时空 token 或 patch [@openai2024sora; @nvidia2025cosmos]。
+T2V 的难点不是“把文字变成几帧图像”，而是把语言中的动作、时间顺序、物体关系和镜头语言转成连续视觉事件。早期方法通常只能生成短、粗糙、语义较弱的视频 [[1]](#ref-1)。Phenaki 和 MAGVIT 将视频压缩为 token，使变长和 masked generation 成为主线之一 [[2]](#ref-2), [[3]](#ref-3)。Diffusion 以后，模型可以复用图像生成的语义能力，再通过 temporal layer 或时空注意力学习运动 [[5]](#ref-5), [[6]](#ref-6), [[8]](#ref-8)。基础模型阶段则进一步把不同长度、分辨率和宽高比的视频统一成时空 token 或 patch [[9]](#ref-9), [[10]](#ref-10)。
 
 ## 最新趋势
 
@@ -42,14 +42,24 @@ T2V 的难点不是“把文字变成几帧图像”，而是把语言中的动�
 
 ## 参考文献
 
-- [@vondrick2016generating] Generating Videos with Scene Dynamics：早期视频 GAN，可作为文本条件视频生成前史。
-- [@villegas2022phenaki] Phenaki：开放域文本到变长视频。
-- [@yu2022magvit] MAGVIT：masked video token generation。
-- [@yu2023language] MAGVIT-v2 / tokenizer-is-key：视觉 tokenizer 与 LM 路线。
-- [@singer2022make] Make-A-Video：无文本视频对的大规模 T2V。
-- [@ho2022imagen] Imagen Video：级联 diffusion T2V。
-- [@guo2023animatediff] AnimateDiff：可复用 motion module。
-- [@bartal2024lumiere] Lumiere：完整时间范围生成。
-- [@openai2024sora] Sora technical report：大规模视频生成与 world simulator 讨论。
-- [@nvidia2025cosmos] Cosmos：world foundation model 平台。
-- [Sora as a World Model? A Complete Survey on Text-to-Video Generation](https://arxiv.org/html/2403.05131v3)：2024-2026 T2V 与 world model survey。
+<a id="ref-1"></a>[1] Carl Vondrick, Hamed Pirsiavash, and Antonio Torralba. [Generating Videos with Scene Dynamics](https://arxiv.org/abs/1609.02612). arXiv preprint, 2016.
+
+<a id="ref-2"></a>[2] Ruben Villegas, Mohammad Babaeizadeh, Pieter-Jan Kindermans, Hernan Moraldo, Han Zhang, Mohammad Taghi Saffar, et al. [Phenaki: Variable Length Video Generation From Open Domain Textual Description](https://arxiv.org/abs/2210.02399). arXiv preprint, 2022.
+
+<a id="ref-3"></a>[3] Lijun Yu, Yong Cheng, Kihyuk Sohn, José Lezama, Han Zhang, Huiwen Chang, et al. [MAGVIT: Masked Generative Video Transformer](https://arxiv.org/abs/2212.05199). arXiv preprint, 2022.
+
+<a id="ref-4"></a>[4] Lijun Yu, José Lezama, Nitesh B. Gundavarapu, Luca Versari, Kihyuk Sohn, David Minnen, et al. [Language Model Beats Diffusion -- Tokenizer is Key to Visual Generation](https://arxiv.org/abs/2310.05737). arXiv preprint, 2023.
+
+<a id="ref-5"></a>[5] Uriel Singer, Adam Polyak, Thomas Hayes, Xi Yin, Jie An, Songyang Zhang, et al. [Make-A-Video: Text-to-Video Generation without Text-Video Data](https://arxiv.org/abs/2209.14792). arXiv preprint, 2022.
+
+<a id="ref-6"></a>[6] Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey Gritsenko, et al. [Imagen Video: High Definition Video Generation with Diffusion Models](https://arxiv.org/abs/2210.02303). arXiv preprint, 2022.
+
+<a id="ref-7"></a>[7] Yuwei Guo, Ceyuan Yang, Anyi Rao, Zhengyang Liang, Yaohui Wang, Yu Qiao, et al. [AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning](https://arxiv.org/abs/2307.04725). arXiv preprint, 2023.
+
+<a id="ref-8"></a>[8] Omer Bar-Tal, Hila Chefer, Omer Tov, Charles Herrmann, Roni Paiss, Shiran Zada, et al. [Lumiere: A Space-Time Diffusion Model for Video Generation](https://arxiv.org/abs/2401.12945). arXiv preprint, 2024.
+
+<a id="ref-9"></a>[9] OpenAI. [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). Technical report, 2024.
+
+<a id="ref-10"></a>[10] NVIDIA, Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, et al. [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). arXiv preprint, 2025.
+
+<a id="ref-11"></a>[11] [Sora as a World Model? A Complete Survey on Text-to-Video Generation](https://arxiv.org/html/2403.05131v3). 2024-2026 T2V 与 world model survey.
