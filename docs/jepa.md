@@ -18,15 +18,15 @@ JEPA（Joint-Embedding Predictive Architecture，联合嵌入预测架构）的�
 
 一个抽象目标可以写为：
 
-\[
+$$
 z_x=f_\theta(x),\qquad
 z_y=f_{\bar\theta}(y),\qquad
 \hat z_y=g_\phi(z_x,m)
-\]
+$$
 
-\[
+$$
 \mathcal{L}_{\text{pred}} = d\left(\hat z_y,\operatorname{stopgrad}(z_y)\right)
-\]
+$$
 
 其中 $m$ 表示被遮挡目标的位置或时空坐标，$d$ 可以是 L1、L2 或其他表征距离。实际方法还需要防止所有输入都映射到同一个常数向量的 **representation collapse**。
 
