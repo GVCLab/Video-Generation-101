@@ -68,7 +68,7 @@ p(x_{1:T}\mid \text{text, image, audio, video})
 
 ### JEPA-style predictive model
 
-在语义 representation 中预测未来，不要求逐像素还原。优点是更聚焦抽象结构，难点是如何证明 latent 包含规划需要的全部信息。
+在语义 representation 中预测未来，不要求逐像素还原。优点是更聚焦抽象结构，难点是如何证明 latent 包含规划需要的全部信息。完整技术谱系见 [JEPA 路线专章](jepa.md)。
 
 ### Action-conditioned video model
 
@@ -86,7 +86,7 @@ p(x_{1:T}\mid \text{text, image, audio, video})
 
 ### V-JEPA 2
 
-代表“无需生成全部像素，也能学习物理预测和规划表示”的路线。其动作条件版本通过少量机器人视频后训练，将通用视频表示连接到控制任务。
+代表“无需生成全部像素，也能学习物理预测和规划表示”的路线。其动作条件版本通过少量机器人视频后训练，将通用视频表示连接到控制任务。需要特别区分 action-free encoder 与 V-JEPA 2-AC 的动作条件 dynamics，详见 [JEPA 路线专章](jepa.md)。
 
 ### Genie 系列
 

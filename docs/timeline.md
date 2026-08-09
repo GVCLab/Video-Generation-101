@@ -141,6 +141,8 @@ GAN 能产生锐利画面，但大规模训练不稳定、模式覆盖难以评�
 ## 2026：Omnimodal Physical AI
 
 - **Cosmos 3**：尝试用统一模型覆盖语言、图像、视频、音频、动作、forward dynamics、inverse dynamics 和机器人策略。
+- **V-JEPA 2.1**：通过 dense predictive loss、deep self-supervision 和图像—视频输入路径强化时空 dense feature。
+- **LeWorldModel / EB-JEPA**：一条路线研究从像素端到端学习可规划 latent dynamics，另一条路线提供单卡可复现的 JEPA 教学与研究组件。
 - **Seedance 2.0、Kling 3.0 等创作模型**：进一步强化原生音视频、多模态参考、多镜头叙事和生成—编辑一体化。
 - 研究重心从“生成一段看起来真实的视频”继续转向“能否记忆、交互、预测动作结果，并为真实策略带来收益”。
 
@@ -152,3 +154,5 @@ GAN 能产生锐利画面，但大规模训练不稳定、模式覆盖难以评�
 2. 时间变化是通过什么机制建模的？
 3. 模型接受何种控制信号？
 4. 成功是通过画质、预测误差，还是闭环任务完成率证明的？
+
+JEPA 从图像表征、视频预测到动作条件规划的独立演化见 [JEPA 路线专章](jepa.md)。

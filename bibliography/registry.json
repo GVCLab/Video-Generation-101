@@ -391,6 +391,92 @@
         "status": "official-code",
         "note": "NVIDIA 官方统一 Cosmos 仓库"
       }
+    },
+    {
+      "citekey": "lecun2022path",
+      "section": "H",
+      "source": {
+        "kind": "manual",
+        "metadata": {
+          "entry_type": "misc",
+          "title": "A Path Towards Autonomous Machine Intelligence",
+          "authors": "Yann LeCun",
+          "year": "2022",
+          "howpublished": "Position paper, version 0.9.2",
+          "url": "https://openreview.net/forum?id=BZ5a1r-kVsf"
+        }
+      },
+      "github": null
+    },
+    {
+      "citekey": "assran2023selfsupervised",
+      "section": "H",
+      "source": {"kind": "arxiv", "id": "2301.08243"},
+      "github": {
+        "url": "https://github.com/facebookresearch/ijepa",
+        "status": "official-code",
+        "note": "Meta AI Research 官方 I-JEPA 实现；仓库已归档"
+      }
+    },
+    {
+      "citekey": "bardes2023mcjepa",
+      "section": "H",
+      "source": {"kind": "arxiv", "id": "2307.12698"},
+      "github": null
+    },
+    {
+      "citekey": "murlabadia2026vjepa21",
+      "section": "H",
+      "source": {
+        "kind": "arxiv",
+        "id": "2603.14482",
+        "author_override": "Lorenzo Mur-Labadia and Matthew Muckley and Amir Bar and Mahmoud Assran and Koustuv Sinha and Michael Rabbat and Yann LeCun and Nicolas Ballas and Adrien Bardes"
+      },
+      "github": {
+        "url": "https://github.com/facebookresearch/vjepa2",
+        "status": "official-code",
+        "note": "与 V-JEPA 2 / 2-AC 共用 Meta AI Research 官方仓库"
+      }
+    },
+    {
+      "citekey": "balestriero2025lejepa",
+      "section": "H",
+      "source": {"kind": "arxiv", "id": "2511.08544"},
+      "github": {
+        "url": "https://github.com/galilai-group/lejepa",
+        "status": "official-code",
+        "note": "LeJEPA 与 SIGReg 官方实现"
+      }
+    },
+    {
+      "citekey": "maes2026leworldmodel",
+      "section": "H",
+      "source": {"kind": "arxiv", "id": "2603.19312"},
+      "github": {
+        "url": "https://github.com/lucas-maes/le-wm",
+        "status": "official-code",
+        "note": "LeWorldModel 官方实现"
+      }
+    },
+    {
+      "citekey": "terver2026lightweight",
+      "section": "H",
+      "source": {"kind": "arxiv", "id": "2602.03604"},
+      "github": {
+        "url": "https://github.com/facebookresearch/eb_jepa",
+        "status": "official-code",
+        "note": "Meta FAIR 官方轻量教学与研究库"
+      }
+    },
+    {
+      "citekey": "bagatella2025tdjepa",
+      "section": "H",
+      "source": {"kind": "arxiv", "id": "2510.00739"},
+      "github": {
+        "url": "https://github.com/facebookresearch/td_jepa",
+        "status": "official-code",
+        "note": "论文官方零样本强化学习实现"
+      }
     }
   ]
 }

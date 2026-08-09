@@ -2,7 +2,7 @@
 
 # 论文引用、代码仓库与 GitHub Stars
 
-本索引覆盖精选阅读列表中的 **41 篇论文或技术报告**。论文元数据来自 Crossref、arXiv 或机构原始页面；GitHub Stars 是 **2026-08-09** 的快照，不代表代码质量。
+本索引覆盖仓库正文登记的 **49 篇论文或技术报告**。论文元数据来自 Crossref、arXiv 或机构原始页面；GitHub Stars 是 **2026-08-09** 的快照，不代表代码质量。
 
 - [完整 BibTeX](../bibliography/references.bib)
 - [引用与仓库登记表](../bibliography/registry.json)
@@ -56,6 +56,14 @@
 | G | `deepmind2025genie3` | [Genie 3: A New Frontier for World Models](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/) | 2025 | **未发现官方 GitHub 仓库** | — |
 | G | `runway2025gwm1` | [Introducing Runway GWM-1](https://runway.com/research/introducing-runway-gwm-1) | 2025 | **未发现官方 GitHub 仓库** | — |
 | G | `nvidia2026cosmos3` | [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800) | 2026 | [NVIDIA/Cosmos](https://github.com/NVIDIA/Cosmos) · **官方代码**；NVIDIA 官方统一 Cosmos 仓库 | 11,419 |
+| H | `lecun2022path` | [A Path Towards Autonomous Machine Intelligence](https://openreview.net/forum?id=BZ5a1r-kVsf) | 2022 | **未发现官方 GitHub 仓库** | — |
+| H | `assran2023selfsupervised` | [Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture](https://arxiv.org/abs/2301.08243) | 2023 | [facebookresearch/ijepa](https://github.com/facebookresearch/ijepa) · **官方代码**；Meta AI Research 官方 I-JEPA 实现；仓库已归档 | 3,488 |
+| H | `bardes2023mcjepa` | [MC-JEPA: A Joint-Embedding Predictive Architecture for Self-Supervised Learning of Motion and Content Features](https://arxiv.org/abs/2307.12698) | 2023 | **未发现官方 GitHub 仓库** | — |
+| H | `murlabadia2026vjepa21` | [V-JEPA 2.1: Unlocking Dense Features in Video Self-Supervised Learning](https://arxiv.org/abs/2603.14482) | 2026 | [facebookresearch/vjepa2](https://github.com/facebookresearch/vjepa2) · **官方代码**；与 V-JEPA 2 / 2-AC 共用 Meta AI Research 官方仓库 | 4,447 |
+| H | `balestriero2025lejepa` | [LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics](https://arxiv.org/abs/2511.08544) | 2025 | [galilai-group/lejepa](https://github.com/galilai-group/lejepa) · **官方代码**；LeJEPA 与 SIGReg 官方实现 | 1,304 |
+| H | `maes2026leworldmodel` | [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312) | 2026 | [lucas-maes/le-wm](https://github.com/lucas-maes/le-wm) · **官方代码**；LeWorldModel 官方实现 | 4,269 |
+| H | `terver2026lightweight` | [A Lightweight Library for Energy-Based Joint-Embedding Predictive Architectures](https://arxiv.org/abs/2602.03604) | 2026 | [facebookresearch/eb_jepa](https://github.com/facebookresearch/eb_jepa) · **官方代码**；Meta FAIR 官方轻量教学与研究库 | 754 |
+| H | `bagatella2025tdjepa` | [TD-JEPA: Latent-predictive Representations for Zero-Shot Reinforcement Learning](https://arxiv.org/abs/2510.00739) | 2025 | [facebookresearch/td_jepa](https://github.com/facebookresearch/td_jepa) · **官方代码**；论文官方零样本强化学习实现 | 54 |
 
 ## 维护约定
 

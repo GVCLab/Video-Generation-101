@@ -13,6 +13,7 @@
 | 整个领域如何演化 | [技术时间线](docs/timeline.md) |
 | 各类任务、模型和术语的区别 | [任务与方法分类](docs/taxonomy.md) |
 | Video model 和 world model 的边界 | [从视频生成到 World Model](docs/world-models.md) |
+| JEPA 如何从表征学习走向动作规划 | [JEPA 路线专章](docs/jepa.md) |
 | 如何正确比较模型 | [评测指南](docs/evaluation.md) |
 | 应该优先读哪些论文 | [精选阅读列表](docs/reading-list.md) |
 | 需要 BibTeX、官方代码和 GitHub Stars | [引用与代码索引](docs/bibliography.md) |
@@ -119,6 +120,7 @@ p(s_{t+1}, o_{t+1}, r_{t+1}\mid s_t,a_t)
 │   ├── timeline.md
 │   ├── taxonomy.md
 │   ├── world-models.md
+│   ├── jepa.md
 │   ├── evaluation.md
 │   ├── reading-list.md
 │   └── bibliography.md
@@ -132,6 +134,8 @@ p(s_{t+1}, o_{t+1}, r_{t+1}\mid s_t,a_t)
 │   └── datasets.md
 ├── scripts/
 │   └── update_bibliography.py
+├── sources/
+│   └── papers_20260809_jepa_lineage.md
 ├── CONTRIBUTING.md
 ├── CITATION.cff
 └── LICENSE

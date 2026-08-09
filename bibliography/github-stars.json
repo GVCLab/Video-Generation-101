@@ -1,6 +1,6 @@
 {
   "as_of": "2026-08-09",
-  "fetched_at": "2026-08-09T10:31:24Z",
+  "fetched_at": "2026-08-09T10:43:57Z",
   "repositories": {
     "https://github.com/GameNGen/GameNGen.github.io": {
       "stars": 91
@@ -26,11 +26,23 @@
     "https://github.com/edenton/svg": {
       "stars": 188
     },
+    "https://github.com/facebookresearch/eb_jepa": {
+      "stars": 754
+    },
+    "https://github.com/facebookresearch/ijepa": {
+      "stars": 3488
+    },
     "https://github.com/facebookresearch/jepa": {
       "stars": 4070
     },
+    "https://github.com/facebookresearch/td_jepa": {
+      "stars": 54
+    },
     "https://github.com/facebookresearch/vjepa2": {
       "stars": 4447
+    },
+    "https://github.com/galilai-group/lejepa": {
+      "stars": 1304
     },
     "https://github.com/google-research/magvit": {
       "stars": 1002
@@ -46,6 +58,9 @@
     },
     "https://github.com/hojonathanho/diffusion": {
       "stars": 5297
+    },
+    "https://github.com/lucas-maes/le-wm": {
+      "stars": 4269
     },
     "https://github.com/lucidrains/video-diffusion-pytorch": {
       "stars": 1384

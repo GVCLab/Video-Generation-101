@@ -4,6 +4,8 @@
 
 全部条目的标准引用、代码仓库类型和带日期的 GitHub Star 快照见 [引用与代码索引](bibliography.md)，也可直接下载 [完整 BibTeX](../bibliography/references.bib)。
 
+如果希望系统理解 latent prediction、V-JEPA 2-AC 与生成式 world model 的差别，直接阅读 [JEPA 路线专章](jepa.md)。
+
 ## 最小阅读集：8 篇建立全局观
 
 1. **Video Textures** — Schödl et al., 2000
