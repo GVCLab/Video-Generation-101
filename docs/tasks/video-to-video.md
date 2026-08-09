@@ -12,7 +12,7 @@ Video-to-video（V2V）输入已有视频和编辑条件，输出结构相关但
 | 条件翻译 | vid2vid、pix2pixHD video variants | semantic map / pose / edge 到视频 | 需要结构标注 |
 | 扩散编辑 | Tune-A-Video、TokenFlow、FateZero、AnimateDiff [[3]](#ref-3) | inversion、attention control、one-shot tuning | 保持运动和身份困难 |
 | I2V-based editing | first-frame guided editing、flow-driven I2V [[4]](#ref-4) | 用首帧编辑结果驱动整段视频 | 复杂局部编辑易漂移 |
-| DiT / foundation editing | TV-LiVE、V2Edit、Ditto 类数据扩展 | training-free 或大规模 instruction video editing | 多轮一致性和高质量数据 |
+| DiT / foundation editing | TV-LiVE [[7]](#ref-7)、V2Edit [[8]](#ref-8)、Ditto [[9]](#ref-9) 类数据扩展 | training-free 或大规模 instruction video editing | 多轮一致性和高质量数据 |
 | 多轮记忆 | memory-augmented V2V | 保存前几轮编辑状态 | 避免已编辑区域被覆盖 |
 
 ## 技术演化逻辑
@@ -40,25 +40,26 @@ V2V 最初是视频风格化和结构翻译问题，通常依赖光流传播或�
 2. 如何构造高质量 instruction-video editing 数据？
 3. 多轮编辑中的“记忆”应保存像素、latent、mask 还是编辑图层？
 4. V2V 与 inpainting、I2V、3D editing 的边界如何统一？
+本页主要参考工作：Consistent Video Editing as Flow-Driven Image-to-Video Generation [[6]](#ref-6)、Memory-V2V: Augmenting Video-to-Video Diffusion Models with Memory [[10]](#ref-10)。
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] Bruce D. Lucas, and Takeo Kanade. [An Iterative Image Registration Technique with an Application to Stereo Vision](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Proceedings of the 7th International Joint Conference on Artificial Intelligence (IJCAI), 1981.
+<a id="ref-1"></a>[1] [An Iterative Image Registration Technique with an Application to Stereo Vision](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Bruce D. Lucas and Takeo Kanade. Proceedings of IJCAI. 1981.
 
-<a id="ref-2"></a>[2] Berthold K.P. Horn, and Brian G. Schunck. [Determining optical flow](https://doi.org/10.1016/0004-3702(81)90024-2). Artificial Intelligence, 1981.
+<a id="ref-2"></a>[2] [Determining optical flow](https://doi.org/10.1016/0004-3702(81)90024-2). Berthold K. P. Horn and Brian G. Schunck. Artificial Intelligence. 1981.
 
-<a id="ref-3"></a>[3] Yuwei Guo, Ceyuan Yang, Anyi Rao, Zhengyang Liang, Yaohui Wang, Yu Qiao, et al. [AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning](https://arxiv.org/abs/2307.04725). arXiv preprint, 2023.
+<a id="ref-3"></a>[3] [AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning](https://arxiv.org/abs/2307.04725). Yuwei Guo, Ceyuan Yang, Anyi Rao, Zhengyang Liang, Yaohui Wang, Yu Qiao, et al. arXiv preprint. 2023.
 
-<a id="ref-4"></a>[4] Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). arXiv preprint, 2023.
+<a id="ref-4"></a>[4] [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. arXiv preprint. 2023.
 
-<a id="ref-5"></a>[5] Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, and David J. Fleet. [Video Diffusion Models](https://arxiv.org/abs/2204.03458). arXiv preprint, 2022.
+<a id="ref-5"></a>[5] [Video Diffusion Models](https://arxiv.org/abs/2204.03458). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. arXiv preprint. 2022.
 
-<a id="ref-6"></a>[6] [Consistent Video Editing as Flow-Driven Image-to-Video Generation](https://arxiv.org/html/2506.07713v1). flow + I2V editing.
+<a id="ref-6"></a>[6] [Consistent Video Editing as Flow-Driven Image-to-Video Generation](https://arxiv.org/abs/2506.07713). Ge Wang, Songlin Fan, Hangxu Liu, Quanjian Song, Hewei Wang, Jinfeng Xu. arXiv preprint. 2025.
 
-<a id="ref-7"></a>[7] [TV-LiVE](https://arxiv.org/html/2506.07205v1). training-free DiT video editing.
+<a id="ref-7"></a>[7] [TV-LiVE: Training-Free, Text-Guided Video Editing via Layer Informed Vitality Exploitation](https://arxiv.org/abs/2506.07205). Min-Jung Kim, Dongjin Kim, Seokju Yun, Jaegul Choo. arXiv preprint. 2025.
 
-<a id="ref-8"></a>[8] [V2Edit](https://arxiv.org/html/2503.10634v1). instruction-guided video and 3D scene editing.
+<a id="ref-8"></a>[8] [V2Edit: Versatile Video Diffusion Editor for Videos and 3D Scenes](https://arxiv.org/abs/2503.10634). Yanming Zhang, Jun-Kun Chen, Jipeng Lyu, Yu-Xiong Wang. arXiv preprint. 2025.
 
-<a id="ref-9"></a>[9] [Ditto](https://arxiv.org/html/2510.15742v1). instruction-based video editing 数据扩展.
+<a id="ref-9"></a>[9] [Scaling Instruction-Based Video Editing with a High-Quality Synthetic Dataset](https://arxiv.org/abs/2510.15742). Qingyan Bai, Qiuyu Wang, Hao Ouyang, Yue Yu, Hanlin Wang, Wen Wang, et al. arXiv preprint. 2025.
 
-<a id="ref-10"></a>[10] [Memory-Augmented Video-to-Video Diffusion](https://arxiv.org/html/2601.16296v2). 多轮编辑记忆.
+<a id="ref-10"></a>[10] [Memory-V2V: Augmenting Video-to-Video Diffusion Models with Memory](https://arxiv.org/abs/2601.16296). Dohun Lee, Chun-Hao Paul Huang, Xuelin Chen, Jong Chul Ye, Duygu Ceylan, Hyeonho Jeong. arXiv preprint. 2026.

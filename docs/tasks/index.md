@@ -4,7 +4,7 @@
 
 这些页面不是产品清单，而是研究地图。阅读时建议先判断任务的条件输入是什么，再看模型到底是在补全像素、生成运动、编辑已有视频，还是模拟动作后的世界。
 
-本轮补充的手动核验记录保存在 [video generation tasks research audit](../../sources/research_20260809_video_generation_tasks_manual.md)。仓库已有正式 BibTeX 与 GitHub star 快照仍以 [引用与代码索引](../bibliography.md) 为准。
+本轮补充的手动核验记录保存在 [video generation tasks research audit](../../sources/research_20260809_video_generation_tasks_manual.md) [[4]](#ref-4)。仓库已有正式 BibTeX 与 GitHub star 快照仍以 [引用与代码索引](../bibliography.md) 为准。
 
 各子文档正文采用 `[[1]](#ref-1)` 这类可跳转编号引用；文末参考文献采用 CVPR-like 的编号格式。正式条目来自 [完整 BibTeX](../../bibliography/references.bib)，少数尚未纳入 BibTeX 的最新工作会以论文链接列出。
 
@@ -39,13 +39,14 @@ flowchart LR
 ```
 
 一个实用的判断规则：越靠右，模型越不能只靠“看起来合理”来评估；它必须越来越多地接受反事实、状态保持和闭环控制测试。
+本页主要参考工作：Video Diffusion Models [[2]](#ref-2)、Video Generation Models as World Simulators [[3]](#ref-3)。
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] Wilson Yan, Yunzhi Zhang, Pieter Abbeel, and Aravind Srinivas. [VideoGPT: Video Generation using VQ-VAE and Transformers](https://arxiv.org/abs/2104.10157). arXiv preprint, 2021.
+<a id="ref-1"></a>[1] [VideoGPT: Video Generation using VQ-VAE and Transformers](https://arxiv.org/abs/2104.10157). Wilson Yan, Yunzhi Zhang, Pieter Abbeel, Aravind Srinivas. arXiv preprint. 2021.
 
-<a id="ref-2"></a>[2] Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, and David J. Fleet. [Video Diffusion Models](https://arxiv.org/abs/2204.03458). arXiv preprint, 2022.
+<a id="ref-2"></a>[2] [Video Diffusion Models](https://arxiv.org/abs/2204.03458). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. arXiv preprint. 2022.
 
-<a id="ref-3"></a>[3] OpenAI. [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). Technical report, 2024.
+<a id="ref-3"></a>[3] [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). OpenAI. Technical report. 2024.
 
-<a id="ref-4"></a>[4] [video generation tasks research audit](../../sources/research_20260809_video_generation_tasks_manual.md). 本目录补充来源的手动核验记录.
+<a id="ref-4"></a>[4] [Video generation tasks research audit](../../sources/research_20260809_video_generation_tasks_manual.md). Video Generation 101 maintainers. Manual research notes. 2026.

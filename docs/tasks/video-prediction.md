@@ -41,31 +41,32 @@ Video prediction 输入历史帧，预测未来帧或未来 latent。它比无�
 2. 高质量像素预测和决策有用性是否一致？
 3. 如何避免 closed-loop rollout 中的 exposure bias？
 4. 是否能从被动视频中学到可干预 dynamics？
+本页主要参考工作：Frame Context Packing and Drift Prevention in Next-Frame-Prediction Video Diffusion Models [[13]](#ref-13)。
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] Bruce D. Lucas, and Takeo Kanade. [An Iterative Image Registration Technique with an Application to Stereo Vision](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Proceedings of the 7th International Joint Conference on Artificial Intelligence (IJCAI), 1981.
+<a id="ref-1"></a>[1] [An Iterative Image Registration Technique with an Application to Stereo Vision](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Bruce D. Lucas and Takeo Kanade. Proceedings of IJCAI. 1981.
 
-<a id="ref-2"></a>[2] Berthold K.P. Horn, and Brian G. Schunck. [Determining optical flow](https://doi.org/10.1016/0004-3702(81)90024-2). Artificial Intelligence, 1981.
+<a id="ref-2"></a>[2] [Determining optical flow](https://doi.org/10.1016/0004-3702(81)90024-2). Berthold K. P. Horn and Brian G. Schunck. Artificial Intelligence. 1981.
 
-<a id="ref-3"></a>[3] Gianfranco Doretto, Alessandro Chiuso, Ying Nian Wu, and Stefano Soatto. [Dynamic Textures](https://doi.org/10.1023/A:1021669406132). International Journal of Computer Vision, 2003.
+<a id="ref-3"></a>[3] [Dynamic Textures](https://doi.org/10.1023/A:1021669406132). Gianfranco Doretto, Alessandro Chiuso, Ying Nian Wu, Stefano Soatto. International Journal of Computer Vision. 2003.
 
-<a id="ref-4"></a>[4] Nitish Srivastava, Elman Mansimov, and Ruslan Salakhutdinov. [Unsupervised Learning of Video Representations using LSTMs](https://arxiv.org/abs/1502.04681). arXiv preprint, 2015.
+<a id="ref-4"></a>[4] [Unsupervised Learning of Video Representations using LSTMs](https://arxiv.org/abs/1502.04681). Nitish Srivastava, Elman Mansimov, Ruslan Salakhutdinov. arXiv preprint. 2015.
 
-<a id="ref-5"></a>[5] Xingjian Shi, Zhourong Chen, Hao Wang, Dit-Yan Yeung, Wai-kin Wong, and Wang-chun Woo. [Convolutional LSTM Network: A Machine Learning Approach for Precipitation Nowcasting](https://arxiv.org/abs/1506.04214). arXiv preprint, 2015.
+<a id="ref-5"></a>[5] [Convolutional LSTM Network: A Machine Learning Approach for Precipitation Nowcasting](https://arxiv.org/abs/1506.04214). Xingjian Shi, Zhourong Chen, Hao Wang, Dit-Yan Yeung, Wai-kin Wong, Wang-chun Woo. arXiv preprint. 2015.
 
-<a id="ref-6"></a>[6] William Lotter, Gabriel Kreiman, and David Cox. [Deep Predictive Coding Networks for Video Prediction and Unsupervised Learning](https://arxiv.org/abs/1605.08104). arXiv preprint, 2016.
+<a id="ref-6"></a>[6] [Deep Predictive Coding Networks for Video Prediction and Unsupervised Learning](https://arxiv.org/abs/1605.08104). William Lotter, Gabriel Kreiman, David Cox. arXiv preprint. 2016.
 
-<a id="ref-7"></a>[7] Chelsea Finn, Ian Goodfellow, and Sergey Levine. [Unsupervised Learning for Physical Interaction through Video Prediction](https://arxiv.org/abs/1605.07157). arXiv preprint, 2016.
+<a id="ref-7"></a>[7] [Unsupervised Learning for Physical Interaction through Video Prediction](https://arxiv.org/abs/1605.07157). Chelsea Finn, Ian Goodfellow, Sergey Levine. arXiv preprint. 2016.
 
-<a id="ref-8"></a>[8] Remi Denton, and Rob Fergus. [Stochastic Video Generation with a Learned Prior](https://arxiv.org/abs/1802.07687). arXiv preprint, 2018.
+<a id="ref-8"></a>[8] [Stochastic Video Generation with a Learned Prior](https://arxiv.org/abs/1802.07687). Remi Denton and Rob Fergus. arXiv preprint. 2018.
 
-<a id="ref-9"></a>[9] Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, and David J. Fleet. [Video Diffusion Models](https://arxiv.org/abs/2204.03458). arXiv preprint, 2022.
+<a id="ref-9"></a>[9] [Video Diffusion Models](https://arxiv.org/abs/2204.03458). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. arXiv preprint. 2022.
 
-<a id="ref-10"></a>[10] Danijar Hafner, Timothy Lillicrap, Jimmy Ba, and Mohammad Norouzi. [Dream to Control: Learning Behaviors by Latent Imagination](https://arxiv.org/abs/1912.01603). arXiv preprint, 2019.
+<a id="ref-10"></a>[10] [Dream to Control: Learning Behaviors by Latent Imagination](https://arxiv.org/abs/1912.01603). Danijar Hafner, Timothy Lillicrap, Jimmy Ba, Mohammad Norouzi. arXiv preprint. 2019.
 
-<a id="ref-11"></a>[11] Mahmoud Assran, Adrien Bardes, David Fan, Quentin Garrido, Russell Howes, Mojtaba Komeili, et al. [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). arXiv preprint, 2025.
+<a id="ref-11"></a>[11] [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). Mahmoud Assran, Adrien Bardes, David Fan, Quentin Garrido, Russell Howes, Mojtaba Komeili, et al. arXiv preprint. 2025.
 
-<a id="ref-12"></a>[12] Michael Mathieu, Camille Couprie, and Yann LeCun. [Deep multi-scale video prediction beyond mean square error](https://arxiv.org/abs/1511.05440). arXiv preprint, 2015.
+<a id="ref-12"></a>[12] [Deep multi-scale video prediction beyond mean square error](https://arxiv.org/abs/1511.05440). Michael Mathieu, Camille Couprie, Yann LeCun. arXiv preprint. 2015.
 
-<a id="ref-13"></a>[13] [FramePack](https://arxiv.org/html/2504.12626v2). 固定上下文的视频 next-frame prediction.
+<a id="ref-13"></a>[13] [Frame Context Packing and Drift Prevention in Next-Frame-Prediction Video Diffusion Models](https://arxiv.org/abs/2504.12626). Lvmin Zhang, Shengqu Cai, Muyang Li, Gordon Wetzstein, Maneesh Agrawala. arXiv preprint. 2025.

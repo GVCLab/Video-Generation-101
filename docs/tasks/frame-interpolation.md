@@ -40,19 +40,20 @@ Frame interpolation 输入前后关键帧，生成中间帧。它常用于升帧
 2. 大模型是否会牺牲端点忠实度来追求视觉合理性？
 3. 如何评估动画场景中不存在唯一真实中间帧的问题？
 4. 任意长度插值如何避免局部速度不均和语义漂移？
+本页主要参考工作：AceVFI: A Comprehensive Survey of Advances in Video Frame Interpolation [[5]](#ref-5)、Adapting Image-to-Video Diffusion Models for Large-Motion Frame Interpolation [[6]](#ref-6)、Towards Holistic Modeling for Video Frame Interpolation with Auto-regressive Diffusion Transformers [[7]](#ref-7)。
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] Bruce D. Lucas, and Takeo Kanade. [An Iterative Image Registration Technique with an Application to Stereo Vision](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Proceedings of the 7th International Joint Conference on Artificial Intelligence (IJCAI), 1981.
+<a id="ref-1"></a>[1] [An Iterative Image Registration Technique with an Application to Stereo Vision](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Bruce D. Lucas and Takeo Kanade. Proceedings of IJCAI. 1981.
 
-<a id="ref-2"></a>[2] Berthold K.P. Horn, and Brian G. Schunck. [Determining optical flow](https://doi.org/10.1016/0004-3702(81)90024-2). Artificial Intelligence, 1981.
+<a id="ref-2"></a>[2] [Determining optical flow](https://doi.org/10.1016/0004-3702(81)90024-2). Berthold K. P. Horn and Brian G. Schunck. Artificial Intelligence. 1981.
 
-<a id="ref-3"></a>[3] Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, and David J. Fleet. [Video Diffusion Models](https://arxiv.org/abs/2204.03458). arXiv preprint, 2022.
+<a id="ref-3"></a>[3] [Video Diffusion Models](https://arxiv.org/abs/2204.03458). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. arXiv preprint. 2022.
 
-<a id="ref-4"></a>[4] Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). arXiv preprint, 2023.
+<a id="ref-4"></a>[4] [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. arXiv preprint. 2023.
 
-<a id="ref-5"></a>[5] [A Comprehensive Survey of Advances in Video Frame Interpolation](https://arxiv.org/abs/2506.01061). 从 motion compensation 到 diffusion 的系统综述.
+<a id="ref-5"></a>[5] [AceVFI: A Comprehensive Survey of Advances in Video Frame Interpolation](https://arxiv.org/abs/2506.01061). Dahyeon Kye, Changhyun Roh, Sukhun Ko, Chanho Eom, Jihyong Oh. arXiv preprint. 2025.
 
-<a id="ref-6"></a>[6] [Adapting Image-to-Video Diffusion Models for Large-Motion Frame Interpolation](https://arxiv.org/html/2412.17042v2). 生成式 VFI 方向.
+<a id="ref-6"></a>[6] [Adapting Image-to-Video Diffusion Models for Large-Motion Frame Interpolation](https://arxiv.org/abs/2412.17042). Luoxu Jin and Hiroshi Watanabe. arXiv preprint. 2024.
 
-<a id="ref-7"></a>[7] [Towards Holistic Modeling for Video Frame Interpolation with Auto-Regressive Diffusion Transformer](https://arxiv.org/pdf/2601.14959). 长程插值趋势.
+<a id="ref-7"></a>[7] [Towards Holistic Modeling for Video Frame Interpolation with Auto-regressive Diffusion Transformers](https://arxiv.org/abs/2601.14959). Xinyu Peng, Han Li, Yuyang Huang, Ziyang Zheng, Yaoming Wang, Xin Chen, et al. arXiv preprint. 2026.

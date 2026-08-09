@@ -13,8 +13,8 @@ Action-conditioned prediction 输入观测历史和动作，预测动作执行�
 | Model-based RL | PlaNet [[3]](#ref-3)、Dreamer [[4]](#ref-4)、DreamerV3 [[5]](#ref-5) | latent dynamics + imagination | 视觉真实度不是主要目标 |
 | Game / embodied | Genie [[6]](#ref-6)、GameNGen [[7]](#ref-7)、GAIA-1 [[8]](#ref-8) | latent action 或 action-conditioned generation | 动作语义和真实控制映射困难 |
 | JEPA / latent | V-JEPA 2-AC [[9]](#ref-9)、LeWorldModel [[10]](#ref-10) | 预测动作后的 future representation | latent 是否足够可规划 |
-| World Action Model | WAM、GigaWorld-Policy、A2World | 联合视频与动作建模 | 跨机器人、跨视角、跨任务迁移 |
-| 多智能体 | MultiWorld | 多主体、多视角动作条件视频 | 交互复杂度高 |
+| World Action Model | WAM、GigaWorld-Policy [[13]](#ref-13)、A2World [[14]](#ref-14) | 联合视频与动作建模 | 跨机器人、跨视角、跨任务迁移 |
+| 多智能体 | MultiWorld [[15]](#ref-15) | 多主体、多视角动作条件视频 | 交互复杂度高 |
 
 ## 技术演化逻辑
 
@@ -41,35 +41,36 @@ Action-conditioned prediction 输入观测历史和动作，预测动作执行�
 2. 不同机器人动作空间如何统一？
 3. future video 与 future latent 哪个更适合规划？
 4. action-conditioned model 是否需要显式 3D 或物理变量？
+本页主要参考工作：World Action Models are Zero-shot Policies [[12]](#ref-12)。
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] David Ha, and Jürgen Schmidhuber. [World Models](https://arxiv.org/abs/1803.10122). Advances in Neural Information Processing Systems 31, 2018.
+<a id="ref-1"></a>[1] [World Models](https://arxiv.org/abs/1803.10122). David Ha and Jürgen Schmidhuber. Advances in Neural Information Processing Systems 31. 2018.
 
-<a id="ref-2"></a>[2] Chelsea Finn, Ian Goodfellow, and Sergey Levine. [Unsupervised Learning for Physical Interaction through Video Prediction](https://arxiv.org/abs/1605.07157). arXiv preprint, 2016.
+<a id="ref-2"></a>[2] [Unsupervised Learning for Physical Interaction through Video Prediction](https://arxiv.org/abs/1605.07157). Chelsea Finn, Ian Goodfellow, Sergey Levine. arXiv preprint. 2016.
 
-<a id="ref-3"></a>[3] Danijar Hafner, Timothy Lillicrap, Ian Fischer, Ruben Villegas, David Ha, Honglak Lee, et al. [Learning Latent Dynamics for Planning from Pixels](https://arxiv.org/abs/1811.04551). arXiv preprint, 2018.
+<a id="ref-3"></a>[3] [Learning Latent Dynamics for Planning from Pixels](https://arxiv.org/abs/1811.04551). Danijar Hafner, Timothy Lillicrap, Ian Fischer, Ruben Villegas, David Ha, Honglak Lee, et al. arXiv preprint. 2018.
 
-<a id="ref-4"></a>[4] Danijar Hafner, Timothy Lillicrap, Jimmy Ba, and Mohammad Norouzi. [Dream to Control: Learning Behaviors by Latent Imagination](https://arxiv.org/abs/1912.01603). arXiv preprint, 2019.
+<a id="ref-4"></a>[4] [Dream to Control: Learning Behaviors by Latent Imagination](https://arxiv.org/abs/1912.01603). Danijar Hafner, Timothy Lillicrap, Jimmy Ba, Mohammad Norouzi. arXiv preprint. 2019.
 
-<a id="ref-5"></a>[5] Danijar Hafner, Jurgis Pasukonis, Jimmy Ba, and Timothy Lillicrap. [Mastering Diverse Domains through World Models](https://arxiv.org/abs/2301.04104). arXiv preprint, 2023.
+<a id="ref-5"></a>[5] [Mastering Diverse Domains through World Models](https://arxiv.org/abs/2301.04104). Danijar Hafner, Jurgis Pasukonis, Jimmy Ba, Timothy Lillicrap. arXiv preprint. 2023.
 
-<a id="ref-6"></a>[6] Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). arXiv preprint, 2024.
+<a id="ref-6"></a>[6] [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. arXiv preprint. 2024.
 
-<a id="ref-7"></a>[7] Dani Valevski, Yaniv Leviathan, Moab Arar, and Shlomi Fruchter. [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837). arXiv preprint, 2024.
+<a id="ref-7"></a>[7] [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837). Dani Valevski, Yaniv Leviathan, Moab Arar, Shlomi Fruchter. arXiv preprint. 2024.
 
-<a id="ref-8"></a>[8] Anthony Hu, Lloyd Russell, Hudson Yeo, Zak Murez, George Fedoseev, Alex Kendall, et al. [GAIA-1: A Generative World Model for Autonomous Driving](https://arxiv.org/abs/2309.17080). arXiv preprint, 2023.
+<a id="ref-8"></a>[8] [GAIA-1: A Generative World Model for Autonomous Driving](https://arxiv.org/abs/2309.17080). Anthony Hu, Lloyd Russell, Hudson Yeo, Zak Murez, George Fedoseev, Alex Kendall, et al. arXiv preprint. 2023.
 
-<a id="ref-9"></a>[9] Mahmoud Assran, Adrien Bardes, David Fan, Quentin Garrido, Russell Howes, Mojtaba Komeili, et al. [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). arXiv preprint, 2025.
+<a id="ref-9"></a>[9] [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). Mahmoud Assran, Adrien Bardes, David Fan, Quentin Garrido, Russell Howes, Mojtaba Komeili, et al. arXiv preprint. 2025.
 
-<a id="ref-10"></a>[10] Lucas Maes, Quentin Le Lidec, Damien Scieur, Yann LeCun, and Randall Balestriero. [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312). arXiv preprint, 2026.
+<a id="ref-10"></a>[10] [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312). Lucas Maes, Quentin Le Lidec, Damien Scieur, Yann LeCun, Randall Balestriero. arXiv preprint. 2026.
 
-<a id="ref-11"></a>[11] NVIDIA, Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, et al. [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). arXiv preprint, 2025.
+<a id="ref-11"></a>[11] [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). NVIDIA, Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, et al. arXiv preprint. 2025.
 
-<a id="ref-12"></a>[12] [World Action Models are Zero-shot Policies](https://arxiv.org/html/2602.15922v1). WAM 路线.
+<a id="ref-12"></a>[12] [World Action Models are Zero-shot Policies](https://arxiv.org/abs/2602.15922). Seonghyeon Ye, Yunhao Ge, Kaiyuan Zheng, Shenyuan Gao, Sihyun Yu, George Kurian, et al. arXiv preprint. 2026.
 
-<a id="ref-13"></a>[13] [GigaWorld-Policy](https://arxiv.org/html/2603.17240v2). 视频生成辅助策略学习.
+<a id="ref-13"></a>[13] [GigaWorld-Policy: An Efficient Action-Centered World--Action Model](https://arxiv.org/abs/2603.17240). Angen Ye, Boyuan Wang, Chaojun Ni, Guan Huang, Guosheng Zhao, Hao Li, et al. arXiv preprint. 2026.
 
-<a id="ref-14"></a>[14] [A2World](https://arxiv.org/html/2606.29501v1). transferable action-conditioned dynamics priors.
+<a id="ref-14"></a>[14] [Learning Transferable Dynamics Priors from Action to World Modeling](https://arxiv.org/abs/2606.29501). Ze Huang, Jiahui Zhang, Hairuo Liu, Chenxi Zhang, Ran Cheng, Li Zhang. arXiv preprint. 2026.
 
-<a id="ref-15"></a>[15] [MultiWorld](https://arxiv.org/html/2604.18564v1). 多智能体多视角 world model.
+<a id="ref-15"></a>[15] [MultiWorld: Scalable Multi-Agent Multi-View Video World Models](https://arxiv.org/abs/2604.18564). Haoyu Wu, Jiwen Yu, Yingtian Zou, Xihui Liu. arXiv preprint. 2026.

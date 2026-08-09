@@ -14,7 +14,7 @@ Interactive world generation 输入初始世界、文本或视频上下文，并
 | latent action | Genie [[6]](#ref-6) | 从无动作标签视频学习可控 action space | 动作含义隐式 |
 | 神经游戏引擎 | GameNGen [[7]](#ref-7) | 生成模型实时模拟游戏帧 | 场景范围受限 |
 | 世界基础模型 | Genie 3 [[8]](#ref-8)、GWM-1 [[9]](#ref-9)、Cosmos [[10]](#ref-10), [[11]](#ref-11) | promptable world events、动作接口、Physical AI 平台 | 状态持久性和可靠性仍待验证 |
-| 多智能体世界 | MultiWorld 类方向 | 多主体、多视角、动作条件 rollout | 复杂交互与评测困难 |
+| 多智能体世界 | MultiWorld [[12]](#ref-12) 类方向 | 多主体、多视角、动作条件 rollout | 复杂交互与评测困难 |
 
 ## 技术演化逻辑
 
@@ -42,31 +42,32 @@ Interactive world generation 输入初始世界、文本或视频上下文，并
 3. 长时间交互中的 memory 应该如何写入和读取？
 4. 模型如何表达不确定性，避免给 planner 错误自信？
 5. 开放世界生成和安全约束如何同时成立？
+本页主要参考工作：From World Models to World Action Models: A Concise Tutorial for Robotics [[13]](#ref-13)。
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] David Ha, and Jürgen Schmidhuber. [World Models](https://arxiv.org/abs/1803.10122). Advances in Neural Information Processing Systems 31, 2018.
+<a id="ref-1"></a>[1] [World Models](https://arxiv.org/abs/1803.10122). David Ha and Jürgen Schmidhuber. Advances in Neural Information Processing Systems 31. 2018.
 
-<a id="ref-2"></a>[2] Danijar Hafner, Timothy Lillicrap, Ian Fischer, Ruben Villegas, David Ha, Honglak Lee, et al. [Learning Latent Dynamics for Planning from Pixels](https://arxiv.org/abs/1811.04551). arXiv preprint, 2018.
+<a id="ref-2"></a>[2] [Learning Latent Dynamics for Planning from Pixels](https://arxiv.org/abs/1811.04551). Danijar Hafner, Timothy Lillicrap, Ian Fischer, Ruben Villegas, David Ha, Honglak Lee, et al. arXiv preprint. 2018.
 
-<a id="ref-3"></a>[3] Danijar Hafner, Timothy Lillicrap, Jimmy Ba, and Mohammad Norouzi. [Dream to Control: Learning Behaviors by Latent Imagination](https://arxiv.org/abs/1912.01603). arXiv preprint, 2019.
+<a id="ref-3"></a>[3] [Dream to Control: Learning Behaviors by Latent Imagination](https://arxiv.org/abs/1912.01603). Danijar Hafner, Timothy Lillicrap, Jimmy Ba, Mohammad Norouzi. arXiv preprint. 2019.
 
-<a id="ref-4"></a>[4] OpenAI. [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). Technical report, 2024.
+<a id="ref-4"></a>[4] [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). OpenAI. Technical report. 2024.
 
-<a id="ref-5"></a>[5] Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). arXiv preprint, 2023.
+<a id="ref-5"></a>[5] [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. arXiv preprint. 2023.
 
-<a id="ref-6"></a>[6] Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). arXiv preprint, 2024.
+<a id="ref-6"></a>[6] [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. arXiv preprint. 2024.
 
-<a id="ref-7"></a>[7] Dani Valevski, Yaniv Leviathan, Moab Arar, and Shlomi Fruchter. [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837). arXiv preprint, 2024.
+<a id="ref-7"></a>[7] [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837). Dani Valevski, Yaniv Leviathan, Moab Arar, Shlomi Fruchter. arXiv preprint. 2024.
 
-<a id="ref-8"></a>[8] Google DeepMind. [Genie 3: A New Frontier for World Models](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/). Project report, 2025.
+<a id="ref-8"></a>[8] [Genie 3: A New Frontier for World Models](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/). Google DeepMind. Project report. 2025.
 
-<a id="ref-9"></a>[9] Runway. [Introducing Runway GWM-1](https://runway.com/research/introducing-runway-gwm-1). Project report, 2025.
+<a id="ref-9"></a>[9] [Introducing Runway GWM-1](https://runway.com/research/introducing-runway-gwm-1). Runway. Project report. 2025.
 
-<a id="ref-10"></a>[10] NVIDIA, Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, et al. [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). arXiv preprint, 2025.
+<a id="ref-10"></a>[10] [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). NVIDIA, Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, et al. arXiv preprint. 2025.
 
-<a id="ref-11"></a>[11] NVIDIA. [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800). arXiv preprint, 2026.
+<a id="ref-11"></a>[11] [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800). NVIDIA. arXiv preprint. 2026.
 
-<a id="ref-12"></a>[12] [MultiWorld](https://arxiv.org/html/2604.18564v1). 多智能体多视角交互世界.
+<a id="ref-12"></a>[12] [MultiWorld: Scalable Multi-Agent Multi-View Video World Models](https://arxiv.org/abs/2604.18564). Haoyu Wu, Jiwen Yu, Yingtian Zou, Xihui Liu. arXiv preprint. 2026.
 
-<a id="ref-13"></a>[13] [From World Models to World Action Models](https://arxiv.org/html/2607.00836v1). world action model 教程.
+<a id="ref-13"></a>[13] [From World Models to World Action Models: A Concise Tutorial for Robotics](https://arxiv.org/abs/2607.00836). Xiaoxiong Zhang, Xiong Zeng, Wei Zhang. arXiv preprint. 2026.

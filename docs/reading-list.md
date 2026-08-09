@@ -42,52 +42,52 @@
 
 ## A. 传统方法与状态空间
 
-- **Lucas–Kanade optical flow** — Lucas & Kanade, 1981. [Paper](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf)
-- **Horn–Schunck optical flow** — Horn & Schunck, 1981. [DOI](https://doi.org/10.1016/0004-3702%2881%2990024-2)
+- **Lucas–Kanade optical flow** — Lucas & Kanade, 1981. [Paper](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf) [[9]](#ref-9)
+- **Horn–Schunck optical flow** — Horn & Schunck, 1981. [DOI](https://doi.org/10.1016/0004-3702%2881%2990024-2) [[10]](#ref-10)
 - **Video Textures** — Schödl et al., 2000. [Paper](https://dl.acm.org/doi/10.1145/344779.345012)
-- **Dynamic Textures** — Doretto et al., 2003. [DOI](https://doi.org/10.1023/A:1021669406132)
+- **Dynamic Textures [[11]](#ref-11)** — Doretto et al., 2003. [DOI](https://doi.org/10.1023/A:1021669406132)
 
 阅读问题：这些方法显式保留了哪些结构？现代生成模型又牺牲了哪些可解释性？
 
 ## B. 深度视频预测
 
 - **Unsupervised Learning of Video Representations using LSTMs** — Srivastava et al., 2015. [Paper](https://arxiv.org/abs/1502.04681)
-- **Convolutional LSTM Network** — Shi et al., 2015. [Paper](https://arxiv.org/abs/1506.04214)
+- **Convolutional LSTM Network [[12]](#ref-12)** — Shi et al., 2015. [Paper](https://arxiv.org/abs/1506.04214)
 - **Beyond MSE** — Mathieu et al., 2015. [Paper](https://arxiv.org/abs/1511.05440)
 - **Unsupervised Learning for Physical Interaction through Video Prediction** — Finn et al., 2016. [Paper](https://arxiv.org/abs/1605.07157)
-- **Deep Predictive Coding Networks for Video Prediction and Unsupervised Learning** — Lotter et al., 2016. [Paper](https://arxiv.org/abs/1605.08104)
+- **Deep Predictive Coding Networks for Video Prediction and Unsupervised Learning [[13]](#ref-13)** — Lotter et al., 2016. [Paper](https://arxiv.org/abs/1605.08104)
 
 阅读问题：模型是在预测像素、运动，还是隐藏状态？多种合理未来如何表达？
 
 ## C. 生成模型路线：VAE 与 GAN
 
 - **Generating Videos with Scene Dynamics** — Vondrick et al., 2016. [Paper](https://arxiv.org/abs/1609.02612)
-- **MoCoGAN: Decomposing Motion and Content for Video Generation** — Tulyakov et al., 2017. [Paper](https://arxiv.org/abs/1707.04993)
-- **Stochastic Video Generation with a Learned Prior** — Denton & Fergus, 2018. [Paper](https://arxiv.org/abs/1802.07687)
-- **Adversarial Video Generation on Complex Datasets / DVD-GAN** — Clark et al., 2019. [Paper](https://arxiv.org/abs/1907.06571)
+- **MoCoGAN: Decomposing Motion and Content for Video Generation [[14]](#ref-14)** — Tulyakov et al., 2017. [Paper](https://arxiv.org/abs/1707.04993)
+- **Stochastic Video Generation with a Learned Prior [[15]](#ref-15)** — Denton & Fergus, 2018. [Paper](https://arxiv.org/abs/1802.07687)
+- **Adversarial Video Generation on Complex Datasets [[16]](#ref-16) / DVD-GAN** — Clark et al., 2019. [Paper](https://arxiv.org/abs/1907.06571)
 
 阅读问题：内容与运动是否真的被解耦？判别器在检查单帧还是检查时间结构？
 
 ## D. Tokenizer 与 Transformer
 
-- **Neural Discrete Representation Learning / VQ-VAE** — van den Oord et al., 2017. [Paper](https://arxiv.org/abs/1711.00937)
+- **Neural Discrete Representation Learning [[17]](#ref-17) / VQ-VAE** — van den Oord et al., 2017. [Paper](https://arxiv.org/abs/1711.00937)
 - **VideoGPT** — Yan et al., 2021. [Paper](https://arxiv.org/abs/2104.10157)
-- **Phenaki** — Villegas et al., 2022. [Paper](https://arxiv.org/abs/2210.02399)
-- **MAGVIT** — Yu et al., 2022/2023. [Paper](https://arxiv.org/abs/2212.05199)
-- **Language Model Beats Diffusion — Tokenizer Is Key to Visual Generation / MAGVIT-v2** — Yu et al., 2023. [Paper](https://arxiv.org/abs/2310.05737)
+- **Phenaki [[18]](#ref-18)** — Villegas et al., 2022. [Paper](https://arxiv.org/abs/2210.02399)
+- **MAGVIT [[19]](#ref-19)** — Yu et al., 2022/2023. [Paper](https://arxiv.org/abs/2212.05199)
+- **Language Model Beats Diffusion — Tokenizer Is Key to Visual Generation / MAGVIT-v2** — Yu et al., 2023. [Paper](https://arxiv.org/abs/2310.05737) [[20]](#ref-20)
 
 阅读问题：压缩率、重建质量、token 数量和生成难度之间如何权衡？
 
 ## E. 生成模型路线：Diffusion、Flow 与大规模视频生成
 
-- **Denoising Diffusion Probabilistic Models** — Ho et al., 2020. [Paper](https://arxiv.org/abs/2006.11239)
+- **Denoising Diffusion Probabilistic Models [[21]](#ref-21)** — Ho et al., 2020. [Paper](https://arxiv.org/abs/2006.11239)
 - **Video Diffusion Models** — Ho et al., 2022. [Paper](https://arxiv.org/abs/2204.03458)
-- **Make-A-Video** — Singer et al., 2022. [Paper](https://arxiv.org/abs/2209.14792)
-- **Imagen Video** — Ho et al., 2022. [Paper](https://arxiv.org/abs/2210.02303)
-- **Align Your Latents** — Blattmann et al., 2023. [Paper](https://arxiv.org/abs/2304.08818)
-- **AnimateDiff** — Guo et al., 2023. [Paper](https://arxiv.org/abs/2307.04725)
-- **Stable Video Diffusion** — Blattmann et al., 2023. [Paper](https://arxiv.org/abs/2311.15127)
-- **Lumiere** — Bar-Tal et al., 2024. [Paper](https://arxiv.org/abs/2401.12945)
+- **Make-A-Video [[22]](#ref-22)** — Singer et al., 2022. [Paper](https://arxiv.org/abs/2209.14792)
+- **Imagen Video [[23]](#ref-23)** — Ho et al., 2022. [Paper](https://arxiv.org/abs/2210.02303)
+- **Align Your Latents** — Blattmann et al., 2023. [Paper](https://arxiv.org/abs/2304.08818) [[24]](#ref-24)
+- **AnimateDiff [[25]](#ref-25)** — Guo et al., 2023. [Paper](https://arxiv.org/abs/2307.04725)
+- **Stable Video Diffusion [[26]](#ref-26)** — Blattmann et al., 2023. [Paper](https://arxiv.org/abs/2311.15127)
+- **Lumiere [[27]](#ref-27)** — Bar-Tal et al., 2024. [Paper](https://arxiv.org/abs/2401.12945)
 - **Sora technical report** — OpenAI, 2024. [Project](https://openai.com/index/video-generation-models-as-world-simulators/)
 
 阅读问题：模型是在整段视频上联合去噪，还是分块、分帧或分辨率级联？时间层如何复用图像预训练？
@@ -95,34 +95,34 @@
 ## F. 决策型 World Model
 
 - **World Models** — Ha & Schmidhuber, 2018. [Paper](https://arxiv.org/abs/1803.10122)
-- **Learning Latent Dynamics for Planning from Pixels / PlaNet** — Hafner et al., 2018/2019. [Paper](https://arxiv.org/abs/1811.04551)
-- **Dream to Control / Dreamer** — Hafner et al., 2019/2020. [Paper](https://arxiv.org/abs/1912.01603)
+- **Learning Latent Dynamics for Planning from Pixels [[28]](#ref-28) / PlaNet** — Hafner et al., 2018/2019. [Paper](https://arxiv.org/abs/1811.04551)
+- **Dream to Control [[29]](#ref-29) / Dreamer** — Hafner et al., 2019/2020. [Paper](https://arxiv.org/abs/1912.01603)
 - **Mastering Atari, Go, Chess and Shogi by Planning with a Learned Model / MuZero** — Schrittwieser et al., 2019/2020. [Paper](https://arxiv.org/abs/1911.08265)
-- **Mastering Diverse Domains through World Models / DreamerV3** — Hafner et al., 2023. [Paper](https://arxiv.org/abs/2301.04104)
-- **GAIA-1: A Generative World Model for Autonomous Driving** — Hu et al., 2023. [Paper](https://arxiv.org/abs/2309.17080)
+- **Mastering Diverse Domains through World Models [[31]](#ref-31) / DreamerV3** — Hafner et al., 2023. [Paper](https://arxiv.org/abs/2301.04104)
+- **GAIA-1: A Generative World Model for Autonomous Driving [[32]](#ref-32)** — Hu et al., 2023. [Paper](https://arxiv.org/abs/2309.17080)
 
 阅读问题：模型是否需要重建像素？它学习的是环境本身，还是仅足以预测价值与策略的状态？
 
 ## G. 大模型路线：视频基础模型与交互世界
 
 - **Genie** — Bruce et al., 2024. [Paper](https://arxiv.org/abs/2402.15391)
-- **GameNGen** — Valevski et al., 2024. [Paper](https://arxiv.org/abs/2408.14837)
-- **Cosmos World Foundation Model Platform** — NVIDIA, 2025. [Paper](https://arxiv.org/abs/2501.03575)
-- **Genie 3** — Google DeepMind, 2025. [Project](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/)
-- **GWM-1** — Runway, 2025. [Project](https://runway.com/research/introducing-runway-gwm-1)
-- **Cosmos 3** — NVIDIA, 2026. [Project](https://research.nvidia.com/labs/cosmos-lab/cosmos3/)
+- **GameNGen** — Valevski et al., 2024. [Paper](https://arxiv.org/abs/2408.14837) [[33]](#ref-33)
+- **Cosmos World Foundation Model Platform** — NVIDIA, 2025. [Paper](https://arxiv.org/abs/2501.03575) [[34]](#ref-34)
+- **Genie 3 [[35]](#ref-35)** — Google DeepMind, 2025. [Project](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/)
+- **GWM-1** — Runway, 2025. [Project](https://runway.com/research/introducing-runway-gwm-1) [[36]](#ref-36)
+- **Cosmos 3 [[37]](#ref-37)** — NVIDIA, 2026. [Project](https://research.nvidia.com/labs/cosmos-lab/cosmos3/)
 
 阅读问题：动作是什么？状态保存多久？模型是否实时？规划收益是在模型内部还是真实环境中测量？
 
 ## H. 参考阅读：JEPA 路线
 
-- **A Path Towards Autonomous Machine Intelligence** — LeCun, 2022. [OpenReview](https://openreview.net/forum?id=BZ5a1r-kVsf)
-- **I-JEPA** — Assran et al., 2023. [Paper](https://arxiv.org/abs/2301.08243)
-- **MC-JEPA** — Bardes et al., 2023. [Paper](https://arxiv.org/abs/2307.12698)
-- **V-JEPA** — Bardes et al., 2024. [Paper](https://arxiv.org/abs/2404.08471)
-- **V-JEPA 2** — Assran et al., 2025. [Paper](https://arxiv.org/abs/2506.09985)
-- **V-JEPA 2.1** — Mur-Labadia et al., 2026. [Paper](https://arxiv.org/abs/2603.14482)
-- **LeJEPA / LeWorldModel / EB-JEPA / TD-JEPA** — 训练稳定性、动作条件 latent dynamics 与强化学习延伸。详见 [JEPA 参考阅读](jepa.md)。
+- **A Path Towards Autonomous Machine Intelligence [[38]](#ref-38)** — LeCun, 2022. [OpenReview](https://openreview.net/forum?id=BZ5a1r-kVsf)
+- **I-JEPA** — Assran et al., 2023. [Paper](https://arxiv.org/abs/2301.08243) [[39]](#ref-39)
+- **MC-JEPA [[40]](#ref-40)** — Bardes et al., 2023. [Paper](https://arxiv.org/abs/2307.12698)
+- **V-JEPA** — Bardes et al., 2024. [Paper](https://arxiv.org/abs/2404.08471) [[41]](#ref-41)
+- **V-JEPA 2 [[42]](#ref-42)** — Assran et al., 2025. [Paper](https://arxiv.org/abs/2506.09985)
+- **V-JEPA 2.1 [[43]](#ref-43)** — Mur-Labadia et al., 2026. [Paper](https://arxiv.org/abs/2603.14482)
+- **LeJEPA [[44]](#ref-44) / LeWorldModel [[45]](#ref-45) / EB-JEPA / TD-JEPA [[47]](#ref-47)** — 训练稳定性、动作条件 latent dynamics 与强化学习延伸。详见 [JEPA 参考阅读](jepa.md)。
 
 阅读问题：JEPA 预测的是像素、token 还是 latent？哪些工作只是表征学习，哪些工作真的接入了动作、rollout 或 planning？
 
@@ -153,98 +153,100 @@ text / image / video / audio / camera / action
 它改变了表示、架构、规模、控制还是评测？
 ```
 
+本页主要参考工作：Mastering Atari, Go, chess and shogi by planning with a learned model [[30]](#ref-30)、A Lightweight Library for Energy-Based Joint-Embedding Predictive Architectures [[46]](#ref-46)。
+
 ## 参考文献
 
-<a id="ref-1"></a>[1] Arno Schödl, Richard Szeliski, David H. Salesin, and Irfan Essa. [Video textures](https://doi.org/10.1145/344779.345012). Proceedings of the 27th annual conference on Computer graphics and interactive techniques - SIGGRAPH '00, 2000.
+<a id="ref-1"></a>[1] [Video textures](https://doi.org/10.1145/344779.345012). Arno Schödl, Richard Szeliski, David H. Salesin, Irfan Essa. Proceedings of SIGGRAPH '00. 2000.
 
-<a id="ref-2"></a>[2] Michael Mathieu, Camille Couprie, and Yann LeCun. [Deep multi-scale video prediction beyond mean square error](https://arxiv.org/abs/1511.05440). arXiv preprint, 2015.
+<a id="ref-2"></a>[2] [Deep multi-scale video prediction beyond mean square error](https://arxiv.org/abs/1511.05440). Michael Mathieu, Camille Couprie, Yann LeCun. arXiv preprint. 2015.
 
-<a id="ref-3"></a>[3] Chelsea Finn, Ian Goodfellow, and Sergey Levine. [Unsupervised Learning for Physical Interaction through Video Prediction](https://arxiv.org/abs/1605.07157). arXiv preprint, 2016.
+<a id="ref-3"></a>[3] [Unsupervised Learning for Physical Interaction through Video Prediction](https://arxiv.org/abs/1605.07157). Chelsea Finn, Ian Goodfellow, Sergey Levine. arXiv preprint. 2016.
 
-<a id="ref-4"></a>[4] Wilson Yan, Yunzhi Zhang, Pieter Abbeel, and Aravind Srinivas. [VideoGPT: Video Generation using VQ-VAE and Transformers](https://arxiv.org/abs/2104.10157). arXiv preprint, 2021.
+<a id="ref-4"></a>[4] [VideoGPT: Video Generation using VQ-VAE and Transformers](https://arxiv.org/abs/2104.10157). Wilson Yan, Yunzhi Zhang, Pieter Abbeel, Aravind Srinivas. arXiv preprint. 2021.
 
-<a id="ref-5"></a>[5] Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, and David J. Fleet. [Video Diffusion Models](https://arxiv.org/abs/2204.03458). arXiv preprint, 2022.
+<a id="ref-5"></a>[5] [Video Diffusion Models](https://arxiv.org/abs/2204.03458). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. arXiv preprint. 2022.
 
-<a id="ref-6"></a>[6] OpenAI. [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). Technical report, 2024.
+<a id="ref-6"></a>[6] [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). OpenAI. Technical report. 2024.
 
-<a id="ref-7"></a>[7] David Ha, and Jürgen Schmidhuber. [World Models](https://arxiv.org/abs/1803.10122). Advances in Neural Information Processing Systems 31, 2018.
+<a id="ref-7"></a>[7] [World Models](https://arxiv.org/abs/1803.10122). David Ha and Jürgen Schmidhuber. Advances in Neural Information Processing Systems 31. 2018.
 
-<a id="ref-8"></a>[8] Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). arXiv preprint, 2024.
+<a id="ref-8"></a>[8] [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. arXiv preprint. 2024.
 
-<a id="ref-9"></a>[9] Bruce D. Lucas, and Takeo Kanade. [An Iterative Image Registration Technique with an Application to Stereo Vision](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Proceedings of the 7th International Joint Conference on Artificial Intelligence (IJCAI), 1981.
+<a id="ref-9"></a>[9] [An Iterative Image Registration Technique with an Application to Stereo Vision](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Bruce D. Lucas and Takeo Kanade. Proceedings of IJCAI. 1981.
 
-<a id="ref-10"></a>[10] Berthold K.P. Horn, and Brian G. Schunck. [Determining optical flow](https://doi.org/10.1016/0004-3702(81)90024-2). Artificial Intelligence, 1981.
+<a id="ref-10"></a>[10] [Determining optical flow](https://doi.org/10.1016/0004-3702(81)90024-2). Berthold K. P. Horn and Brian G. Schunck. Artificial Intelligence. 1981.
 
-<a id="ref-11"></a>[11] Gianfranco Doretto, Alessandro Chiuso, Ying Nian Wu, and Stefano Soatto. [Dynamic Textures](https://doi.org/10.1023/A:1021669406132). International Journal of Computer Vision, 2003.
+<a id="ref-11"></a>[11] [Dynamic Textures](https://doi.org/10.1023/A:1021669406132). Gianfranco Doretto, Alessandro Chiuso, Ying Nian Wu, Stefano Soatto. International Journal of Computer Vision. 2003.
 
-<a id="ref-12"></a>[12] Xingjian Shi, Zhourong Chen, Hao Wang, Dit-Yan Yeung, Wai-kin Wong, and Wang-chun Woo. [Convolutional LSTM Network: A Machine Learning Approach for Precipitation Nowcasting](https://arxiv.org/abs/1506.04214). arXiv preprint, 2015.
+<a id="ref-12"></a>[12] [Convolutional LSTM Network: A Machine Learning Approach for Precipitation Nowcasting](https://arxiv.org/abs/1506.04214). Xingjian Shi, Zhourong Chen, Hao Wang, Dit-Yan Yeung, Wai-kin Wong, Wang-chun Woo. arXiv preprint. 2015.
 
-<a id="ref-13"></a>[13] William Lotter, Gabriel Kreiman, and David Cox. [Deep Predictive Coding Networks for Video Prediction and Unsupervised Learning](https://arxiv.org/abs/1605.08104). arXiv preprint, 2016.
+<a id="ref-13"></a>[13] [Deep Predictive Coding Networks for Video Prediction and Unsupervised Learning](https://arxiv.org/abs/1605.08104). William Lotter, Gabriel Kreiman, David Cox. arXiv preprint. 2016.
 
-<a id="ref-14"></a>[14] Sergey Tulyakov, Ming-Yu Liu, Xiaodong Yang, and Jan Kautz. [MoCoGAN: Decomposing Motion and Content for Video Generation](https://arxiv.org/abs/1707.04993). arXiv preprint, 2017.
+<a id="ref-14"></a>[14] [MoCoGAN: Decomposing Motion and Content for Video Generation](https://arxiv.org/abs/1707.04993). Sergey Tulyakov, Ming-Yu Liu, Xiaodong Yang, Jan Kautz. arXiv preprint. 2017.
 
-<a id="ref-15"></a>[15] Remi Denton, and Rob Fergus. [Stochastic Video Generation with a Learned Prior](https://arxiv.org/abs/1802.07687). arXiv preprint, 2018.
+<a id="ref-15"></a>[15] [Stochastic Video Generation with a Learned Prior](https://arxiv.org/abs/1802.07687). Remi Denton and Rob Fergus. arXiv preprint. 2018.
 
-<a id="ref-16"></a>[16] Aidan Clark, Jeff Donahue, and Karen Simonyan. [Adversarial Video Generation on Complex Datasets](https://arxiv.org/abs/1907.06571). arXiv preprint, 2019.
+<a id="ref-16"></a>[16] [Adversarial Video Generation on Complex Datasets](https://arxiv.org/abs/1907.06571). Aidan Clark, Jeff Donahue, Karen Simonyan. arXiv preprint. 2019.
 
-<a id="ref-17"></a>[17] Aaron van den Oord, Oriol Vinyals, and Koray Kavukcuoglu. [Neural Discrete Representation Learning](https://arxiv.org/abs/1711.00937). arXiv preprint, 2017.
+<a id="ref-17"></a>[17] [Neural Discrete Representation Learning](https://arxiv.org/abs/1711.00937). Aaron van den Oord, Oriol Vinyals, Koray Kavukcuoglu. arXiv preprint. 2017.
 
-<a id="ref-18"></a>[18] Ruben Villegas, Mohammad Babaeizadeh, Pieter-Jan Kindermans, Hernan Moraldo, Han Zhang, Mohammad Taghi Saffar, et al. [Phenaki: Variable Length Video Generation From Open Domain Textual Description](https://arxiv.org/abs/2210.02399). arXiv preprint, 2022.
+<a id="ref-18"></a>[18] [Phenaki: Variable Length Video Generation From Open Domain Textual Description](https://arxiv.org/abs/2210.02399). Ruben Villegas, Mohammad Babaeizadeh, Pieter-Jan Kindermans, Hernan Moraldo, Han Zhang, Mohammad Taghi Saffar, et al. arXiv preprint. 2022.
 
-<a id="ref-19"></a>[19] Lijun Yu, Yong Cheng, Kihyuk Sohn, José Lezama, Han Zhang, Huiwen Chang, et al. [MAGVIT: Masked Generative Video Transformer](https://arxiv.org/abs/2212.05199). arXiv preprint, 2022.
+<a id="ref-19"></a>[19] [MAGVIT: Masked Generative Video Transformer](https://arxiv.org/abs/2212.05199). Lijun Yu, Yong Cheng, Kihyuk Sohn, José Lezama, Han Zhang, Huiwen Chang, et al. arXiv preprint. 2022.
 
-<a id="ref-20"></a>[20] Lijun Yu, José Lezama, Nitesh B. Gundavarapu, Luca Versari, Kihyuk Sohn, David Minnen, et al. [Language Model Beats Diffusion -- Tokenizer is Key to Visual Generation](https://arxiv.org/abs/2310.05737). arXiv preprint, 2023.
+<a id="ref-20"></a>[20] [Language Model Beats Diffusion -- Tokenizer is Key to Visual Generation](https://arxiv.org/abs/2310.05737). Lijun Yu, José Lezama, Nitesh B. Gundavarapu, Luca Versari, Kihyuk Sohn, David Minnen, et al. arXiv preprint. 2023.
 
-<a id="ref-21"></a>[21] Jonathan Ho, Ajay Jain, and Pieter Abbeel. [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239). arXiv preprint, 2020.
+<a id="ref-21"></a>[21] [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239). Jonathan Ho, Ajay Jain, Pieter Abbeel. arXiv preprint. 2020.
 
-<a id="ref-22"></a>[22] Uriel Singer, Adam Polyak, Thomas Hayes, Xi Yin, Jie An, Songyang Zhang, et al. [Make-A-Video: Text-to-Video Generation without Text-Video Data](https://arxiv.org/abs/2209.14792). arXiv preprint, 2022.
+<a id="ref-22"></a>[22] [Make-A-Video: Text-to-Video Generation without Text-Video Data](https://arxiv.org/abs/2209.14792). Uriel Singer, Adam Polyak, Thomas Hayes, Xi Yin, Jie An, Songyang Zhang, et al. arXiv preprint. 2022.
 
-<a id="ref-23"></a>[23] Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey Gritsenko, et al. [Imagen Video: High Definition Video Generation with Diffusion Models](https://arxiv.org/abs/2210.02303). arXiv preprint, 2022.
+<a id="ref-23"></a>[23] [Imagen Video: High Definition Video Generation with Diffusion Models](https://arxiv.org/abs/2210.02303). Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey Gritsenko, et al. arXiv preprint. 2022.
 
-<a id="ref-24"></a>[24] Andreas Blattmann, Robin Rombach, Huan Ling, Tim Dockhorn, Seung Wook Kim, Sanja Fidler, et al. [Align your Latents: High-Resolution Video Synthesis with Latent Diffusion Models](https://arxiv.org/abs/2304.08818). arXiv preprint, 2023.
+<a id="ref-24"></a>[24] [Align your Latents: High-Resolution Video Synthesis with Latent Diffusion Models](https://arxiv.org/abs/2304.08818). Andreas Blattmann, Robin Rombach, Huan Ling, Tim Dockhorn, Seung Wook Kim, Sanja Fidler, et al. arXiv preprint. 2023.
 
-<a id="ref-25"></a>[25] Yuwei Guo, Ceyuan Yang, Anyi Rao, Zhengyang Liang, Yaohui Wang, Yu Qiao, et al. [AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning](https://arxiv.org/abs/2307.04725). arXiv preprint, 2023.
+<a id="ref-25"></a>[25] [AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning](https://arxiv.org/abs/2307.04725). Yuwei Guo, Ceyuan Yang, Anyi Rao, Zhengyang Liang, Yaohui Wang, Yu Qiao, et al. arXiv preprint. 2023.
 
-<a id="ref-26"></a>[26] Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). arXiv preprint, 2023.
+<a id="ref-26"></a>[26] [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. arXiv preprint. 2023.
 
-<a id="ref-27"></a>[27] Omer Bar-Tal, Hila Chefer, Omer Tov, Charles Herrmann, Roni Paiss, Shiran Zada, et al. [Lumiere: A Space-Time Diffusion Model for Video Generation](https://arxiv.org/abs/2401.12945). arXiv preprint, 2024.
+<a id="ref-27"></a>[27] [Lumiere: A Space-Time Diffusion Model for Video Generation](https://arxiv.org/abs/2401.12945). Omer Bar-Tal, Hila Chefer, Omer Tov, Charles Herrmann, Roni Paiss, Shiran Zada, et al. arXiv preprint. 2024.
 
-<a id="ref-28"></a>[28] Danijar Hafner, Timothy Lillicrap, Ian Fischer, Ruben Villegas, David Ha, Honglak Lee, et al. [Learning Latent Dynamics for Planning from Pixels](https://arxiv.org/abs/1811.04551). arXiv preprint, 2018.
+<a id="ref-28"></a>[28] [Learning Latent Dynamics for Planning from Pixels](https://arxiv.org/abs/1811.04551). Danijar Hafner, Timothy Lillicrap, Ian Fischer, Ruben Villegas, David Ha, Honglak Lee, et al. arXiv preprint. 2018.
 
-<a id="ref-29"></a>[29] Danijar Hafner, Timothy Lillicrap, Jimmy Ba, and Mohammad Norouzi. [Dream to Control: Learning Behaviors by Latent Imagination](https://arxiv.org/abs/1912.01603). arXiv preprint, 2019.
+<a id="ref-29"></a>[29] [Dream to Control: Learning Behaviors by Latent Imagination](https://arxiv.org/abs/1912.01603). Danijar Hafner, Timothy Lillicrap, Jimmy Ba, Mohammad Norouzi. arXiv preprint. 2019.
 
-<a id="ref-30"></a>[30] Julian Schrittwieser, Ioannis Antonoglou, Thomas Hubert, Karen Simonyan, Laurent Sifre, Simon Schmitt, et al. [Mastering Atari, Go, chess and shogi by planning with a learned model](https://doi.org/10.1038/s41586-020-03051-4). Nature, 2020.
+<a id="ref-30"></a>[30] [Mastering Atari, Go, chess and shogi by planning with a learned model](https://doi.org/10.1038/s41586-020-03051-4). Julian Schrittwieser, Ioannis Antonoglou, Thomas Hubert, Karen Simonyan, Laurent Sifre, Simon Schmitt, et al. Nature. 2020.
 
-<a id="ref-31"></a>[31] Danijar Hafner, Jurgis Pasukonis, Jimmy Ba, and Timothy Lillicrap. [Mastering Diverse Domains through World Models](https://arxiv.org/abs/2301.04104). arXiv preprint, 2023.
+<a id="ref-31"></a>[31] [Mastering Diverse Domains through World Models](https://arxiv.org/abs/2301.04104). Danijar Hafner, Jurgis Pasukonis, Jimmy Ba, Timothy Lillicrap. arXiv preprint. 2023.
 
-<a id="ref-32"></a>[32] Anthony Hu, Lloyd Russell, Hudson Yeo, Zak Murez, George Fedoseev, Alex Kendall, et al. [GAIA-1: A Generative World Model for Autonomous Driving](https://arxiv.org/abs/2309.17080). arXiv preprint, 2023.
+<a id="ref-32"></a>[32] [GAIA-1: A Generative World Model for Autonomous Driving](https://arxiv.org/abs/2309.17080). Anthony Hu, Lloyd Russell, Hudson Yeo, Zak Murez, George Fedoseev, Alex Kendall, et al. arXiv preprint. 2023.
 
-<a id="ref-33"></a>[33] Dani Valevski, Yaniv Leviathan, Moab Arar, and Shlomi Fruchter. [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837). arXiv preprint, 2024.
+<a id="ref-33"></a>[33] [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837). Dani Valevski, Yaniv Leviathan, Moab Arar, Shlomi Fruchter. arXiv preprint. 2024.
 
-<a id="ref-34"></a>[34] NVIDIA, Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, et al. [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). arXiv preprint, 2025.
+<a id="ref-34"></a>[34] [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). NVIDIA, Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, et al. arXiv preprint. 2025.
 
-<a id="ref-35"></a>[35] Google DeepMind. [Genie 3: A New Frontier for World Models](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/). Project report, 2025.
+<a id="ref-35"></a>[35] [Genie 3: A New Frontier for World Models](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/). Google DeepMind. Project report. 2025.
 
-<a id="ref-36"></a>[36] Runway. [Introducing Runway GWM-1](https://runway.com/research/introducing-runway-gwm-1). Project report, 2025.
+<a id="ref-36"></a>[36] [Introducing Runway GWM-1](https://runway.com/research/introducing-runway-gwm-1). Runway. Project report. 2025.
 
-<a id="ref-37"></a>[37] NVIDIA. [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800). arXiv preprint, 2026.
+<a id="ref-37"></a>[37] [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800). NVIDIA. arXiv preprint. 2026.
 
-<a id="ref-38"></a>[38] Yann LeCun. [A Path Towards Autonomous Machine Intelligence](https://openreview.net/forum?id=BZ5a1r-kVsf). Position paper, version 0.9.2, 2022.
+<a id="ref-38"></a>[38] [A Path Towards Autonomous Machine Intelligence](https://openreview.net/forum?id=BZ5a1r-kVsf). Yann LeCun. Project report. 2022.
 
-<a id="ref-39"></a>[39] Mahmoud Assran, Quentin Duval, Ishan Misra, Piotr Bojanowski, Pascal Vincent, Michael Rabbat, et al. [Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture](https://arxiv.org/abs/2301.08243). arXiv preprint, 2023.
+<a id="ref-39"></a>[39] [Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture](https://arxiv.org/abs/2301.08243). Mahmoud Assran, Quentin Duval, Ishan Misra, Piotr Bojanowski, Pascal Vincent, Michael Rabbat, et al. arXiv preprint. 2023.
 
-<a id="ref-40"></a>[40] Adrien Bardes, Jean Ponce, and Yann LeCun. [MC-JEPA: A Joint-Embedding Predictive Architecture for Self-Supervised Learning of Motion and Content Features](https://arxiv.org/abs/2307.12698). arXiv preprint, 2023.
+<a id="ref-40"></a>[40] [MC-JEPA: A Joint-Embedding Predictive Architecture for Self-Supervised Learning of Motion and Content Features](https://arxiv.org/abs/2307.12698). Adrien Bardes, Jean Ponce, Yann LeCun. arXiv preprint. 2023.
 
-<a id="ref-41"></a>[41] Adrien Bardes, Quentin Garrido, Jean Ponce, Xinlei Chen, Michael Rabbat, Yann LeCun, et al. [Revisiting Feature Prediction for Learning Visual Representations from Video](https://arxiv.org/abs/2404.08471). arXiv preprint, 2024.
+<a id="ref-41"></a>[41] [Revisiting Feature Prediction for Learning Visual Representations from Video](https://arxiv.org/abs/2404.08471). Adrien Bardes, Quentin Garrido, Jean Ponce, Xinlei Chen, Michael Rabbat, Yann LeCun, et al. arXiv preprint. 2024.
 
-<a id="ref-42"></a>[42] Mahmoud Assran, Adrien Bardes, David Fan, Quentin Garrido, Russell Howes, Mojtaba Komeili, et al. [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). arXiv preprint, 2025.
+<a id="ref-42"></a>[42] [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). Mahmoud Assran, Adrien Bardes, David Fan, Quentin Garrido, Russell Howes, Mojtaba Komeili, et al. arXiv preprint. 2025.
 
-<a id="ref-43"></a>[43] Lorenzo Mur-Labadia, Matthew Muckley, Amir Bar, Mahmoud Assran, Koustuv Sinha, Michael Rabbat, et al. [V-JEPA 2.1: Unlocking Dense Features in Video Self-Supervised Learning](https://arxiv.org/abs/2603.14482). arXiv preprint, 2026.
+<a id="ref-43"></a>[43] [V-JEPA 2.1: Unlocking Dense Features in Video Self-Supervised Learning](https://arxiv.org/abs/2603.14482). Lorenzo Mur-Labadia, Matthew Muckley, Amir Bar, Mido Assran, Koustuv Sinha, Mike Rabbat, et al. arXiv preprint. 2026.
 
-<a id="ref-44"></a>[44] Randall Balestriero, and Yann LeCun. [LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics](https://arxiv.org/abs/2511.08544). arXiv preprint, 2025.
+<a id="ref-44"></a>[44] [LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics](https://arxiv.org/abs/2511.08544). Randall Balestriero and Yann LeCun. arXiv preprint. 2025.
 
-<a id="ref-45"></a>[45] Lucas Maes, Quentin Le Lidec, Damien Scieur, Yann LeCun, and Randall Balestriero. [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312). arXiv preprint, 2026.
+<a id="ref-45"></a>[45] [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312). Lucas Maes, Quentin Le Lidec, Damien Scieur, Yann LeCun, Randall Balestriero. arXiv preprint. 2026.
 
-<a id="ref-46"></a>[46] Basile Terver, Randall Balestriero, Megi Dervishi, David Fan, Quentin Garrido, Tushar Nagarajan, et al. [A Lightweight Library for Energy-Based Joint-Embedding Predictive Architectures](https://arxiv.org/abs/2602.03604). arXiv preprint, 2026.
+<a id="ref-46"></a>[46] [A Lightweight Library for Energy-Based Joint-Embedding Predictive Architectures](https://arxiv.org/abs/2602.03604). Basile Terver, Randall Balestriero, Megi Dervishi, David Fan, Quentin Garrido, Tushar Nagarajan, et al. arXiv preprint. 2026.
 
-<a id="ref-47"></a>[47] Marco Bagatella, Matteo Pirotta, Ahmed Touati, Alessandro Lazaric, and Andrea Tirinzoni. [TD-JEPA: Latent-predictive Representations for Zero-Shot Reinforcement Learning](https://arxiv.org/abs/2510.00739). arXiv preprint, 2025.
+<a id="ref-47"></a>[47] [TD-JEPA: Latent-predictive Representations for Zero-Shot Reinforcement Learning](https://arxiv.org/abs/2510.00739). Marco Bagatella, Matteo Pirotta, Ahmed Touati, Alessandro Lazaric, Andrea Tirinzoni. arXiv preprint. 2025.
