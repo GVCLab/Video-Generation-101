@@ -15,6 +15,7 @@
 | Video model 和 world model 的边界 | [从视频生成到 World Model](docs/world-models.md) |
 | 如何正确比较模型 | [评测指南](docs/evaluation.md) |
 | 应该优先读哪些论文 | [精选阅读列表](docs/reading-list.md) |
+| 需要 BibTeX、官方代码和 GitHub Stars | [引用与代码索引](docs/bibliography.md) |
 | 可以实际运行哪些开放模型 | [开放模型与代码](resources/open-models.md) |
 | 常见训练与评测数据 | [数据集索引](resources/datasets.md) |
 
@@ -119,10 +120,18 @@ p(s_{t+1}, o_{t+1}, r_{t+1}\mid s_t,a_t)
 │   ├── taxonomy.md
 │   ├── world-models.md
 │   ├── evaluation.md
-│   └── reading-list.md
+│   ├── reading-list.md
+│   └── bibliography.md
+├── bibliography/
+│   ├── references.bib
+│   ├── registry.json
+│   ├── metadata.json
+│   └── github-stars.json
 ├── resources/
 │   ├── open-models.md
 │   └── datasets.md
+├── scripts/
+│   └── update_bibliography.py
 ├── CONTRIBUTING.md
 ├── CITATION.cff
 └── LICENSE

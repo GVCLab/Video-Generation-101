@@ -1,0 +1,63 @@
+{
+  "as_of": "2026-08-09",
+  "fetched_at": "2026-08-09T10:31:24Z",
+  "repositories": {
+    "https://github.com/GameNGen/GameNGen.github.io": {
+      "stars": 91
+    },
+    "https://github.com/NVIDIA/Cosmos": {
+      "stars": 11419
+    },
+    "https://github.com/Stability-AI/generative-models": {
+      "stars": 27249
+    },
+    "https://github.com/coxlab/prednet": {
+      "stars": 806
+    },
+    "https://github.com/cvondrick/videogan": {
+      "stars": 706
+    },
+    "https://github.com/danijar/dreamer": {
+      "stars": 619
+    },
+    "https://github.com/danijar/dreamerv3": {
+      "stars": 3643
+    },
+    "https://github.com/edenton/svg": {
+      "stars": 188
+    },
+    "https://github.com/facebookresearch/jepa": {
+      "stars": 4070
+    },
+    "https://github.com/facebookresearch/vjepa2": {
+      "stars": 4447
+    },
+    "https://github.com/google-research/magvit": {
+      "stars": 1002
+    },
+    "https://github.com/google-research/planet": {
+      "stars": 1260
+    },
+    "https://github.com/guoyww/AnimateDiff": {
+      "stars": 12212
+    },
+    "https://github.com/hardmaru/WorldModelsExperiments": {
+      "stars": 730
+    },
+    "https://github.com/hojonathanho/diffusion": {
+      "stars": 5297
+    },
+    "https://github.com/lucidrains/video-diffusion-pytorch": {
+      "stars": 1384
+    },
+    "https://github.com/sergeytulyakov/mocogan": {
+      "stars": 603
+    },
+    "https://github.com/werner-duvaud/muzero-general": {
+      "stars": 2854
+    },
+    "https://github.com/wilson1yan/VideoGPT": {
+      "stars": 1079
+    }
+  }
+}

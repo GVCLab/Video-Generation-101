@@ -1,0 +1,396 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "citekey": "lucas1981iterative",
+      "section": "A",
+      "source": {
+        "kind": "manual",
+        "metadata": {
+          "entry_type": "inproceedings",
+          "title": "An Iterative Image Registration Technique with an Application to Stereo Vision",
+          "authors": "Bruce D. Lucas and Takeo Kanade",
+          "year": "1981",
+          "booktitle": "Proceedings of the 7th International Joint Conference on Artificial Intelligence (IJCAI)",
+          "pages": "674--679",
+          "url": "https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf"
+        }
+      },
+      "github": null
+    },
+    {
+      "citekey": "horn1981determining",
+      "section": "A",
+      "source": {"kind": "doi", "id": "10.1016/0004-3702(81)90024-2"},
+      "github": null
+    },
+    {
+      "citekey": "schodl2000video",
+      "section": "A",
+      "source": {"kind": "doi", "id": "10.1145/344779.345012"},
+      "github": null
+    },
+    {
+      "citekey": "doretto2003dynamic",
+      "section": "A",
+      "source": {"kind": "doi", "id": "10.1023/A:1021669406132"},
+      "github": null
+    },
+    {
+      "citekey": "srivastava2015unsupervised",
+      "section": "B",
+      "source": {"kind": "arxiv", "id": "1502.04681"},
+      "github": null
+    },
+    {
+      "citekey": "shi2015convolutional",
+      "section": "B",
+      "source": {"kind": "arxiv", "id": "1506.04214"},
+      "github": null
+    },
+    {
+      "citekey": "mathieu2015deep",
+      "section": "B",
+      "source": {"kind": "arxiv", "id": "1511.05440"},
+      "github": null
+    },
+    {
+      "citekey": "finn2016unsupervised",
+      "section": "B",
+      "source": {"kind": "arxiv", "id": "1605.07157"},
+      "github": null
+    },
+    {
+      "citekey": "lotter2016deep",
+      "section": "B",
+      "source": {"kind": "arxiv", "id": "1605.08104"},
+      "github": {
+        "url": "https://github.com/coxlab/prednet",
+        "status": "official-code",
+        "note": "作者维护的 Keras 实现"
+      }
+    },
+    {
+      "citekey": "vondrick2016generating",
+      "section": "C",
+      "source": {"kind": "arxiv", "id": "1609.02612"},
+      "github": {
+        "url": "https://github.com/cvondrick/videogan",
+        "status": "official-code",
+        "note": "论文项目页链接的作者实现"
+      }
+    },
+    {
+      "citekey": "tulyakov2017mocogan",
+      "section": "C",
+      "source": {"kind": "arxiv", "id": "1707.04993"},
+      "github": {
+        "url": "https://github.com/sergeytulyakov/mocogan",
+        "status": "official-code",
+        "note": "作者实现"
+      }
+    },
+    {
+      "citekey": "denton2018stochastic",
+      "section": "C",
+      "source": {"kind": "arxiv", "id": "1802.07687"},
+      "github": {
+        "url": "https://github.com/edenton/svg",
+        "status": "official-code",
+        "note": "作者实现"
+      }
+    },
+    {
+      "citekey": "clark2019adversarial",
+      "section": "C",
+      "source": {"kind": "arxiv", "id": "1907.06571"},
+      "github": null
+    },
+    {
+      "citekey": "oord2017neural",
+      "section": "D",
+      "source": {"kind": "arxiv", "id": "1711.00937"},
+      "github": null
+    },
+    {
+      "citekey": "yan2021videogpt",
+      "section": "D",
+      "source": {"kind": "arxiv", "id": "2104.10157"},
+      "github": {
+        "url": "https://github.com/wilson1yan/VideoGPT",
+        "status": "official-code",
+        "note": "作者实现"
+      }
+    },
+    {
+      "citekey": "villegas2022phenaki",
+      "section": "D",
+      "source": {"kind": "arxiv", "id": "2210.02399"},
+      "github": null
+    },
+    {
+      "citekey": "yu2022magvit",
+      "section": "D",
+      "source": {"kind": "arxiv", "id": "2212.05199"},
+      "github": {
+        "url": "https://github.com/google-research/magvit",
+        "status": "official-code",
+        "note": "Google Research 官方实现；仓库已归档"
+      }
+    },
+    {
+      "citekey": "yu2023language",
+      "section": "D",
+      "source": {"kind": "arxiv", "id": "2310.05737"},
+      "github": {
+        "url": "https://github.com/google-research/magvit",
+        "status": "official-related-code",
+        "note": "作者团队的 MAGVIT v1 仓库；README 未声明包含 MAGVIT-v2 实现；仓库已归档"
+      }
+    },
+    {
+      "citekey": "ho2020denoising",
+      "section": "E",
+      "source": {"kind": "arxiv", "id": "2006.11239"},
+      "github": {
+        "url": "https://github.com/hojonathanho/diffusion",
+        "status": "official-code",
+        "note": "作者实现"
+      }
+    },
+    {
+      "citekey": "ho2022video",
+      "section": "E",
+      "source": {"kind": "arxiv", "id": "2204.03458"},
+      "github": {
+        "url": "https://github.com/lucidrains/video-diffusion-pytorch",
+        "status": "community-implementation",
+        "note": "第三方复现；未发现论文作者公开的官方实现"
+      }
+    },
+    {
+      "citekey": "singer2022make",
+      "section": "E",
+      "source": {"kind": "arxiv", "id": "2209.14792"},
+      "github": null
+    },
+    {
+      "citekey": "ho2022imagen",
+      "section": "E",
+      "source": {"kind": "arxiv", "id": "2210.02303"},
+      "github": null
+    },
+    {
+      "citekey": "blattmann2023align",
+      "section": "E",
+      "source": {"kind": "arxiv", "id": "2304.08818"},
+      "github": null
+    },
+    {
+      "citekey": "guo2023animatediff",
+      "section": "E",
+      "source": {"kind": "arxiv", "id": "2307.04725"},
+      "github": {
+        "url": "https://github.com/guoyww/AnimateDiff",
+        "status": "official-code",
+        "note": "作者实现"
+      }
+    },
+    {
+      "citekey": "blattmann2023stable",
+      "section": "E",
+      "source": {"kind": "arxiv", "id": "2311.15127"},
+      "github": {
+        "url": "https://github.com/Stability-AI/generative-models",
+        "status": "official-code",
+        "note": "Stability AI 官方模型仓库"
+      }
+    },
+    {
+      "citekey": "bartal2024lumiere",
+      "section": "E",
+      "source": {"kind": "arxiv", "id": "2401.12945"},
+      "github": null
+    },
+    {
+      "citekey": "openai2024sora",
+      "section": "E",
+      "source": {
+        "kind": "manual",
+        "metadata": {
+          "entry_type": "misc",
+          "title": "Video Generation Models as World Simulators",
+          "authors": "{OpenAI}",
+          "year": "2024",
+          "howpublished": "Technical report",
+          "url": "https://openai.com/index/video-generation-models-as-world-simulators/"
+        }
+      },
+      "github": null
+    },
+    {
+      "citekey": "ha2018worldmodels",
+      "section": "F",
+      "source": {
+        "kind": "manual",
+        "metadata": {
+          "entry_type": "incollection",
+          "title": "World Models",
+          "authors": "David Ha and Jürgen Schmidhuber",
+          "year": "2018",
+          "booktitle": "Advances in Neural Information Processing Systems 31",
+          "pages": "2451--2463",
+          "publisher": "Curran Associates, Inc.",
+          "url": "https://arxiv.org/abs/1803.10122"
+        }
+      },
+      "github": {
+        "url": "https://github.com/hardmaru/WorldModelsExperiments",
+        "status": "official-research-artifact",
+        "note": "作者发布的实验代码与笔记"
+      }
+    },
+    {
+      "citekey": "hafner2018learning",
+      "section": "F",
+      "source": {"kind": "arxiv", "id": "1811.04551"},
+      "github": {
+        "url": "https://github.com/google-research/planet",
+        "status": "official-code",
+        "note": "Google Research 官方实现；仓库已归档"
+      }
+    },
+    {
+      "citekey": "hafner2019dream",
+      "section": "F",
+      "source": {"kind": "arxiv", "id": "1912.01603"},
+      "github": {
+        "url": "https://github.com/danijar/dreamer",
+        "status": "official-code",
+        "note": "作者实现"
+      }
+    },
+    {
+      "citekey": "schrittwieser2020mastering",
+      "section": "F",
+      "source": {"kind": "doi", "id": "10.1038/s41586-020-03051-4"},
+      "github": {
+        "url": "https://github.com/werner-duvaud/muzero-general",
+        "status": "community-implementation",
+        "note": "第三方通用实现；DeepMind 仅公开伪代码，未公开完整官方训练仓库"
+      }
+    },
+    {
+      "citekey": "hafner2023mastering",
+      "section": "F",
+      "source": {"kind": "arxiv", "id": "2301.04104"},
+      "github": {
+        "url": "https://github.com/danijar/dreamerv3",
+        "status": "official-code",
+        "note": "作者实现"
+      }
+    },
+    {
+      "citekey": "hu2023gaia",
+      "section": "F",
+      "source": {"kind": "arxiv", "id": "2309.17080"},
+      "github": null
+    },
+    {
+      "citekey": "bardes2024revisiting",
+      "section": "G",
+      "source": {"kind": "arxiv", "id": "2404.08471"},
+      "github": {
+        "url": "https://github.com/facebookresearch/jepa",
+        "status": "official-code",
+        "note": "Meta AI Research 官方实现"
+      }
+    },
+    {
+      "citekey": "bruce2024genie",
+      "section": "G",
+      "source": {"kind": "arxiv", "id": "2402.15391"},
+      "github": null
+    },
+    {
+      "citekey": "valevski2024diffusion",
+      "section": "G",
+      "source": {"kind": "arxiv", "id": "2408.14837"},
+      "github": {
+        "url": "https://github.com/GameNGen/GameNGen.github.io",
+        "status": "official-project-page",
+        "note": "官方项目页源码，不含模型训练或推理实现"
+      }
+    },
+    {
+      "citekey": "nvidia2025cosmos",
+      "section": "G",
+      "source": {"kind": "arxiv", "id": "2501.03575"},
+      "github": {
+        "url": "https://github.com/NVIDIA/Cosmos",
+        "status": "official-code",
+        "note": "NVIDIA 官方实现"
+      }
+    },
+    {
+      "citekey": "assran2025vjepa2",
+      "section": "G",
+      "source": {
+        "kind": "arxiv",
+        "id": "2506.09985",
+        "author_override": "Mahmoud Assran and Adrien Bardes and David Fan and Quentin Garrido and Russell Howes and Mojtaba Komeili and Matthew Muckley and Ammar Rizvi and Claire Roberts and Koustuv Sinha and Artem Zholus and Sergio Arnaud and Abha Gejji and Ada Martin and Francois Robert Hogan and Daniel Dugas and Piotr Bojanowski and Vasil Khalidov and Patrick Labatut and Francisco Massa and Marc Szafraniec and Kapil Krishnakumar and Yong Li and Xiaodong Ma and Sarath Chandar and Franziska Meier and Yann LeCun and Michael Rabbat and Nicolas Ballas"
+      },
+      "github": {
+        "url": "https://github.com/facebookresearch/vjepa2",
+        "status": "official-code",
+        "note": "Meta AI Research 官方实现"
+      }
+    },
+    {
+      "citekey": "deepmind2025genie3",
+      "section": "G",
+      "source": {
+        "kind": "manual",
+        "metadata": {
+          "entry_type": "misc",
+          "title": "Genie 3: A New Frontier for World Models",
+          "authors": "{Google DeepMind}",
+          "year": "2025",
+          "howpublished": "Project report",
+          "url": "https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/"
+        }
+      },
+      "github": null
+    },
+    {
+      "citekey": "runway2025gwm1",
+      "section": "G",
+      "source": {
+        "kind": "manual",
+        "metadata": {
+          "entry_type": "misc",
+          "title": "Introducing Runway GWM-1",
+          "authors": "{Runway}",
+          "year": "2025",
+          "howpublished": "Project report",
+          "url": "https://runway.com/research/introducing-runway-gwm-1"
+        }
+      },
+      "github": null
+    },
+    {
+      "citekey": "nvidia2026cosmos3",
+      "section": "G",
+      "source": {
+        "kind": "arxiv",
+        "id": "2606.02800",
+        "author_override": "{NVIDIA}"
+      },
+      "github": {
+        "url": "https://github.com/NVIDIA/Cosmos",
+        "status": "official-code",
+        "note": "NVIDIA 官方统一 Cosmos 仓库"
+      }
+    }
+  ]
+}

@@ -2,6 +2,8 @@
 
 本页不是追求数量的 awesome list，而是按概念演化挑选的阅读路径。建议优先阅读原始论文，并结合项目页中的视频与失败案例。
 
+全部条目的标准引用、代码仓库类型和带日期的 GitHub Star 快照见 [引用与代码索引](bibliography.md)，也可直接下载 [完整 BibTeX](../bibliography/references.bib)。
+
 ## 最小阅读集：8 篇建立全局观
 
 1. **Video Textures** — Schödl et al., 2000
