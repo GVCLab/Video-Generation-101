@@ -4,7 +4,7 @@
 
 全部条目的标准引用、代码仓库类型和带日期的 GitHub Star 快照见 [引用与代码索引](bibliography.md)，也可直接下载 [完整 BibTeX](../bibliography/references.bib)。
 
-如果希望系统理解 latent prediction、V-JEPA 2-AC 与生成式 world model 的差别，直接阅读 [JEPA 路线专章](jepa.md)。
+本页把 JEPA 放在参考阅读中，而不是作为视频生成主线章节。若需要理解 latent prediction、V-JEPA 2-AC 与生成式 world model 的差别，可读 [JEPA 参考阅读](jepa.md)。
 
 ## 最小阅读集：8 篇建立全局观
 
@@ -59,7 +59,7 @@
 
 阅读问题：模型是在预测像素、运动，还是隐藏状态？多种合理未来如何表达？
 
-## C. VAE 与 GAN
+## C. 生成模型路线：VAE 与 GAN
 
 - **Generating Videos with Scene Dynamics** — Vondrick et al., 2016. [Paper](https://arxiv.org/abs/1609.02612)
 - **MoCoGAN: Decomposing Motion and Content for Video Generation** — Tulyakov et al., 2017. [Paper](https://arxiv.org/abs/1707.04993)
@@ -78,7 +78,7 @@
 
 阅读问题：压缩率、重建质量、token 数量和生成难度之间如何权衡？
 
-## E. Diffusion、Flow 与大规模视频生成
+## E. 生成模型路线：Diffusion、Flow 与大规模视频生成
 
 - **Denoising Diffusion Probabilistic Models** — Ho et al., 2020. [Paper](https://arxiv.org/abs/2006.11239)
 - **Video Diffusion Models** — Ho et al., 2022. [Paper](https://arxiv.org/abs/2204.03458)
@@ -103,18 +103,28 @@
 
 阅读问题：模型是否需要重建像素？它学习的是环境本身，还是仅足以预测价值与策略的状态？
 
-## G. 视频基础模型与交互世界
+## G. 大模型路线：视频基础模型与交互世界
 
-- **V-JEPA** — Bardes et al., 2024. [Paper](https://arxiv.org/abs/2404.08471)
 - **Genie** — Bruce et al., 2024. [Paper](https://arxiv.org/abs/2402.15391)
 - **GameNGen** — Valevski et al., 2024. [Paper](https://arxiv.org/abs/2408.14837)
 - **Cosmos World Foundation Model Platform** — NVIDIA, 2025. [Paper](https://arxiv.org/abs/2501.03575)
-- **V-JEPA 2** — Meta, 2025. [Project](https://ai.meta.com/blog/v-jepa-2-world-model-benchmarks/)
 - **Genie 3** — Google DeepMind, 2025. [Project](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/)
 - **GWM-1** — Runway, 2025. [Project](https://runway.com/research/introducing-runway-gwm-1)
 - **Cosmos 3** — NVIDIA, 2026. [Project](https://research.nvidia.com/labs/cosmos-lab/cosmos3/)
 
 阅读问题：动作是什么？状态保存多久？模型是否实时？规划收益是在模型内部还是真实环境中测量？
+
+## H. 参考阅读：JEPA 路线
+
+- **A Path Towards Autonomous Machine Intelligence** — LeCun, 2022. [OpenReview](https://openreview.net/forum?id=BZ5a1r-kVsf)
+- **I-JEPA** — Assran et al., 2023. [Paper](https://arxiv.org/abs/2301.08243)
+- **MC-JEPA** — Bardes et al., 2023. [Paper](https://arxiv.org/abs/2307.12698)
+- **V-JEPA** — Bardes et al., 2024. [Paper](https://arxiv.org/abs/2404.08471)
+- **V-JEPA 2** — Assran et al., 2025. [Paper](https://arxiv.org/abs/2506.09985)
+- **V-JEPA 2.1** — Mur-Labadia et al., 2026. [Paper](https://arxiv.org/abs/2603.14482)
+- **LeJEPA / LeWorldModel / EB-JEPA / TD-JEPA** — 训练稳定性、动作条件 latent dynamics 与强化学习延伸。详见 [JEPA 参考阅读](jepa.md)。
+
+阅读问题：JEPA 预测的是像素、token 还是 latent？哪些工作只是表征学习，哪些工作真的接入了动作、rollout 或 planning？
 
 ## 建议的论文笔记模板
 

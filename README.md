@@ -12,8 +12,10 @@
 |---|---|
 | 整个领域如何演化 | [技术时间线](docs/timeline.md) |
 | 各类任务、模型和术语的区别 | [任务与方法分类](docs/taxonomy.md) |
+| VAE、GAN、Diffusion 如何串成主线 | [生成模型路线](docs/generative-models.md) |
+| 视频生成如何进入基础模型阶段 | [大模型路线](docs/foundation-models.md) |
 | Video model 和 world model 的边界 | [从视频生成到 World Model](docs/world-models.md) |
-| JEPA 如何从表征学习走向动作规划 | [JEPA 路线专章](docs/jepa.md) |
+| 视频生成能落到哪些真实场景 | [相关应用](docs/applications.md) |
 | 如何正确比较模型 | [评测指南](docs/evaluation.md) |
 | 应该优先读哪些论文 | [精选阅读列表](docs/reading-list.md) |
 | 需要 BibTeX、官方代码和 GitHub Stars | [引用与代码索引](docs/bibliography.md) |
@@ -40,16 +42,14 @@ flowchart LR
 
 这不是一条“旧方法被新方法完全替代”的直线。今天的 world model 仍然在重新吸收传统模拟器的显式状态、物理约束和可验证性。
 
-## 六代方法
+## 四条主线
 
-| 代际 | 典型表示 | 生成机制 | 代表工作 | 主要瓶颈 |
+| 主线 | 典型表示 | 生成或预测机制 | 代表工作 | 主要瓶颈 |
 |---|---|---|---|---|
-| 传统合成 | 几何、材质、粒子、运动场 | 渲染、物理求解、重采样 | Video Textures、Dynamic Textures | 开放世界建模成本高 |
-| 深度预测 | 像素或连续 latent | CNN、LSTM、ConvLSTM | Beyond MSE、CDNA | 模糊、长期误差累积 |
-| VAE / GAN | 连续随机 latent | 变分推断、对抗训练 | MoCoGAN、DVD-GAN | 训练不稳定、覆盖不足 |
-| Token 模型 | 离散时空 token | 自回归或掩码预测 | VideoGPT、Phenaki、MAGVIT | token 成本与误差累积 |
-| Diffusion / Flow | 连续时空 latent | 迭代去噪或概率流 | Video Diffusion、Lumiere、Sora | 推理成本、长期一致性 |
-| World model | 状态、动作、记忆 | 条件 rollout、规划、闭环交互 | Dreamer、Genie、V-JEPA 2、Cosmos | 因果性、记忆与可靠性 |
+| 传统与预测 | 光流、运动场、像素或 latent | Warping、状态空间、CNN/RNN | Video Textures、ConvLSTM、CDNA | 多模态未来与误差累积 |
+| 生成模型 | 连续 latent、随机变量、噪声 | VAE、GAN、Diffusion、Flow | MoCoGAN、DVD-GAN、Video Diffusion、Sora | 训练稳定性、采样成本、长程一致性 |
+| 大模型 | 时空 token、spacetime patch、多模态 latent | Transformer、masked modeling、foundation model post-training | VideoGPT、MAGVIT、Sora、Cosmos | 数据治理、上下文长度、可控性 |
+| 应用与 World Model | 状态、动作、记忆、交互环境 | 条件 rollout、编辑闭环、规划、仿真 | Dreamer、Genie、GameNGen、GWM-1、Cosmos | 因果性、状态持久性、闭环可靠性 |
 
 ## 必须分清的三个概念
 
@@ -90,7 +90,7 @@ p(s_{t+1}, o_{t+1}, r_{t+1}\mid s_t,a_t)
 - **2016–2019**：Video GAN、MoCoGAN、DVD-GAN 探索内容—运动解耦和高分辨率生成。
 - **2021–2023**：VideoGPT、Phenaki、MAGVIT 将视频压缩成视觉 token 后用 Transformer 建模。
 - **2022–2024**：Video Diffusion、Imagen Video、Make-A-Video、Lumiere、Sora 推动 diffusion 成为主流。
-- **2024–2025**：Genie、GameNGen、V-JEPA 2、Genie 3 把焦点推向潜在动作、物理预测和实时交互。
+- **2024–2025**：Genie、GameNGen、Genie 3、GWM-1 把焦点推向潜在动作、物理预测和实时交互。
 - **2025–2026**：GWM-1、Cosmos 系列等开始统一视频、声音、动作、规划和 Physical AI。
 
 详细版本见 [技术时间线](docs/timeline.md)。
@@ -100,9 +100,11 @@ p(s_{t+1}, o_{t+1}, r_{t+1}\mid s_t,a_t)
 ### 快速建立全局观
 
 1. 阅读 [任务与方法分类](docs/taxonomy.md)。
-2. 从 [精选阅读列表](docs/reading-list.md) 的“最小阅读集”选 8 篇。
-3. 阅读 [World Model 专章](docs/world-models.md)，理解生成质量和模拟能力的差别。
-4. 用 [评测指南](docs/evaluation.md) 分析一个你熟悉的模型。
+2. 阅读 [生成模型路线](docs/generative-models.md)，先把 VAE、GAN、diffusion 和 flow 串起来。
+3. 阅读 [大模型路线](docs/foundation-models.md)，理解 tokenizer、Transformer 和 world foundation model 的关系。
+4. 从 [精选阅读列表](docs/reading-list.md) 的“最小阅读集”选 8 篇。
+5. 阅读 [World Model 专章](docs/world-models.md)，理解生成质量和模拟能力的差别。
+6. 用 [相关应用](docs/applications.md) 和 [评测指南](docs/evaluation.md) 分析一个你熟悉的模型。
 
 ### 准备做研究
 
@@ -119,10 +121,13 @@ p(s_{t+1}, o_{t+1}, r_{t+1}\mid s_t,a_t)
 ├── docs/
 │   ├── timeline.md
 │   ├── taxonomy.md
+│   ├── generative-models.md
+│   ├── foundation-models.md
 │   ├── world-models.md
-│   ├── jepa.md
+│   ├── applications.md
 │   ├── evaluation.md
 │   ├── reading-list.md
+│   ├── jepa.md
 │   └── bibliography.md
 ├── bibliography/
 │   ├── references.bib

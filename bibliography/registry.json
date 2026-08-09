@@ -298,7 +298,7 @@
     },
     {
       "citekey": "bardes2024revisiting",
-      "section": "G",
+      "section": "H",
       "source": {"kind": "arxiv", "id": "2404.08471"},
       "github": {
         "url": "https://github.com/facebookresearch/jepa",
@@ -334,7 +334,7 @@
     },
     {
       "citekey": "assran2025vjepa2",
-      "section": "G",
+      "section": "H",
       "source": {
         "kind": "arxiv",
         "id": "2506.09985",

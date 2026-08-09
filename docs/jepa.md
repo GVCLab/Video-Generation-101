@@ -1,4 +1,4 @@
-# JEPA 路线：从表征预测到可规划 World Model
+# JEPA 参考阅读：从表征预测到可规划 World Model
 
 JEPA（Joint-Embedding Predictive Architecture，联合嵌入预测架构）的核心主张是：**不要强迫模型预测未来世界的每个像素，而是在表征空间中预测那些稳定、可预测、对理解与行动有用的结构。**
 
