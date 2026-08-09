@@ -1,0 +1,48 @@
+name: 推荐论文或项目
+description: 推荐添加一篇论文、模型、数据集或官方项目
+title: "[Resource]: "
+labels:
+  - resource
+body:
+  - type: dropdown
+    id: resource_type
+    attributes:
+      label: 资源类型
+      options:
+        - 论文
+        - 模型或代码
+        - 数据集
+        - Benchmark
+        - 官方技术报告
+        - 其他
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: 名称
+      placeholder: 官方标题或项目名称
+    validations:
+      required: true
+  - type: input
+    id: primary_source
+    attributes:
+      label: 原始来源
+      description: 论文、作者项目页或官方仓库链接
+      placeholder: https://...
+    validations:
+      required: true
+  - type: textarea
+    id: contribution
+    attributes:
+      label: 推荐理由
+      description: 它改变了什么表示、方法、控制方式或评测？
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 证据与限制
+      description: 简述主要证据、开放状态及已知限制
+    validations:
+      required: true

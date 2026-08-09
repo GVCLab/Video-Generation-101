@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this knowledge map, please cite the repository."
+title: "Video Generation 101: From Motion Models to World Models"
+type: software
+authors:
+  - name: "Video Generation 101 contributors"
+version: 0.1.0
+date-released: 2026-08-09
+license: MIT
+abstract: "A Chinese-language knowledge map of video generation, video prediction, diffusion models, and interactive world models."
+keywords:
+  - video generation
+  - video prediction
+  - diffusion models
+  - world models
+  - physical AI
