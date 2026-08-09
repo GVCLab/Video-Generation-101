@@ -6,16 +6,18 @@
 
 | 任务 | 条件 | 输出 | 主要难点 |
 |---|---|---|---|
-| Unconditional video generation | 无或类别标签 | 新视频 | 多样性与时空真实性 |
-| Text-to-video | 文本 | 与描述匹配的视频 | 语义、动作、镜头和叙事遵循 |
-| Image-to-video | 首帧或参考图 | 动态视频 | 保持身份和布局，同时产生合理运动 |
-| Video prediction | 历史帧 | 未来帧 | 多模态未来、长期误差和不确定性 |
-| Frame interpolation | 前后关键帧 | 中间帧 | 大运动、遮挡和运动边界 |
-| Video-to-video | 视频与编辑指令 | 编辑后视频 | 结构保持与跨帧一致性 |
-| Video inpainting | 视频与 mask | 补全区域 | 遮挡、运动传播和背景一致性 |
-| Story / multi-shot generation | 剧本、分镜、参考素材 | 多镜头序列 | 角色、场景、因果和镜头连续性 |
-| Action-conditioned prediction | 观测与动作 | 动作后的未来 | 动作可控性和反事实准确性 |
-| Interactive world generation | 初始世界与实时动作 | 持续生成的环境 | 低延迟、记忆、3D 和闭环稳定性 |
+| [Unconditional video generation](tasks/unconditional-video-generation.md) | 无或类别标签 | 新视频 | 多样性与时空真实性 |
+| [Text-to-video](tasks/text-to-video.md) | 文本 | 与描述匹配的视频 | 语义、动作、镜头和叙事遵循 |
+| [Image-to-video](tasks/image-to-video.md) | 首帧或参考图 | 动态视频 | 保持身份和布局，同时产生合理运动 |
+| [Video prediction](tasks/video-prediction.md) | 历史帧 | 未来帧 | 多模态未来、长期误差和不确定性 |
+| [Frame interpolation](tasks/frame-interpolation.md) | 前后关键帧 | 中间帧 | 大运动、遮挡和运动边界 |
+| [Video-to-video](tasks/video-to-video.md) | 视频与编辑指令 | 编辑后视频 | 结构保持与跨帧一致性 |
+| [Video inpainting](tasks/video-inpainting.md) | 视频与 mask | 补全区域 | 遮挡、运动传播和背景一致性 |
+| [Story / multi-shot generation](tasks/story-multishot.md) | 剧本、分镜、参考素材 | 多镜头序列 | 角色、场景、因果和镜头连续性 |
+| [Action-conditioned prediction](tasks/action-conditioned-prediction.md) | 观测与动作 | 动作后的未来 | 动作可控性和反事实准确性 |
+| [Interactive world generation](tasks/interactive-world-generation.md) | 初始世界与实时动作 | 持续生成的环境 | 低延迟、记忆、3D 和闭环稳定性 |
+
+每个任务的完整技术演化见 [生成任务深度路线图](tasks/index.md)。
 
 ## 二、按表示空间分类
 

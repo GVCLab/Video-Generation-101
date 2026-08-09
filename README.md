@@ -12,6 +12,7 @@
 |---|---|
 | 整个领域如何演化 | [技术时间线](docs/timeline.md) |
 | 各类任务、模型和术语的区别 | [任务与方法分类](docs/taxonomy.md) |
+| 每类生成任务从早期到最新方法的路线 | [生成任务深度路线图](docs/tasks/index.md) |
 | VAE、GAN、Diffusion 如何串成主线 | [生成模型路线](docs/generative-models.md) |
 | 视频生成如何进入基础模型阶段 | [大模型路线](docs/foundation-models.md) |
 | Video model 和 world model 的边界 | [从视频生成到 World Model](docs/world-models.md) |
@@ -121,6 +122,11 @@ $$
 ├── docs/
 │   ├── timeline.md
 │   ├── taxonomy.md
+│   ├── tasks/
+│   │   ├── index.md
+│   │   ├── text-to-video.md
+│   │   ├── image-to-video.md
+│   │   └── ...
 │   ├── generative-models.md
 │   ├── foundation-models.md
 │   ├── world-models.md
