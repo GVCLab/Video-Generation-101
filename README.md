@@ -1,8 +1,8 @@
 # Video Generation 101
 
-一份面向研究者、工程师和创作者的 **视频生成技术知识地图**：从传统运动建模、深度视频预测，到 diffusion、flow matching 和可交互 world model。
+#### Created by Codex and <a href='https://vinthony.github.io/'>Xiaodong Cun<sup>*</sup></a>, from <a href='https://gvclab.github.io'>GVC Lab, Great Bay University</a>
 
-> 这不是一门按周展开的完整课程，也不是产品排行榜。仓库关注技术脉络、关键思想、代表论文、开放实现，以及“视频生成模型何时才算 world model”这个核心问题。
+一份面向研究者、工程师和创作者的 **视频生成技术知识地图**：从传统运动建模、深度视频预测，到 diffusion、flow matching 和可交互 world model。
 
 资料更新时间：**2026-08**
 
