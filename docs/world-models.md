@@ -96,7 +96,81 @@ $$
 
 面向 Physical AI，将数据治理、视频 tokenizer、生成、物理推理、动作预测和机器人策略放入同一平台。Cosmos 3 [[11]](#ref-11) 进一步尝试统一语言、视觉、声音和动作。
 
-## 6. World model 的关键评测
+## 6. Memory：Persistent World Modeling
+
+对长时段生成而言，记忆不是简单地增加上下文长度，而是让模型持续维护一个可写入、可检索、可更新的世界状态。相比
+
+$$
+\text{Observation} + \text{Action} \rightarrow \text{Future}
+$$
+
+更完整的形式是：
+
+$$
+M_{t+1}=\operatorname{Update}(M_t,o_t,a_t),\qquad
+\hat{o}_{t+1}=G(o_t,a_t,\operatorname{Retrieve}(M_t,q_t))
+$$
+
+其中 $M_t$ 不应被理解成单一的历史帧缓存，而应包含对未来预测有用的空间、对象、事件和动态状态。一个完整的 Memory 系统至少需要处理：
+
+```text
+Write → Store → Retrieve → Update → Consolidate / Forget
+```
+
+### Working memory：短期时序记忆
+
+最近帧、滑动窗口、KV cache 和压缩上下文负责局部运动、姿态、外观及帧间连续性。它们能缓解上下文预算随视频长度增长的问题，但“压缩了历史”并不等于“形成了持久的世界状态”：过早压缩可能丢失身份、位置或事件因果关系。
+
+### Episodic memory：经历与事件记忆
+
+模型可以把关键帧、片段或 latent 作为可检索的经历，在视角回访或生成需要时取回。检索键可以来自视觉相似度、相机位姿、时间戳、文本描述或当前查询。与只保留最近窗口相比，这一路线允许模型回忆很久以前发生过的内容，但也引入了检索误差和注意力分散问题。
+
+### Recurrent / compressed memory：压缩状态记忆
+
+另一条路线把长历史递归地写入固定大小的 latent 或 state：
+
+$$
+h_t=f(h_{t-1},x_t)
+$$
+
+它的存储成本不随视频长度线性增长，适合长 rollout；代价是状态必须在有限容量内保留真正影响未来的变量。较合理的架构通常是“局部 attention + 持久 recurrent state”，分别承担细节连续性和全局身份、场景与动态。
+
+### Spatial memory：空间可寻址的世界记忆
+
+World model 需要记住的不只是“以前看见过什么”，还包括“什么东西在世界的什么位置”。3D point map、surfel、历史视角和 latent 3D cache 都可以作为空间地址，使相机离开场景后再返回时恢复几何布局、遮挡关系和外观。探索阶段可更多依赖时间记忆，回访阶段则应路由到空间记忆。
+
+### Entity memory：对象与身份记忆
+
+人物、物体和场景可以拥有独立的可寻址 slot，分别保存身份、外观、位置、关系和当前状态。例如，角色换了视角或经历多个 shot 后，模型仍应知道“谁是谁”；道具被拿起、移动或损坏后，状态也应写回相应对象，而不是只留在某一帧的纹理中。
+
+### Dynamic / event memory：状态、事件与因果记忆
+
+静态背景可以被归档，动态对象则需要在离开视野后继续被跟踪或预测。因此，Memory 应保存速度、方向、潜在状态和可能的未观测轨迹，而不只是 appearance。更进一步，事件记忆应记录“手推杯子 → 杯子掉落 → 杯子破碎”这类状态转移，使模型在重新看到杯子时仍能保持 `broken(cup)=True`。
+
+这也说明 Memory 与 dynamics 并非两个完全独立的模块：
+
+$$
+M_{t+k}=F(M_t,a_{t:t+k})
+$$
+
+对象离开视野期间，记忆本身也应按照世界动力学演化。
+
+### 研究判断
+
+现有工作已经较好地覆盖了短期连续性、历史检索和空间回访，但以下问题仍适合作为 World Model 的独立研究主线：
+
+- **Unified World Memory**：统一表示几何、实体、动态和事件，而不是为每种信息维护互不沟通的缓存。
+- **Memory consolidation**：将 raw frames 逐步压缩为 episodes、objects、events 和可复用的 world state。
+- **Learned forgetting**：长期保留重要事件，合并重复背景，覆盖过时状态，删除与当前任务无关的细节。
+- **Addressability**：区分“存得下”“没有丢”和“之后找得到”。长期上下文中的位置编码、检索键和状态漂移都可能让已保存的记忆失效。
+
+因此，本章将 Memory 定义为：
+
+> Maintaining a persistent, updateable, and addressable internal state of the world during long-horizon generation and interaction.
+
+它是连接视频生成、空间建模、动力学预测和规划的核心能力，而不是单纯的长视频工程优化。
+
+## 7. World model 的关键评测
 
 漂亮 demo 不能回答以下问题：
 
@@ -124,7 +198,7 @@ $$
 
 通过模型选择动作，是否比无模型策略、真实数据 baseline 或简单 simulator 获得更高任务成功率？
 
-## 7. 当前最重要的开放问题
+## 8. 当前最重要的开放问题
 
 - 视频数据中的相关性是否足以学习因果干预？
 - 2D 生成器能否形成稳定、可复用的 3D 空间记忆？
@@ -134,7 +208,7 @@ $$
 - 如何验证罕见危险事件，而不被逼真的常见场景平均分掩盖？
 - 智能体是否会利用 learned simulator 的错误，在想象世界中获得虚假高奖励？
 
-## 8. 一个谨慎的表述模板
+## 9. 一个谨慎的表述模板
 
 讨论新模型时，可以使用以下表述：
 
