@@ -1,6 +1,6 @@
 # 生成任务深度路线图
 
-本目录把 [任务与方法分类](../taxonomy.md) 中的 10 个生成任务拆成独立子文档。每篇都按同一条研究线索组织：任务定义、原始方法、深度学习阶段、diffusion / Transformer / foundation model 阶段、最新趋势、评测与开放问题。
+本目录把 [任务与方法分类](../taxonomy.md) 中的 11 个生成任务拆成独立子文档。每篇都按同一条研究线索组织：任务定义、原始方法、深度学习阶段、diffusion / Transformer / foundation model 阶段、最新趋势、评测与开放问题。
 
 这些页面不是产品清单，而是研究地图。阅读时建议先判断任务的条件输入是什么，再看模型到底是在补全像素、生成运动、编辑已有视频，还是模拟动作后的世界。
 
@@ -22,6 +22,7 @@
 | Story / multi-shot generation | [故事与多镜头生成](story-multishot.md) | 如何保持角色、场景、叙事和镜头连续性 |
 | Action-conditioned prediction | [动作条件预测](action-conditioned-prediction.md) | 如何预测动作干预后的未来 |
 | Interactive world generation | [交互式世界生成](interactive-world-generation.md) | 如何实时响应用户或智能体动作并保持世界状态 |
+| Digital human / audio-driven human animation | [数字人与音频驱动人类视频生成](digital-human.md) | 如何让身份一致的人类视频遵循语音、音乐、表情和动作 |
 
 ## 横向比较
 

@@ -16,6 +16,7 @@
 | [Story / multi-shot generation](tasks/story-multishot.md) | 剧本、分镜、参考素材 | 多镜头序列 | 角色、场景、因果和镜头连续性 |
 | [Action-conditioned prediction](tasks/action-conditioned-prediction.md) | 观测与动作 | 动作后的未来 | 动作可控性和反事实准确性 |
 | [Interactive world generation [[7]](#ref-7)](tasks/interactive-world-generation.md) | 初始世界与实时动作 | 持续生成的环境 | 低延迟、记忆、3D 和闭环稳定性 |
+| [Digital human / audio-driven human animation](tasks/digital-human.md) | 人像与语音、音乐、文本或动作 | 可说话、唱歌或表演的人类视频 | 口型同步、身份与身体一致性、生成效率和安全 |
 
 每个任务的完整技术演化见 [生成任务深度路线图](tasks/index.md)。
 
