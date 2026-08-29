@@ -13,22 +13,22 @@ This is the working gap matrix for the long-term goal: every subfield should hav
 - **P1:** route is sound but misses mechanisms, milestones, quantitative evidence or a major recent branch.
 - **P2:** presentation, visual coverage, metadata normalization or secondary breadth.
 
-Counts are a repository snapshot after adding the causal-streaming chapter. “Visual” counts Mermaid blocks plus embedded images; a visual can still fail the scientific-quality gate.
+Counts are a repository snapshot after adding the causal-streaming chapter, with the mechanism, foundation, task-map, application, interpolation, inpainting and world-model rows refreshed on 2026-08-30. “Visual” counts Mermaid blocks plus embedded images; a visual can still fail the scientific-quality gate.
 
 ## A. Generation mechanisms and foundation models
 
 | File | Lines | Refs | Visuals | Current depth | Main gap | Priority |
 |---|---:|---:|---:|---:|---|---|
-| `docs/generative-models.md` | 441 | 32 | 3 | 4 | Rewritten as a five-axis cross-classification map with compatibility constraints, 2024–26 milestones, claim-specific evidence and an independently audited visual; next gate is controlled implementation comparison | P2 |
-| `recurrent-prediction.md` | 89 | 5 | 0 | 2 | Missing SV2P/SVG-LP/SAVP/VideoFlow comparison and teacher/open-loop/self-forcing bridge | P1 |
-| `variational-generation.md` | 77 | 5 | 0 | 1.5 | Mixes stochastic latent models with tokenizer/codec role; no tensor shapes, causal padding or compression trade-off | P0 |
-| `adversarial-generation.md` | 63 | 5 | 0 | 2 | Stops at DVD-GAN; misses StyleGAN-V/DIGAN and GAN's current decoder/distillation role | P1 |
-| `autoregressive-generation.md` | 74 | 5 | 0 | 2 | Does not separate pixel, discrete-token, continuous-latent and chunk-wise AR; no KV/cache complexity | P1 |
-| `masked-generation.md` | 75 | 5 | 0 | 2 | Missing absorbing-state/discrete diffusion link, confidence calibration and tube/frame/block schedules | P1 |
+| `docs/generative-models.md` | 449 | 32 | 4 | 4 | Rewritten as a five-axis cross-classification map with compatibility constraints, three token-generation routes, 2024–26 milestones and claim-specific evidence; next gate is controlled implementation comparison | P2 |
+| `recurrent-prediction.md` | 368 | 23 | 3 | 4 | Rewritten across deterministic transforms, recurrent state, stochastic latents, RSSM, diffusion rollout and forcing boundaries with a reproducible evidence log; next gate is matched open-loop/closed-loop reproduction | P2 |
+| `variational-generation.md` | 488 | 27 | 2 | 4 | Rewritten to separate stochastic latent generators from codec/tokenizer roles, with tensor/compression/causality audits; next gate is a fixed-generator codec ablation | P2 |
+| `adversarial-generation.md` | 358 | 32 | 3 | 4 | Rewritten across full video GANs, tokenizer/decoder critics and explicit adversarial video distillation, including negative classifications; next gate is fixed-teacher/NFE/critic reproduction | P2 |
+| `autoregressive-generation.md` | 647 | 20 | 2 | 4 | Rewritten across strict token, frame, set and chunk factorization, continuous heads, cache complexity and forcing; next gate is a matched decoder/cache implementation study | P2 |
+| `masked-generation.md` | 399 | 18 | 3 | 4 | Rewritten across absorbing-state/discrete diffusion links, confidence calibration and token/frame/tube/block schedules; next gate is controlled schedule/calibration reproduction | P2 |
 | `diffusion-models.md` | 413 | 24 | 2 | 4 | Rewritten across DDPM→score→reverse SDE→PF-ODE, parameterization, weighting, architecture and acceleration; next gate is numerical notebook reproduction | P2 |
 | `flow-consistency-models.md` | 546 | 20 | 2 | 4 | Rewritten across FM/RF/reflow, CM/sCM/rCM, Shortcut/MeanFlow/FACM/AlphaFlow and DMD/DMD2 with video evidence boundaries; next gate is matched-budget reproduction | P2 |
-| `causal-streaming-generation.md` | 376 | 25 | 2 | 3.5 | New focused review; next gate is independent reproduction/benchmark integration, not more paper names | P2 |
-| `foundation-models.md` | 236 | 22 | 1 | 2.5 | Needs data→captioner→tokenizer→generator→post-train→distill→SR/audio/safety/API system view and current open models | P0 |
+| `causal-streaming-generation.md` | 374 | 25 | 2 | 3.5 | New focused review; next gate is independent reproduction/benchmark integration, not more paper names | P2 |
+| `foundation-models.md` | 352 | 42 | 3 | 4 | Rewritten as a data→captioner→tokenizer→generator→post-train→distill→decode/audio/safety/API system with release-surface evidence; next gate is clean-environment manifest reproduction | P2 |
 
 ### Mechanism-level structural correction
 
@@ -50,10 +50,10 @@ Modern systems routinely choose one item from several axes. Diffusion Forcing, C
 | `image-to-video.md` | 63 | 9 | 0 | 1.5 | Generic ancestors are presented too close to I2V milestones; missing STIV, subject/reference-time, identity and camera/3D control protocols | P0 |
 | `video-to-video.md` | 303 | 22 | 0 | 3 | Strongest task review; add mechanism-choice visual and split benchmark/data milestones; fresh JoyAI entry is now marked provisional | P1 |
 | `digital-human.md` | 237 | 22 | 1 | 3 | Correct Hallo/SadTalker date convention; generated PNG contains unlabelled illustrative scores; add 2026 long-duration/camera-control work | P0 factual, then P1 |
-| `frame-interpolation.md` | 59 | 7 | 0 | 1 | IFRNet is incorrectly placed in Transformer route; missing SoftSplat/IFRNet/AMT/EDEN/BiM-VFI and standard protocols | P0 |
+| `frame-interpolation.md` | 480 | 32 | 4 | 4 | Rewritten as correspondence/reconstruction versus generative routes, with hard endpoint constraints, milestone-date rules, protocol traps, failure analysis and a reproducible evidence log; next gate is matched-data/runtime reproduction | P2 |
 | `video-prediction.md` | 72 | 13 | 0 | 1.5 | Missing MCVD; FramePack venue stale; must separate pixel/distribution/latent prediction and planning utility | P0 |
 | `action-conditioned-prediction.md` | 76 | 15 | 0 | 2 | Needs action-intervention, counterfactual, model-exploitation and closed-loop benchmark protocols | P1 |
-| `video-inpainting.md` | 61 | 8 | 0 | 1 | Jumps from optical flow to 2024–25 DiT; missing STTN, FuseFormer, E²FGVI and ProPainter lineage | P0 |
+| `video-inpainting.md` | 545 | 38 | 3 | 4 | Rewritten from valid-pixel propagation through missing-region synthesis and global temporal verification, with mask-outside preservation, scene-cut reset, benchmark traps and a reproducible evidence log; next gate is controlled mask/protocol reproduction | P2 |
 | `story-multishot.md` | 64 | 9 | 0 | 1 | SVD does not support the claimed LLM storyboard route; ShotAdapter venue stale; missing OneStory/MultiShotMaster and benchmark protocol | P0 |
 | `interactive-world-generation.md` | 75 | 13 | 0 | 1.5 | Mixes demos, papers and platforms; needs FPS/resolution/horizon/loop-memory/closed-loop evidence matrix | P0 |
 | `unconditional-video-generation.md` | 68 | 15 | 0 | 1.5 | Sora and Cosmos are conditional foundation/world models, not representative unconditional methods | P0 factual |
@@ -63,7 +63,7 @@ Modern systems routinely choose one item from several axes. Diffusion Forcing, C
 | File | Lines | Refs | Visuals | Current depth | Main gap | Priority |
 |---|---:|---:|---:|---:|---|---|
 | `video-reasoning.md` | 746 | 55 | 1 | 3.5 | Integrate already-audited 2026 Thinking in Video, UniVR and RuleMaze; normalize MME-CoF/VChain/VIPER venue status | P1 |
-| `world-models.md` | 304 | 26 | 1 | 2.5 | Add cascaded vs joint WAM, action verifier, persistent memory and decision-utility benchmarks; label repository synthesis | P0 |
+| `world-models.md` | 523 | 33 | 3 | 4 | Rewritten around cascaded versus joint world-action routes, receding-horizon execution, pseudo-action recovery, verifier scope, persistent memory, uncertainty and decision utility; next gate is independent closed-loop reproduction | P2 |
 | `physical-consistency.md` | 528 | 41 | 3 | 4 | Rewritten with a six-level concept taxonomy, one canonical L0–L7 evidence ladder, 2024–26 method/benchmark registries, grouped interventions, program measurements, counterfactuals and closed-loop validation; an independent primary-source audit closed four evidence-level P1s, and the next gate is independent GAUGE/robotics replication | P2 |
 | `evaluation.md` | 845 | 62 | 3 | 4 | Rewritten with 2025–26 generation/editing/reasoning/world-model families, evaluator stress tests, pairwise statistics, judge/arena calibration, SLO/energy, watermark and C2PA 2.4; independent audit passed after citation and standards-boundary fixes, and the next gate is evaluator/inter-validator replication | P2 |
 | `jepa.md` | 283 | 10 | 2 | 3 | Add quantitative comparison, uncertainty/multimodality and action-conditioned planning loop; distinguish probe evidence from physical law | P1 |
@@ -72,8 +72,8 @@ Modern systems routinely choose one item from several axes. Diffusion Forcing, C
 
 | File | Lines | Refs | Visuals | Current depth | Main gap | Priority |
 |---|---:|---:|---:|---:|---|---|
-| `taxonomy.md` | 76 | 0 | 1 | 1.5 | Linear task chain implies a false progression; replace with condition source × preservation × open/closed-loop task map | P0 |
-| `applications.md` | 118 | 9 | 0 | 1.5 | Missing digital-human applications and capability→system requirement→acceptance metric→failure/safety gate mapping | P0 |
+| `taxonomy.md` | 260 | 9 | 3 | 4 | Rewritten as condition source × source-content relation × interaction-horizon axes, with task contracts, boundary cases, milestone criteria and a reproducible evidence log; next gate is coverage expansion without collapsing the axes | P2 |
+| `applications.md` | 324 | 12 | 3 | 4 | Rewritten as capability claim→workflow→acceptance→hard deployment gates→monitor/rollback, with digital-human, creative, world and Physical-AI protocols plus provenance limits; next gate is domain-specific production replication | P2 |
 | `timeline.md` | 722 | 0 local anchors | 1 Mermaid + 76 images | 3 breadth | Image-rich but relation-poor; add mechanism evolution lanes and separate recent preprints as frontier observations | P1 |
 | `reading-list.md` | 252 | 47 | 0 | 2.5 | Needs route-oriented prerequisites and current causal/streaming, post-training and native AV reading paths | P1 |
 | `resources/datasets.md` | 795 | 38 | 2 | 4 | Rewritten as a current scoping review with release-surface taxonomy, an exact ten-stage data-engine path plus governance loop, rights/provenance, action/physics branches, manifest and fixed-compute validation; release-unit claims passed independent audit, and the next gate is acquisition/decode-yield replication | P2 |
@@ -99,16 +99,17 @@ Each visual must have an explicit learning objective, editable/accessible altern
 
 | Priority | Visual | Learning objective |
 |---|---|---|
-| P0 | Orthogonal mechanism cube/map | Show representation, factorization, objective, backbone and deployment as composable axes |
-| P0 | Video tokenizer tensor pipeline | Show causal 3D encoding, spatial/temporal compression, latent shape, generator and decoder bottlenecks |
+| Done | Orthogonal mechanism cube/map | Show representation, factorization, objective, backbone and deployment as composable axes |
+| Done | Video tokenizer tensor pipeline | Show causal 3D encoding, spatial/temporal compression, latent shape, generator and decoder bottlenecks |
+| Done | Modern foundation system stack | Track governance→representation→generator→post-train→decode→deployment and separate full GAN, codec critic and adversarial distillation roles |
 | P0 | DDPM–SDE–PF-ODE–FM/RF–CM/DMD map | Prevent the most common diffusion/flow/consistency terminology errors |
 | Done | Offline bidirectional vs causal streaming | Separate full-clip denoising from chunk-causal output, bounded memory and new-condition loop |
 | Done | Data/provenance pipeline | Source→shot split→dedup→filter→caption→license/provenance→versioned split; generated figure plus accessible Mermaid alternative verified |
 | P0 | Physics evidence loop | Condition→state→generator/simulator→measurement→constraint/reward→falsification |
-| P0 | WAM dual route | Compare cascaded planner+generator with joint action-video model and verifier |
-| P0 | Three-axis task map | Condition source, source-preservation strength and open-loop→closed-loop |
-| P0 | VFI dual branch | Flow/depth/occlusion deterministic branch vs diffusion/DiT generative branch |
-| P0 | Video inpainting pipeline | Valid-pixel propagation→missing-region synthesis→global consistency→outside-mask protection |
+| Done | WAM dual route | Compare cascaded planner+generator with joint action-video model and verifier |
+| Done | Three-axis task map | Condition source, source-preservation strength and open-loop→closed-loop |
+| Done | VFI dual branch | Flow/depth/occlusion deterministic branch vs diffusion/DiT generative branch |
+| Done | Video inpainting pipeline | Valid-pixel propagation→missing-region synthesis→global consistency→outside-mask protection |
 | P1 | Video reasoning three clocks | Output-time, denoising-time and interaction-time reasoning with intervention points |
 | P1 | Evaluation evidence ladder | L0 visual plausibility through L7 real-world closed-loop utility |
 | P1 | Multi-shot memory workflow | Script/character bible→shot plan→references→generation→memory update→conflict/rollback |

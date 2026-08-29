@@ -1,118 +1,324 @@
-# 相关应用：从创作工具到物理智能
+# 视频生成应用：从能力主张到可部署证据
 
-视频生成模型的应用不只是“输入一句话，输出一段视频”。真正有价值的应用通常会把生成、编辑、控制、检索、评测和安全工作流组合起来。
+> 一手来源复核截至 **2026-08-30**。本章不按公司或产品排名，而是把能力映射为系统需求、验收协议、风险门槛和回滚条件。检索与图像生成记录见[研究日志](../sources/research_20260830_task_application_taxonomy.md)。
 
-本章按使用场景整理应用，而不是按公司或产品排名。
+一段演示视频只能证明“某次生成可能成功”。一个真实应用还必须证明：目标用户能稳定控制结果、错误可发现、成本和延迟可承受、素材权利可追溯、失败时能够停止或回滚。
 
-## 1. 内容创作与影视预演
+因此，本章采用下面的链条：
 
-典型任务：
+$$
+\text{use-case contract}
+\rightarrow
+\text{capability workflow}
+\rightarrow
+\text{acceptance protocol}
+\rightarrow
+\text{deployment gate}
+\rightarrow
+\text{monitoring and rollback}.
+$$
 
-- 文本到视频 [[1]](#ref-1)[[2]](#ref-2)，用于概念短片、广告草图和动态分镜。
-- 图像到视频 [[4]](#ref-4)，让角色设定、产品图或场景概念动起来。
-- 多镜头生成 [[3]](#ref-3)（Sora 报告展示的长镜头一致性讨论），保持角色、场景、服装和故事连续性。
-- 风格迁移和镜头语言探索，例如相机运动、光照和画幅变化。
+## 1. 一张图看懂“模型能力”为什么还不是“应用”
 
-核心要求不是单帧漂亮，而是可控、可改、可重复。专业创作更关心角色一致性、镜头衔接、局部编辑和版本管理。
+![从能力主张到部署证据的六阶段流程。流程依次定义使用合同、输入与控制、模型工作流、人工选择与版本、验收协议，以及部署监测；验收与部署之间有通过或停止门。下方分别列出创意媒体、数字人、交互世界和物理智能需要的领域证据。](../assets/diagrams/capability-to-deployment-evidence.png)
 
-## 2. [视频编辑](tasks/video-to-video.md)与后期制作
+**图 1：部署是带硬门槛的证据链。** 四条领域证据并不是四个排行榜，而是说明同一个生成模型进入不同场景时，必须换一套成功标准。创作关心可控、连续与可改；数字人增加同意、身份与音画同步；交互世界要求动作响应、状态记忆和 deadline；Physical AI 最终要看反事实、闭环成功和安全。图中没有性能数字，避免把示意值误读成 benchmark 结果。
 
-常见应用：
+~~~mermaid
+flowchart LR
+    accTitle: 从使用合同到部署与回滚
+    accDescr: 真实应用先定义用户、决策和潜在伤害，再确定输入控制与模型工作流，经过人工修订和版本管理后执行多随机种子、指标与压力测试；只有全部硬门槛通过才部署，部署后持续监测并在异常时回滚。
 
-- 视频补全、去物体、扩展画幅和背景替换。
-- 关键帧插值、慢动作、超分辨率和去噪。
-- 局部风格化、换装、换背景和动作迁移 [[5]](#ref-5)。
-- 文本驱动剪辑和素材重组。
+    U["1 使用合同<br/>用户 · 决策 · 伤害"] --> I["2 输入与控制<br/>text · image · video · audio · action"]
+    I --> W["3 模型与工具工作流<br/>生成 · 编辑 · 动画 · 模拟"]
+    W --> H["4 Human-in-the-loop<br/>选择 · 修订 · 版本"]
+    H --> A["5 验收协议<br/>多 seed · 指标 · 压力测试"]
+    A --> G{"硬门槛全通过？"}
+    G -- 是 --> D["6 部署与监测<br/>SLO · 成本 · 隐私 · 来源"]
+    G -- 否 --> S["STOP<br/>记录失败并修正"]
+    D --> M{"漂移 / 事故 / 权利变化？"}
+    M -- 否 --> D
+    M -- 是 --> R["回滚模型、配置或素材"]
+    R --> U
+~~~
 
-这类应用最怕“整段重画”。好的视频编辑模型需要只改变指定区域，同时保持时间一致、身份一致和镜头结构。
+顺序化文字替代：先写用户、决策和伤害，再写允许使用的文字、图像、视频、音频或动作条件；把基础模型与编辑、音频、安全和版本工具组装成工作流；人工选择和修订后，以多个随机种子、分项指标和压力测试验收。任何硬门槛失败都停止上线。通过后仍需监测服务等级、成本、隐私、来源、事故和分布漂移，并保留回滚入口。
 
-从技术史看，视频编辑已经从光流传播、时空补全和条件 vid2vid，发展到 neural atlas、diffusion inversion / attention control、图像编辑器 + I2V，以及原生 V2V DiT、instruction editing 和多轮 memory。完整关系和建议 milestones 见[视频编辑专题](tasks/video-to-video.md)。
+## 2. 五种证据对象不能混用
 
-## 3. 动画、游戏与交互环境
+| 对象 | 它能证明什么 | 它不能自动证明什么 |
+|---|---|---|
+| 论文 | 作者在特定数据、模型和协议下的方法与结果 | 当前产品仍可用、开放权重可复现、真实用户稳定成功 |
+| checkpoint | 固定参数在已知推理代码和硬件下的能力 | 训练数据权利、完整产品后处理、线上服务 SLO |
+| API / 产品 | 当前入口暴露的规格和使用政策 | 论文机制就是产品机制、能力来自单一 checkpoint |
+| 工作流 | 模型、提示、参考、编辑、审核和版本如何组合 | 在真实负载与风险条件下已经可靠 |
+| 部署 | 真实流量下的质量、延迟、成本与事故记录 | 对新分布永久有效或没有长期风险 |
 
-视频生成正在进入实时交互场景 [[6]](#ref-6)：
+“论文展示了 720p”“官方页面写实时”“仓库开放了代码”分别是不同证据。Genie 3 官方页面把 720p、20–24 FPS 和持续交互列为产品/机构能力主张；在没有公开论文、checkpoint 与独立 SLO 复现时，应保留这一证据边界 [[4]](#ref-4)。
 
-- 生成可导航的 2D/3D 风格环境。
-- 根据按键、手柄或文本事件实时改变场景。
-- 为游戏原型生成角色动作、背景循环和过场动画。
-- 用神经模拟器 [[7]](#ref-7)替代或补充传统渲染管线。
+## 3. 先写使用合同，而不是先挑模型
 
-这类应用把模型从 open-loop generation 推向 closed-loop interaction。延迟、状态记忆和可预测控制比纯画质更重要。
+一个最小应用合同至少包含：
 
-## 4. 机器人与自动驾驶 [[8]](#ref-8)
+| 字段 | 必答问题 | 例子 |
+|---|---|---|
+| 用户 | 谁创建、谁审核、谁观看或据此行动？ | 剪辑师、教师、驾驶规划器 |
+| 决策 | 输出只是灵感，还是会触发真实动作？ | 分镜候选 vs 机器人抓取 |
+| 输入权利 | 文字、肖像、声音、源视频和训练素材是否可用？ | 演员授权、企业素材、敏感场景 |
+| 任务合同 | 哪些属性必须改变，哪些必须保持？ | 换背景但保留人物与镜头 |
+| 时域 | 一次性短片、跨镜头记忆还是闭环？ | 5 秒广告、连续角色剧集、24 FPS 世界 |
+| 风险预算 | 哪类错误可修，哪类错误必须阻断？ | logo 轻微变形可返工；身份冒用必须阻断 |
+| 退出与回滚 | 如何撤回版本、停用素材或恢复旧模型？ | 资产 hash、模型版本、审批日志 |
 
-在 Physical AI [[9]](#ref-9) 中，视频模型常用于：
+NIST AI 600-1 把生成式 AI 风险管理组织为面向生命周期的 govern、map、measure 与 manage；它提供跨行业风险框架，不替代本应用的具体任务指标 [[10]](#ref-10)。
 
-- 预测不同动作后的视觉后果。
-- 生成罕见场景或危险边界案例。
-- 做离线数据增强和 policy 预训练。
-- 为规划器提供 latent rollout 或候选未来。
+## 4. 场景 → 能力链 → 验收门槛
 
-这里必须谨慎区分两种能力：生成逼真的驾驶或机器人视频，不等于能安全预测真实动作后果。应用价值最终应由闭环任务、真实环境迁移和安全评测证明。
+| 场景 | 需要组合的能力 | 系统级验收 | 硬失败 / 安全门 |
+|---|---|---|---|
+| 影视、广告与动态分镜 | T2V / I2V、相机控制、角色参考、多镜头、局部编辑、超分与音频 | 指令遵循、角色/道具连续、镜头可改率、人工分钟/成片秒、版本可重放 | 未授权素材、品牌/人物误用、无法定位生成来源 |
+| 后期、修复与本地化 | V2V、inpainting、插帧、重定时、口型/语音、本地字幕 | mask 外误差、边界 seam、口型偏移、文字正确率、往返编辑损失 | 未编辑区域被改、真实证据被误修、来源链丢失 |
+| 数字人和虚拟主播 | 身份参考、音频/文字/动作驱动、长时/流式人体动画 | 身份、口型、表情、身体、语义和延迟分项；多人和遮挡压力测试 | 无同意身份、冒用、声音克隆、未成年人或敏感人物风险 |
+| 游戏原型与交互世界 | 场景生成、动作条件 rollout、状态记忆、低延迟输出 | 动作响应、回访一致、状态账本、deadline miss、任务完成 | 动作无效却画面逼真、平均 FPS 掩盖尾延迟、状态不可恢复 |
+| 机器人与自动驾驶 | 视频世界模型、反事实 rollout、规划/策略、传感器或多视角条件 | 状态/动作正确性、闭环成功、真实迁移、罕见事件覆盖、安全边界 | 用感知质量替代决策效用；模拟器漏洞被策略利用 |
+| 合成数据与仿真 | 条件采样、长尾场景、标签/伪动作恢复、域随机化 | 下游收益、覆盖、校准、真实验证集表现、数据谱系 | synthetic bias、标签错误、训练测试污染、只报生成分数 |
+| 教育与科学可视化 | 过程生成、结构/公式约束、交互解释、来源链接 | 事实逐项核验、单位/边界条件、专家复核、可访问性 | 视觉可信但科学错误、无来源的“实验结果” |
+| 工业设计与流程预演 | 参考保持、几何/相机控制、多版本比较、数字孪生接口 | 尺寸/状态约束、变更追踪、与 CAD/模拟器一致性 | 把概念视频当工程验证或合规证据 |
 
-## 5. 数据合成与仿真
+统一模型可以降低部署与交互成本，但不能用“all-in-one”替代分任务验收。VACE 通过 Video Condition Unit 组织 reference、editing 和 mask 条件，并在 12 类任务上做作者实验；部署时仍须分别测试参考保持、编辑泄漏和 mask 外保护 [[1]](#ref-1)。
 
-生成模型可以补充传统模拟器：
+## 5. 四类高影响应用的证据边界
 
-- 为视觉识别、检测、分割和跟踪生成长尾样本。
-- 生成不同天气、光照、相机、材质和人群状态。
-- 为机器人和自动驾驶构造罕见或昂贵场景。
-- 与显式 3D/物理模拟器结合，提升视觉真实感。
+### 5.1 创意媒体：价值来自“可改”，不只来自“可生成”
 
-关键风险是 synthetic bias。合成数据看起来丰富，但如果分布错误，可能让下游模型学到错误捷径。
+专业制作的核心循环是：
 
-## 6. 教育、科学可视化与设计
+~~~mermaid
+flowchart LR
+    accTitle: 创意视频的可回滚制作循环
+    accDescr: 剧本和资产权利经过分镜与参考配置进入生成，自动检查和人工审片将失败定位到提示、参考、模型或后处理，局部修改形成新版本；批准版本连同来源记录发布，未批准版本可回滚。
 
-视频生成也适合把抽象过程动态化：
+    A["剧本 / brief<br/>角色与素材权利"] --> B["分镜与 shot contract<br/>主体 · 动作 · 相机 · 时长"]
+    B --> C["生成候选<br/>多 seed / 多配置"]
+    C --> D["自动检查<br/>条件 · 身份 · 时间 · 文字"]
+    D --> E["人工审片<br/>采用 / 局部修订 / 拒绝"]
+    E -- 修订 --> F["V2V / mask / reference<br/>只改一个变量"]
+    F --> D
+    E -- 批准 --> G["锁定版本<br/>模型 · prompt · seed · asset hash"]
+    G --> H["发布 + provenance"]
+    H --> I["反馈 / 撤回 / 回滚"]
+~~~
 
-- 科学过程可视化，例如流体、材料、天体或细胞动态。
-- 教学动画和交互式解释。
-- 产品设计、建筑漫游和工业流程预演。
-- 医学、工程和实验流程的视觉沟通。
+最低报告项：
 
-这类应用更看重可解释、可校验和可追溯。视觉吸引力有用，但不能替代事实正确性。
+- 每个 shot 生成多少候选、采用率和返工次数；
+- 角色、服装、道具、地点、镜头和对白分别是否保持；
+- 局部修改是否污染非目标区域；
+- 人工时间、GPU 时间、端到端成本与最终交付时长；
+- prompt、seed、checkpoint、参考资产和后处理版本能否重放。
 
-## 7. 安全、版权与来源标记
+只报“生成一次用了几秒”会漏掉筛选和返工成本。偏好模型也不是最终真值：MJ-Video 把 alignment、safety、fineness、coherence/consistency 和 bias/fairness 分成细项，说明“总体偏好”内部有不同失败来源；其数据与模型结论仍受作者协议限制 [[12]](#ref-12)。
 
-视频生成应用必须处理现实约束：
+### 5.2 数字人：身份和同意是系统变量
 
-- 人物肖像、声音和身份冒用。
-- 训练数据版权与输出版权。
-- 水印、内容来源标记和生成内容披露。
-- 虚假新闻、诈骗、伪证据和平台治理。
-- 针对未成年人、公共人物和敏感事件的限制。
+数字人不是普通 I2V 多一个音频输入。应用需要同时验证：
 
-技术路线越强，治理问题越不能被放到最后。一个应用是否成熟，往往取决于模型能力、产品工作流和安全机制三者是否一起设计。
+1. **身份**：面部、发型、服装、身体和个体特征跨姿态、遮挡与时长保持；
+2. **同步**：口型、表情、头部、上身/全身与音频节奏和语义一致；
+3. **语义表演**：情绪、意图、对象交互和多人轮次符合文字/音频；
+4. **系统时延**：离线成片与实时对话采用不同窗口、缓冲和 deadline；
+5. **治理**：身份、声音与素材的同意、用途范围、到期、撤回和可追溯记录。
 
-## 8. 选型问题清单
+OmniHuman-1.5 用结构化语义条件和 Multimodal DiT 推进“语义表演”，但它是 2025 作者预印本；不能据此跳过长期身份、多人串扰、同意和独立复现 [[2]](#ref-2)。
 
-评估一个视频生成应用时，可以先问：
+数字人验收必须用真实业务分布分层：近景/半身/全身、静态/剧烈运动、单人/多人、普通话/方言/跨语言、短句/长段、遮挡/出画再入画。任何平均同步分都不能抵消未经授权的身份生成。
 
-1. 主要目标是创作、编辑、仿真、交互还是训练数据？
-2. 输入条件是什么：文本、图像、视频、音频、动作，还是多参考？
-3. 输出需要多长、多稳定、多可控？
-4. 是否需要局部编辑和版本迭代？
-5. 是否涉及人物、版权、商用授权或安全风险？
-6. 成功指标是主观质量、下游任务收益，还是闭环控制表现？
+### 5.3 交互世界：平均 FPS 不是交互性
 
-这些问题能帮助读者把论文能力翻译成真实系统需求。
+交互系统第 $k$ 轮接收动作 $a_k$ 与当前状态/观测 $s_k,o_k$，在 deadline $d$ 内返回：
+
+$$
+(\hat{o}_{k+1},\hat{s}_{k+1})
+\sim
+p_\theta(\cdot\mid o_{\le k},a_{\le k},m_k).
+$$
+
+其中 $m_k$ 是压缩记忆。验收至少拆成：
+
+- **动作因果**：固定历史，改动作是否只产生预期差异；
+- **状态保持**：对象、拓扑、库存、开关和已发生事件能否回访；
+- **时延分布**：TTFF、每步 p50/p95/p99、deadline miss 与抖动；
+- **长期退化**：画质、动作响应和状态错误随 rollout 长度的曲线；
+- **错误恢复**：无效动作、快速反向、断连、重连和 checkpoint 恢复。
+
+Genie 在 ICML 2024 通过无标签互联网视频学习 latent action space，是任务路线里程碑 [[3]](#ref-3)。UniSim 则把 action-in/video-out 作为统一交互接口，并明确其“universal”指接口范围而不是模拟所有感官和现象 [[5]](#ref-5)。当前产品/机构页面的 Genie 3 规格应作为官方声明单列，不与这两篇论文的实验合并 [[4]](#ref-4)。
+
+### 5.4 Physical AI：视频逼真不等于决策正确
+
+机器人或驾驶中的典型链路是：
+
+$$
+\text{observation}
+\rightarrow
+\text{candidate actions}
+\rightarrow
+\text{predicted futures}
+\rightarrow
+\text{cost / verifier}
+\rightarrow
+\text{action}
+\rightarrow
+\text{new observation}.
+$$
+
+每一箭头都会引入误差。漂亮视频可能遗漏碰撞、小物体、接触、交通参与者意图或机器人坐标；策略还可能主动利用模型的系统性错误。因此验收层级必须从 open-loop 画面、状态与动作一致、反事实正确，推进到 closed-loop 任务、真实转移和安全边界。
+
+DreamGen 把适配后的 I2V 世界模型、latent action / inverse dynamics 和 policy training 串联，并报告 DreamGen Bench 与下游策略的相关性；这比只比较视频分数更接近应用证据，但收益仍是作者在特定机器人、数据和任务设置下的结果 [[6]](#ref-6)。Cosmos 平台把数据管线、tokenizer、预训练 world foundation model 与下游 post-training 组织成 Physical AI 平台 [[7]](#ref-7)；Cosmos 3 又把语言、图像、视频、音频和动作合并到 omnimodal 技术报告中 [[8]](#ref-8)。两者都不能替代真实设备的独立闭环安全测试。
+
+### 5.5 合成数据：生成指标不是最终指标
+
+合成数据应报告四层结果：
+
+1. 生成数据的条件覆盖、标签/伪动作正确性和去重；
+2. 真实—合成分布差异与已知盲区；
+3. 固定训练预算下的下游提升，而非只增加总数据量；
+4. 独立真实验证集、真实设备或真实用户上的收益和失败。
+
+若只在合成验证集上提升，可能只是同时拟合了生成器偏差。若伪动作来自 inverse dynamics，还要把视频误差与动作恢复误差分别做消融。
+
+### 5.6 教育、科学与工业可视化：事实优先于观感
+
+这些应用应把生成图像视为**待核验的表达层**：
+
+- 数值、单位、边界条件和因果方向逐项回到来源；
+- 生成模型不得补造实验数据、测量曲线或设备结构；
+- 说明哪些画面是示意、模拟、重建或真实观测；
+- 让领域专家审阅高影响结论，并保留可访问文字替代；
+- 概念视频不得冒充工程验证、临床证据或合规证明。
+
+## 6. 验收不是一个加权总分
+
+对应用 $u$，把门槛写成布尔合取而不是平均：
+
+$$
+\operatorname{PASS}(u)
+=
+G_q \land G_c \land G_p \land G_{\text{SLO}}
+\land G_s \land G_g,
+$$
+
+其中 $G_q$ 是质量，$G_c$ 是控制，$G_p$ 是保留/状态，$G_{\text{SLO}}$ 是系统服务等级，$G_s$ 是安全，$G_g$ 是权利与治理。某一项特别高不能抵消另一项硬失败。
+
+### 6.1 统计与样本协议
+
+- 预注册 prompt / 素材集、难度分层、seed 数和停止规则；
+- 报告均值、分位数、置信区间、失败率和最坏类别；
+- 配对比较固定 prompt、seed、时长、分辨率、后处理和硬件；
+- 人评公开指令、随机化、盲法、人数、重复样本和一致性；
+- 模型裁判先用人工集校准，并报告题型/群体偏差；
+- 失败案例进入 taxonomy，不从结果集中删除。
+
+ITU-T P.910 (07/2026) 是当前有效的多媒体主观视频质量评测建议，可支持观看条件和主观试验设计；它并不覆盖所有生成任务的指令、身份、动作和闭环协议 [[11]](#ref-11)。
+
+### 6.2 服务等级与成本
+
+离线创作至少报告每个**被采用输出**的成本，而不是单次推理成本：
+
+$$
+C_{\text{accepted}}
+=
+\frac{C_{\text{generation}}+C_{\text{selection}}+C_{\text{editing}}+C_{\text{review}}}
+{N_{\text{accepted}}}.
+$$
+
+流式/交互系统至少报告：
+
+- time to first frame / first usable chunk；
+- steady-state p50/p95/p99 latency 与 jitter；
+- deadline miss、断流和恢复时间；
+- 编码、模型、解码、安全检查和网络的分项时延；
+- 并发量、硬件、精度、缓存、分辨率和帧率。
+
+## 7. 来源、权利与安全必须贯穿工作流
+
+C2PA 2.4 提供可加密验证的来源与编辑历史结构，适合记录创作、修改和发布链；规范本身明确不对内容“好或坏、真或假”作价值判断，只验证声明与资产的关联、格式和防篡改属性 [[9]](#ref-9)。因此：
+
+- Content Credentials 不能替代事实核查；
+- 水印不能替代同意与授权；
+- provenance 缺失不能自动证明内容为假；
+- provenance 存在也不能证明生成内容符合物理事实；
+- 裁切、转码、平台重封装和截图后的凭证存活率必须实测。
+
+建议资产账本记录：来源 URI / hash、权利主体、允许用途、地域与期限、同意与撤回、模型/数据版本、编辑动作、审核者和发布去向。高风险人物内容还要有阻断、申诉和快速撤回流程。
+
+## 8. 2024–2026 的应用路线变化
+
+| 方向 | 代表进展 | 应用意义 | 证据边界 |
+|---|---|---|---|
+| 统一创作与编辑 | VACE，ICCV 2025 [[1]](#ref-1) | reference、editing、mask 进入统一条件接口，可组合工作流 | 论文 12 任务实验不等于所有产品条件都同样可靠 |
+| 语义数字人 | OmniHuman-1.5，2025 预印本 [[2]](#ref-2) | 从音频节奏扩展到图像、音频、文字的语义表演 | 作者技术报告；治理与长期部署需另证 |
+| 生成式交互环境 | Genie，ICML 2024；Genie 3 官方页面 [[3]](#ref-3) [[4]](#ref-4) | latent action 学习和实时交互把 open-loop clip 推向 closed-loop | 论文与产品声明必须分开；当前页面规格非独立复现 |
+| 统一 action-in/video-out 模拟 | UniSim，ICLR 2024 [[5]](#ref-5) | 多数据域可通过统一接口支持规划器、代理与 VLM 训练 | “universal”有限定，不包含所有模态或现实规律 |
+| 神经轨迹训练机器人 | DreamGen，2025 预印本 [[6]](#ref-6) | 生成视频经伪动作恢复进入 policy training | 级联误差与真实迁移仍需逐层审计 |
+| Physical AI 平台 | Cosmos 2025；Cosmos 3 2026 [[7]](#ref-7) [[8]](#ref-8) | 数据、tokenizer、world model、post-training 与 action 逐步合并 | 机构技术报告与开放发布面，不等于通用闭环成功 |
+| 风险与来源基础设施 | NIST AI 600-1；C2PA 2.4 [[10]](#ref-10) [[9]](#ref-9) | 风险管理和媒体来源进入系统设计，不再是发布后补丁 | 通用框架仍需转译为场景硬门槛 |
+
+## 9. 可直接复制的应用验收卡
+
+~~~text
+Use case:
+Primary user / affected user:
+Decision or action triggered by output:
+
+Inputs and rights:
+Required changes:
+Must-preserve invariants:
+Output duration / fps / resolution:
+Open-loop, long-memory or closed-loop:
+
+Quality metrics:
+Control / counterfactual tests:
+Preservation / outside-region tests:
+Human evaluation protocol:
+SLO and cost budget:
+Safety and privacy hard gates:
+Provenance and asset ledger:
+
+Prompt / asset strata:
+Number of seeds and repeats:
+Confidence interval / failure rate:
+Known unsupported cases:
+
+Owner:
+Monitoring signals:
+Incident response:
+Rollback target and recovery time:
+~~~
+
+填写后再进入[任务地图](taxonomy.md)选择专章；用[评测指南](evaluation.md)补全统计与证据等级；动作与现实决策场景继续阅读[World Model](world-models.md)和[物理一致性](physical-consistency.md)。
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] [Make-A-Video: Text-to-Video Generation without Text-Video Data](https://arxiv.org/abs/2209.14792). Uriel Singer, Adam Polyak, Thomas Hayes, Xi Yin, Jie An, Songyang Zhang, et al. ICLR. 2023.
+<a id="ref-1"></a>[1] [VACE: All-in-One Video Creation and Editing](https://openaccess.thecvf.com/content/ICCV2025/html/Jiang_VACE_All-in-One_Video_Creation_and_Editing_ICCV_2025_paper.html). Zeyinzi Jiang, Zhen Han, Chaojie Mao, Jingfeng Zhang, Yulin Pan, Yu Liu. ICCV. 2025.
 
-<a id="ref-2"></a>[2] [Imagen Video: High Definition Video Generation with Diffusion Models](https://arxiv.org/abs/2210.02303). Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey Gritsenko, et al. arXiv preprint. 2022.
+<a id="ref-2"></a>[2] [OmniHuman-1.5: Instilling an Active Mind in Avatars via Cognitive Simulation](https://arxiv.org/abs/2508.19209). Jianwen Jiang, Weihong Zeng, Zerong Zheng, Jiaqi Yang, Chao Liang, Wang Liao, et al. arXiv preprint. 2025.
 
-<a id="ref-3"></a>[3] [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). OpenAI. Technical report. 2024.
+<a id="ref-3"></a>[3] [Genie: Generative Interactive Environments](https://proceedings.mlr.press/v235/bruce24a.html). Jake Bruce, Michael D. Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. ICML. 2024.
 
-<a id="ref-4"></a>[4] [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. arXiv preprint. 2023.
+<a id="ref-4"></a>[4] [Genie 3](https://deepmind.google/models/genie/). Google DeepMind. Official system page. 2025–2026 snapshot.
 
-<a id="ref-5"></a>[5] [AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning](https://arxiv.org/abs/2307.04725). Yuwei Guo, Ceyuan Yang, Anyi Rao, Zhengyang Liang, Yaohui Wang, Yu Qiao, et al. ICLR. 2024.
+<a id="ref-5"></a>[5] [Learning Interactive Real-World Simulators](https://openreview.net/forum?id=sFyTZEqmUY). Sherry Yang, Yilun Du, Kamyar Ghasemipour, Jonathan Tompson, Leslie Kaelbling, Dale Schuurmans, et al. ICLR. 2024.
 
-<a id="ref-6"></a>[6] [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. ICML. 2024.
+<a id="ref-6"></a>[6] [DreamGen: Unlocking Generalization in Robot Learning through Video World Models](https://arxiv.org/abs/2505.12705). Joel Jang, Seonghyeon Ye, Zongyu Lin, Jiannan Xiang, Johan Bjorck, Yu Fang, et al. arXiv preprint. 2025.
 
-<a id="ref-7"></a>[7] [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837). Dani Valevski, Yaniv Leviathan, Moab Arar, Shlomi Fruchter. ICLR. 2025.
+<a id="ref-7"></a>[7] [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). NVIDIA et al. Technical report. 2025.
 
-<a id="ref-8"></a>[8] [GAIA-1: A Generative World Model for Autonomous Driving](https://arxiv.org/abs/2309.17080). Anthony Hu, Lloyd Russell, Hudson Yeo, Zak Murez, George Fedoseev, Alex Kendall, et al. arXiv preprint. 2023.
+<a id="ref-8"></a>[8] [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800). NVIDIA et al. Technical report. 2026.
 
-<a id="ref-9"></a>[9] [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, Tiffany Cai, et al. arXiv preprint. 2025.
+<a id="ref-9"></a>[9] [C2PA Technical Specification, Version 2.4](https://spec.c2pa.org/specifications/specifications/2.4/specs/C2PA_Specification.html). Coalition for Content Provenance and Authenticity. 2026.
+
+<a id="ref-10"></a>[10] [Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile](https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence). Chloe Autio, Reva Schwartz, Jesse Dunietz, Shomik Jain, Martin Stanley, Elham Tabassi, et al. NIST AI 600-1. 2024.
+
+<a id="ref-11"></a>[11] [P.910: Subjective video quality assessment methods for multimedia applications](https://www.itu.int/rec/T-REC-P.910-202607-P/en). ITU-T Recommendation P.910 (07/2026). 2026.
+
+<a id="ref-12"></a>[12] [MJ-Video: Benchmarking and Rewarding Video Generation with Fine-Grained Video Preference](https://proceedings.neurips.cc/paper_files/paper/2025/hash/71ad539a57b1fd49b19e5c80070cb8b9-Abstract-Conference.html). Haibo Tong, Zhaoyang Wang, Zhaorun Chen, Haonian Ji, Shi Qiu, Siwei Han, et al. NeurIPS. 2025.
