@@ -21,6 +21,5 @@ jobs:
           args: >-
             --no-progress
             --accept 200,204,206,403,429
-            --exclude-mail
             './**/*.md'
           fail: true
