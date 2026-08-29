@@ -81,7 +81,7 @@ flowchart LR
 
 | 结构 | 核心问题 | 主要演进与代表工作 | 学习入口 |
 |---|---|---|---|
-| **1. 技术基础：视频表示、时序建模与生成机制** | 模型怎样表达时间、运动和多种可能未来？ | 从 Video Textures [[1]](#ref-1)、Dynamic Textures [[2]](#ref-2)、ConvLSTM [[3]](#ref-3)、CDNA [[4]](#ref-4)，到 MoCoGAN [[5]](#ref-5)、DVD-GAN [[6]](#ref-6) 和 Video Diffusion [[10]](#ref-10)；方法由显式运动与预测扩展到 VAE、GAN、autoregressive、masked modeling、diffusion 与 flow | [生成模型路线](docs/generative-models.md) |
+| **1. 技术基础：视频表示、时序建模与生成机制** | 模型怎样表达时间、运动和多种可能未来？ | 从 Video Textures [[1]](#ref-1)、Dynamic Textures [[2]](#ref-2)、ConvLSTM [[3]](#ref-3)、CDNA [[4]](#ref-4)，到 MoCoGAN [[5]](#ref-5)、DVD-GAN [[6]](#ref-6) 和 Video Diffusion [[10]](#ref-10)；方法由显式运动与预测扩展到 VAE、GAN、autoregressive、masked modeling、diffusion、flow，以及把少步蒸馏、长期记忆和 SLO 组合起来的 causal streaming | [生成模型路线](docs/generative-models.md) · [因果流式专章](docs/generative-models/causal-streaming-generation.md) |
 | **2. 视频基础模型与创作系统** | 模型怎样从单任务生成器扩展为可迁移、多条件、多模态系统？ | VideoGPT [[7]](#ref-7)、Phenaki [[8]](#ref-8)、MAGVIT [[9]](#ref-9)、Make-A-Video [[11]](#ref-11)、Imagen Video [[12]](#ref-12)、Lumiere [[13]](#ref-13) 与 Sora [[14]](#ref-14) 串起技术前驱与规模化模型。发展应从五个正交维度观察：开放式文本到视频；多条件与多参考；源视频保持与可寻址编辑；多段 prompt/storyboard 与跨镜头连续；原生联合音视频。所谓“统一”还必须说明是统一接口、流水线、backbone、模型家族还是单一 checkpoint | [视频基础模型路线](docs/foundation-models.md) · [视频编辑](docs/tasks/video-to-video.md) |
 | **3. Video Reasoning：把视觉生成作为计算介质** | 模型能否用连续视觉状态执行搜索、规则、物理推演与规划；结果和过程怎样验证？ | 以 *Video models are zero-shot learners and reasoners* 为叙事原点：先还原其零样本证据、Chain-of-Frames 假说与黑盒边界，再向前追溯视觉化思维，向后展开 benchmark、VBVR 百万规模监督、Chain-of-Steps、early commitment、verifiable reward、test-time adaptation、层级去噪和 planner—generator—verifier 闭环；不把正确终态等同于忠实推理 | [Video Reasoning 专章](docs/video-reasoning.md) |
 | **4. World Model：从未来预测到行动闭环** | 模型能否根据状态和动作预测后果，并进一步支持交互、规划或决策？ | 决策型 latent dynamics 与生成式视觉模型形成两条并行历史，并在 Genie [[15]](#ref-15)、GameNGen [[16]](#ref-16)、Genie 3 [[17]](#ref-17)、GWM-1 [[18]](#ref-18) 和 Cosmos [[19]](#ref-19) 等交互环境与 Physical AI 系统中逐渐汇合；是否达到闭环仍须逐个系统核验 | [从视频生成到 World Model](docs/world-models.md) · [物理一致性的视频生成](docs/physical-consistency.md) |
@@ -113,11 +113,12 @@ flowchart LR
 
 1. 用 [任务地图](docs/taxonomy.md) 明确不同任务的输入和输出。
 2. 阅读 [生成模型路线](docs/generative-models.md)，串起 VAE、GAN、autoregressive、diffusion 和 flow。
-3. 阅读 [视频基础模型路线](docs/foundation-models.md)，理解 tokenizer、Transformer、多模态条件，以及“统一”发生在接口、backbone、模型家族还是 checkpoint 层。
-4. 阅读 [Video Reasoning 专章](docs/video-reasoning.md)，区分输出帧、去噪过程和交互闭环三种推理时间，并掌握可验证证据阶梯。
-5. 阅读 [World Model 专章](docs/world-models.md)，区分生成质量、环境预测和决策能力。
-6. 补充 [物理一致性的视频生成](docs/physical-consistency.md)，理解视觉 plausibility 与真实规律的差别。
-7. 用 [相关应用](docs/applications.md) 和 [评测指南](docs/evaluation.md) 分析一个具体模型。
+3. 用 [因果、流式与实时视频生成](docs/generative-models/causal-streaming-generation.md) 理解少步生成、训练—推理分布、长期记忆和在线系统怎样汇合。
+4. 阅读 [视频基础模型路线](docs/foundation-models.md)，理解 tokenizer、Transformer、多模态条件，以及“统一”发生在接口、backbone、模型家族还是 checkpoint 层。
+5. 阅读 [Video Reasoning 专章](docs/video-reasoning.md)，区分输出帧、去噪过程和交互闭环三种推理时间，并掌握可验证证据阶梯。
+6. 阅读 [World Model 专章](docs/world-models.md)，区分生成质量、环境预测和决策能力。
+7. 补充 [物理一致性的视频生成](docs/physical-consistency.md)，理解视觉 plausibility 与真实规律的差别。
+8. 用 [相关应用](docs/applications.md) 和 [评测指南](docs/evaluation.md) 分析一个具体模型。
 
 ### 准备做研究
 
@@ -147,7 +148,8 @@ flowchart LR
 │   │   ├── autoregressive-generation.md
 │   │   ├── masked-generation.md
 │   │   ├── diffusion-models.md
-│   │   └── flow-consistency-models.md
+│   │   ├── flow-consistency-models.md
+│   │   └── causal-streaming-generation.md
 │   ├── foundation-models.md
 │   ├── video-reasoning.md
 │   ├── world-models.md

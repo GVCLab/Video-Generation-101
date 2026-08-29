@@ -4,6 +4,8 @@
 
 Interactive world generation 输入初始世界、文本或视频上下文，并在生成过程中实时接受用户或智能体动作，持续输出可交互环境。它是视频生成、world model、游戏引擎和机器人模拟的交叉点。
 
+这里至少有两层问题：生成器怎样在有界资源下持续发帧，环境又是否对动作给出稳定、可反事实检验的响应。前一层的 causal factorization、少步蒸馏、rolling memory、TTFF 与 deadline 协议见[因果、流式与实时视频生成](../generative-models/causal-streaming-generation.md)；本页更关心后一层的世界状态与闭环证据。
+
 ## 从原始方法到现代方法
 
 | 阶段 | 代表方法 | 技术核心 | 局限 |
@@ -22,7 +24,7 @@ Interactive world generation 输入初始世界、文本或视频上下文，并
 
 ## 最新趋势
 
-- 从单次视频生成转向实时导航和连续动作输入。
+- 从单次视频生成转向实时导航和连续动作输入；但应分别报告 causal、streaming、real-time 与 action-conditioned 证据。
 - 从视觉一致性转向空间记忆、对象状态、可回访性和 promptable events。
 - 从游戏和驾驶扩展到机器人、Physical AI 和多智能体场景。
 - 从纯像素输出转向状态、动作、声音、语言和策略的统一模型。

@@ -68,6 +68,8 @@ Diffusion、score-based model、probability flow ODE [[4]](#ref-4) 和 flow matc
 
 若已有成熟 diffusion 教师且需要少步部署，可优先考虑 consistency 或其他蒸馏；若从头训练并希望使用 ODE 运输视角，flow matching/rectified flow 更自然；若最高质量比延迟重要，多步 diffusion 仍可能更稳。三者不是互斥标签，现代系统常把 flow 训练、蒸馏和少步求解器组合起来。
 
+少步只是实时流式生成的一层。CausVid、Self Forcing、Causal Forcing 和 Causal-rCM 怎样把 ODE/consistency/DMD 与 causal factorization、on-policy rollout 和 KV memory 连接起来，见[因果、流式与实时视频生成专章](causal-streaming-generation.md)。
+
 ## 参考文献
 
 <a id="ref-1"></a>[1] [Flow Matching for Generative Modeling](https://arxiv.org/abs/2210.02747). Yaron Lipman, Ricky T. Q. Chen, Heli Ben-Hamu, Maximilian Nickel, Matt Le. ICLR. 2023.

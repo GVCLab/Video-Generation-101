@@ -65,6 +65,8 @@ $$
 
 扩散的主要成本来自多步网络调用。可通过高阶求解器、减少步数、progressive distillation、consistency distillation 和 adversarial distillation 加速。评估加速时要同时检查细节、运动连续性、条件遵循和多样性；单张关键帧接近并不等于整段视频等价。
 
+若还要在完整视频结束前持续发帧，则问题从“少做几步”扩展为双向 teacher 到 causal student 的迁移、自生成历史训练、KV cache 维护和在线 deadline 调度。完整路线见[因果、流式与实时视频生成](causal-streaming-generation.md)。
+
 ## 7. 代表工作与演进
 
 DDPM 奠定现代训练框架 [[1]](#ref-1)；Video Diffusion Models 系统展示视频生成、预测和插帧 [[2]](#ref-2)；Imagen Video 与 Make-A-Video 探索文本图像先验和级联高分辨率视频 [[3]](#ref-3), [[4]](#ref-4)；Stable Video Diffusion 推动开放 latent video diffusion [[6]](#ref-6)；Sora 把 spacetime patch 与 Transformer diffusion 扩展到更大规模 [[7]](#ref-7)。

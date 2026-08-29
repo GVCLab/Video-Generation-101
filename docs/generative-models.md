@@ -17,6 +17,7 @@
 | Masked generation | 从 mask token 开始多轮并行填充 | 生成较快，也适合补全 | 需设计填充顺序和终止策略 |
 | Diffusion | 从噪声出发，通过多步去噪得到视频 | 质量、覆盖度和条件控制的组合较强 | 多步推理成本高 |
 | Flow / consistency | 学习从简单分布到数据分布的更直接路径 | 有机会减少采样步数 | 需验证加速后的细节和时间一致性 |
+| Causal / streaming generation | 按帧或时间块生成，复用有界历史并持续发帧 | 支持未知时长、低延迟和条件在线更新 | 暴露偏移、长期漂移、缓存与 deadline 相互耦合 |
 
 这些机制可以组合使用。例如，一个视频模型可先用 VAE 压缩视频，再用 Transformer 在 latent 中执行 diffusion 或 flow。“在什么空间生成”与“用什么机制生成”是两个不同问题。
 
@@ -31,8 +32,9 @@
 5. [掩码生成：从缺失 token 到并行视频合成](generative-models/masked-generation.md)
 6. [扩散模型：从噪声逐步还原视频](generative-models/diffusion-models.md)
 7. [Flow 与 Consistency：学习更直接的生成路径](generative-models/flow-consistency-models.md)
+8. [因果、流式与实时视频生成：从 Diffusion Forcing 到可交互长视频](generative-models/causal-streaming-generation.md)
 
-推荐初学者按上述顺序阅读。递归与自回归解释“按什么顺序产生视频”，VAE/tokenizer 解释“在什么表示空间工作”，GAN、diffusion、flow 和 consistency 则解释“如何把模型分布推向真实视频分布”。
+推荐初学者先读前七篇，再把第八篇当作综合章。递归与自回归解释“按什么顺序产生视频”，VAE/tokenizer 解释“在什么表示空间工作”，GAN、diffusion、flow 和 consistency 解释“如何把模型分布推向真实视频分布”；因果流式生成则把 factorization、少步蒸馏、长期记忆与在线系统组合起来。
 
 ## 1. 从视频预测到概率生成
 
@@ -113,6 +115,8 @@ Flow matching、rectified flow、consistency model 等方法试图把多步去�
 - 采样步数减少后，运动连续性和细节是否保持？
 - 长视频生成是一次完成、分块生成，还是带记忆地递推？
 
+当目标是边生成边播放、在 rollout 中接收新 prompt 或动作时，还要区分 causal、streaming、real-time、long video 与 interactive 五种主张。它们的训练—推理分布、KV memory、SLO 与公平评测见[因果、流式与实时视频生成专章](generative-models/causal-streaming-generation.md)。
+
 ## 6. 这条路线留下的核心问题
 
 生成模型路线最成熟，也最容易被误解成“已经解决世界建模”。实际还需要继续问：
@@ -131,7 +135,8 @@ Flow matching、rectified flow、consistency model 等方法试图把多步去�
 3. **DVD-GAN**：理解视频 GAN 的扩展尝试。
 4. **Video Diffusion Models**：理解 diffusion 如何进入视频。
 5. **Stable Video Diffusion**：理解开放 latent video diffusion baseline。
-6. **Sora technical report [[13]](#ref-13)**：理解大规模视频生成与 world simulator 讨论的连接点。
+6. **Diffusion Forcing → CausVid → Self Forcing**：进入[因果流式专章](generative-models/causal-streaming-generation.md)，理解少步、历史分布和长期记忆为何必须一起处理。
+7. **Sora technical report [[13]](#ref-13)**：理解大规模视频生成与 world simulator 讨论的连接点。
 本页主要参考工作：Denoising Diffusion Probabilistic Models [[5]](#ref-5)、AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning [[10]](#ref-10)。
 
 ## 参考文献

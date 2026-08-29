@@ -157,6 +157,7 @@ Masked V2V 是视频 inpainting 的上位接口：
 | 2025 | FiVE-Bench / instruction data scaling [[14]](#ref-14), [[15]](#ref-15) | 同时测编辑成功、背景保持、时间一致和质量；规模化合成指令编辑数据 | 领域开始从精选 demo 转向数据和可诊断评测 | 自动指标仍会漏掉对象级和短暂时间错误 |
 | 2026 | Memory-V2V [[16]](#ref-16) | 显式检索和压缩前几轮编辑状态 | 把单次 V2V 推向多轮、可持续的创作过程 | 长期记忆冲突与版本回滚仍未成熟 |
 | 2026 | EgoEdit / FFP-300K [[17]](#ref-17), [[18]](#ref-18) | 实时流式编辑与大规模高保真首帧传播数据 | 速度、长序列、真实交互和数据规模成为下一阶段主轴 | 结论仍需跨场景、跨模型与独立复现 |
+| 2026-08（前沿观察） | JoyAI-Video-Edit [[22]](#ref-22) | chunk-wise AR、source-anchored DMD 与 long-horizon AR distillation | 把开放时长编辑、源视频保持和作者报告的 720p 实时速度放入同一系统 | 新近预印本；单 B200 速度与其他硬件/分辨率设置不可直接横比 |
 
 ### 怎样读这张表
 
@@ -190,7 +191,7 @@ Memory-V2V 表明外部视频 cache 与 token compression 是一种实现 [[16]]
 
 ### 6.4 从短片离线处理转向长视频与实时流式编辑
 
-当前研究开始把时长、分辨率、速度和显存放到与画质同等重要的位置。流式第一视角编辑还必须处理持续相机运动、手—物交互和新内容不断进入画面的情况 [[17]](#ref-17)。这比把一个固定短 clip 整段加载后编辑更接近真实应用。
+当前研究开始把时长、分辨率、速度和显存放到与画质同等重要的位置。流式第一视角编辑还必须处理持续相机运动、手—物交互和新内容不断进入画面的情况 [[17]](#ref-17)。JoyAI-Video-Edit 将 source-anchored distillation 与长时自回归蒸馏用于开放时长编辑 [[22]](#ref-22)；其速度仍是特定 B200、720p 设置下的作者报告。因果、流式、实时与长视频的严格区分及 SLO 协议见[因果流式视频生成专章](../generative-models/causal-streaming-generation.md)。
 
 ### 6.5 从 2D 视觉合理转向场景与物理约束
 
@@ -298,3 +299,5 @@ Space-Time Completion
 <a id="ref-20"></a>[20] [VE-Bench: Subjective-Aligned Benchmark Suite for Text-Driven Video Editing Quality Assessment](https://arxiv.org/abs/2408.11481). Shangkun Sun, Xiaoyu Liang, Songlin Fan, Wenxu Gao, Wei Gao. AAAI. 2025.
 
 <a id="ref-21"></a>[21] [IVEBench: Modern Benchmark Suite for Instruction-Guided Video Editing Assessment](https://arxiv.org/abs/2510.11647). Yinan Chen, Jiangning Zhang, Teng Hu, Yuxiang Zeng, Zhucun Xue, Qingdong He, et al. ICLR. 2026.
+
+<a id="ref-22"></a>[22] [JoyAI-Video-Edit: Real-Time Open-Ended Video Editing with Autoregressive Diffusion](https://arxiv.org/abs/2608.03974). Yicheng Xiao, Wenxun Dai, Xinran Qin, et al. arXiv preprint. 2026.

@@ -92,6 +92,17 @@
 
 阅读问题：模型是在整段视频上联合去噪，还是分块、分帧或分辨率级联？时间层如何复用图像预训练？
 
+### E.1 因果、流式与实时生成
+
+- **Diffusion Forcing** — Chen et al., 2024. [Paper](https://arxiv.org/abs/2407.01392)
+- **CausVid / From Slow Bidirectional to Fast Autoregressive Video Diffusion Models** — Yin et al., 2024/2025. [Paper](https://arxiv.org/abs/2412.07772)
+- **Self Forcing** — Huang et al., 2025. [Paper](https://arxiv.org/abs/2506.08009)
+- **Rolling Forcing / LongLive** — joint rolling denoising、attention sink、prompt recache 与 train-long-test-long。[Rolling Forcing](https://arxiv.org/abs/2509.25161) · [LongLive](https://arxiv.org/abs/2509.22622)
+- **StreamDiffusionV2** — Feng et al., MLSys 2026. [Proceedings](https://proceedings.mlsys.org/paper_files/paper/2026/hash/698cfaf72a208aef2e78bcac55b74328-Abstract-Conference.html)
+- **Causal Forcing → Causal Forcing++ → Causal-rCM** — causal flow-map initialization、frame-wise 1–2 step 与统一蒸馏 recipe。[Causal Forcing](https://arxiv.org/abs/2602.02214) · [Causal Forcing++](https://arxiv.org/abs/2605.15141) · [Causal-rCM](https://arxiv.org/abs/2606.25473)
+
+阅读问题：论文解决的是 causal factorization、少步蒸馏、self-generated history、长期 memory，还是 serving SLO？FPS 是否在相同硬件、分辨率、步数和端到端计时口径下报告？完整比较见[因果、流式与实时视频生成专章](generative-models/causal-streaming-generation.md)。
+
 ## F. 决策型 World Model
 
 - **World Models** — Ha & Schmidhuber, 2018. [Paper](https://arxiv.org/abs/1803.10122)
