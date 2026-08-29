@@ -23,7 +23,7 @@
     "index": 3,
     "title": "Video Rewrite",
     "paper_or_report": "https://doi.org/10.1145/258734.258880",
-    "project": "https://graphics.stanford.edu/~bregler/videorewrite/",
+    "project": null,
     "code": null,
     "weights": null,
     "demo": null,

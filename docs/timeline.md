@@ -118,7 +118,7 @@ flowchart TB
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/1997-video-rewrite.jpg" alt="Video Rewrite 音频驱动口型合成概念图"></td>
-<td><strong>1997 — <a href="https://doi.org/10.1145/258734.258880">Video Rewrite</a></strong> <code>数据驱动条件合成</code><br><strong>表示/机制：</strong>从已拍摄素材中选择与新语音对应的嘴部片段，再通过图像变形与合成连接片段。<br><strong>控制/任务：</strong>以音频为条件改变说话人的口型。<br><strong>意义/边界：</strong>很早展示了“检索、重排、morphing、条件驱动”的视频合成流程，但受特定人物和素材覆盖范围限制。<br><strong>资源：</strong><a href="https://doi.org/10.1145/258734.258880">Paper</a> · <a href="https://graphics.stanford.edu/~bregler/videorewrite/">Project（历史页，已失效）</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+<td><strong>1997 — <a href="https://doi.org/10.1145/258734.258880">Video Rewrite</a></strong> <code>数据驱动条件合成</code><br><strong>表示/机制：</strong>从已拍摄素材中选择与新语音对应的嘴部片段，再通过图像变形与合成连接片段。<br><strong>控制/任务：</strong>以音频为条件改变说话人的口型。<br><strong>意义/边界：</strong>很早展示了“检索、重排、morphing、条件驱动”的视频合成流程，但受特定人物和素材覆盖范围限制。<br><strong>资源：</strong><a href="https://doi.org/10.1145/258734.258880">Paper</a> · Project：历史页已下线 · Code：未公开 · Weights：未公开 · Demo：—</td>
 </tr>
 </table>
 
@@ -676,7 +676,7 @@ Sora 在生成路线中提出“视频生成可能通向世界模拟器”的研
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2026-kling3.jpg" alt="Kling 3 多模态原生音视频创作概念图"></td>
-<td><strong>2026 — <a href="https://ir.kuaishou.com/news-releases/news-release-details/kling-ai-launches-30-model-ushering-era-where-everyone-can-be">Kling Video 3 / Video 3 Omni</a></strong> <code>官方发布</code> <code>创作模型</code><br><strong>表示/机制：</strong>以统一多模态输入输出支持文本、图像、音频和视频参考。<br><strong>控制/任务：</strong>文本/图像/参考到视频、视频内编辑、最长 15 秒多镜头 storyboard 与原生多语言/方言音频。<br><strong>意义/边界：</strong>代表创作控制和音视频联合生成进步；尚无机器人闭环或可规划状态证据。<br><strong>资源：</strong><a href="https://ir.kuaishou.com/news-releases/news-release-details/kling-ai-launches-30-model-ushering-era-where-everyone-can-be">Official Release</a> · <a href="https://kling.ai/quickstart/klingai-video-3-model-user-guide">Project</a> · Code：未公开 · Weights：未公开 · <a href="https://kling.ai/">Demo（需账号/地区限制）</a></td>
+<td><strong>2026 — <a href="https://kling.ai/release-note/release-notes/whbvu8hsip">Kling Video 3 / Video 3 Omni</a></strong> <code>官方发布</code> <code>创作模型</code><br><strong>表示/机制：</strong>以统一多模态输入输出支持文本、图像、音频和视频参考。<br><strong>控制/任务：</strong>文本/图像/参考到视频、视频内编辑、最长 15 秒多镜头 storyboard 与原生多语言/方言音频。<br><strong>意义/边界：</strong>代表创作控制和音视频联合生成进步；尚无机器人闭环或可规划状态证据。<br><strong>资源：</strong><a href="https://kling.ai/release-note/release-notes/whbvu8hsip">Official Release</a> · <a href="https://kling.ai/quickstart/klingai-video-3-model-user-guide">Project</a> · Code：未公开 · Weights：未公开 · <a href="https://kling.ai/">Demo（需账号/地区限制）</a></td>
 </tr>
 </table>
 

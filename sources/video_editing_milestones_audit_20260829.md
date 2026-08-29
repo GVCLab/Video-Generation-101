@@ -41,7 +41,7 @@ Higher resolution or a stronger selected demo alone was not considered sufficien
 - VE-Bench, 2024: <https://arxiv.org/abs/2408.11481>
 - IVEBench, 2025: <https://arxiv.org/abs/2510.11647>
 - Memory-V2V, 2026: <https://arxiv.org/abs/2601.16296>
-- EgoEdit, CVPR 2026: <https://openaccess.thecvf.com/content/CVPR2026/html/Li_EgoEdit_Dataset_Real-Time_Streaming_Model_and_Benchmark_for_Egocentric_Video_Editing_CVPR_2026_paper.html>
+- EgoEdit, CVPR 2026: <https://arxiv.org/abs/2512.06065>
 - FFP-300K, CVPR 2026: <https://openaccess.thecvf.com/content/CVPR2026/html/Huang_FFP-300K_Scaling_First-Frame_Propagation_for_Generalizable_Video_Editing_CVPR_2026_paper.html>
 
 ## Evidence boundaries retained

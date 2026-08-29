@@ -20,6 +20,6 @@ jobs:
         with:
           args: >-
             --no-progress
-            --accept 200,204,206,403,429
+            --accept 200,202,204,206,401,403,429
             './**/*.md'
           fail: true

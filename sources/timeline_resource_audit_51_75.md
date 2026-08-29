@@ -193,7 +193,7 @@ Audit date: 2026-08-29. Scope: DreamerV3 through Seedance 2.5, including MiniMax
 
 ## 72 — Kling Video 3 / Video 3 Omni
 
-- paper_or_report: https://ir.kuaishou.com/news-releases/news-release-details/kling-ai-launches-30-model-ushering-era-where-everyone-can-be
+- paper_or_report: https://kling.ai/release-note/release-notes/whbvu8hsip
 - project: https://kling.ai/quickstart/klingai-video-3-model-user-guide
 - code: none
 - weights: none

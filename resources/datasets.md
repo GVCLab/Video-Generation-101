@@ -9,7 +9,7 @@
 | Moving MNIST [[1]](#ref-1) | 移动数字的合成序列 | ConvLSTM [[2]](#ref-2)、长期预测入门 | [Reference](https://arxiv.org/abs/1502.04681) |
 | KTH Actions | 六类人体动作 | 早期预测与生成 | [Dataset](https://www.csc.kth.se/cvap/actions/) |
 | BAIR Robot Pushing [[3]](#ref-3) | 机器人推动物体 | 动作条件视频预测 | [TensorFlow Datasets](https://www.tensorflow.org/datasets/catalog/bair_robot_pushing_small) |
-| UCF-101 [[4]](#ref-4) | 人类动作视频 | 类别条件视频生成 | [Dataset](https://www.crcv.ucf.edu/data/UCF101.php) |
+| UCF-101 [[4]](#ref-4) | 人类动作视频 | 类别条件视频生成 | [TensorFlow Datasets](https://www.tensorflow.org/datasets/catalog/ucf101) |
 
 这些数据规模小、视觉分布窄，适合教学和机制验证，不适合证明开放世界生成能力。
 

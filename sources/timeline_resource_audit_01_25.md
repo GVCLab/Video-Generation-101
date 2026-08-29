@@ -23,7 +23,7 @@ Audit date: 2026-08-29. Scope: Lucas–Kanade through Phenaki, in the exact orde
 ## 03 — Video Rewrite
 
 - paper_or_report: https://doi.org/10.1145/258734.258880
-- project: https://graphics.stanford.edu/~bregler/videorewrite/
+- project: none (legacy author page is offline)
 - code: none
 - weights: none
 - demo: none
