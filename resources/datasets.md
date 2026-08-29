@@ -49,10 +49,10 @@
 - episode 边界、任务、成功和失败标签。
 - 观测延迟和动作延迟。
 
-## 5. 驾驶与具身环境 [[6]](#ref-6)
+## 5. 驾驶与具身环境
 
 - [Waymo Open Dataset](https://github.com/waymo-research/waymo-open-dataset)：感知、运动和驾驶研究。
-- [nuScenes](https://www.nuscenes.org/)：多传感器自动驾驶 [[5]](#ref-5)数据。
+- [nuScenes](https://www.nuscenes.org/) [[5]](#ref-5)：多传感器自动驾驶数据。
 - [BDD100K](https://github.com/bdd100k/bdd100k)：多样化道路视频与标注。
 - [Habitat](https://aihabitat.org/)：具身导航 simulator 和数据生态。
 - [Procgen](https://github.com/openai/procgen)：用于泛化研究的程序化游戏环境。
@@ -86,20 +86,15 @@ known_limitations:
 - 构建发布日期晚于训练截止时间的新测试集。
 - 使用程序生成、可精确控制的物理与反事实测试。
 - 披露无法确认训练数据时的风险，而不是默认没有污染。
-本页主要参考工作：Mastering Diverse Domains through World Models [[7]](#ref-7)。
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] [Unsupervised Learning of Video Representations using LSTMs](https://arxiv.org/abs/1502.04681). Nitish Srivastava, Elman Mansimov, Ruslan Salakhutdinov. arXiv preprint. 2015.
+<a id="ref-1"></a>[1] [Unsupervised Learning of Video Representations using LSTMs](https://arxiv.org/abs/1502.04681). Nitish Srivastava, Elman Mansimov, Ruslan Salakhutdinov. ICML. 2015.
 
-<a id="ref-2"></a>[2] [Convolutional LSTM Network: A Machine Learning Approach for Precipitation Nowcasting](https://arxiv.org/abs/1506.04214). Xingjian Shi, Zhourong Chen, Hao Wang, Dit-Yan Yeung, Wai-kin Wong, Wang-chun Woo. arXiv preprint. 2015.
+<a id="ref-2"></a>[2] [Convolutional LSTM Network: A Machine Learning Approach for Precipitation Nowcasting](https://arxiv.org/abs/1506.04214). Xingjian Shi, Zhourong Chen, Hao Wang, Dit-Yan Yeung, Wai-kin Wong, Wang-chun Woo. NeurIPS. 2015.
 
-<a id="ref-3"></a>[3] [Unsupervised Learning for Physical Interaction through Video Prediction](https://arxiv.org/abs/1605.07157). Chelsea Finn, Ian Goodfellow, Sergey Levine. arXiv preprint. 2016.
+<a id="ref-3"></a>[3] [Unsupervised Learning for Physical Interaction through Video Prediction](https://arxiv.org/abs/1605.07157). Chelsea Finn, Ian Goodfellow, Sergey Levine. NeurIPS. 2016.
 
-<a id="ref-4"></a>[4] [MoCoGAN: Decomposing Motion and Content for Video Generation](https://arxiv.org/abs/1707.04993). Sergey Tulyakov, Ming-Yu Liu, Xiaodong Yang, Jan Kautz. arXiv preprint. 2017.
+<a id="ref-4"></a>[4] [UCF101: A Dataset of 101 Human Actions Classes From Videos in The Wild](https://arxiv.org/abs/1212.0402). Khurram Soomro, Amir Roshan Zamir, Mubarak Shah. arXiv preprint. 2012.
 
-<a id="ref-5"></a>[5] [GAIA-1: A Generative World Model for Autonomous Driving](https://arxiv.org/abs/2309.17080). Anthony Hu, Lloyd Russell, Hudson Yeo, Zak Murez, George Fedoseev, Alex Kendall, et al. arXiv preprint. 2023.
-
-<a id="ref-6"></a>[6] [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. arXiv preprint. 2024.
-
-<a id="ref-7"></a>[7] [Mastering Diverse Domains through World Models](https://arxiv.org/abs/2301.04104). Danijar Hafner, Jurgis Pasukonis, Jimmy Ba, Timothy Lillicrap. arXiv preprint. 2023.
+<a id="ref-5"></a>[5] [nuScenes: A multimodal dataset for autonomous driving](https://arxiv.org/abs/1903.11027). Holger Caesar, Varun Bankiti, Alex H. Lang, Sourabh Vora, Venice Erin Liong, Qiang Xu, et al. CVPR. 2020.

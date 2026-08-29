@@ -1,142 +1,76 @@
-# 任务与方法分类
+# 视频生成的下游与相关任务
 
-视频生成领域容易混乱，通常不是因为模型太多，而是不同工作使用了同一个词，却在解决不同的问题。本页提供一套适合阅读论文和维护时间线的统一分类。
+视频生成不只是“输入一句话，输出一段视频”。根据输入条件和期望输出的不同，它延伸出内容生成、预测与补全、视频编辑、多镜头叙事、数字人和交互式世界等任务。
 
-## 一、按生成任务分类
+本页只回答三个问题：**有哪些任务、每个任务接收什么输入、它需要生成什么结果。**
 
-| 任务 | 条件 | 输出 | 主要难点 |
+## 一、内容生成任务
+
+| 任务 | 输入 | 输出 | 核心要求 |
 |---|---|---|---|
-| [Unconditional video generation](tasks/unconditional-video-generation.md) | 无或类别标签 | 新视频 | 多样性与时空真实性 |
-| [Text-to-video](tasks/text-to-video.md) | 文本 | 与描述匹配的视频 | 语义、动作、镜头和叙事遵循 |
-| [Image-to-video](tasks/image-to-video.md) | 首帧或参考图 | 动态视频 | 保持身份和布局，同时产生合理运动 |
-| [Video prediction](tasks/video-prediction.md) | 历史帧 | 未来帧 | 多模态未来、长期误差和不确定性 |
-| [Frame interpolation](tasks/frame-interpolation.md) | 前后关键帧 | 中间帧 | 大运动、遮挡和运动边界 |
-| [Video-to-video](tasks/video-to-video.md) | 视频与编辑指令 | 编辑后视频 | 结构保持与跨帧一致性 |
-| [Video inpainting](tasks/video-inpainting.md) | 视频与 mask | 补全区域 | 遮挡、运动传播和背景一致性 |
-| [Story / multi-shot generation](tasks/story-multishot.md) | 剧本、分镜、参考素材 | 多镜头序列 | 角色、场景、因果和镜头连续性 |
-| [Action-conditioned prediction](tasks/action-conditioned-prediction.md) | 观测与动作 | 动作后的未来 | 动作可控性和反事实准确性 |
-| [Interactive world generation [[7]](#ref-7)](tasks/interactive-world-generation.md) | 初始世界与实时动作 | 持续生成的环境 | 低延迟、记忆、3D 和闭环稳定性 |
-| [Digital human / audio-driven human animation](tasks/digital-human.md) | 人像与语音、音乐、文本或动作 | 可说话、唱歌或表演的人类视频 | 口型同步、身份与身体一致性、生成效率和安全 |
+| [无条件视频生成](tasks/unconditional-video-generation.md) | 无，或只有类别标签 | 新视频 | 生成真实、多样的运动和场景 |
+| [文本到视频](tasks/text-to-video.md) | 文字描述 | 与文字匹配的视频 | 遵循主体、动作、场景、风格和镜头要求 |
+| [图像到视频](tasks/image-to-video.md) | 首帧或参考图 | 从该图像延展出的动态视频 | 保持主体和布局，同时生成合理运动 |
 
-每个任务的完整技术演化见 [生成任务深度路线图](tasks/index.md)。
+## 二、预测与时间补全任务
 
-## 二、按表示空间分类
+| 任务 | 输入 | 输出 | 核心要求 |
+|---|---|---|---|
+| [视频预测](tasks/video-prediction.md) | 过去的视频帧 | 一种或多种可能的未来 | 处理多种合理未来与长期误差累积 |
+| [帧插值](tasks/frame-interpolation.md) | 前后关键帧 | 两帧之间的中间帧 | 处理大运动、遮挡和运动边界 |
+| [动作条件预测](tasks/action-conditioned-prediction.md) | 历史观测与动作 | 执行该动作后的未来 | 让结果正确响应动作和反事实变化 |
 
-### Pixel space
+## 三、视频编辑与修复任务
 
-直接生成 RGB 像素。信息完整，但计算和存储成本高；模型还要花大量容量重建对决策无关的细节。
+视频编辑不是简单“重新生成一次”，而是在执行修改的同时保留原视频的身份、结构、运动和未编辑区域。它与 T2I、I2V、T2V、视频 DiT、3D/4D 表示和多模态基础模型的完整关系及历史节点，见[视频编辑：从时空传播到视频基础模型](tasks/video-to-video.md)。
 
-### Motion space [[1]](#ref-1)
+| 任务 | 输入 | 输出 | 核心要求 |
+|---|---|---|---|
+| [视频编辑 / 视频到视频](tasks/video-to-video.md) | 原视频，以及文字、mask、参考图、轨迹或多轮历史 | 编辑后的视频 | 只改变指定内容，并保持身份、结构、运动和时间一致性 |
+| [视频修复与补全](tasks/video-inpainting.md) | 视频、需修改区域与可选指令 | 局部补全后的视频 | 在遮挡和运动中保持背景、物体和边界连续 |
 
-预测光流 [[2]](#ref-2)、仿射变换、深度、轨迹或 deformation，再通过 warping 得到视频。控制性强，但在新出现区域和复杂非刚体运动上容易失败。
+## 四、长时间与多镜头生成任务
 
-### Continuous latent space
+| 任务 | 输入 | 输出 | 核心要求 |
+|---|---|---|---|
+| [故事与多镜头生成](tasks/story-multishot.md) | 剧本、分镜、文字或参考素材 | 由多个镜头组成的视频 | 保持角色、场景、服装、事件和叙事连续 |
 
-先用 autoencoder 将视频压缩，再在 latent 中建模。这是 latent diffusion 和许多现代视频基础模型的常见选择。
+## 五、人物与音频驱动任务
 
-### Discrete token space
+| 任务 | 输入 | 输出 | 核心要求 |
+|---|---|---|---|
+| [数字人与音频驱动人类动画](tasks/digital-human.md) | 人像与语音、音乐、文字或动作 | 会说话、唱歌或表演的人类视频 | 保持身份，同步口型、表情、身体和音频 |
 
-使用 VQ-VAE [[3]](#ref-3)、VQGAN 或视频 tokenizer 将视频转换为离散 token，再用 autoregressive 或 masked Transformer 生成。优点是能借用语言模型的建模方式，缺点是 token 数量巨大且 tokenizer 会引入不可逆失真。
+## 六、交互式世界生成任务
 
-### Structured / object-centric state
+| 任务 | 输入 | 输出 | 核心要求 |
+|---|---|---|---|
+| [交互式世界生成](tasks/interactive-world-generation.md) | 初始世界与用户或智能体的连续动作 | 持续更新、可交互的环境 | 低延迟响应，并保持空间、状态和长期记忆 |
 
-使用对象、深度、相机、3D 几何、场景图或可学习 slot 表示世界。它更适合物理推理和规划，但很难覆盖开放世界的全部视觉细节。
+## 任务之间的关系
 
-## 三、按生成机制分类
-
-### Recurrent prediction
-
-逐帧或逐 latent 预测未来。结构直观，适合在线 rollout；但训练时看到真实历史、推理时看到自身输出，会产生 exposure bias。
-
-### Variational generation
-
-通过隐变量表示未来的不确定性。适合多模态预测，但 ELBO 的优化目标容易造成模糊或 posterior collapse。
-
-### Adversarial generation
-
-判别器推动生成器产生锐利、真实的视频。GAN 曾是高质量视频生成的主线，但训练不稳定、mode collapse 和大规模扩展困难。
-
-### Autoregressive generation [[4]](#ref-4)
-
-把视频表示成序列并建模：
-
-$$
-p(z_{1:N})=\prod_i p(z_i\mid z_{<i})
-$$
-
-它具有明确似然并天然支持变长输出，但采样串行，长期误差可能逐步积累。
-
-### Masked generation [[5]](#ref-5)
-
-从全部或部分 mask 的 token 开始，多轮并行填充。通常比逐 token 自回归更快，也适合视频补全和多任务条件生成。
-
-### Diffusion and flow [[6]](#ref-6)
-
-从噪声或简单分布出发，通过迭代去噪或连续概率流到达数据分布。它们在画质、覆盖度和条件控制上表现突出，但需要解决多步推理和超长时序一致性。
-
-## 四、按条件和控制信号分类
-
-- **语义条件**：文本、类别、剧本。
-- **视觉条件**：首帧、参考图、参考视频、首尾帧。
-- **结构条件**：姿态、边缘、深度、分割、关键点。
-- **运动条件**：轨迹、光流、相机路径、动作序列。
-- **音频条件**：语音、音乐、环境声。
-- **智能体动作**：离散按键、控制量、机器人关节或末端执行器动作。
-
-最后一类是区分创作型视频模型和决策型 world model 的重要信号。
-
-## 五、时间建模的四个尺度
-
-1. **帧内空间结构**：物体形状、纹理、文字和局部几何。
-2. **短期运动**：速度、光流、碰撞、姿态和相机运动。
-3. **场景状态**：对象永久性、遮挡后的记忆、人物身份和环境变化。
-4. **长程叙事或任务**：多镜头因果、目标进展和智能体策略。
-
-只解决第 1、2 层的模型可以生成漂亮短片，却可能完全没有第 3、4 层所需的状态记忆。
-
-## 六、三个经常被混用的“可控性”
-
-### Prompt steerability
-
-修改文字能否改变输出。它衡量语义遵循，不等于精确控制。
-
-### Trajectory controllability
-
-给定相机路径、物体轨迹或动作，输出是否按指定轨迹演化。
-
-### Closed-loop interactivity
-
-用户或智能体在生成过程中连续提供动作，模型必须低延迟响应，并保持之前世界状态的一致性。
-
-## 七、判断一项工作属于哪一类
-
-阅读论文时，建议记录以下字段：
-
-```yaml
-task: text-to-video | prediction | editing | action-conditioned | interactive
-representation: pixel | continuous-latent | discrete-token | structured-state
-generator: recurrent | vae | gan | autoregressive | masked | diffusion | flow
-conditions: [text, image, video, audio, camera, action]
-temporal_horizon: frames | seconds | minutes
-interaction: open-loop | chunked-control | closed-loop
-evaluation: [quality, alignment, physics, memory, action, planning]
-availability: paper | code | weights | api
+```mermaid
+flowchart LR
+    A["从无到有<br/>无条件 / 文生视频"] --> B["参考约束<br/>图生视频"]
+    B --> C["修改已有内容<br/>视频编辑 / 修复"]
+    C --> D["扩展时间结构<br/>预测 / 插值 / 多镜头"]
+    D --> E["动作改变未来<br/>动作条件 / 交互世界"]
 ```
 
-这套记录方式比单纯按公司或发布时间整理更容易发现真正的技术演化。
+不同任务可以共用模型，但不能因此忽略任务边界。例如，文本到视频要求语义和画面匹配；动作条件预测则要求模型在改变动作时正确改变未来。后者不能只用“视频看起来真实”来验证。
 
-## 参考文献
+越靠近动作条件和交互世界，模型就越不能只靠“看起来合理”来评价；还需要接受反事实、状态保持和闭环控制测试。
 
-<a id="ref-1"></a>[1] [An Iterative Image Registration Technique with an Application to Stereo Vision](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Bruce D. Lucas and Takeo Kanade. Proceedings of IJCAI. 1981.
+## 如何使用任务专章
 
-<a id="ref-2"></a>[2] [Determining optical flow](https://doi.org/10.1016/0004-3702(81)90024-2). Berthold K. P. Horn and Brian G. Schunck. Artificial Intelligence. 1981.
+上表中的每个任务名称都可直接进入对应专章。各专章按相同的研究线索组织：
 
-<a id="ref-3"></a>[3] [Neural Discrete Representation Learning](https://arxiv.org/abs/1711.00937). Aaron van den Oord, Oriol Vinyals, Koray Kavukcuoglu. arXiv preprint. 2017.
+1. 任务定义与输入输出；
+2. 早期方法和深度学习阶段；
+3. Diffusion、Transformer 与 foundation model 阶段；
+4. 代表工作和最新趋势；
+5. 评测方法与开放问题。
 
-<a id="ref-4"></a>[4] [VideoGPT: Video Generation using VQ-VAE and Transformers](https://arxiv.org/abs/2104.10157). Wilson Yan, Yunzhi Zhang, Pieter Abbeel, Aravind Srinivas. arXiv preprint. 2021.
+这些专章是研究地图，不是产品排行或工具清单。阅读时建议先确定任务的输入和输出，再分析模型究竟在生成内容、预测未来、编辑既有视频，还是模拟动作后的世界。
 
-<a id="ref-5"></a>[5] [MAGVIT: Masked Generative Video Transformer](https://arxiv.org/abs/2212.05199). Lijun Yu, Yong Cheng, Kihyuk Sohn, José Lezama, Han Zhang, Huiwen Chang, et al. arXiv preprint. 2022.
-
-<a id="ref-6"></a>[6] [Video Diffusion Models](https://arxiv.org/abs/2204.03458). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. arXiv preprint. 2022.
-
-<a id="ref-7"></a>[7] [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. arXiv preprint. 2024.
+各专章使用可跳转的编号引用，标准引用、代码仓库和 GitHub Star 快照见 [引用与代码索引](bibliography.md)；任务调研的手动核验记录保存在 [video generation tasks research audit](../sources/research_20260809_video_generation_tasks_manual.md)。

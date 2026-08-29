@@ -130,10 +130,10 @@ $$
 | 数据集 | 主要用途 | 特点 | 主要偏差/限制 |
 |---|---|---|---|
 | GRID | 早期音视频同步和唇读 | 受控录制、语句模板清晰、对齐容易 | 词汇和场景单一，难代表开放域说话 |
-| LRS2 / LRS3 | 大规模 in-the-wild 说话视频 | 语种、人物、场景和音频更丰富；适合跨人物泛化 | 压缩、噪声、遮挡、字幕和版权过滤影响质量 |
-| VoxCeleb1/2 | 说话人身份和开放域视频 | 人物多、场景广，常用于预训练 | 画面分辨率和音画质量不均，动作标注弱 |
+| LRS2 / LRS3 [[20]](#ref-20) | 大规模 in-the-wild 说话视频 | 语种、人物、场景和音频更丰富；适合跨人物泛化 | 压缩、噪声、遮挡、字幕和版权过滤影响质量 |
+| VoxCeleb1/2 [[21]](#ref-21) | 说话人身份和开放域视频 | 人物多、场景广，常用于预训练 | 画面分辨率和音画质量不均，动作标注弱 |
 | MEAD [[18]](#ref-18) | 情绪说话脸和多视角生成 | 60 位演员、8 类情绪、3 个强度、7 个视角，受控高质量采集 | 演绎情绪与真实自然表达仍有差距 |
-| HDTF | 高清 talking face、身份和跨人物测试 | 约 400 个公开视频，适合高清肖像生成与同步评测 | in-the-wild 分布复杂，公开版本与预处理方式不完全统一 |
+| HDTF [[22]](#ref-22) | 高清 talking face、身份和跨人物测试 | 约 400 个公开视频，适合高清肖像生成与同步评测 | in-the-wild 分布复杂，公开版本与预处理方式不完全统一 |
 | TalkCuts [[17]](#ref-17) | 多镜头人类说话视频 | 把人类说话视频扩展到 shot、镜头和跨镜头连续性 | 重点从脸部同步转向多镜头，基准仍较新 |
 
 数据的主要瓶颈不是单纯规模，而是**同步且有授权的高质量视频**：脸部需要足够分辨率，音频需要清晰，人物需要有丰富表情和动作，且训练/测试身份不能泄漏。未来数据还需要显式记录音素边界、情绪、视线、头姿、手势、镜头、说话人授权和合成来源。
@@ -192,46 +192,46 @@ $$
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] [MakeItTalk: Speaker-Aware Talking-Head Animation](https://arxiv.org/abs/2004.12992). Sicheng Zhou, Jieming Liu, Zeyu Liu, Yao Sun, Limin Wang, and others. ACM Transactions on Graphics. 2020.
+<a id="ref-1"></a>[1] [MakeItTalk: Speaker-Aware Talking-Head Animation](https://arxiv.org/abs/2004.12992). Yang Zhou, Xintong Han, Eli Shechtman, Jose Echevarria, Evangelos Kalogerakis, Dingzeyu Li. ACM TOG (SIGGRAPH Asia). 2020.
 
-<a id="ref-2"></a>[2] [A Lip Sync Expert Is All You Need for Speech to Lip Generation In the Wild](https://arxiv.org/abs/2008.10010). Prajwal K. R., Rudrabha Mukhopadhyay, Vinay P. Namboodiri, and others. ACM Multimedia. 2020.
+<a id="ref-2"></a>[2] [A Lip Sync Expert Is All You Need for Speech to Lip Generation In The Wild](https://arxiv.org/abs/2008.10010). K R Prajwal, Rudrabha Mukhopadhyay, Vinay P. Namboodiri, C. V. Jawahar. ACM Multimedia. 2020.
 
-<a id="ref-3"></a>[3] [Audio-Driven Talking Face Video Generation with Dynamic-NeRF](https://arxiv.org/abs/2011.03727). Ziqiao Li, Cheng Peng, Licheng Zhou, Yufei Feng, Xiaohui Xie, and others. ICCV. 2021.
+<a id="ref-3"></a>[3] [AD-NeRF: Audio Driven Neural Radiance Fields for Talking Head Synthesis](https://arxiv.org/abs/2103.11078). Yudong Guo, Keyu Chen, Sen Liang, Yong-Jin Liu, Hujun Bao, Juyong Zhang. ICCV. 2021.
 
-<a id="ref-4"></a>[4] [SadTalker: Learning Realistic 3D Motion Coefficients for Stylized Audio-Driven Single Image Talking Face Animation](https://arxiv.org/abs/2211.12194). Wenlong Zhao, Xiaozhong Wu, Jinyu Chen, and others. 2023.
+<a id="ref-4"></a>[4] [SadTalker: Learning Realistic 3D Motion Coefficients for Stylized Audio-Driven Single Image Talking Face Animation](https://arxiv.org/abs/2211.12194). Wenxuan Zhang, Xiaodong Cun, Xuan Wang, Yong Zhang, Xi Shen, Yu Guo, et al. CVPR. 2023.
 
-<a id="ref-5"></a>[5] [Hallo: Hierarchical Audio-Driven Visual Synthesis for Portrait Image Animation](https://arxiv.org/abs/2406.08801). Mingwang Xu, Hui Li, Qingkun Su, and others. 2024.
+<a id="ref-5"></a>[5] [Hallo: Hierarchical Audio-Driven Visual Synthesis for Portrait Image Animation](https://arxiv.org/abs/2406.08801). Mingwang Xu, Hui Li, Qingkun Su, Hanlin Shang, Liwei Zhang, Ce Liu, et al. arXiv preprint. 2024.
 
-<a id="ref-6"></a>[6] [VASA-1: Lifelike Audio-Driven Talking Faces Generated in Real Time](https://arxiv.org/abs/2404.10667). Sicheng Xu, Guojun Chen, Yu-Xiao Guo, and others. 2024.
+<a id="ref-6"></a>[6] [VASA-1: Lifelike Audio-Driven Talking Faces Generated in Real Time](https://arxiv.org/abs/2404.10667). Sicheng Xu, Guojun Chen, Yu-Xiao Guo, Jiaolong Yang, Chong Li, Zhenyu Zang, et al. NeurIPS. 2024.
 
-<a id="ref-7"></a>[7] [OmniHuman-1: Rethinking the Scaling-Up of One-Stage Conditioned Human Animation Models](https://arxiv.org/abs/2502.01061). Gaojie Lin, Jianwen Jiang, Jiaqi Yang, Zerong Zheng, Chao Liang. 2025.
+<a id="ref-7"></a>[7] [OmniHuman-1: Rethinking the Scaling-Up of One-Stage Conditioned Human Animation Models](https://arxiv.org/abs/2502.01061). Gaojie Lin, Jianwen Jiang, Jiaqi Yang, Zerong Zheng, Chao Liang, Yuan Zhang, et al. ICCV. 2025.
 
-<a id="ref-8"></a>[8] [Deep Video Portraits](https://arxiv.org/abs/1805.11714). Olivia Wiles, A. Sophia Koepke, Andrew Zisserman. ACM Transactions on Graphics. 2018.
+<a id="ref-8"></a>[8] [Deep Video Portraits](https://arxiv.org/abs/1805.11714). Hyeongwoo Kim, Pablo Garrido, Ayush Tewari, Weipeng Xu, Justus Thies, Matthias Nießner, et al. ACM TOG (SIGGRAPH). 2018.
 
-<a id="ref-9"></a>[9] [Talking Face Generation by Adversarially Disentangled Audio-Visual Representation](https://arxiv.org/abs/1907.07837). Kunpeng Wang, Qingshan Liu, Rui Zhu, Wei Zeng, and others. AAAI. 2020.
+<a id="ref-9"></a>[9] [Talking Face Generation by Adversarially Disentangled Audio-Visual Representation](https://arxiv.org/abs/1807.07860). Hang Zhou, Yu Liu, Ziwei Liu, Ping Luo, Xiaogang Wang. AAAI. 2019.
 
-<a id="ref-10"></a>[10] [Audio-driven Talking Face Video Generation with Learning-based Personalized Head Pose](https://arxiv.org/abs/2002.10137). Xinya Ji, Hang Zhou, Keke Li, and others. 2020.
+<a id="ref-10"></a>[10] [Audio-driven Talking Face Video Generation with Learning-based Personalized Head Pose](https://arxiv.org/abs/2002.10137). Ran Yi, Zipeng Ye, Juyong Zhang, Hujun Bao, Yong-Jin Liu. arXiv preprint. 2020.
 
-<a id="ref-11"></a>[11] [Pose-Controllable Talking Face Generation by Implicitly Modularized Audio-Visual Representation](https://openaccess.thecvf.com/content/CVPR2021/html/Zhang_Pose-Controllable_Talking_Face_Generation_by_Implicitly_Modularized_Audio-Visual_Representation_CVPR_2021_paper.html). Yizhong Zhang, Siwei Yang, Zhixin Yang, and others. CVPR. 2021.
+<a id="ref-11"></a>[11] [Pose-Controllable Talking Face Generation by Implicitly Modularized Audio-Visual Representation](https://openaccess.thecvf.com/content/CVPR2021/html/Zhou_Pose-Controllable_Talking_Face_Generation_by_Implicitly_Modularized_Audio-Visual_Representation_CVPR_2021_paper.html). Hang Zhou, Yasheng Sun, Wayne Wu, Chen Change Loy, Xiaogang Wang, Ziwei Liu. CVPR. 2021.
 
-<a id="ref-12"></a>[12] [Audio2Head: Audio-driven One-shot Talking-head Generation with Natural Head Motion](https://www.ijcai.org/proceedings/2021/0152.pdf). Xinya Ji, Hang Zhou, Keke Li, and others. IJCAI. 2021.
+<a id="ref-12"></a>[12] [Audio2Head: Audio-driven One-shot Talking-head Generation with Natural Head Motion](https://www.ijcai.org/proceedings/2021/0152.pdf). Suzhen Wang, Lincheng Li, Yu Ding, Changjie Fan, Xin Yu. IJCAI. 2021.
 
-<a id="ref-13"></a>[13] [VideoReTalking: Audio-based Lip Synchronization for Talking Head Video Editing In the Wild](https://doi.org/10.1145/3550469.3555399). Kaihang Zhou, Xiaocui Zeng, Yufei Yin, and others. SIGGRAPH Asia. 2022.
+<a id="ref-13"></a>[13] [VideoReTalking: Audio-based Lip Synchronization for Talking Head Video Editing In the Wild](https://doi.org/10.1145/3550469.3555399). Kun Cheng, Xiaodong Cun, Yong Zhang, Menghan Xia, Fei Yin, Mingrui Zhu, et al. SIGGRAPH Asia. 2022.
 
-<a id="ref-14"></a>[14] [StyleTalker: One-shot Style-based Audio-driven Talking Head Video Generation](https://arxiv.org/abs/2208.10922). Sicheng Zhang, Yi Zhang, and others. 2022.
+<a id="ref-14"></a>[14] [StyleTalker: One-shot Style-based Audio-driven Talking Head Video Generation](https://arxiv.org/abs/2208.10922). Dongchan Min, Minyoung Song, Eunji Ko, Sung Ju Hwang. arXiv preprint. 2022.
 
-<a id="ref-15"></a>[15] [DiffTalk: Crafting Diffusion Models for Generalized Audio-Driven Portraits Animation](https://openaccess.thecvf.com/content/CVPR2023/html/Ren_DiffTalk_Crafting_Diffusion_Models_for_Generalized_Audio-Driven_Portraits_Animation_CVPR_2023_paper.html). Yuanxun Ren, Gefei Li, Yicheng Zhang, and others. CVPR. 2023.
+<a id="ref-15"></a>[15] [DiffTalk: Crafting Diffusion Models for Generalized Audio-Driven Portraits Animation](https://openaccess.thecvf.com/content/CVPR2023/html/Shen_DiffTalk_Crafting_Diffusion_Models_for_Generalized_Audio-Driven_Portraits_Animation_CVPR_2023_paper.html). Shuai Shen, Wenliang Zhao, Zibin Meng, Wanhua Li, Zheng Zhu, Jie Zhou, et al. CVPR. 2023.
 
-<a id="ref-16"></a>[16] [OmniAvatar: Efficient Audio-Driven Avatar Video Generation with Adaptive Body Animation](https://arxiv.org/abs/2506.18866). Qijun Gan, Ruizi Yang, Jianke Zhu, Shaofei Xue, Steven Hoi. 2025.
+<a id="ref-16"></a>[16] [OmniAvatar: Efficient Audio-Driven Avatar Video Generation with Adaptive Body Animation](https://arxiv.org/abs/2506.18866). Qijun Gan, Ruizi Yang, Jianke Zhu, Shaofei Xue, Steven Hoi. arXiv preprint. 2025.
 
-<a id="ref-17"></a>[17] [TalkCuts: A Large-Scale Dataset for Multi-Shot Human Speech Video Generation](https://talkcuts.github.io/). Research project and benchmark. 2025.
+<a id="ref-17"></a>[17] [TalkCuts: A Large-Scale Dataset for Multi-Shot Human Speech Video Generation](https://arxiv.org/abs/2510.07249). Jiaben Chen, Zixin Wang, Ailing Zeng, Yang Fu, Xueyang Yu, Siyuan Cen, et al. NeurIPS Datasets and Benchmarks. 2025.
 
-<a id="ref-18"></a>[18] [MEAD: A Large-scale Audio-visual Dataset for Emotional Talking-face Generation](https://wywu.github.io/projects/MEAD/MEAD.html). Kaisiyuan Wang, Qianyi Wu, Linsen Song, and others. ECCV. 2020.
+<a id="ref-18"></a>[18] [MEAD: A Large-scale Audio-visual Dataset for Emotional Talking-face Generation](https://wywu.github.io/projects/MEAD/MEAD.html). Kaisiyuan Wang, Qianyi Wu, Linsen Song, Zhuoqian Yang, Wayne Wu, Chen Qian, et al. ECCV. 2020.
 
-<a id="ref-19"></a>[19] [What comprises a good talking-head video generation?: A Survey and Benchmark](https://arxiv.org/abs/2005.03201). Lele Chen, Guofeng Cui, Ziyi Kou, Haitian Zheng, Chenliang Xu. 2020.
+<a id="ref-19"></a>[19] [What comprises a good talking-head video generation?: A Survey and Benchmark](https://arxiv.org/abs/2005.03201). Lele Chen, Guofeng Cui, Ziyi Kou, Haitian Zheng, Chenliang Xu. CVPR Workshop on Sight and Sound. 2020.
 
-<a id="ref-20"></a>[20] [The Lip Reading Sentences 3 (LRS3) Dataset](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs3.html). Visual Geometry Group, University of Oxford. Dataset project.
+<a id="ref-20"></a>[20] [LRS3-TED: a large-scale dataset for visual speech recognition](https://arxiv.org/abs/1809.00496). Triantafyllos Afouras, Joon Son Chung, Andrew Zisserman. arXiv preprint. 2018.
 
-<a id="ref-21"></a>[21] [VoxCeleb: A Large-Scale Audio-Visual Dataset for Speaker Identification](https://www.robots.ox.ac.uk/~vgg/data/voxceleb/). Arsha Nagrani, Joon Son Chung, Andrew Zisserman. Dataset project.
+<a id="ref-21"></a>[21] [VoxCeleb: A Large-Scale Speaker Identification Dataset](https://www.robots.ox.ac.uk/~vgg/data/voxceleb/). Arsha Nagrani, Joon Son Chung, Andrew Zisserman. INTERSPEECH. 2017.
 
-<a id="ref-22"></a>[22] [HDTF: High-Definition Talking Face Dataset](https://github.com/MRzzm/HDTF). Dataset and project repository.
+<a id="ref-22"></a>[22] [Flow-Guided One-Shot Talking Face Generation with a High-Resolution Audio-Visual Dataset (HDTF)](https://github.com/MRzzm/HDTF). Zhimeng Zhang, Lincheng Li, Yu Ding, Changjie Fan. CVPR. 2021.

@@ -4,6 +4,36 @@
 
 这条线不同于决策型 world model。生成模型可以学到大量运动、物理和场景规律，但核心目标通常仍是建模 $p(x_{1:T}\mid c)$，而不是显式回答“采取动作 $a_t$ 后会发生什么”。
 
+如果关注的是“文本如何约束视频内容”，请从[文本到视频](tasks/text-to-video.md)开始；本章只负责解释 T2V、I2V 和其他视频任务共同使用的 VAE、GAN、diffusion 与 flow 生成机制。
+
+## 生成机制总览
+
+| 生成机制 | 基本做法 | 主要优势 | 主要限制 |
+|---|---|---|---|
+| Recurrent prediction | 逐帧或逐 latent 预测未来 | 结构直观，适合在线 rollout | 自身误差会逐步累积 |
+| Variational generation | 用随机 latent 表示多种可能未来 | 可建模不确定性 | 可能模糊或 posterior collapse |
+| Adversarial generation | 让生成器与判别器对抗训练 | 容易得到锐利画面 | 训练不稳定，可能 mode collapse |
+| Autoregressive generation | 按顺序预测下一个像素、token 或 latent | 天然支持变长生成 | 采样串行，长序列成本高 |
+| Masked generation | 从 mask token 开始多轮并行填充 | 生成较快，也适合补全 | 需设计填充顺序和终止策略 |
+| Diffusion | 从噪声出发，通过多步去噪得到视频 | 质量、覆盖度和条件控制的组合较强 | 多步推理成本高 |
+| Flow / consistency | 学习从简单分布到数据分布的更直接路径 | 有机会减少采样步数 | 需验证加速后的细节和时间一致性 |
+
+这些机制可以组合使用。例如，一个视频模型可先用 VAE 压缩视频，再用 Transformer 在 latent 中执行 diffusion 或 flow。“在什么空间生成”与“用什么机制生成”是两个不同问题。
+
+## 分机制详细教程
+
+本页负责建立全局路线；每种机制的数学目标、训练过程、视频结构、失败模式和实践选择见以下独立文档：
+
+1. [递归预测：逐步生成未来视频](generative-models/recurrent-prediction.md)
+2. [变分生成：用潜变量表达多种可能未来](generative-models/variational-generation.md)
+3. [对抗生成：用判别器学习时空真实感](generative-models/adversarial-generation.md)
+4. [自回归生成：把视频变成可预测的序列](generative-models/autoregressive-generation.md)
+5. [掩码生成：从缺失 token 到并行视频合成](generative-models/masked-generation.md)
+6. [扩散模型：从噪声逐步还原视频](generative-models/diffusion-models.md)
+7. [Flow 与 Consistency：学习更直接的生成路径](generative-models/flow-consistency-models.md)
+
+推荐初学者按上述顺序阅读。递归与自回归解释“按什么顺序产生视频”，VAE/tokenizer 解释“在什么表示空间工作”，GAN、diffusion、flow 和 consistency 则解释“如何把模型分布推向真实视频分布”。
+
 ## 1. 从视频预测到概率生成
 
 早期深度视频预测通常直接优化下一帧或未来帧误差：
@@ -106,28 +136,28 @@ Flow matching、rectified flow、consistency model 等方法试图把多步去�
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] [Deep multi-scale video prediction beyond mean square error](https://arxiv.org/abs/1511.05440). Michael Mathieu, Camille Couprie, Yann LeCun. arXiv preprint. 2015.
+<a id="ref-1"></a>[1] [Deep multi-scale video prediction beyond mean square error](https://arxiv.org/abs/1511.05440). Michael Mathieu, Camille Couprie, Yann LeCun. ICLR. 2016.
 
-<a id="ref-2"></a>[2] [MoCoGAN: Decomposing Motion and Content for Video Generation](https://arxiv.org/abs/1707.04993). Sergey Tulyakov, Ming-Yu Liu, Xiaodong Yang, Jan Kautz. arXiv preprint. 2017.
+<a id="ref-2"></a>[2] [MoCoGAN: Decomposing Motion and Content for Video Generation](https://arxiv.org/abs/1707.04993). Sergey Tulyakov, Ming-Yu Liu, Xiaodong Yang, Jan Kautz. CVPR. 2018.
 
-<a id="ref-3"></a>[3] [Stochastic Video Generation with a Learned Prior](https://arxiv.org/abs/1802.07687). Remi Denton and Rob Fergus. arXiv preprint. 2018.
+<a id="ref-3"></a>[3] [Stochastic Video Generation with a Learned Prior](https://arxiv.org/abs/1802.07687). Remi Denton, Rob Fergus. ICML. 2018.
 
 <a id="ref-4"></a>[4] [Adversarial Video Generation on Complex Datasets](https://arxiv.org/abs/1907.06571). Aidan Clark, Jeff Donahue, Karen Simonyan. arXiv preprint. 2019.
 
-<a id="ref-5"></a>[5] [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239). Jonathan Ho, Ajay Jain, Pieter Abbeel. arXiv preprint. 2020.
+<a id="ref-5"></a>[5] [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239). Jonathan Ho, Ajay Jain, Pieter Abbeel. NeurIPS. 2020.
 
-<a id="ref-6"></a>[6] [Video Diffusion Models](https://arxiv.org/abs/2204.03458). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. arXiv preprint. 2022.
+<a id="ref-6"></a>[6] [Video Diffusion Models](https://arxiv.org/abs/2204.03458). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. NeurIPS. 2022.
 
-<a id="ref-7"></a>[7] [Make-A-Video: Text-to-Video Generation without Text-Video Data](https://arxiv.org/abs/2209.14792). Uriel Singer, Adam Polyak, Thomas Hayes, Xi Yin, Jie An, Songyang Zhang, et al. arXiv preprint. 2022.
+<a id="ref-7"></a>[7] [Make-A-Video: Text-to-Video Generation without Text-Video Data](https://arxiv.org/abs/2209.14792). Uriel Singer, Adam Polyak, Thomas Hayes, Xi Yin, Jie An, Songyang Zhang, et al. ICLR. 2023.
 
 <a id="ref-8"></a>[8] [Imagen Video: High Definition Video Generation with Diffusion Models](https://arxiv.org/abs/2210.02303). Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey Gritsenko, et al. arXiv preprint. 2022.
 
-<a id="ref-9"></a>[9] [Align your Latents: High-Resolution Video Synthesis with Latent Diffusion Models](https://arxiv.org/abs/2304.08818). Andreas Blattmann, Robin Rombach, Huan Ling, Tim Dockhorn, Seung Wook Kim, Sanja Fidler, et al. arXiv preprint. 2023.
+<a id="ref-9"></a>[9] [Align your Latents: High-Resolution Video Synthesis with Latent Diffusion Models](https://arxiv.org/abs/2304.08818). Andreas Blattmann, Robin Rombach, Huan Ling, Tim Dockhorn, Seung Wook Kim, Sanja Fidler, et al. CVPR. 2023.
 
-<a id="ref-10"></a>[10] [AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning](https://arxiv.org/abs/2307.04725). Yuwei Guo, Ceyuan Yang, Anyi Rao, Zhengyang Liang, Yaohui Wang, Yu Qiao, et al. arXiv preprint. 2023.
+<a id="ref-10"></a>[10] [AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning](https://arxiv.org/abs/2307.04725). Yuwei Guo, Ceyuan Yang, Anyi Rao, Zhengyang Liang, Yaohui Wang, Yu Qiao, et al. ICLR. 2024.
 
 <a id="ref-11"></a>[11] [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. arXiv preprint. 2023.
 
-<a id="ref-12"></a>[12] [Lumiere: A Space-Time Diffusion Model for Video Generation](https://arxiv.org/abs/2401.12945). Omer Bar-Tal, Hila Chefer, Omer Tov, Charles Herrmann, Roni Paiss, Shiran Zada, et al. arXiv preprint. 2024.
+<a id="ref-12"></a>[12] [Lumiere: A Space-Time Diffusion Model for Video Generation](https://arxiv.org/abs/2401.12945). Omer Bar-Tal, Hila Chefer, Omer Tov, Charles Herrmann, Roni Paiss, Shiran Zada, et al. SIGGRAPH Asia. 2024.
 
 <a id="ref-13"></a>[13] [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). OpenAI. Technical report. 2024.

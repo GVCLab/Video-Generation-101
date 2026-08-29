@@ -262,9 +262,9 @@ V-JEPA 的训练目标有几个重要边界：
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] [A Path Towards Autonomous Machine Intelligence](https://openreview.net/forum?id=BZ5a1r-kVsf). Yann LeCun. Project report. 2022.
+<a id="ref-1"></a>[1] [A Path Towards Autonomous Machine Intelligence](https://openreview.net/forum?id=BZ5a1r-kVsf). Yann LeCun. OpenReview working paper (v0.9.2). 2022.
 
-<a id="ref-2"></a>[2] [Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture](https://arxiv.org/abs/2301.08243). Mahmoud Assran, Quentin Duval, Ishan Misra, Piotr Bojanowski, Pascal Vincent, Michael Rabbat, et al. arXiv preprint. 2023.
+<a id="ref-2"></a>[2] [Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture](https://arxiv.org/abs/2301.08243). Mahmoud Assran, Quentin Duval, Ishan Misra, Piotr Bojanowski, Pascal Vincent, Michael Rabbat, et al. CVPR. 2023.
 
 <a id="ref-3"></a>[3] [MC-JEPA: A Joint-Embedding Predictive Architecture for Self-Supervised Learning of Motion and Content Features](https://arxiv.org/abs/2307.12698). Adrien Bardes, Jean Ponce, Yann LeCun. arXiv preprint. 2023.
 
@@ -274,10 +274,10 @@ V-JEPA 的训练目标有几个重要边界：
 
 <a id="ref-6"></a>[6] [V-JEPA 2.1: Unlocking Dense Features in Video Self-Supervised Learning](https://arxiv.org/abs/2603.14482). Lorenzo Mur-Labadia, Matthew Muckley, Amir Bar, Mido Assran, Koustuv Sinha, Mike Rabbat, et al. arXiv preprint. 2026.
 
-<a id="ref-7"></a>[7] [LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics](https://arxiv.org/abs/2511.08544). Randall Balestriero and Yann LeCun. arXiv preprint. 2025.
+<a id="ref-7"></a>[7] [LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics](https://arxiv.org/abs/2511.08544). Randall Balestriero, Yann LeCun. arXiv preprint. 2025.
 
 <a id="ref-8"></a>[8] [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312). Lucas Maes, Quentin Le Lidec, Damien Scieur, Yann LeCun, Randall Balestriero. arXiv preprint. 2026.
 
 <a id="ref-9"></a>[9] [A Lightweight Library for Energy-Based Joint-Embedding Predictive Architectures](https://arxiv.org/abs/2602.03604). Basile Terver, Randall Balestriero, Megi Dervishi, David Fan, Quentin Garrido, Tushar Nagarajan, et al. arXiv preprint. 2026.
 
-<a id="ref-10"></a>[10] [TD-JEPA: Latent-predictive Representations for Zero-Shot Reinforcement Learning](https://arxiv.org/abs/2510.00739). Marco Bagatella, Matteo Pirotta, Ahmed Touati, Alessandro Lazaric, Andrea Tirinzoni. arXiv preprint. 2025.
+<a id="ref-10"></a>[10] [TD-JEPA: Latent-predictive Representations for Zero-Shot Reinforcement Learning](https://arxiv.org/abs/2510.00739). Marco Bagatella, Matteo Pirotta, Ahmed Touati, Alessandro Lazaric, Andrea Tirinzoni. ICLR. 2026.

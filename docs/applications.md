@@ -8,23 +8,25 @@
 
 典型任务：
 
-- 文本到视频 [[1]](#ref-1)，用于概念短片、广告草图和动态分镜。
+- 文本到视频 [[1]](#ref-1)[[2]](#ref-2)，用于概念短片、广告草图和动态分镜。
 - 图像到视频 [[4]](#ref-4)，让角色设定、产品图或场景概念动起来。
-- 多镜头生成 [[3]](#ref-3)，保持角色、场景、服装和故事连续性。
+- 多镜头生成 [[3]](#ref-3)（Sora 报告展示的长镜头一致性讨论），保持角色、场景、服装和故事连续性。
 - 风格迁移和镜头语言探索，例如相机运动、光照和画幅变化。
 
 核心要求不是单帧漂亮，而是可控、可改、可重复。专业创作更关心角色一致性、镜头衔接、局部编辑和版本管理。
 
-## 2. 视频编辑 [[5]](#ref-5)与后期制作
+## 2. [视频编辑](tasks/video-to-video.md)与后期制作
 
 常见应用：
 
 - 视频补全、去物体、扩展画幅和背景替换。
 - 关键帧插值、慢动作、超分辨率和去噪。
-- 局部风格化、换装、换背景和动作迁移。
+- 局部风格化、换装、换背景和动作迁移 [[5]](#ref-5)。
 - 文本驱动剪辑和素材重组。
 
 这类应用最怕“整段重画”。好的视频编辑模型需要只改变指定区域，同时保持时间一致、身份一致和镜头结构。
+
+从技术史看，视频编辑已经从光流传播、时空补全和条件 vid2vid，发展到 neural atlas、diffusion inversion / attention control、图像编辑器 + I2V，以及原生 V2V DiT、instruction editing 和多轮 memory。完整关系和建议 milestones 见[视频编辑专题](tasks/video-to-video.md)。
 
 ## 3. 动画、游戏与交互环境
 
@@ -94,11 +96,10 @@
 6. 成功指标是主观质量、下游任务收益，还是闭环控制表现？
 
 这些问题能帮助读者把论文能力翻译成真实系统需求。
-本页主要参考工作：Imagen Video: High Definition Video Generation with Diffusion Models [[2]](#ref-2)。
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] [Make-A-Video: Text-to-Video Generation without Text-Video Data](https://arxiv.org/abs/2209.14792). Uriel Singer, Adam Polyak, Thomas Hayes, Xi Yin, Jie An, Songyang Zhang, et al. arXiv preprint. 2022.
+<a id="ref-1"></a>[1] [Make-A-Video: Text-to-Video Generation without Text-Video Data](https://arxiv.org/abs/2209.14792). Uriel Singer, Adam Polyak, Thomas Hayes, Xi Yin, Jie An, Songyang Zhang, et al. ICLR. 2023.
 
 <a id="ref-2"></a>[2] [Imagen Video: High Definition Video Generation with Diffusion Models](https://arxiv.org/abs/2210.02303). Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey Gritsenko, et al. arXiv preprint. 2022.
 
@@ -106,12 +107,12 @@
 
 <a id="ref-4"></a>[4] [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. arXiv preprint. 2023.
 
-<a id="ref-5"></a>[5] [AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning](https://arxiv.org/abs/2307.04725). Yuwei Guo, Ceyuan Yang, Anyi Rao, Zhengyang Liang, Yaohui Wang, Yu Qiao, et al. arXiv preprint. 2023.
+<a id="ref-5"></a>[5] [AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning](https://arxiv.org/abs/2307.04725). Yuwei Guo, Ceyuan Yang, Anyi Rao, Zhengyang Liang, Yaohui Wang, Yu Qiao, et al. ICLR. 2024.
 
-<a id="ref-6"></a>[6] [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. arXiv preprint. 2024.
+<a id="ref-6"></a>[6] [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. ICML. 2024.
 
-<a id="ref-7"></a>[7] [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837). Dani Valevski, Yaniv Leviathan, Moab Arar, Shlomi Fruchter. arXiv preprint. 2024.
+<a id="ref-7"></a>[7] [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837). Dani Valevski, Yaniv Leviathan, Moab Arar, Shlomi Fruchter. ICLR. 2025.
 
 <a id="ref-8"></a>[8] [GAIA-1: A Generative World Model for Autonomous Driving](https://arxiv.org/abs/2309.17080). Anthony Hu, Lloyd Russell, Hudson Yeo, Zak Murez, George Fedoseev, Alex Kendall, et al. arXiv preprint. 2023.
 
-<a id="ref-9"></a>[9] [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). NVIDIA, Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, et al. arXiv preprint. 2025.
+<a id="ref-9"></a>[9] [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, Tiffany Cai, et al. arXiv preprint. 2025.

@@ -1,0 +1,252 @@
+[
+  {
+    "index": 51,
+    "title": "DreamerV3",
+    "paper_or_report": "https://arxiv.org/abs/2301.04104",
+    "project": "https://danijar.com/project/dreamerv3/",
+    "code": "https://github.com/danijar/dreamerv3",
+    "weights": null,
+    "demo": null,
+    "notes": "Author-maintained source repository; the Nature paper also names it as source for the presented experiments. No official pretrained-checkpoint catalog was found."
+  },
+  {
+    "index": 52,
+    "title": "GAIA-1",
+    "paper_or_report": "https://arxiv.org/abs/2309.17080",
+    "project": "https://wayve.ai/thinking/scaling-gaia-1/",
+    "code": null,
+    "weights": null,
+    "demo": null,
+    "notes": "Wayve released a technical report and recorded generations, but no public implementation, checkpoint, or interactive endpoint."
+  },
+  {
+    "index": 53,
+    "title": "UniSim: Learning Interactive Real-World Simulators",
+    "paper_or_report": "https://arxiv.org/abs/2310.06114",
+    "project": "https://universal-simulator.github.io/",
+    "code": null,
+    "weights": null,
+    "demo": null,
+    "notes": "The author page provides qualitative rollouts. No qualifying author/institution code repository or pretrained weights were found; similarly named repositories are unrelated."
+  },
+  {
+    "index": 54,
+    "title": "V-JEPA",
+    "paper_or_report": "https://arxiv.org/abs/2404.08471",
+    "project": "https://ai.meta.com/blog/v-jepa-yann-lecun-ai-model-video-joint-embedding-predictive-architecture/",
+    "code": "https://github.com/facebookresearch/jepa",
+    "weights": "https://github.com/facebookresearch/jepa#model-zoo",
+    "demo": null,
+    "notes": "Meta FAIR released pretraining/evaluation code and official encoder/probe checkpoints; no hosted interactive demo."
+  },
+  {
+    "index": 55,
+    "title": "Genie 1",
+    "paper_or_report": "https://arxiv.org/abs/2402.15391",
+    "project": "https://deepmind.google/research/publications/60474/",
+    "code": null,
+    "weights": null,
+    "demo": null,
+    "notes": "The paper explicitly states that trained checkpoints and the training dataset were not released; community reimplementations are not official Genie 1."
+  },
+  {
+    "index": 56,
+    "title": "GameNGen",
+    "paper_or_report": "https://arxiv.org/abs/2408.14837",
+    "project": "https://gamengen.github.io/",
+    "code": null,
+    "weights": null,
+    "demo": null,
+    "notes": "Official page has recorded gameplay, but Google/author code and weights were not released; public GitHub reproductions are third-party."
+  },
+  {
+    "index": 57,
+    "title": "Genie 2",
+    "paper_or_report": null,
+    "project": "https://deepmind.google/blog/genie-2-a-large-scale-foundation-world-model/",
+    "code": null,
+    "weights": null,
+    "demo": null,
+    "notes": "Research announcement only: no separate paper, public code, weights, or Genie-2-specific endpoint. Later Project Genie access is based on Genie 3."
+  },
+  {
+    "index": 58,
+    "title": "DINO-WM",
+    "paper_or_report": "https://arxiv.org/abs/2411.04983",
+    "project": "https://dino-wm.github.io/",
+    "code": "https://github.com/gaoyuezhou/dino_wm",
+    "weights": "https://osf.io/bmw48/?view_only=a56a296ce3b24cceaf408383a175ce28",
+    "demo": null,
+    "notes": "Authors released code, task data, and trained PointMaze, PushT, and Wall checkpoints on OSF; project videos are not an interactive demo."
+  },
+  {
+    "index": 59,
+    "title": "NVIDIA Cosmos / Predict1 platform",
+    "paper_or_report": "https://arxiv.org/abs/2501.03575",
+    "project": "https://research.nvidia.com/labs/cosmos-lab/",
+    "code": "https://github.com/NVIDIA/Cosmos",
+    "weights": "https://huggingface.co/collections/nvidia/cosmos-6751e884dc10e013a0a0d8e6",
+    "demo": null,
+    "notes": "Open code and model artifacts under NVIDIA licenses. This is the Cosmos platform/Predict1 generation, not one checkpoint named Cosmos 1; historical resources now direct users to later releases."
+  },
+  {
+    "index": 60,
+    "title": "Cosmos Predict2",
+    "paper_or_report": "https://developer.nvidia.com/blog/?p=101575",
+    "project": "https://research.nvidia.com/labs/cosmos-lab/cosmos-predict2/",
+    "code": "https://github.com/nvidia-cosmos/cosmos-predict2",
+    "weights": "https://huggingface.co/collections/nvidia/cosmos-predict2",
+    "demo": "https://huggingface.co/spaces/nvidia/Cosmos-Predict2",
+    "notes": "NVIDIA released post-training/inference code and 2B/14B checkpoints. Repo and collection are archived in favor of Predict2.5 but remain the historical Predict2 resources."
+  },
+  {
+    "index": 61,
+    "title": "V-JEPA 2 / V-JEPA 2-AC",
+    "paper_or_report": "https://arxiv.org/abs/2506.09985",
+    "project": "https://ai.meta.com/research/vjepa/",
+    "code": "https://github.com/facebookresearch/vjepa2",
+    "weights": "https://huggingface.co/collections/facebook/v-jepa-2-6841bad8413014e185b497a6",
+    "demo": "https://github.com/facebookresearch/vjepa2#usage-demo",
+    "notes": "Meta released pretraining/post-training code, encoder checkpoints, probes, and V-JEPA 2-AC. Demo is an official notebook/Colab example, not hosted robot control."
+  },
+  {
+    "index": 62,
+    "title": "Veo 3 / Veo 3.1",
+    "paper_or_report": "https://arxiv.org/abs/2509.20328",
+    "project": "https://deepmind.google/models/veo/",
+    "code": null,
+    "weights": null,
+    "demo": "https://labs.google/fx/tools/flow",
+    "notes": "Paper is a Google DeepMind black-box capabilities study, not a training report. Veo is proprietary and available through subscription/region-dependent Google products/API."
+  },
+  {
+    "index": 63,
+    "title": "Genie 3",
+    "paper_or_report": "https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/",
+    "project": "https://deepmind.google/models/genie/",
+    "code": null,
+    "weights": null,
+    "demo": "https://labs.google/fx/projectgenie/",
+    "notes": "No public paper, code, or checkpoints. Project Genie is an experimental subscription/region-gated prototype, not an open release."
+  },
+  {
+    "index": 64,
+    "title": "Matrix-Game 2.0",
+    "paper_or_report": "https://arxiv.org/abs/2508.13009",
+    "project": "https://matrix-game-v2.github.io/",
+    "code": "https://github.com/SkyworkAI/Matrix-Game",
+    "weights": "https://huggingface.co/Skywork/Matrix-Game-2.0",
+    "demo": null,
+    "notes": "Skywork released code and universal/GTA/Temple Run pretrained variants. Official page has recordings, but no hosted interactive player was identified."
+  },
+  {
+    "index": 65,
+    "title": "Marble",
+    "paper_or_report": "https://www.worldlabs.ai/blog/marble-world-model",
+    "project": "https://docs.worldlabs.ai/",
+    "code": null,
+    "weights": null,
+    "demo": "https://marble.worldlabs.ai/",
+    "notes": "Proprietary World Labs product. It launched as limited beta; a paid World API is now available, but product/API access does not imply public source or weights."
+  },
+  {
+    "index": 66,
+    "title": "Sora 2",
+    "paper_or_report": "https://openai.com/index/sora-2-system-card/",
+    "project": "https://openai.com/index/sora-2/",
+    "code": null,
+    "weights": null,
+    "demo": null,
+    "notes": "OpenAI released a system card and product announcement, not code or weights. The system card says the Sora product is unavailable from 2026-04-26."
+  },
+  {
+    "index": 67,
+    "title": "Runway GWM-1",
+    "paper_or_report": null,
+    "project": "https://runway.com/research/introducing-runway-gwm-1",
+    "code": null,
+    "weights": null,
+    "demo": null,
+    "notes": "Proprietary family of separately post-trained Worlds, Characters/Avatars, and Robotics models. Gated/API/licensing surfaces exist, but no public model repository or weights."
+  },
+  {
+    "index": 68,
+    "title": "NVIDIA Cosmos 3",
+    "paper_or_report": "https://arxiv.org/abs/2606.02800",
+    "project": "https://research.nvidia.com/labs/cosmos-lab/cosmos3/",
+    "code": "https://github.com/NVIDIA/cosmos",
+    "weights": "https://huggingface.co/collections/nvidia/cosmos3",
+    "demo": "https://build.nvidia.com/models?q=cosmos",
+    "notes": "Code and checkpoints released under OpenMDW-1.1. Hugging Face weights are gated and require accepting/requesting access; hosted NVIDIA endpoints are separate."
+  },
+  {
+    "index": 69,
+    "title": "V-JEPA 2.1",
+    "paper_or_report": "https://arxiv.org/abs/2603.14482",
+    "project": "https://ai.meta.com/research/vjepa/",
+    "code": "https://github.com/facebookresearch/vjepa2",
+    "weights": "https://github.com/facebookresearch/vjepa2#v-jepa-21-pretrained-checkpoints",
+    "demo": "https://github.com/facebookresearch/vjepa2#usage-demo",
+    "notes": "Official 80M, 300M, 1B, and 2B checkpoints are linked by Meta. Third-party HF ports are not used as the authoritative release path."
+  },
+  {
+    "index": 70,
+    "title": "LeWorldModel (LeWM)",
+    "paper_or_report": "https://arxiv.org/abs/2603.19312",
+    "project": "https://le-wm.github.io/",
+    "code": "https://github.com/lucas-maes/le-wm",
+    "weights": "https://huggingface.co/collections/quentinll/lewm",
+    "demo": null,
+    "notes": "Authors released MIT code, datasets, and per-environment checkpoints; project videos are visualizations rather than an interactive demo."
+  },
+  {
+    "index": 71,
+    "title": "EB-JEPA",
+    "paper_or_report": "https://arxiv.org/abs/2602.03604",
+    "project": "https://github.com/facebookresearch/eb_jepa",
+    "code": "https://github.com/facebookresearch/eb_jepa",
+    "weights": null,
+    "demo": null,
+    "notes": "Apache-2.0 tutorial/research library designed for local training. No published pretrained-checkpoint catalog or hosted demo."
+  },
+  {
+    "index": 72,
+    "title": "Kling Video 3 / Video 3 Omni",
+    "paper_or_report": "https://ir.kuaishou.com/news-releases/news-release-details/kling-ai-launches-30-model-ushering-era-where-everyone-can-be",
+    "project": "https://kling.ai/quickstart/klingai-video-3-model-user-guide",
+    "code": null,
+    "weights": null,
+    "demo": "https://kling.ai/",
+    "notes": "Proprietary Kuaishou product with web/API access and documentation; no public model source or downloadable checkpoints."
+  },
+  {
+    "index": 73,
+    "title": "Seedance 2.0",
+    "paper_or_report": "https://arxiv.org/abs/2604.14148",
+    "project": "https://seed.bytedance.com/seedance2_0",
+    "code": null,
+    "weights": null,
+    "demo": "https://jimeng.jianying.com/",
+    "notes": "ByteDance released a technical paper/project page but no code or weights. Jimeng is an official product route and may require account/region access."
+  },
+  {
+    "index": 74,
+    "title": "MiniMax H3",
+    "paper_or_report": "https://www.minimax.io/blog/minimax-h3",
+    "project": "https://www.minimax.io/research",
+    "code": "https://github.com/MiniMax-AI/MiniMax-H3",
+    "weights": "https://huggingface.co/MiniMaxAI/MiniMax-H3",
+    "demo": "https://hailuoai.video/",
+    "notes": "Two CFG-distilled H3-Base families and inference code are public under the MiniMax H3 Community License. H3-Context-IR, H3-Regenerate-2K, and initial sparse attention were not in the first release; fuller report forthcoming."
+  },
+  {
+    "index": 75,
+    "title": "Seedance 2.5",
+    "paper_or_report": "https://seed.bytedance.com/en/blog/one-take-creation-flexible-referencing-introducing-seedance-2-5",
+    "project": "https://seed.bytedance.com/seedance2_5",
+    "code": null,
+    "weights": null,
+    "demo": "https://jimeng.jianying.com/",
+    "notes": "Proprietary ByteDance release with Jimeng/Doubao product access. Launch post says BytePlus ModelArk API was coming soon; no public code, weights, or standalone technical paper found."
+  }
+]

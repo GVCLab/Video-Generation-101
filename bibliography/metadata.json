@@ -98,6 +98,17 @@
     "url": "https://arxiv.org/abs/2311.15127",
     "year": "2023"
   },
+  "bommasani2021opportunities": {
+    "arxiv_id": "2108.07258",
+    "authors": "Rishi Bommasani and Drew A. Hudson and Ehsan Adeli and Russ Altman and Simran Arora and Sydney von Arx and Michael S. Bernstein and Jeannette Bohg and Antoine Bosselut and Emma Brunskill and Erik Brynjolfsson and Shyamal Buch and Dallas Card and Rodrigo Castellon and Niladri Chatterji and Annie Chen and Kathleen Creel and Jared Quincy Davis and Dora Demszky and Chris Donahue and Moussa Doumbouya and Esin Durmus and Stefano Ermon and John Etchemendy and Kawin Ethayarajh and Li Fei-Fei and Chelsea Finn and Trevor Gale and Lauren Gillespie and Karan Goel and Noah Goodman and Shelby Grossman and Neel Guha and Tatsunori Hashimoto and Peter Henderson and John Hewitt and Daniel E. Ho and Jenny Hong and Kyle Hsu and Jing Huang and Thomas Icard and Saahil Jain and Dan Jurafsky and Pratyusha Kalluri and Siddharth Karamcheti and Geoff Keeling and Fereshte Khani and Omar Khattab and Pang Wei Koh and Mark Krass and Ranjay Krishna and Rohith Kuditipudi and Ananya Kumar and Faisal Ladhak and Mina Lee and Tony Lee and Jure Leskovec and Isabelle Levent and Xiang Lisa Li and Xuechen Li and Tengyu Ma and Ali Malik and Christopher D. Manning and Suvir Mirchandani and Eric Mitchell and Zanele Munyikwa and Suraj Nair and Avanika Narayan and Deepak Narayanan and Ben Newman and Allen Nie and Juan Carlos Niebles and Hamed Nilforoshan and Julian Nyarko and Giray Ogut and Laurel Orr and Isabel Papadimitriou and Joon Sung Park and Chris Piech and Eva Portelance and Christopher Potts and Aditi Raghunathan and Rob Reich and Hongyu Ren and Frieda Rong and Yusuf Roohani and Camilo Ruiz and Jack Ryan and Christopher Ré and Dorsa Sadigh and Shiori Sagawa and Keshav Santhanam and Andy Shih and Krishnan Srinivasan and Alex Tamkin and Rohan Taori and Armin W. Thomas and Florian Tramèr and Rose E. Wang and William Wang and Bohan Wu and Jiajun Wu and Yuhuai Wu and Sang Michael Xie and Michihiro Yasunaga and Jiaxuan You and Matei Zaharia and Michael Zhang and Tianyi Zhang and Xikun Zhang and Yuhui Zhang and Lucia Zheng and Kaitlyn Zhou and Percy Liang",
+    "entry_type": "misc",
+    "primary_class": "cs.LG",
+    "source_id": "2108.07258",
+    "source_kind": "arxiv",
+    "title": "On the Opportunities and Risks of Foundation Models",
+    "url": "https://arxiv.org/abs/2108.07258",
+    "year": "2021"
+  },
   "bruce2024genie": {
     "arxiv_id": "2402.15391",
     "authors": "Jake Bruce and Michael Dennis and Ashley Edwards and Jack Parker-Holder and Yuge Shi and Edward Hughes and Matthew Lai and Aditi Mavalankar and Richie Steigerwald and Chris Apps and Yusuf Aytar and Sarah Bechtle and Feryal Behbahani and Stephanie Chan and Nicolas Heess and Lucy Gonzalez and Simon Osindero and Sherjil Ozair and Scott Reed and Jingwei Zhang and Konrad Zolna and Jeff Clune and Nando de Freitas and Satinder Singh and Tim Rocktäschel",
@@ -119,6 +130,16 @@
     "title": "Adversarial Video Generation on Complex Datasets",
     "url": "https://arxiv.org/abs/1907.06571",
     "year": "2019"
+  },
+  "deepmind2024genie2": {
+    "authors": "{Google DeepMind}",
+    "entry_type": "misc",
+    "howpublished": "Official research release",
+    "source_id": "https://deepmind.google/blog/genie-2-a-large-scale-foundation-world-model/",
+    "source_kind": "manual",
+    "title": "Genie 2: A Large-Scale Foundation World Model",
+    "url": "https://deepmind.google/blog/genie-2-a-large-scale-foundation-world-model/",
+    "year": "2024"
   },
   "deepmind2025genie3": {
     "authors": "{Google DeepMind}",
@@ -180,10 +201,8 @@
   },
   "ha2018worldmodels": {
     "authors": "David Ha and Jürgen Schmidhuber",
-    "booktitle": "Advances in Neural Information Processing Systems 31",
-    "entry_type": "incollection",
-    "pages": "2451--2463",
-    "publisher": "Curran Associates, Inc.",
+    "entry_type": "misc",
+    "howpublished": "arXiv preprint arXiv:1803.10122 (NeurIPS 31 version titled: Recurrent World Models Facilitate Policy Evolution)",
     "source_id": "https://arxiv.org/abs/1803.10122",
     "source_kind": "manual",
     "title": "World Models",
@@ -221,6 +240,17 @@
     "source_kind": "arxiv",
     "title": "Mastering Diverse Domains through World Models",
     "url": "https://arxiv.org/abs/2301.04104",
+    "year": "2023"
+  },
+  "hansen2023tdmpc2": {
+    "arxiv_id": "2310.16828",
+    "authors": "Nicklas Hansen and Hao Su and Xiaolong Wang",
+    "entry_type": "misc",
+    "primary_class": "cs.LG",
+    "source_id": "2310.16828",
+    "source_kind": "arxiv",
+    "title": "TD-MPC2: Scalable, Robust World Models for Continuous Control",
+    "url": "https://arxiv.org/abs/2310.16828",
     "year": "2023"
   },
   "ho2020denoising": {
@@ -311,7 +341,7 @@
     "source_id": "https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf",
     "source_kind": "manual",
     "title": "An Iterative Image Registration Technique with an Application to Stereo Vision",
-    "url": "https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf",
+    "url": "https://publications.ri.cmu.edu/storage/publications/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf",
     "year": "1981"
   },
   "maes2026leworldmodel": {
@@ -358,6 +388,16 @@
     "url": "https://arxiv.org/abs/2501.03575",
     "year": "2025"
   },
+  "nvidia2025cosmospredict2": {
+    "authors": "{NVIDIA}",
+    "entry_type": "misc",
+    "howpublished": "Technical release",
+    "source_id": "https://developer.nvidia.com/blog/?p=101575",
+    "source_kind": "manual",
+    "title": "Develop Custom Physical AI Foundation Models with NVIDIA Cosmos Predict-2",
+    "url": "https://developer.nvidia.com/blog/?p=101575",
+    "year": "2025"
+  },
   "nvidia2026cosmos3": {
     "arxiv_id": "2606.02800",
     "authors": "{NVIDIA}",
@@ -368,6 +408,16 @@
     "title": "Cosmos 3: Omnimodal World Models for Physical AI",
     "url": "https://arxiv.org/abs/2606.02800",
     "year": "2026"
+  },
+  "oh2015actionconditional": {
+    "authors": "Junhyuk Oh and Xiaoxiao Guo and Honglak Lee and Richard Lewis and Satinder Singh",
+    "booktitle": "Advances in Neural Information Processing Systems 28",
+    "entry_type": "inproceedings",
+    "source_id": "https://papers.nips.cc/paper_files/paper/2015/hash/6ba3af5d7b2790e73f0de32e5c8c1798-Abstract.html",
+    "source_kind": "manual",
+    "title": "Action-Conditional Video Prediction using Deep Networks in Atari Games",
+    "url": "https://papers.nips.cc/paper_files/paper/2015/hash/6ba3af5d7b2790e73f0de32e5c8c1798-Abstract.html",
+    "year": "2015"
   },
   "oord2017neural": {
     "arxiv_id": "1711.00937",
@@ -516,6 +566,16 @@
     "url": "https://arxiv.org/abs/1609.02612",
     "year": "2016"
   },
+  "worldlabs2025marble": {
+    "authors": "{World Labs}",
+    "entry_type": "misc",
+    "howpublished": "Official research release",
+    "source_id": "https://www.worldlabs.ai/blog/marble-world-model",
+    "source_kind": "manual",
+    "title": "Marble: A Multimodal World Model",
+    "url": "https://www.worldlabs.ai/blog/marble-world-model",
+    "year": "2025"
+  },
   "yan2021videogpt": {
     "arxiv_id": "2104.10157",
     "authors": "Wilson Yan and Yunzhi Zhang and Pieter Abbeel and Aravind Srinivas",
@@ -526,6 +586,28 @@
     "title": "VideoGPT: Video Generation using VQ-VAE and Transformers",
     "url": "https://arxiv.org/abs/2104.10157",
     "year": "2021"
+  },
+  "yang2023interactive": {
+    "arxiv_id": "2310.06114",
+    "authors": "Sherry Yang and Yilun Du and Kamyar Ghasemipour and Jonathan Tompson and Leslie Kaelbling and Dale Schuurmans and Pieter Abbeel",
+    "entry_type": "misc",
+    "primary_class": "cs.AI",
+    "source_id": "2310.06114",
+    "source_kind": "arxiv",
+    "title": "Learning Interactive Real-World Simulators",
+    "url": "https://arxiv.org/abs/2310.06114",
+    "year": "2023"
+  },
+  "ye2026worldaction": {
+    "arxiv_id": "2602.15922",
+    "authors": "Seonghyeon Ye and Yunhao Ge and Kaiyuan Zheng and Shenyuan Gao and Sihyun Yu and George Kurian and Suneel Indupuru and You Liang Tan and Chuning Zhu and Jiannan Xiang and Ayaan Malik and Kyungmin Lee and William Liang and Nadun Ranawaka and Jiasheng Gu and Yinzhen Xu and Guanzhi Wang and Fengyuan Hu and Avnish Narayan and Johan Bjorck and Jing Wang and Gwanghyun Kim and Dantong Niu and Ruijie Zheng and Yuqi Xie and Jimmy Wu and Qi Wang and Ryan Julian and Danfei Xu and Yilun Du and Yevgen Chebotar and Scott Reed and Jan Kautz and Yuke Zhu and Linxi \"Jim\" Fan and Joel Jang",
+    "entry_type": "misc",
+    "primary_class": "cs.RO",
+    "source_id": "2602.15922",
+    "source_kind": "arxiv",
+    "title": "World Action Models are Zero-shot Policies",
+    "url": "https://arxiv.org/abs/2602.15922",
+    "year": "2026"
   },
   "yu2022magvit": {
     "arxiv_id": "2212.05199",
@@ -548,5 +630,16 @@
     "title": "Language Model Beats Diffusion -- Tokenizer is Key to Visual Generation",
     "url": "https://arxiv.org/abs/2310.05737",
     "year": "2023"
+  },
+  "zhou2024dinowm": {
+    "arxiv_id": "2411.04983",
+    "authors": "Gaoyue Zhou and Hengkai Pan and Yann LeCun and Lerrel Pinto",
+    "entry_type": "misc",
+    "primary_class": "cs.RO",
+    "source_id": "2411.04983",
+    "source_kind": "arxiv",
+    "title": "DINO-WM: World Models on Pre-trained Visual Features enable Zero-shot Planning",
+    "url": "https://arxiv.org/abs/2411.04983",
+    "year": "2024"
   }
 }

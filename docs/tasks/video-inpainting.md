@@ -44,17 +44,17 @@ Video inpainting 输入视频和 mask，补全被遮挡、删除或缺失的区�
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] [An Iterative Image Registration Technique with an Application to Stereo Vision](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Bruce D. Lucas and Takeo Kanade. Proceedings of IJCAI. 1981.
+<a id="ref-1"></a>[1] [An Iterative Image Registration Technique with an Application to Stereo Vision](https://publications.ri.cmu.edu/storage/publications/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Bruce D. Lucas, Takeo Kanade. IJCAI. 1981.
 
-<a id="ref-2"></a>[2] [Determining optical flow](https://doi.org/10.1016/0004-3702(81)90024-2). Berthold K. P. Horn and Brian G. Schunck. Artificial Intelligence. 1981.
+<a id="ref-2"></a>[2] [Determining optical flow](https://doi.org/10.1016/0004-3702%2881%2990024-2). Berthold K. P. Horn, Brian G. Schunck. Artificial Intelligence. 1981.
 
-<a id="ref-3"></a>[3] [Video Diffusion Models](https://arxiv.org/abs/2204.03458). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. arXiv preprint. 2022.
+<a id="ref-3"></a>[3] [Video Diffusion Models](https://arxiv.org/abs/2204.03458). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. NeurIPS. 2022.
 
-<a id="ref-4"></a>[4] [VideoPainter: Any-length Video Inpainting and Editing with Plug-and-Play Context Control](https://arxiv.org/abs/2503.05639). Yuxuan Bian, Zhaoyang Zhang, Xuan Ju, Mingdeng Cao, Liangbin Xie, Ying Shan, et al. arXiv preprint. 2025.
+<a id="ref-4"></a>[4] [VideoPainter: Any-length Video Inpainting and Editing with Plug-and-Play Context Control](https://arxiv.org/abs/2503.05639). Yuxuan Bian, Zhaoyang Zhang, Xuan Ju, Mingdeng Cao, Liangbin Xie, Ying Shan, et al. SIGGRAPH. 2025.
 
 <a id="ref-5"></a>[5] [DiTPainter: Efficient Video Inpainting with Diffusion Transformers](https://arxiv.org/abs/2504.15661). Xian Wu, Chang Liu. arXiv preprint. 2025.
 
-<a id="ref-6"></a>[6] [EraserDiT: Fast Video Inpainting with Diffusion Transformer Model](https://arxiv.org/abs/2506.12853). Jie Liu and Zheng Hui. arXiv preprint. 2025.
+<a id="ref-6"></a>[6] [EraserDiT: Fast Video Inpainting with Diffusion Transformer Model](https://arxiv.org/abs/2506.12853). Jie Liu, Zheng Hui. arXiv preprint. 2025.
 
 <a id="ref-7"></a>[7] [Coherent Video Inpainting Using Optical Flow-Guided Efficient Diffusion](https://arxiv.org/abs/2412.00857). Bohai Gu, Hao Luo, Song Guo, Peiran Dong, Qihua Zhou. arXiv preprint. 2024.
 

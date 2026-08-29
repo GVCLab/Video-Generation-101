@@ -333,7 +333,7 @@ def render_index(registry: dict[str, Any], metadata: dict[str, Any], stars: dict
         "",
         "# 论文引用、代码仓库与 GitHub Stars",
         "",
-        f"本索引覆盖仓库正文登记的 **{len(registry['entries'])} 篇论文或技术报告**。论文元数据来自 Crossref、arXiv 或机构原始页面；GitHub Stars 是 **{stars['as_of']}** 的快照，不代表代码质量。",
+        f"本索引收录 **{len(registry['entries'])} 篇**在 `bibliography/registry.json` 中登记的核心论文与技术报告，用于提供标准 BibTeX 和官方代码状态。仓库正文引用的文献总数多于此，完整清单以各章文末的参考文献为准。论文元数据来自 Crossref、arXiv 或机构原始页面；GitHub Stars 是 **{stars['as_of']}** 的快照，不代表代码质量。",
         "",
         "- [完整 BibTeX](../bibliography/references.bib)",
         "- [引用与仓库登记表](../bibliography/registry.json)",

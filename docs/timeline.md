@@ -1,246 +1,722 @@
 # 技术时间线
 
-本时间线选择改变了“视频如何表示、生成或被用于决策”的工作。年份以论文首次公开或官方发布为主，不代表同年所有工作具有相同成熟度。
-
-## 1990s–2003：显式运动与统计动态
-
-### 关键思想
-
-- 运动补偿、光流、morphing 和 image-based rendering。
-- 将视频看作可重组的帧或可辨识的动态系统。
-- 显式模拟器通过几何、材质和物理状态生成画面。
-
-### 代表节点
-
-- **1981 — Lucas–Kanade [[1]](#ref-1)**：用局部最小二乘估计光流。
-- **1981 — Horn–Schunck [[2]](#ref-2)**：用全局平滑正则化估计密集光流。
-- **2000 — Video Textures [[3]](#ref-3)**：通过寻找相似帧和跳转点，将短视频重组为连续动态纹理。
-- **2003 — Dynamic Textures [[4]](#ref-4)**：以线性动力系统建模烟、火、水面和树叶等随机视觉过程。
-
-### 留下的遗产
-
-现代模型中的 flow-guided generation、warping、显式相机控制、state-space model 和数字孪生，都能在这一时期找到祖先。
-
-## 2014–2016：深度视频预测
-
-### 关键思想
-
-- 使用 CNN 编码空间内容，用 RNN/LSTM 建模时间。
-- 将自监督下一帧预测作为学习视觉表示的方法。
-- 从直接预测像素转向预测变换、运动核和多尺度残差。
-
-### 代表节点
-
-- **2014 — Video sequence modeling with RNNs**：探索用递归网络预测视频。
-- **2015 — ConvLSTM [[5]](#ref-5)**：把 LSTM 的全连接运算替换为卷积，保留空间结构。
-- **2015 — Beyond MSE [[6]](#ref-6)**：指出 MSE 会产生平均化和模糊，引入多尺度与对抗损失。
-- **2016 — CDNA / DNA / STP [[7]](#ref-7)**：通过预测像素变换和运动核学习物理交互。
-- **2016 — PredNet [[8]](#ref-8)**：以预测编码思想组织深层视频预测网络。
-
-### 核心矛盾
-
-未来通常不是唯一的。确定性网络在多个合理未来之间求平均，因此“数值误差较低”可能对应“视觉结果更模糊”。
-
-## 2016–2019：VAE 与 GAN 视频生成
-
-### 关键思想
-
-- 使用随机 latent 表达不确定未来。
-- 用时空判别器替代逐像素损失。
-- 解耦静态内容和动态运动。
-
-### 代表节点
-
-- **2016 — Generating Videos with Scene Dynamics [[9]](#ref-9)**：使用时空卷积 GAN，并分离前景和背景。
-- **2017 — MoCoGAN [[10]](#ref-10)**：把内容 latent 和运动 latent 分开建模。
-- **2018 — Stochastic Video Generation [[11]](#ref-11)**：进一步研究可控、随机和长程的视频生成。
-- **2019 — DVD-GAN [[12]](#ref-12)**：展示大型 GAN 在高分辨率视频上的扩展能力。
-
-### 核心矛盾
-
-GAN 能产生锐利画面，但大规模训练不稳定、模式覆盖难以评估，也缺少像 likelihood 那样统一的训练目标。
-
-## 2017–2023：视觉 Token 与 Transformer
-
-### 关键思想
-
-- 先压缩视频，再对离散 token 建模。
-- 使用自回归、masked token prediction 和时空注意力。
-- 将文本、图像和视频放入更统一的序列建模框架。
-
-### 代表节点
-
-- **2017 — VQ-VAE [[13]](#ref-13)**：学习离散视觉 codebook。
-- **2021 — VideoGPT [[14]](#ref-14)**：VQ-VAE 视频 tokenizer + GPT 式自回归 Transformer。
-- **2022 — Phenaki [[15]](#ref-15)**：用 causal video tokenizer 和 masked Transformer 生成可变长度视频。
-- **2022/2023 — MAGVIT [[16]](#ref-16)**：用 3D tokenizer 和 masked generation 统一多种视频生成任务。
-- **2023 — MAGVIT-v2 [[17]](#ref-17)**：继续提升视觉 tokenizer 和语言模型兼容性。
-
-### 核心矛盾
-
-压缩减少计算，却可能丢失运动细节；自回归生成具有统一概率建模形式，但视频 token 数量和串行采样成本非常高。
-
-## 2020–2024：Diffusion 成为主线
-
-### 关键思想
-
-- 从噪声逐步还原视频分布。
-- 复用大规模图像生成模型，再增加 temporal layer 或时空注意力。
-- 在 latent space 训练，并通过级联超分辨率提高输出质量。
-
-### 代表节点
-
-- **2020 — DDPM [[18]](#ref-18)**：奠定现代 diffusion 生成框架。
-- **2022 — Video Diffusion Models [[19]](#ref-19)**：系统展示时空 diffusion 在视频生成和预测中的能力。
-- **2022 — Make-A-Video [[20]](#ref-20) / Imagen Video [[21]](#ref-21)**：大规模文本视频生成与级联时空超分辨率。
-- **2022/2023 — Latent Video Diffusion [[22]](#ref-22)**：将生成过程移动到压缩 latent。
-- **2023 — AnimateDiff [[23]](#ref-23)**：向图像 diffusion 注入可复用 motion module。
-- **2023 — Stable Video Diffusion [[24]](#ref-24)**：开放权重图像到视频模型推动社区复现。
-- **2024 — Lumiere [[25]](#ref-25)**：以 Space-Time U-Net 直接生成完整视频时间范围。
-- **2024 — Sora [[26]](#ref-26)**：把不同时长、尺寸和宽高比的视频表示为空时 patch，并以 Transformer diffusion 扩展规模。
-
-### 核心矛盾
-
-短视频画质快速提高，但对象永久性、因果、复杂交互、超长状态一致性和推理成本仍是主要问题。
-
-## 2018–2023：决策型 World Model 的并行谱系
-
-这一谱系并不是从文本视频生成自然“升级”而来，而是来自控制、强化学习和规划。
-
-### 代表节点
-
-- **2018 — World Models [[27]](#ref-27)**：用 VAE 表示观测、RNN 建模 dynamics，并在想象环境中训练 controller。
-- **2019 — PlaNet [[28]](#ref-28)**：在 latent dynamics 中进行在线规划。
-- **2020 — Dreamer [[29]](#ref-29)**：在学习到的 latent world model 中优化行为。
-- **2020 — MuZero [[30]](#ref-30)**：不重建完整观测，学习足以预测价值、策略和奖励的模型。
-- **2023 — DreamerV3 [[31]](#ref-31)**：展示一套 world model 方法跨多种任务工作的可能性。
-- **2023 — GAIA-1 [[32]](#ref-32)**：探索面向自动驾驶的生成式 world model。
-
-### 核心矛盾
-
-面向决策的 latent state 不一定需要生成漂亮像素；面向视频的生成器也不一定包含对规划有用的、因果一致的状态。
-
-## 2024：生成模型与交互世界汇合
-
-- **V-JEPA [[33]](#ref-33)**：在 representation space 预测缺失的时空信息，而非重建全部像素。
-- **Genie 1 [[34]](#ref-34)**：从无动作标签的互联网游戏视频中发现 latent action，并生成可控制环境。
-- **GameNGen [[35]](#ref-35)**：使用神经生成模型模拟可玩的游戏环境。
-- **Sora**：提出大规模视频生成可能通向通用物理世界模拟器，同时公开展示模型的物理失败。
-
-这一年之后，“视频生成模型是否就是 world model”成为领域的核心争论之一。
-
-## 2025：动作、物理与实时交互
-
-- **Cosmos 1 [[36]](#ref-36)**：提供面向 Physical AI 的 world foundation model、tokenizer 和数据处理平台。
-- **V-JEPA 2 [[37]](#ref-37)**：将视频自监督表示、物理预测和少量机器人数据后训练连接到 zero-shot planning。
-- **Veo 3**：除原生音视频生成外，研究显示其生成预训练中出现了分割、深度、物理属性和 affordance 等零样本能力。
-- **Genie 3 [[38]](#ref-38)**：从文本生成可实时导航、维持数分钟的交互环境。
-- **Sora 2**：加强物理、可控性和同步音频，同时更加突出肖像、来源与安全问题。
-- **GWM-1 [[39]](#ref-39)**：将可探索世界、实时 avatar 和机器人动作条件 rollout 放在一个 general world model 家族下。
-
-## 2026：Omnimodal Physical AI
-
-- **Cosmos 3 [[40]](#ref-40)**：尝试用统一模型覆盖语言、图像、视频、音频、动作、forward dynamics、inverse dynamics 和机器人策略。
-- **V-JEPA 2.1 [[41]](#ref-41)**：通过 dense predictive loss、deep self-supervision 和图像—视频输入路径强化时空 dense feature。
-- **LeWorldModel [[42]](#ref-42) / EB-JEPA [[43]](#ref-43)**：一条路线研究从像素端到端学习可规划 latent dynamics，另一条路线提供单卡可复现的 JEPA 教学与研究组件。
-- **Seedance 2.0、Kling 3.0 等创作模型**：进一步强化原生音视频、多模态参考、多镜头叙事和生成—编辑一体化。
-- 研究重心从“生成一段看起来真实的视频”继续转向“能否记忆、交互、预测动作结果，并为真实策略带来收益”。
-
-## 如何阅读这条时间线
-
-建议不要只记模型名，而是为每个时代回答四个问题：
-
-1. 视频被压缩或表示成了什么？
-2. 时间变化是通过什么机制建模的？
-3. 模型接受何种控制信号？
-4. 成功是通过画质、预测误差，还是闭环任务完成率证明的？
-
-JEPA 从图像表征、视频预测到动作条件规划的独立演化作为参考阅读收录，见 [JEPA 参考阅读](jepa.md)。
-
-## 参考文献
-
-<a id="ref-1"></a>[1] [An Iterative Image Registration Technique with an Application to Stereo Vision](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Bruce D. Lucas and Takeo Kanade. Proceedings of IJCAI. 1981.
-
-<a id="ref-2"></a>[2] [Determining optical flow](https://doi.org/10.1016/0004-3702(81)90024-2). Berthold K. P. Horn and Brian G. Schunck. Artificial Intelligence. 1981.
-
-<a id="ref-3"></a>[3] [Video textures](https://doi.org/10.1145/344779.345012). Arno Schödl, Richard Szeliski, David H. Salesin, Irfan Essa. Proceedings of SIGGRAPH '00. 2000.
-
-<a id="ref-4"></a>[4] [Dynamic Textures](https://doi.org/10.1023/A:1021669406132). Gianfranco Doretto, Alessandro Chiuso, Ying Nian Wu, Stefano Soatto. International Journal of Computer Vision. 2003.
-
-<a id="ref-5"></a>[5] [Convolutional LSTM Network: A Machine Learning Approach for Precipitation Nowcasting](https://arxiv.org/abs/1506.04214). Xingjian Shi, Zhourong Chen, Hao Wang, Dit-Yan Yeung, Wai-kin Wong, Wang-chun Woo. arXiv preprint. 2015.
-
-<a id="ref-6"></a>[6] [Deep multi-scale video prediction beyond mean square error](https://arxiv.org/abs/1511.05440). Michael Mathieu, Camille Couprie, Yann LeCun. arXiv preprint. 2015.
-
-<a id="ref-7"></a>[7] [Unsupervised Learning for Physical Interaction through Video Prediction](https://arxiv.org/abs/1605.07157). Chelsea Finn, Ian Goodfellow, Sergey Levine. arXiv preprint. 2016.
-
-<a id="ref-8"></a>[8] [Deep Predictive Coding Networks for Video Prediction and Unsupervised Learning](https://arxiv.org/abs/1605.08104). William Lotter, Gabriel Kreiman, David Cox. arXiv preprint. 2016.
-
-<a id="ref-9"></a>[9] [Generating Videos with Scene Dynamics](https://arxiv.org/abs/1609.02612). Carl Vondrick, Hamed Pirsiavash, Antonio Torralba. arXiv preprint. 2016.
-
-<a id="ref-10"></a>[10] [MoCoGAN: Decomposing Motion and Content for Video Generation](https://arxiv.org/abs/1707.04993). Sergey Tulyakov, Ming-Yu Liu, Xiaodong Yang, Jan Kautz. arXiv preprint. 2017.
-
-<a id="ref-11"></a>[11] [Stochastic Video Generation with a Learned Prior](https://arxiv.org/abs/1802.07687). Remi Denton and Rob Fergus. arXiv preprint. 2018.
-
-<a id="ref-12"></a>[12] [Adversarial Video Generation on Complex Datasets](https://arxiv.org/abs/1907.06571). Aidan Clark, Jeff Donahue, Karen Simonyan. arXiv preprint. 2019.
-
-<a id="ref-13"></a>[13] [Neural Discrete Representation Learning](https://arxiv.org/abs/1711.00937). Aaron van den Oord, Oriol Vinyals, Koray Kavukcuoglu. arXiv preprint. 2017.
-
-<a id="ref-14"></a>[14] [VideoGPT: Video Generation using VQ-VAE and Transformers](https://arxiv.org/abs/2104.10157). Wilson Yan, Yunzhi Zhang, Pieter Abbeel, Aravind Srinivas. arXiv preprint. 2021.
-
-<a id="ref-15"></a>[15] [Phenaki: Variable Length Video Generation From Open Domain Textual Description](https://arxiv.org/abs/2210.02399). Ruben Villegas, Mohammad Babaeizadeh, Pieter-Jan Kindermans, Hernan Moraldo, Han Zhang, Mohammad Taghi Saffar, et al. arXiv preprint. 2022.
-
-<a id="ref-16"></a>[16] [MAGVIT: Masked Generative Video Transformer](https://arxiv.org/abs/2212.05199). Lijun Yu, Yong Cheng, Kihyuk Sohn, José Lezama, Han Zhang, Huiwen Chang, et al. arXiv preprint. 2022.
-
-<a id="ref-17"></a>[17] [Language Model Beats Diffusion -- Tokenizer is Key to Visual Generation](https://arxiv.org/abs/2310.05737). Lijun Yu, José Lezama, Nitesh B. Gundavarapu, Luca Versari, Kihyuk Sohn, David Minnen, et al. arXiv preprint. 2023.
-
-<a id="ref-18"></a>[18] [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239). Jonathan Ho, Ajay Jain, Pieter Abbeel. arXiv preprint. 2020.
-
-<a id="ref-19"></a>[19] [Video Diffusion Models](https://arxiv.org/abs/2204.03458). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. arXiv preprint. 2022.
-
-<a id="ref-20"></a>[20] [Make-A-Video: Text-to-Video Generation without Text-Video Data](https://arxiv.org/abs/2209.14792). Uriel Singer, Adam Polyak, Thomas Hayes, Xi Yin, Jie An, Songyang Zhang, et al. arXiv preprint. 2022.
-
-<a id="ref-21"></a>[21] [Imagen Video: High Definition Video Generation with Diffusion Models](https://arxiv.org/abs/2210.02303). Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey Gritsenko, et al. arXiv preprint. 2022.
-
-<a id="ref-22"></a>[22] [Align your Latents: High-Resolution Video Synthesis with Latent Diffusion Models](https://arxiv.org/abs/2304.08818). Andreas Blattmann, Robin Rombach, Huan Ling, Tim Dockhorn, Seung Wook Kim, Sanja Fidler, et al. arXiv preprint. 2023.
-
-<a id="ref-23"></a>[23] [AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning](https://arxiv.org/abs/2307.04725). Yuwei Guo, Ceyuan Yang, Anyi Rao, Zhengyang Liang, Yaohui Wang, Yu Qiao, et al. arXiv preprint. 2023.
-
-<a id="ref-24"></a>[24] [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. arXiv preprint. 2023.
-
-<a id="ref-25"></a>[25] [Lumiere: A Space-Time Diffusion Model for Video Generation](https://arxiv.org/abs/2401.12945). Omer Bar-Tal, Hila Chefer, Omer Tov, Charles Herrmann, Roni Paiss, Shiran Zada, et al. arXiv preprint. 2024.
-
-<a id="ref-26"></a>[26] [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). OpenAI. Technical report. 2024.
-
-<a id="ref-27"></a>[27] [World Models](https://arxiv.org/abs/1803.10122). David Ha and Jürgen Schmidhuber. Advances in Neural Information Processing Systems 31. 2018.
-
-<a id="ref-28"></a>[28] [Learning Latent Dynamics for Planning from Pixels](https://arxiv.org/abs/1811.04551). Danijar Hafner, Timothy Lillicrap, Ian Fischer, Ruben Villegas, David Ha, Honglak Lee, et al. arXiv preprint. 2018.
-
-<a id="ref-29"></a>[29] [Dream to Control: Learning Behaviors by Latent Imagination](https://arxiv.org/abs/1912.01603). Danijar Hafner, Timothy Lillicrap, Jimmy Ba, Mohammad Norouzi. arXiv preprint. 2019.
-
-<a id="ref-30"></a>[30] [Mastering Atari, Go, chess and shogi by planning with a learned model](https://doi.org/10.1038/s41586-020-03051-4). Julian Schrittwieser, Ioannis Antonoglou, Thomas Hubert, Karen Simonyan, Laurent Sifre, Simon Schmitt, et al. Nature. 2020.
-
-<a id="ref-31"></a>[31] [Mastering Diverse Domains through World Models](https://arxiv.org/abs/2301.04104). Danijar Hafner, Jurgis Pasukonis, Jimmy Ba, Timothy Lillicrap. arXiv preprint. 2023.
-
-<a id="ref-32"></a>[32] [GAIA-1: A Generative World Model for Autonomous Driving](https://arxiv.org/abs/2309.17080). Anthony Hu, Lloyd Russell, Hudson Yeo, Zak Murez, George Fedoseev, Alex Kendall, et al. arXiv preprint. 2023.
-
-<a id="ref-33"></a>[33] [Revisiting Feature Prediction for Learning Visual Representations from Video](https://arxiv.org/abs/2404.08471). Adrien Bardes, Quentin Garrido, Jean Ponce, Xinlei Chen, Michael Rabbat, Yann LeCun, et al. arXiv preprint. 2024.
-
-<a id="ref-34"></a>[34] [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. arXiv preprint. 2024.
-
-<a id="ref-35"></a>[35] [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837). Dani Valevski, Yaniv Leviathan, Moab Arar, Shlomi Fruchter. arXiv preprint. 2024.
-
-<a id="ref-36"></a>[36] [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). NVIDIA, Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, et al. arXiv preprint. 2025.
-
-<a id="ref-37"></a>[37] [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). Mahmoud Assran, Adrien Bardes, David Fan, Quentin Garrido, Russell Howes, Mojtaba Komeili, et al. arXiv preprint. 2025.
-
-<a id="ref-38"></a>[38] [Genie 3: A New Frontier for World Models](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/). Google DeepMind. Project report. 2025.
-
-<a id="ref-39"></a>[39] [Introducing Runway GWM-1](https://runway.com/research/introducing-runway-gwm-1). Runway. Project report. 2025.
-
-<a id="ref-40"></a>[40] [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800). NVIDIA. arXiv preprint. 2026.
-
-<a id="ref-41"></a>[41] [V-JEPA 2.1: Unlocking Dense Features in Video Self-Supervised Learning](https://arxiv.org/abs/2603.14482). Lorenzo Mur-Labadia, Matthew Muckley, Amir Bar, Mido Assran, Koustuv Sinha, Mike Rabbat, et al. arXiv preprint. 2026.
-
-<a id="ref-42"></a>[42] [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312). Lucas Maes, Quentin Le Lidec, Damien Scieur, Yann LeCun, Randall Balestriero. arXiv preprint. 2026.
-
-<a id="ref-43"></a>[43] [A Lightweight Library for Energy-Based Joint-Embedding Predictive Architectures](https://arxiv.org/abs/2602.03604). Basile Terver, Randall Balestriero, Megi Dervishi, David Fan, Quentin Garrido, Tushar Nagarajan, et al. arXiv preprint. 2026.
+本页将视频生成的发展整理为三条并行技术泳道、一个应用层和一套横向验证框架。它们并非简单的前后替代关系：生成机制持续为大规模模型提供底座，World Model 还拥有来自控制、强化学习与规划的独立谱系，最终在交互生成和 Physical AI 中逐渐汇合。
+
+资料核查截止：**2026-08-29**
+
+> **阅读说明**
+>
+> - 年份采用论文首次公开或机构首次官方发布的时间，而不是后续会议、期刊或产品开放年份。
+> - 这是一组经过筛选的技术谱系，不是所有模型的产品年表。
+> - Video editing 是贯穿多条泳道的横向能力；从 Video Rewrite、时空补全、vid2vid 到 Diffusion / DiT、instruction editing 与 memory 的专门节点，见[视频编辑 milestones](tasks/video-to-video.md)。
+> - 每个节点均链接到论文、作者项目页或机构官方发布等一手来源。
+> - 每个节点的“资源”栏统一标记 Paper/Report、Project、Code、Weights 与 Demo；Code 只认作者或机构官方实现，`未公开` 表示截至核查日未找到官方公开资源，第三方复现不会冒充官方实现；`—` 表示没有独立入口或不适用，失效、归档、下线与访问受限会直接标注状态。
+> - 企业节点中的分辨率、速度、时长与性能，如无独立复现，均按“官方或作者报告”理解。
+> - 下列图片均由 imagegen 根据论文机制生成，属于**概念示意图，不是论文原图，也不代表模型真实输出**。
+
+## 并行泳道索引
+
+```mermaid
+flowchart TB
+    accTitle: 视频生成技术发展的并行泳道
+    accDescr: 生成机制基础、视频基础模型与创作能力、World Model 与行动闭环三条技术路线并行发展，最后落到应用工作流和分层评测；多条件、多镜头、音视频与统一系统是不同维度。
+
+    subgraph generation_track ["生成机制基础：视频如何被表示与生成"]
+        direction LR
+        motion_prediction["显式运动与<br/>时序预测"] --> probabilistic_generation["随机生成与<br/>序列建模"]
+        probabilistic_generation --> scalable_generation["Diffusion、Flow<br/>与 DiT"]
+    end
+
+    subgraph foundation_track ["视频基础模型与创作能力：规模、条件与模态如何扩展"]
+        direction LR
+        text_video["T2V 与视频 Token<br/>技术前驱"] --> foundation_backbone["规模化预训练与<br/>可迁移 Backbone"]
+        foundation_backbone --> multi_condition["多条件与<br/>多参考接口"]
+        foundation_backbone --> source_editing["源视频约束与<br/>可寻址编辑"]
+        foundation_backbone --> timeline_authoring["多段 Prompt / 分镜<br/>与跨镜头连续"]
+        foundation_backbone --> native_av["原生联合<br/>音视频"]
+        multi_condition --> unified_creation["不同层级的统一<br/>接口 / Backbone / Checkpoint"]
+        source_editing --> unified_creation
+        timeline_authoring --> unified_creation
+        native_av --> unified_creation
+    end
+
+    subgraph world_track ["World Model 与行动闭环：动作如何改变未来"]
+        direction LR
+        state_space["状态空间与<br/>model-based control"] --> latent_planning["Latent imagination<br/>与 planning"]
+        action_rollout["动作条件视觉 Rollout<br/>不等同闭环"] --> world_model_evidence["动作条件状态转移<br/>持久性与干预证据"]
+        latent_planning --> world_model_evidence
+        world_model_evidence -.-> closed_loop_control["闭环决策验证<br/>动作 → 响应 → 观测 → 再决策"]
+    end
+
+    subgraph application_layer ["应用层：能力如何落地"]
+        workflows["创作、编辑、游戏、<br/>机器人与数据合成"]
+    end
+
+    subgraph validation_framework ["验证框架：能力如何被证明"]
+        evidence["质量、物理、反事实、<br/>闭环与安全评测"]
+    end
+
+    probabilistic_generation -.->|"生成机制"| text_video
+    scalable_generation -.->|"规模化底座"| foundation_backbone
+    motion_prediction -.->|"预测传统"| latent_planning
+    scalable_generation -.->|"生成式视觉先验"| action_rollout
+    foundation_backbone -.->|"视觉先验可复用；仍需动作数据"| action_rollout
+    multi_condition --> workflows
+    source_editing --> workflows
+    timeline_authoring --> workflows
+    native_av --> workflows
+    unified_creation --> workflows
+    world_model_evidence --> workflows
+    closed_loop_control --> workflows
+    evidence -.-> foundation_backbone
+    evidence -.-> world_model_evidence
+    evidence -.-> closed_loop_control
+    evidence -.-> workflows
+
+    classDef foundation fill:#f3f4f6,stroke:#6b7280,stroke-width:2px,color:#1f2937
+    classDef creative fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
+    classDef world fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#3b0764
+    classDef outcome fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+
+    class motion_prediction,probabilistic_generation,scalable_generation foundation
+    class text_video,foundation_backbone,multi_condition,source_editing,timeline_authoring,native_av,unified_creation creative
+    class state_space,latent_planning,action_rollout,world_model_evidence,closed_loop_control world
+    class evidence foundation
+    class workflows outcome
+```
+
+| 泳道 | 核心问题 | 阅读方法 | 对应专题 |
+|---|---|---|---|
+| **生成机制基础** | 视频如何表示、压缩、预测和采样？ | 显式运动与统计动态 → 深度视频预测 → 随机预测与 GAN → 视频 Token → Diffusion、DiT 与 Flow | [生成模型路线](generative-models.md) |
+| **视频基础模型与创作能力** | 模型如何从技术前驱扩展为规模化、可迁移的多模态系统？ | 先读 T2V、视频 Token 与规模化预训练，再分别看开放生成、多条件/多参考、源视频约束与编辑、多段 prompt/分镜、跨镜头连续和原生联合音视频；遇到“统一”时继续追问统一发生在哪一层 | [视频基础模型路线](foundation-models.md) · [视频编辑 milestones](tasks/video-to-video.md) · [任务地图](taxonomy.md) |
+| **World Model 与行动闭环** | 模型能否维护状态、响应动作，并进一步支持反事实、规划或持续交互？ | 分别追踪决策型 latent dynamics 与动作条件视觉 rollout；先检查动作条件转移、状态持久和干预证据，若声称支持决策或控制，再要求“动作 → 环境响应 → 新观测 → 再决策”的闭环验证 | [World Model 专章](world-models.md) · [JEPA 路线](jepa.md) |
+| **应用层** | 技术在哪里产生价值，又提出哪些新约束？ | 内容与编辑工作流、数字人、游戏与交互、数据合成、自动驾驶、机器人和科学可视化 | [相关应用](applications.md) · [任务地图](taxonomy.md) |
+| **验证框架** | 应以什么证据证明能力有效？ | 分开检查生成质量、条件遵循、长程状态、物理与反事实、延迟、规划或控制闭环，以及安全治理 | [评测指南](evaluation.md) · [物理一致性](physical-consistency.md) |
+
+> **术语与归属原则：**同一模型可能横跨多条泳道。本页按其主要技术贡献和验证证据归类，而不是因为使用了 Diffusion、Transformer 或“World Model”名称就重复收录。这里的“多段 prompt”特指按时间或镜头组织的 prompt/storyboard，不等同于多参考输入；“统一模型”必须注明统一的是接口、流水线、共享 backbone、模型家族还是单一 checkpoint；动作条件 rollout 或实时交互可以提供 World Model 证据，但只有反复执行“动作 → 环境响应 → 新观测 → 再决策”才构成闭环验证，平台或模型家族也不能整体继承某个策略分支的闭环能力。
+
+---
+
+## 生成机制基础｜1981–2003：显式运动、重组与统计动态
+
+这一阶段的工作不是今天意义上的大规模生成模型，却奠定了运动表示、帧重用、条件驱动和状态空间建模的基本语言。
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/1981-lucas-kanade.jpg" alt="Lucas–Kanade 局部运动估计概念图"></td>
+<td><strong>1981 — <a href="https://publications.ri.cmu.edu/an-iterative-image-registration-technique-with-an-application-to-stereo-vision-ijcai/">Lucas–Kanade</a></strong> <code>运动表示前驱</code><br><strong>表示/机制：</strong>在局部窗口内利用空间强度梯度，通过迭代配准与最小二乘估计小位移。<br><strong>控制/任务：</strong>输入相邻图像或视频帧，输出局部运动；原论文首先是图像配准与立体视觉工作。<br><strong>意义/边界：</strong>后来成为经典局部光流方法，并影响 flow-guided generation 与 warping，但它本身不是生成模型。<br><strong>资源：</strong><a href="https://publications.ri.cmu.edu/an-iterative-image-registration-technique-with-an-application-to-stereo-vision-ijcai/">Paper</a> · Project：— · Code：未公开 · Weights：不适用 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/1981-horn-schunck.jpg" alt="Horn–Schunck 稠密光流概念图"></td>
+<td><strong>1981 — <a href="https://doi.org/10.1016/0004-3702(81)90024-2">Horn–Schunck</a></strong> <code>运动表示前驱</code><br><strong>表示/机制：</strong>把亮度恒常约束与全局平滑先验结合，联合估计整幅图像的稠密运动场。<br><strong>控制/任务：</strong>输入相邻帧，输出全局一致的光流。<br><strong>意义/边界：</strong>与 Lucas–Kanade 的局部法形成经典对照；全局平滑有利于补全弱纹理区域，也可能抹平真实运动边界。<br><strong>资源：</strong><a href="https://doi.org/10.1016/0004-3702(81)90024-2">Paper</a> · Project：— · Code：未公开 · Weights：不适用 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/1997-video-rewrite.jpg" alt="Video Rewrite 音频驱动口型合成概念图"></td>
+<td><strong>1997 — <a href="https://doi.org/10.1145/258734.258880">Video Rewrite</a></strong> <code>数据驱动条件合成</code><br><strong>表示/机制：</strong>从已拍摄素材中选择与新语音对应的嘴部片段，再通过图像变形与合成连接片段。<br><strong>控制/任务：</strong>以音频为条件改变说话人的口型。<br><strong>意义/边界：</strong>很早展示了“检索、重排、morphing、条件驱动”的视频合成流程，但受特定人物和素材覆盖范围限制。<br><strong>资源：</strong><a href="https://doi.org/10.1145/258734.258880">Paper</a> · <a href="https://graphics.stanford.edu/~bregler/videorewrite/">Project（历史页，已失效）</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2000-video-textures.jpg" alt="Video Textures 帧跳转循环概念图"></td>
+<td><strong>2000 — <a href="https://www.microsoft.com/en-us/research/publication/video-textures/">Video Textures</a></strong> <code>帧重组</code><br><strong>表示/机制：</strong>依据帧间相似度构建可跳转的帧图，在合适位置重排已有画面，合成任意长度的连续动态纹理。<br><strong>控制/任务：</strong>从一段短视频生成稳定循环或交互式序列。<br><strong>意义/边界：</strong>它不生成新像素；质量取决于素材中是否存在可无缝连接的状态。<br><strong>资源：</strong><a href="https://www.microsoft.com/en-us/research/publication/video-textures/">Paper</a> · <a href="https://sites.cc.gatech.edu/gvu/perception/projects/videotexture/index.html">Project</a> · Code：未公开 · Weights：不适用 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2001-dynamic-textures.jpg" alt="Dynamic Textures 线性动力系统概念图"></td>
+<td><strong>2001/2003 — <a href="https://doi.org/10.1109/ICCV.2001.937658">Dynamic Textures</a></strong> <code>统计动态</code><br><strong>表示/机制：</strong>在低维外观子空间中，用随机线性动力系统和系统辨识建模、预测并合成烟、火、水面与树叶等随机过程。<br><strong>控制/任务：</strong>从观测序列学习隐状态转移，再从状态模型采样。<br><strong>意义/边界：</strong>ICCV 2001 首次提出，<a href="https://doi.org/10.1023/A:1021669406132">IJCV 2003</a> 给出扩展版；它是视觉 state-space model 的直接前驱，但主要适合近似平稳动态纹理。<br><strong>资源：</strong><a href="https://doi.org/10.1109/ICCV.2001.937658">Paper</a> · <a href="http://www.cs.ucla.edu/~doretto/projects/dynamic-textures.html">Project（历史页，已失效）</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+### 这一阶段留下什么
+
+光流直接进入后来的 warping、插帧与运动引导；Dynamic Textures 则把“视觉观测由隐藏动态状态产生”写成了可学习模型。显式相机、3D 仿真与数字孪生还来自计算机图形学和机器人学的独立谱系，不能全部归因于上述节点。
+
+---
+
+## 生成机制基础｜2014–2017：深度视频预测
+
+深度网络开始直接学习时空相关性。这里的核心问题不是“能否预测下一帧”，而是如何避免逐像素回归把多个合理未来平均成模糊图像。
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2014-video-language-modeling.jpg" alt="Video Language Modeling 离散图像 patch 预测概念图"></td>
+<td><strong>2014 — <a href="https://arxiv.org/abs/1412.6604">Video (Language) Modeling</a></strong> <code>离散自回归前驱</code><br><strong>表示/机制：</strong>把 8×8 图像 patch 量化到大型离散词典，再借用语言模型式 rNN/rCNN 预测下一时刻的 patch 分布。<br><strong>控制/任务：</strong>补全缺失帧或从历史帧外推短时未来。<br><strong>意义/边界：</strong>展示了自然视频中的非平凡短时运动；离散化损失明显，递归生成也容易逐渐停滞。<br><strong>资源：</strong><a href="https://arxiv.org/abs/1412.6604">Paper</a> · <a href="https://ai.meta.com/research/publications/video-language-modeling-a-baseline-for-generative-models-of-natural-videos/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2015-convlstm.jpg" alt="ConvLSTM 空间记忆网格概念图"></td>
+<td><strong>2015 — <a href="https://papers.nips.cc/paper_files/paper/2015/hash/07563a3fe3bbe7e3ba84431ad9d055af-Abstract.html">ConvLSTM</a></strong> <code>卷积递归</code><br><strong>表示/机制：</strong>把 LSTM 的 input-to-state 与 state-to-state 变换卷积化，使隐藏状态保留二维空间结构。<br><strong>控制/任务：</strong>原任务是雷达回波降水临近预报，随后成为视频预测的常用时序单元。<br><strong>意义/边界：</strong>比全连接 LSTM 更适合网格数据，但长序列仍受误差累积与记忆容量限制。<br><strong>资源：</strong><a href="https://papers.nips.cc/paper_files/paper/2015/hash/07563a3fe3bbe7e3ba84431ad9d055af-Abstract.html">Paper</a> · Project：— · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2015-beyond-mse.jpg" alt="Beyond MSE 从模糊平均到锐利预测概念图"></td>
+<td><strong>2015 — <a href="https://arxiv.org/abs/1511.05440">Beyond MSE</a></strong> <code>感知损失</code><br><strong>表示/机制：</strong>结合多尺度网络、对抗训练与 image-gradient-difference loss，减少只优化像素 MSE 带来的模糊。<br><strong>控制/任务：</strong>根据历史帧预测未来画面。<br><strong>意义/边界：</strong>当 one-to-many 未来被单一输出和 L2/MSE 训练时，条件均值容易模糊；这不是所有确定性模型都必然模糊的无条件结论。<br><strong>资源：</strong><a href="https://arxiv.org/abs/1511.05440">Paper</a> · <a href="http://cs.nyu.edu/~mathieu/iclr2016.html">Project</a> · <a href="https://github.com/coupriec/VideoPredictionICLR2016">Code</a> · <a href="http://perso.esiee.fr/~coupriec/MathieuICLR16TestCode.zip">Weights</a> · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2015-action-conditional.jpg" alt="动作条件视频预测概念图"></td>
+<td><strong>2015 — <a href="https://papers.nips.cc/paper_files/paper/2015/hash/6ba3af5d7b2790e73f0de32e5c8c1798-Abstract.html">Action-Conditional Video Prediction</a></strong> <code>动作条件预测</code><br><strong>表示/机制：</strong>CNN 编码 Atari 帧，递归模型同时接收动作并预测受控制的未来画面。<br><strong>控制/任务：</strong>显式回答“采取这个动作后会看到什么”。<br><strong>意义/边界：</strong>连接了视频预测与决策型 world model；但实验环境、画面结构和动作空间仍较简单。<br><strong>资源：</strong><a href="https://papers.nips.cc/paper_files/paper/2015/hash/6ba3af5d7b2790e73f0de32e5c8c1798-Abstract.html">Paper</a> · <a href="https://junhyuk.com/publication/2015_action_conditional/">Project</a> · <a href="https://github.com/junhyukoh/nips2015-action-conditional-video-prediction">Code</a> · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2016-cdna-dna-stp.jpg" alt="DNA CDNA STP 变换式视频预测概念图"></td>
+<td><strong>2016 — <a href="https://arxiv.org/abs/1605.07157">DNA / CDNA / STP</a></strong> <code>变换式预测</code><br><strong>表示/机制：</strong>不从头重画像素，而是预测逐像素局部变换、卷积运动核或仿射空间变换，再通过 mask 合成下一帧。<br><strong>控制/任务：</strong>以机器人动作和历史图像为条件预测物体交互。<br><strong>意义/边界：</strong>显式复用已有像素能得到更锐利结果；遮挡、新显露区域和长时误差仍难处理。<br><strong>资源：</strong><a href="https://arxiv.org/abs/1605.07157">Paper</a> · <a href="https://sites.google.com/site/robotprediction">Project</a> · <a href="https://github.com/tensorflow/models/tree/5eb294f84bd3f415b548980e69fee63db1f6f1df/research/video_prediction">Code（历史快照）</a> · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2016-prednet.jpg" alt="PredNet 分层预测误差概念图"></td>
+<td><strong>2016 — <a href="https://openreview.net/forum?id=B1ewdt9xe">PredNet</a></strong> <code>预测编码</code><br><strong>表示/机制：</strong>分层卷积递归网络在每层预测输入，只把预测误差继续向上传递。<br><strong>控制/任务：</strong>无动作条件的下一帧预测与无监督表征学习。<br><strong>意义/边界：</strong>把 predictive coding 组织原则具体化；预测质量仍主要在短期驾驶视频等设置中验证。<br><strong>资源：</strong><a href="https://openreview.net/forum?id=B1ewdt9xe">Paper</a> · <a href="https://coxlab.github.io/prednet/">Project</a> · <a href="https://github.com/coxlab/prednet">Code</a> · <a href="https://www.dropbox.com/s/iutxm0anhxqca0z/model_data_keras2.zip?dl=0">Weights</a> · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2017-video-pixel-networks.jpg" alt="Video Pixel Networks 原始像素自回归概念图"></td>
+<td><strong>2017 — <a href="https://proceedings.mlr.press/v70/kalchbrenner17a.html">Video Pixel Networks</a></strong> <code>像素自回归</code><br><strong>表示/机制：</strong>直接分解原始视频像素的联合概率，以卷积 LSTM 与 PixelCNN 式解码逐像素建模。<br><strong>控制/任务：</strong>给定前缀帧预测后续视频，并提供显式 likelihood。<br><strong>意义/边界：</strong>补齐了“概率可处理”的路线，但逐像素串行采样极慢，也难扩展到高分辨率长视频。<br><strong>资源：</strong><a href="https://proceedings.mlr.press/v70/kalchbrenner17a.html">Paper</a> · Project：— · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2017-sv2p.jpg" alt="SV2P 多种随机未来概念图"></td>
+<td><strong>2017 — <a href="https://openreview.net/forum?id=rk49Mg-CW">SV2P</a></strong> <code>随机预测</code><br><strong>表示/机制：</strong>为未来序列引入随机 latent，使同一历史上下文能够采样出不同的多帧未来。<br><strong>控制/任务：</strong>同时覆盖无动作与动作条件的真实视频预测。<br><strong>意义/边界：</strong>较早有效处理真实视频中的 one-to-many 未来；多样性、清晰度和长期一致性仍存在权衡。<br><strong>资源：</strong><a href="https://openreview.net/forum?id=rk49Mg-CW">Paper</a> · <a href="https://sites.google.com/site/stochasticvideoprediction/main">Project</a> · <a href="https://github.com/tensorflow/tensor2tensor/blob/master/tensor2tensor/models/video/sv2p.py">Code（已归档）</a> · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+---
+
+## 生成机制基础｜2016–2019：随机预测、GAN 与可处理概率
+
+这一时期混合了两种不同问题：一类从历史帧预测多个可能未来，另一类从噪声、类别或文本合成新视频。不能只用“视频生成”把二者抹平。
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2016-vgan.jpg" alt="VGAN 前景背景分解概念图"></td>
+<td><strong>2016 — <a href="https://proceedings.neurips.cc/paper_files/paper/2016/hash/04025959b191f8f9de3f924f0940515f-Abstract.html">VGAN / Generating Videos with Scene Dynamics</a></strong> <code>对抗式合成</code><br><strong>表示/机制：</strong>以时空卷积 GAN 分离静态背景与动态前景，并通过 mask 合成短视频。<br><strong>控制/任务：</strong>主要是无条件自然场景合成和表征学习。<br><strong>意义/边界：</strong>展示约 64×64、32 帧、1 秒级视频；“前景运动、背景静止”的假设限制了复杂相机和动态场景。<br><strong>资源：</strong><a href="https://proceedings.neurips.cc/paper_files/paper/2016/hash/04025959b191f8f9de3f924f0940515f-Abstract.html">Paper</a> · <a href="https://www.cs.columbia.edu/~vondrick/tinyvideo/">Project</a> · <a href="https://github.com/cvondrick/videogan">Code</a> · <a href="https://drive.google.com/file/d/0B-xMJ5CYz_F9QS1BTE5yWl9aUWs/view?usp=sharing">Weights</a> · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2017-mocogan.jpg" alt="MoCoGAN 内容运动解耦概念图"></td>
+<td><strong>2017 — <a href="https://openaccess.thecvf.com/content_cvpr_2018/html/Tulyakov_MoCoGAN_Decomposing_Motion_CVPR_2018_paper.html">MoCoGAN</a></strong> <code>内容—运动解耦</code><br><strong>表示/机制：</strong>在整段视频中固定 content latent，让 motion latent 随随机过程演化，并同时使用图像与视频判别器。<br><strong>控制/任务：</strong>无条件或类别条件视频合成。<br><strong>意义/边界：</strong>把身份/外观与运动拆开成为经典设计；预印本 2017、CVPR 2018，解耦并不保证真实因果因素被正确识别。<br><strong>资源：</strong><a href="https://openaccess.thecvf.com/content_cvpr_2018/html/Tulyakov_MoCoGAN_Decomposing_Motion_CVPR_2018_paper.html">Paper</a> · <a href="https://github.com/sergeytulyakov/mocogan">Project</a> · <a href="https://github.com/sergeytulyakov/mocogan">Code</a> · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2017-text-to-video.jpg" alt="早期文本生成视频概念图"></td>
+<td><strong>2017 — <a href="https://arxiv.org/abs/1710.00421">Video Generation from Text</a></strong> <code>早期文本视频</code><br><strong>表示/机制：</strong>先以条件 VAE 从文本生成静态 gist，再将文本动态信息转成图像滤波器，配合 GAN 生成短视频。<br><strong>控制/任务：</strong>自然语言同时决定大致场景布局与运动。<br><strong>意义/边界：</strong>是开放域文本到视频的早期代表；分辨率、时长、语义组合和真实感都远弱于后来的大规模预训练模型。<br><strong>资源：</strong><a href="https://arxiv.org/abs/1710.00421">Paper</a> · <a href="https://www.nec-labs.com/blog/video-generation-from-text/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2018-svg-lp.jpg" alt="SVG-LP 学习随机先验概念图"></td>
+<td><strong>2018 — <a href="https://proceedings.mlr.press/v80/denton18a.html">SVG-LP</a></strong> <code>随机预测</code><br><strong>表示/机制：</strong>每个时间步引入随机 latent，并学习依赖历史的 prior，将随机因素与确定性预测组合。<br><strong>控制/任务：</strong>给定视频历史采样多个清晰且不同的未来。<br><strong>意义/边界：</strong>重点是多样未来，不是用户可控生成；递归 rollout 仍会积累误差。<br><strong>资源：</strong><a href="https://proceedings.mlr.press/v80/denton18a.html">Paper</a> · <a href="https://sites.google.com/view/svglp/">Project</a> · <a href="https://github.com/edenton/svg">Code</a> · <a href="https://github.com/edenton/svg/tree/master/pretrained_models">Weights</a> · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2018-fvd.jpg" alt="FVD 视频分布距离概念图"></td>
+<td><strong>2018 — <a href="https://research.google/pubs/towards-accurate-generative-models-of-video-a-new-metric-challenges/">Fréchet Video Distance</a></strong> <code>评测</code><br><strong>表示/机制：</strong>把真实与生成视频映射到预训练 I3D 时空特征，再比较两个特征分布的 Fréchet 距离。<br><strong>控制/任务：</strong>同时感知画面内容、运动与样本分布。<br><strong>意义/边界：</strong>成为视频生成常用指标；它依赖特征模型与数据分布，不能单独证明文本遵循、物理、因果或闭环能力。<br><strong>资源：</strong><a href="https://research.google/pubs/towards-accurate-generative-models-of-video-a-new-metric-challenges/">Paper</a> · <a href="https://research.google/blog/audio-and-visual-quality-measurement-using-fr%C3%A9chet-distance/">Project</a> · <a href="https://github.com/google-research/google-research/tree/master/frechet_video_distance">Code</a> · <a href="https://www.kaggle.com/models/deepmind/i3d-kinetics">Feature Weights</a> · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2019-dvd-gan.jpg" alt="DVD-GAN 双视频判别器概念图"></td>
+<td><strong>2019 — <a href="https://arxiv.org/abs/1907.06571">DVD-GAN</a></strong> <code>大规模 GAN</code><br><strong>表示/机制：</strong>基于 BigGAN；空间判别器检查抽样的全分辨率帧，时间判别器检查空间降采样后的整段视频。<br><strong>控制/任务：</strong>在 Kinetics-600 上做类别条件合成。<br><strong>意义/边界：</strong>相对当时扩展到 12 帧 256×256 或 48 帧 128×128；训练成本高、优化敏感，也没有显式可处理 likelihood。<br><strong>资源：</strong><a href="https://arxiv.org/abs/1907.06571">Paper</a> · Project：— · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2019-videoflow.jpg" alt="VideoFlow 条件 normalizing flow 概念图"></td>
+<td><strong>2019 — <a href="https://research.google/pubs/videoflow-a-conditional-flow-based-model-for-stochastic-video-generation/">VideoFlow</a></strong> <code>Normalizing Flow</code><br><strong>表示/机制：</strong>用可逆多尺度 normalizing flow 建模条件视频分布，并直接优化 likelihood。<br><strong>控制/任务：</strong>根据历史帧采样多个随机未来。<br><strong>意义/边界：</strong>补齐 GAN/VAE 之外的显式密度路线；这里的“flow”是可逆 normalizing flow，不等同于 2022 年后的 Flow Matching。<br><strong>资源：</strong><a href="https://research.google/pubs/videoflow-a-conditional-flow-based-model-for-stochastic-video-generation/">Paper</a> · Project：— · <a href="https://github.com/tensorflow/tensor2tensor/blob/master/tensor2tensor/models/video/next_frame_glow.py">Code（已归档）</a> · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+### 随机预测与 GAN 的核心矛盾
+
+对抗训练通常有利于感知锐度，但优化可能敏感，也不提供显式、易处理的 likelihood；显式概率模型能覆盖不确定性，却常受采样速度、重建或架构约束。样本质量与模式覆盖无法由单一指标同时充分衡量。
+
+---
+
+## 生成机制 → 视频基础模型｜2017–2023：视觉 Token 与视频语言模型
+
+这条路线先把视频压缩成离散符号，再使用语言模型式自回归或 masked prediction。需要特别注意：MAGVIT 的离散 code 与 Sora/DiT 的连续 latent patch 并不是同一种“token”。
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2017-vq-vae.jpg" alt="VQ-VAE 离散视觉 codebook 概念图"></td>
+<td><strong>2017 — <a href="https://arxiv.org/abs/1711.00937">VQ-VAE</a></strong> <code>离散表征基础</code><br><strong>表示/机制：</strong>encoder 将连续特征量化为离散 codebook index，decoder 重建观测，prior 则另行学习。<br><strong>控制/任务：</strong>论文覆盖图像、视频与语音，但它并非专门的视频 tokenizer。<br><strong>意义/边界：</strong>为视觉 token 与两阶段生成奠基；压缩率、codebook 使用率和重建细节形成新的瓶颈。<br><strong>资源：</strong><a href="https://arxiv.org/abs/1711.00937">Paper</a> · <a href="https://deepmind.google/blog/deepmind-papers-at-nips-2017/">Project</a> · <a href="https://github.com/google-deepmind/sonnet/blob/v2/sonnet/src/nets/vqvae.py">Code（Sonnet 示例）</a> · Weights：未公开 · <a href="https://github.com/google-deepmind/sonnet/blob/v2/examples/vqvae_example.ipynb">Demo/Notebook</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2021-videogpt.jpg" alt="VideoGPT 离散视频 token 自回归概念图"></td>
+<td><strong>2021 — <a href="https://arxiv.org/abs/2104.10157">VideoGPT</a></strong> <code>自回归视频 Transformer</code><br><strong>表示/机制：</strong>用 3D convolution 与 axial attention 的 VQ-VAE 压缩视频，再由 GPT 式 Transformer 自回归预测离散 latent。<br><strong>控制/任务：</strong>无条件、类别条件和视频前缀条件生成。<br><strong>意义/边界：</strong>架构简单且概率形式统一；token 串行采样和长序列成本很高。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2104.10157">Paper</a> · <a href="https://wilsonyan.com/videogpt/index.html">Project</a> · <a href="https://github.com/wilson1yan/VideoGPT">Code</a> · <a href="https://github.com/wilson1yan/VideoGPT/blob/master/videogpt/download.py">Weights</a> · <a href="https://colab.research.google.com/github/wilson1yan/VideoGPT/blob/master/notebooks/Using_VideoGPT.ipynb">Demo</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2021-nuwa.jpg" alt="NÜWA 统一文本图像视频合成概念图"></td>
+<td><strong>2021 — <a href="https://arxiv.org/abs/2111.12417">NÜWA</a></strong> <code>统一视觉合成</code><br><strong>表示/机制：</strong>以 3D Transformer encoder-decoder 和 3D Nearby Attention 统一处理一维文本、二维图像与三维视频。<br><strong>控制/任务：</strong>覆盖文本到视频、视频预测以及零样本视觉编辑等任务。<br><strong>意义/边界：</strong>较早展示“一套多模态预训练框架覆盖多种视觉合成”；规模与生成质量仍受当时 tokenizer 和算力限制。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2111.12417">Paper</a> · <a href="https://github.com/microsoft/NUWA">Project（资料仓库，已归档）</a> · Code：未公开 · Weights：未公开 · Demo：— · <a href="https://www.microsoft.com/en-us/research/articles/nuwa/">Overview</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2022-cogvideo.jpg" alt="CogVideo 从图像模型扩展到视频概念图"></td>
+<td><strong>2022 — <a href="https://arxiv.org/abs/2205.15868">CogVideo</a></strong> <code>大规模文本视频预训练</code><br><strong>表示/机制：</strong>9B 自回归 Transformer 继承 CogView2 图像模型参数，并通过多帧率分层训练扩展到视频。<br><strong>控制/任务：</strong>开放域文本到视频。<br><strong>意义/边界：</strong>是首批开放的大规模预训练 T2V 路线之一；低帧率、低分辨率与自回归成本仍明显。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2205.15868">Paper</a> · <a href="https://github.com/zai-org/CogVideo/tree/CogVideo">Project</a> · <a href="https://github.com/zai-org/CogVideo/tree/CogVideo">Code</a> · <a href="https://github.com/zai-org/CogVideo/tree/CogVideo#download">Weights</a> · <a href="https://models.aminer.cn/cogvideo/">Demo</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2022-phenaki.jpg" alt="Phenaki prompt 序列长视频概念图"></td>
+<td><strong>2022 — <a href="https://arxiv.org/abs/2210.02399">Phenaki</a></strong> <code>Masked 生成</code><br><strong>表示/机制：</strong>以带时间因果注意力的 C-ViViT tokenizer 压缩视频，再用文本条件双向 masked Transformer 迭代补全 token。<br><strong>控制/任务：</strong>prompt 序列驱动可变长度、分段延展的视频叙事。<br><strong>意义/边界：</strong>比纯自回归提高并行度；长视频仍依赖分段生成，身份、状态与质量会漂移。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2210.02399">Paper</a> · <a href="https://sites.research.google/gr/phenaki/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2022-magvit.jpg" alt="MAGVIT masked 视频 token 多任务概念图"></td>
+<td><strong>2022 — <a href="https://arxiv.org/abs/2212.05199">MAGVIT</a></strong> <code>统一视频生成任务</code><br><strong>表示/机制：</strong>3D tokenizer 将视频离散化，masked video token modeling 用一个模型覆盖十类生成任务。<br><strong>控制/任务：</strong>可接受类别、图像、视频片段或掩码等不同条件。<br><strong>意义/边界：</strong>首次公开为 2022，CVPR 发表为 2023；masked decoding 仍需多轮迭代，并受 tokenizer 重建损失限制。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2212.05199">Paper</a> · <a href="https://magvit.cs.cmu.edu/">Project</a> · <a href="https://github.com/google-research/magvit">Code（已归档）</a> · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2023-magvit-v2.jpg" alt="MAGVIT-v2 lookup-free quantization 概念图"></td>
+<td><strong>2023 — <a href="https://arxiv.org/abs/2310.05737">MAGVIT-v2</a></strong> <code>视觉 tokenizer</code><br><strong>表示/机制：</strong>使用 causal 3D CNN 与 lookup-free quantization，构造图像/视频共享的大型离散词表。<br><strong>控制/任务：</strong>服务生成、压缩和识别，并增强与语言模型式生成器的兼容。<br><strong>意义/边界：</strong>论文“LM beats diffusion”的结论来自相同数据、相近规模与预算的受控实验，不能泛化成所有语言模型都胜过 diffusion。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2310.05737">Paper</a> · <a href="https://magvit.cs.cmu.edu/v2/">Project</a> · Code：未公开 · <a href="https://github.com/google-research/magvit">Related Code（MAGVIT v1）</a> · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2023-videopoet.jpg" alt="VideoPoet 多模态 token 语言模型概念图"></td>
+<td><strong>2023 — <a href="https://arxiv.org/abs/2312.14125">VideoPoet</a></strong> <code>多模态生成语言模型</code><br><strong>表示/机制：</strong>decoder-only Transformer 统一处理文本、图像、视频与音频 token，以混合生成目标预训练后再适配任务。<br><strong>控制/任务：</strong>文本/图像到视频、视频编辑、延展与视频到音频。<br><strong>意义/边界：</strong>清楚展示“视频生成语言模型化”；离散 token 的序列长度、串行解码和 tokenizer 误差仍是代价。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2312.14125">Paper</a> · <a href="https://sites.research.google/videopoet/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+### 视频 Token 与序列建模的核心矛盾
+
+自回归模型具有统一概率形式，但串行采样昂贵；masked generation 提高并行度，却仍需多轮迭代。两者都受视频 token 数量、tokenizer 重建损失和长程状态一致性制约。
+
+---
+
+## 视频基础模型｜2020–2025：Diffusion、DiT、Flow Matching 与规模化生成
+
+这条路线同时发生了三次迁移：从像素到连续 latent、从 U-Net 到 Transformer、从 denoising 目标扩展到速度场与 Flow Matching。不能把所有方法都概括为“逐步去噪”。
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2020-ddpm.jpg" alt="DDPM 逐步反向去噪概念图"></td>
+<td><strong>2020 — <a href="https://arxiv.org/abs/2006.11239">DDPM</a></strong> <code>Diffusion 基础</code><br><strong>表示/机制：</strong>通过前向加噪和学习反向去噪，连接 diffusion probabilistic model 与 denoising score matching。<br><strong>控制/任务：</strong>原工作主要是图像生成，不是视频模型。<br><strong>意义/边界：</strong>奠定现代 diffusion 训练框架；直接在高维视频像素上扩展会带来巨大计算成本。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2006.11239">Paper</a> · <a href="https://hojonathanho.github.io/diffusion/">Project</a> · <a href="https://github.com/hojonathanho/diffusion">Code</a> · <a href="https://www.dropbox.com/sh/pm6tn31da21yrx4/AABWKZnBzIROmDjGxpB6vn6Ja">Weights</a> · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2021-latent-diffusion.jpg" alt="Latent Diffusion 连续潜空间概念图"></td>
+<td><strong>2021 — <a href="https://arxiv.org/abs/2112.10752">Latent Diffusion Models</a></strong> <code>连续 latent</code><br><strong>表示/机制：</strong>先用 autoencoder 把图像压缩到连续 latent，再在 latent 中做 diffusion，并以 cross-attention 接受文本等条件。<br><strong>控制/任务：</strong>通用条件图像生成。<br><strong>意义/边界：</strong>是 Video LDM 与大量视频 latent diffusion 的直接基础；压缩节省算力，也可能丢失细节。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2112.10752">Paper</a> · <a href="https://ommer-lab.com/research/latent-diffusion-models/">Project</a> · <a href="https://github.com/CompVis/latent-diffusion">Code</a> · <a href="https://huggingface.co/CompVis/ldm-text2im-large-256">Weights</a> · <a href="https://huggingface.co/spaces/CompVis/text2img-latent-diffusion">Demo</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2022-video-diffusion.jpg" alt="Video Diffusion Models 时空去噪概念图"></td>
+<td><strong>2022 — <a href="https://arxiv.org/abs/2204.03458">Video Diffusion Models</a></strong> <code>视频 diffusion</code><br><strong>表示/机制：</strong>将图像 diffusion 的 U-Net 扩展到时空域，联合图像与视频训练，并通过条件采样进行空间与时间延展。<br><strong>控制/任务：</strong>无条件视频、视频预测和扩展。<br><strong>意义/边界：</strong>系统证明 diffusion 可用于视频；像素空间训练和多步采样成本很高。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2204.03458">Paper</a> · <a href="https://video-diffusion.github.io/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2022-make-a-video.jpg" alt="Make-A-Video 解耦文本语义与视频运动概念图"></td>
+<td><strong>2022 — <a href="https://arxiv.org/abs/2209.14792">Make-A-Video</a></strong> <code>弱配对文本视频</code><br><strong>表示/机制：</strong>从图文数据学习语义，从无标注视频学习运动，并以分解时空 U-Net 生成视频。<br><strong>控制/任务：</strong>在无需成对文本—视频训练集的情况下做文本到视频。<br><strong>意义/边界：</strong>缓解高质量视频字幕稀缺；跨数据源学到的语义与运动仍可能错配。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2209.14792">Paper</a> · <a href="https://makeavideo.studio/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2022-imagen-video.jpg" alt="Imagen Video 时空超分辨率级联概念图"></td>
+<td><strong>2022 — <a href="https://arxiv.org/abs/2210.02303">Imagen Video</a></strong> <code>级联超分辨率</code><br><strong>表示/机制：</strong>低分辨率 base model 后接交错的空间与时间超分辨率 diffusion，并使用 v-parameterization 与 progressive distillation。<br><strong>控制/任务：</strong>高分辨率文本到视频。<br><strong>意义/边界：</strong>把分辨率与帧率逐级放大；多模型级联增加训练、推理与误差传播成本。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2210.02303">Paper</a> · <a href="https://imagen.research.google/video/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2022-flow-matching.jpg" alt="Rectified Flow 与 Flow Matching 速度场概念图"></td>
+<td><strong>2022 — <a href="https://arxiv.org/abs/2209.03003">Rectified Flow</a> / <a href="https://arxiv.org/abs/2210.02747">Flow Matching</a></strong> <code>连续速度场</code><br><strong>表示/机制：</strong>学习把噪声运输到数据的 ODE 速度场；Rectified Flow 强调拉直运输轨迹，Flow Matching 提供无需模拟完整轨迹的条件速度回归。<br><strong>控制/任务：</strong>最初是通用生成建模基础，随后进入大规模图像和视频模型。<br><strong>意义/边界：</strong>可包含 diffusion path，也可使用其他概率路径；它不是简单的“逐步反向去噪”同义词。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2209.03003">Paper-RF</a> · <a href="https://arxiv.org/abs/2210.02747">Paper-FM</a> · <a href="https://rectifiedflow.github.io/">Project-RF</a> · <a href="https://ai.meta.com/research/publications/flow-matching-guide-and-code/">Project-FM</a> · <a href="https://github.com/gnobitab/RectifiedFlow">Code-RF</a> · <a href="https://github.com/facebookresearch/flow_matching">Code-FM</a> · Weights：不适用 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2022-dit.jpg" alt="DiT 连续 latent patch Transformer 概念图"></td>
+<td><strong>2022 — <a href="https://arxiv.org/abs/2212.09748">Diffusion Transformer</a></strong> <code>DiT 架构桥梁</code><br><strong>表示/机制：</strong>把连续 latent 切成 patch token，以 Transformer 替换常用 U-Net，并展示生成质量随模型计算规模提高。<br><strong>控制/任务：</strong>原论文是类别条件图像生成。<br><strong>意义/边界：</strong>为 Sora 与后续视频 DiT 提供直接架构桥梁；图像结果本身不证明视频时序能力。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2212.09748">Paper</a> · <a href="https://www.wpeebles.com/DiT">Project</a> · <a href="https://github.com/facebookresearch/DiT">Code（已归档）</a> · <a href="https://dl.fbaipublicfiles.com/DiT/models/DiT-XL-2-256x256.pt">Weights</a> · <a href="https://huggingface.co/spaces/wpeebles/DiT">Demo（当前不可用）</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2023-latent-video-diffusion.jpg" alt="Latent Video Diffusion 时间层概念图"></td>
+<td><strong>2023 — <a href="https://arxiv.org/abs/2304.08818">Latent Video Diffusion</a></strong> <code>视频 latent diffusion</code><br><strong>表示/机制：</strong>从图像 LDM 预训练出发加入时间维，在视频上微调，并让图像 upsampler 具备时间对齐能力。<br><strong>控制/任务：</strong>文本到视频和高分辨率视频合成。<br><strong>意义/边界：</strong>首次公开和 CVPR 均为 2023；图像先验降低训练成本，但运动学习仍依赖视频数据。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2304.08818">Paper</a> · <a href="https://research.nvidia.com/labs/toronto-ai/VideoLDM/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2023-animatediff.jpg" alt="AnimateDiff 可插拔运动模块概念图"></td>
+<td><strong>2023 — <a href="https://arxiv.org/abs/2307.04725">AnimateDiff</a></strong> <code>可插拔运动模块</code><br><strong>表示/机制：</strong>训练可插入同一基础文本图像 diffusion 家族的 motion module，并可用 MotionLoRA 学习新运动模式。<br><strong>控制/任务：</strong>让个性化图像模型在尽量保留外观能力的同时生成动画。<br><strong>意义/边界：</strong>显著降低社区视频化门槛；强图像先验不自动保证复杂物理和长程状态一致性。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2307.04725">Paper</a> · <a href="https://animatediff.github.io/">Project</a> · <a href="https://github.com/guoyww/AnimateDiff">Code</a> · <a href="https://huggingface.co/guoyww/animatediff">Weights</a> · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2023-stable-video-diffusion.jpg" alt="Stable Video Diffusion 图像到视频概念图"></td>
+<td><strong>2023 — <a href="https://arxiv.org/abs/2311.15127">Stable Video Diffusion</a></strong> <code>开放权重</code><br><strong>表示/机制：</strong>采用图像预训练、视频预训练、高质量视频微调三阶段流程，并系统研究视频数据筛选。<br><strong>控制/任务：</strong>公开的重点权重用于图像到视频。<br><strong>意义/边界：</strong>推动社区复现与应用；应称“开放权重”而非笼统“完全开源”，使用范围以<a href="https://huggingface.co/stabilityai/stable-video-diffusion-img2vid">模型卡</a>为准。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2311.15127">Paper</a> · <a href="https://stability.ai/news/stable-video-diffusion-open-ai-video-model">Project</a> · <a href="https://github.com/Stability-AI/generative-models">Code</a> · <a href="https://huggingface.co/stabilityai/stable-video-diffusion-img2vid">Weights</a> · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2023-walt.jpg" alt="WALT 时空窗口注意力概念图"></td>
+<td><strong>2023 — <a href="https://arxiv.org/abs/2312.06662">W.A.L.T.</a></strong> <code>视频 diffusion Transformer</code><br><strong>表示/机制：</strong>causal encoder 在共享 latent 中压缩图像和视频，window attention 兼顾空间与时空生成，并以三级模型输出高分辨率视频。<br><strong>控制/任务：</strong>联合图像/视频与文本到视频。<br><strong>意义/边界：</strong>是 Sora 前重要的视频 DiT 节点；窗口化降低计算，也限制直接全局交互。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2312.06662">Paper</a> · <a href="https://walt-video-diffusion.github.io/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2023-videocrafter.jpg" alt="VideoCrafter 开放视频 diffusion 概念图"></td>
+<td><strong>2023/2024 — <a href="https://arxiv.org/abs/2310.19512">VideoCrafter1</a> / <a href="https://arxiv.org/abs/2401.09047">VideoCrafter2</a></strong> <code>开放研究生态</code><br><strong>表示/机制：</strong>VideoCrafter1 公开 T2V/I2V diffusion 权重；VideoCrafter2 探索用低质量视频学习运动、用高质量合成图像提升画质的解耦训练。<br><strong>控制/任务：</strong>文本到视频、图像到视频。<br><strong>意义/边界：</strong>提供可研究的开放基线；训练数据质量分离并不消除语义、运动和身份的一致性问题。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2310.19512">Paper-V1</a> · <a href="https://arxiv.org/abs/2401.09047">Paper-V2</a> · <a href="https://ailab-cvc.github.io/videocrafter1/">Project-V1</a> · <a href="https://ailab-cvc.github.io/videocrafter2/">Project-V2</a> · <a href="https://github.com/AILab-CVC/VideoCrafter">Code</a> · <a href="https://huggingface.co/VideoCrafter/VideoCrafter2">Weights</a> · <a href="https://huggingface.co/spaces/VideoCrafter/VideoCrafter">Demo（当前不可用）</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2024-lumiere.jpg" alt="Lumiere Space-Time U-Net 概念图"></td>
+<td><strong>2024 — <a href="https://arxiv.org/abs/2401.12945">Lumiere</a></strong> <code>全时域联合生成</code><br><strong>表示/机制：</strong>Space-Time U-Net 在每个 diffusion step 联合处理完整时间范围，避免先生成关键帧再做时间超分。<br><strong>控制/任务：</strong>文本到视频、图像动画与局部编辑。<br><strong>意义/边界：</strong>“一次处理全时域”不等于一次网络调用完成采样；仍需要多步 diffusion。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2401.12945">Paper</a> · <a href="https://lumiere-video.github.io/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2024-sora.jpg" alt="Sora 空时 patch diffusion Transformer 概念图"></td>
+<td><strong>2024 — <a href="https://openai.com/index/video-generation-models-as-world-simulators/">Sora</a></strong> <code>视频基础模型</code><br><strong>表示/机制：</strong>将压缩视频 latent 切成可适配不同时长、分辨率和宽高比的空时 patch，再以 diffusion Transformer 建模。<br><strong>控制/任务：</strong>文本、图像与视频条件生成和编辑。<br><strong>意义/边界：</strong>2024-02-15 发布的是技术报告和演示，未公开完整实现；报告展示最长一分钟样例，也同时公开物体永久性与物理失败。<br><strong>资源：</strong><a href="https://openai.com/index/video-generation-models-as-world-simulators/">Tech Report</a> · <a href="https://openai.com/index/sora-is-here/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2024-cogvideox.jpg" alt="CogVideoX 3D VAE 与专家 Transformer 概念图"></td>
+<td><strong>2024 — <a href="https://arxiv.org/abs/2408.06072">CogVideoX</a></strong> <code>开放视频 DiT</code><br><strong>表示/机制：</strong>3D causal VAE 做时空压缩，expert adaptive LayerNorm 融合文本/视频，并使用渐进训练与多分辨率 frame packing。<br><strong>控制/任务：</strong>开放权重文本到视频和图像到视频。<br><strong>意义/边界：</strong>补充了可复现的大规模视频 DiT 路线；论文中的领先结论依赖特定自动指标与人评设置。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2408.06072">Paper</a> · <a href="https://yzy-thu.github.io/CogVideoX-demo/">Project</a> · <a href="https://github.com/zai-org/CogVideo">Code</a> · <a href="https://huggingface.co/zai-org/CogVideoX-5b">Weights</a> · <a href="https://huggingface.co/spaces/zai-org/CogVideoX-5B-Space">Demo</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2024-movie-gen.jpg" alt="Movie Gen 视频音频编辑模型家族概念图"></td>
+<td><strong>2024 — <a href="https://arxiv.org/abs/2410.13720">Movie Gen</a></strong> <code>Flow Matching 媒体模型家族</code><br><strong>表示/机制：</strong>最大视频模型为 30B Transformer，在时空 latent 上采用 Flow Matching；最长上下文约 73K 视频 token。<br><strong>控制/任务：</strong>把视频生成、个性化、精准编辑与同步音频组织成模型家族。<br><strong>意义/边界：</strong>作者报告 16 秒、16 FPS、1080p 等结果；这是大规模 Flow Matching 进入视频的强证据，但不是单一 checkpoint 完成全部任务。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2410.13720">Paper</a> · <a href="https://ai.meta.com/research/movie-gen/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2024-hunyuanvideo.jpg" alt="HunyuanVideo 双流到单流 Transformer 概念图"></td>
+<td><strong>2024 — <a href="https://arxiv.org/abs/2412.03603">HunyuanVideo</a></strong> <code>开放大型视频模型</code><br><strong>表示/机制：</strong>causal 3D VAE 压缩视频，dual-stream 到 single-stream 的 full-attention Transformer 融合文本/视频，并使用 flow-matching scheduler。<br><strong>控制/任务：</strong>文本到视频，并公开<a href="https://github.com/Tencent-Hunyuan/HunyuanVideo">代码和权重</a>。<br><strong>意义/边界：</strong>超过 13B 参数，缩小开放与闭源系统的规模差距；专业人评结论仍主要来自作者报告。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2412.03603">Paper</a> · <a href="https://aivideo.hunyuan.tencent.com/">Project</a> · <a href="https://github.com/Tencent-Hunyuan/HunyuanVideo">Code</a> · <a href="https://huggingface.co/tencent/HunyuanVideo">Weights</a> · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2025-wan.jpg" alt="Wan 开放视频模型家族概念图"></td>
+<td><strong>2025 — <a href="https://arxiv.org/abs/2503.20314">Wan 2.1</a></strong> <code>开放视频基础模型家族</code><br><strong>表示/机制：</strong>沿用视频 DiT 范式，以新 VAE、规模化预训练、数据治理和自动评测构成 1.3B/14B 模型家族。<br><strong>控制/任务：</strong>覆盖 T2V、I2V、视频编辑与个性化等任务，<a href="https://github.com/Wan-Video/Wan2.1">代码和模型开放</a>。<br><strong>意义/边界：</strong>作者报告 1.3B 版本约需 8.19 GB 显存；性能与效率数字应在具体硬件、分辨率和评测设置下理解。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2503.20314">Paper</a> · <a href="https://wan.video/">Project</a> · <a href="https://github.com/Wan-Video/Wan2.1">Code</a> · <a href="https://huggingface.co/Wan-AI/Wan2.1-T2V-14B">Weights</a> · <a href="https://huggingface.co/spaces/Wan-AI/Wan2.1">Demo</a></td>
+</tr>
+</table>
+
+### 同期闭源产品如何放入时间线
+
+Veo、Kling 与 Runway Gen-3 Alpha 等 2024 产品推动了真实用户访问和创作工作流，但公开材料不足以确认完整训练目标与架构，因此这里把它们视为产业背景，不用产品展示替代可核验的技术节点。
+
+---
+
+## World Model｜2018–2023：决策型模型的并行谱系
+
+这条谱系来自控制、强化学习和规划，并不是文本视频生成自然“升级”而来。面向决策的 latent state 不必生成漂亮像素；能生成漂亮视频也不等于状态可用于规划。
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2018-world-models.jpg" alt="World Models VAE RNN controller 概念图"></td>
+<td><strong>2018 — <a href="https://arxiv.org/abs/1803.10122">World Models</a></strong> <code>决策/规划</code><br><strong>表示/机制：</strong>VAE 压缩视觉观测，RNN 学习 latent dynamics，轻量 controller 在模型想象的环境中训练。<br><strong>控制/任务：</strong>CarRacing 与 VizDoom 等控制任务。<br><strong>意义/边界：</strong>把“表示、动态、控制器”模块化为经典范式；实验规模与环境复杂度仍有限。<br><strong>资源：</strong><a href="https://arxiv.org/abs/1803.10122">Paper</a> · <a href="https://worldmodels.github.io/">Project</a> · <a href="https://github.com/hardmaru/WorldModelsExperiments">Code</a> · Weights：未公开 · <a href="https://worldmodels.github.io/">Demo</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2018-planet.jpg" alt="PlaNet latent CEM 规划概念图"></td>
+<td><strong>2018 — <a href="https://arxiv.org/abs/1811.04551">PlaNet</a></strong> <code>在线 latent 规划</code><br><strong>表示/机制：</strong>RSSM 同时包含确定性与随机 latent state，并以 latent overshooting 学习多步动态。<br><strong>控制/任务：</strong>用 CEM 在 latent 中在线搜索动作序列。<br><strong>意义/边界：</strong>首次公开于 2018，不是 2019；规划性能依赖模型在候选动作分布上的准确性。<br><strong>资源：</strong><a href="https://arxiv.org/abs/1811.04551">Paper</a> · <a href="https://danijar.com/project/planet/">Project</a> · <a href="https://github.com/google-research/planet">Code（已归档）</a> · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2019-dreamer.jpg" alt="Dreamer latent imagination actor critic 概念图"></td>
+<td><strong>2019 — <a href="https://arxiv.org/abs/1912.01603">Dreamer</a></strong> <code>想象中学习行为</code><br><strong>表示/机制：</strong>在学习到的 latent world model 中 rollout，并通过 imagined actor–critic 与解析梯度优化行为。<br><strong>控制/任务：</strong>从像素学习连续控制。<br><strong>意义/边界：</strong>把每步在线规划改成后台 latent imagination 训练；模型偏差仍会被策略利用。<br><strong>资源：</strong><a href="https://arxiv.org/abs/1912.01603">Paper</a> · <a href="https://danijar.com/project/dreamer/">Project</a> · <a href="https://github.com/danijar/dreamer">Code</a> · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2019-muzero.jpg" alt="MuZero 隐状态树搜索概念图"></td>
+<td><strong>2019/2020 — <a href="https://arxiv.org/abs/1911.08265">MuZero</a></strong> <code>任务相关动态</code><br><strong>表示/机制：</strong>representation、dynamics 与 prediction networks 学习供搜索使用的 reward、value 和 policy，而不重建完整观测。<br><strong>控制/任务：</strong>以 MCTS 规划 Atari、Go、国际象棋和将棋。<br><strong>意义/边界：</strong>预印本 2019、Nature 版本 2020；它证明“对决策足够”不等于“视觉上完整的世界模拟器”。<br><strong>资源：</strong><a href="https://arxiv.org/abs/1911.08265">Paper</a> · <a href="https://deepmind.google/blog/muzero-mastering-go-chess-shogi-and-atari-without-rules/">Project</a> · Code：未公开 · <a href="https://gist.github.com/Mononofu/6c2d27ea1b3a9b3c1a293ebabed062ed">Pseudocode</a> · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2023-dreamerv3.jpg" alt="DreamerV3 跨域统一控制概念图"></td>
+<td><strong>2023 — <a href="https://arxiv.org/abs/2301.04104">DreamerV3</a></strong> <code>跨域 world model</code><br><strong>表示/机制：</strong>以归一化、平衡和变换等稳定化设计，让一套固定配置跨多类任务训练。<br><strong>控制/任务：</strong>覆盖 150 多个任务；作者报告在无人工数据与 curriculum 下取得 Minecraft diamond 结果。<br><strong>意义/边界：</strong>展示算法通用性，而不是证明一个模型在所有环境间共享同一世界知识。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2301.04104">Paper</a> · <a href="https://danijar.com/project/dreamerv3/">Project</a> · <a href="https://github.com/danijar/dreamerv3">Code</a> · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2023-gaia1.jpg" alt="GAIA-1 驾驶 token world model 概念图"></td>
+<td><strong>2023 — <a href="https://arxiv.org/abs/2309.17080">GAIA-1</a></strong> <code>驾驶生成式 world model</code><br><strong>表示/机制：</strong>把视频、文本和车辆动作离散为 token，自回归预测未来驾驶场景。<br><strong>控制/任务：</strong>由 ego action 与文本条件控制天气、道路和车辆行为。<br><strong>意义/边界：</strong>把视频生成与驾驶动作放入同一预测模型；生成合理场景不等于通过闭环自动驾驶安全验证。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2309.17080">Paper</a> · <a href="https://wayve.ai/thinking/scaling-gaia-1/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2023-unisim.jpg" alt="UniSim 通用视觉模拟与策略训练概念图"></td>
+<td><strong>2023 — <a href="https://arxiv.org/abs/2310.06114">UniSim</a></strong> <code>动作条件视觉模拟</code><br><strong>表示/机制：</strong>汇集图像、机器人和导航数据，学习由高级语言或低级动作控制的视觉模拟器。<br><strong>控制/任务：</strong>在生成经验中训练策略，再迁移到真实机器人。<br><strong>意义/边界：</strong>作者报告零样本真实机器人迁移；这一结果来自特定任务与数据设置，不能泛化为任意现实环境的可靠模拟。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2310.06114">Paper</a> · <a href="https://universal-simulator.github.io/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+---
+
+## 汇合节点｜2024：表示学习、交互视频与生成式游戏环境
+
+Sora 在生成路线中提出“视频生成可能通向世界模拟器”的研究假设；同年，V-JEPA、Genie、GameNGen、DINO-WM 与 Genie 2 分别从 feature prediction、latent action、动作条件像素生成和显式交互推进这场讨论。
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2024-v-jepa.jpg" alt="V-JEPA 表示空间预测概念图"></td>
+<td><strong>2024 — <a href="https://arxiv.org/abs/2404.08471">V-JEPA</a></strong> <code>表示学习</code><br><strong>表示/机制：</strong>遮挡视频 tube，在 representation space 预测缺失时空信息，不重建全部像素。<br><strong>控制/任务：</strong>无文本、无负样本的视频自监督表征学习。<br><strong>意义/边界：</strong>把计算集中在可预测特征；它本身不是动作条件模型，也不是可交互像素生成器。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2404.08471">Paper</a> · <a href="https://ai.meta.com/blog/v-jepa-yann-lecun-ai-model-video-joint-embedding-predictive-architecture/">Project</a> · <a href="https://github.com/facebookresearch/jepa">Code</a> · <a href="https://github.com/facebookresearch/jepa#model-zoo">Weights</a> · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2024-genie1.jpg" alt="Genie 1 latent action 游戏世界概念图"></td>
+<td><strong>2024 — <a href="https://arxiv.org/abs/2402.15391">Genie 1</a></strong> <code>交互视频模拟</code><br><strong>表示/机制：</strong>11B 模型由时空 tokenizer、自回归 dynamics model 和 latent action model 组成，从无动作标签视频中发现控制信号。<br><strong>控制/任务：</strong>主要从互联网 2D 平台游戏视频生成可控环境。<br><strong>意义/边界：</strong>展示 latent action 的可扩展学习；并非已经覆盖通用 3D 或机器人世界。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2402.15391">Paper</a> · <a href="https://deepmind.google/research/publications/60474/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2024-gamengen.jpg" alt="GameNGen 动作条件游戏扩散循环概念图"></td>
+<td><strong>2024 — <a href="https://arxiv.org/abs/2408.14837">GameNGen</a></strong> <code>神经游戏引擎实验</code><br><strong>表示/机制：</strong>RL agent 采集 Doom 轨迹，扩散模型依据历史帧和动作预测下一帧。<br><strong>控制/任务：</strong>在单一 Doom 环境中逐帧响应玩家动作。<br><strong>意义/边界：</strong>作者报告单 TPU 约 20 FPS 和多分钟稳定生成；这是特定游戏实验，不是通用游戏引擎。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2408.14837">Paper</a> · <a href="https://gamengen.github.io/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2024-genie2.jpg" alt="Genie 2 单图生成交互 3D 世界概念图"></td>
+<td><strong>2024 — <a href="https://deepmind.google/blog/genie-2-a-large-scale-foundation-world-model/">Genie 2</a></strong> <code>官方发布</code> <code>交互 3D 世界</code><br><strong>表示/机制：</strong>从单张图像生成可由键盘和鼠标控制的 3D 环境。<br><strong>控制/任务：</strong>动作分支、相机运动与环境交互。<br><strong>意义/边界：</strong>官方称一致性可达约一分钟，但多数示例为 10–20 秒；未蒸馏基础模型并非实时，实时蒸馏版以画质为代价。<br><strong>资源：</strong>Paper/Report：— · <a href="https://deepmind.google/blog/genie-2-a-large-scale-foundation-world-model/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2024-dino-wm.jpg" alt="DINO-WM 特征空间动作规划概念图"></td>
+<td><strong>2024 — <a href="https://arxiv.org/abs/2411.04983">DINO-WM</a></strong> <code>特征空间规划</code><br><strong>表示/机制：</strong>冻结 DINOv2 patch feature，学习动作条件 dynamics，并在测试时优化动作序列使预测特征接近目标特征。<br><strong>控制/任务：</strong>无需专家示范、奖励或单独逆动力学模型的目标到达。<br><strong>意义/边界：</strong>说明强视觉表征可直接支撑规划；证据来自有限控制环境，且成功依赖目标特征的可达性。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2411.04983">Paper</a> · <a href="https://dino-wm.github.io/">Project</a> · <a href="https://github.com/gaoyuezhou/dino_wm">Code</a> · <a href="https://osf.io/bmw48/?view_only=a56a296ce3b24cceaf408383a175ce28">Weights</a> · Demo：—</td>
+</tr>
+</table>
+
+### 不能混淆的证据
+
+- 表示预测成功，不等于像素可生成。
+- 开环动作条件 rollout，不等于闭环控制可靠。
+- 能维持视觉一致性，不等于具有因果模型。
+- 在一个游戏实时运行，不等于可泛化到任意交互世界。
+
+---
+
+## 并行进展｜2025：Physical AI、交互世界与原生音视频
+
+2025 年的关键变化不是所有路线合成了一个“万能 world model”，而是视频模型、表征模型、交互世界、显式 3D 和机器人后训练开始共享更大的数据与模型基础。
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2025-cosmos.jpg" alt="NVIDIA Cosmos Physical AI 平台概念图"></td>
+<td><strong>2025 — <a href="https://arxiv.org/abs/2501.03575">NVIDIA Cosmos</a></strong> <code>Physical AI 平台</code><br><strong>表示/机制：</strong>由 autoregressive/diffusion world foundation models、tokenizer、数据整理、guardrail 和后训练工具组成。<br><strong>控制/任务：</strong>为机器人和自动驾驶等具体任务提供数据生成与模型底座。<br><strong>意义/边界：</strong>首代官方名称是 Cosmos 平台/Predict1 系列，不是一个严格名为“Cosmos 1”的单模型；平台也不等于闭环机器人策略。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2501.03575">Paper</a> · <a href="https://research.nvidia.com/labs/cosmos-lab/">Project</a> · <a href="https://github.com/NVIDIA/Cosmos">Code</a> · <a href="https://huggingface.co/collections/nvidia/cosmos-6751e884dc10e013a0a0d8e6">Weights</a> · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2025-cosmos-predict2.jpg" alt="Cosmos Predict2 多尺度世界状态生成概念图"></td>
+<td><strong>2025 — <a href="https://developer.nvidia.com/blog/?p=101575">Cosmos Predict2</a></strong> <code>官方发布</code> <code>世界状态生成</code><br><strong>表示/机制：</strong>提供 2B/14B 世界状态视频生成模型，支持灵活分辨率、帧率和面向具体 Physical AI 场景的后训练。<br><strong>控制/任务：</strong>文本、图像、首尾帧等条件的未来状态生成。<br><strong>意义/边界：</strong>适合作为数据与预测底座；具体控制收益仍需由下游任务独立验证。<br><strong>资源：</strong><a href="https://developer.nvidia.com/blog/?p=101575">Technical Release</a> · <a href="https://research.nvidia.com/labs/cosmos-lab/cosmos-predict2/">Project</a> · <a href="https://github.com/nvidia-cosmos/cosmos-predict2">Code</a> · <a href="https://huggingface.co/collections/nvidia/cosmos-predict2">Weights</a> · <a href="https://huggingface.co/spaces/nvidia/Cosmos-Predict2">Demo</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2025-v-jepa2.jpg" alt="V-JEPA 2 机器人图像目标规划概念图"></td>
+<td><strong>2025 — <a href="https://arxiv.org/abs/2506.09985">V-JEPA 2</a></strong> <code>表示到规划</code><br><strong>表示/机制：</strong>先从超过一百万小时无动作互联网视频和图像学习表示，再用少于 62 小时 DROID 机器人数据训练动作条件模型。<br><strong>控制/任务：</strong>在新实验室的 Franka 机械臂上，以目标图像完成 reach、grasp 与 pick-and-place。<br><strong>意义/边界：</strong>“zero-shot”指无需目标实验室额外机器人数据、任务训练或奖励，并非完全没用机器人数据；论文还报告相机位姿敏感、长时误差和搜索成本等限制。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2506.09985">Paper</a> · <a href="https://ai.meta.com/research/vjepa/">Project</a> · <a href="https://github.com/facebookresearch/vjepa2">Code</a> · <a href="https://huggingface.co/collections/facebook/v-jepa-2-6841bad8413014e185b497a6">Weights</a> · <a href="https://github.com/facebookresearch/vjepa2#usage-demo">Usage Demo</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2025-veo3.jpg" alt="Veo 3 音视频生成与零样本视觉探测概念图"></td>
+<td><strong>2025 — <a href="https://blog.google/innovation-and-ai/products/generative-media-models-io-2025/">Veo 3</a> / Veo 3.1</strong> <code>创作模型</code> <code>视觉探测</code><br><strong>表示/机制：</strong>2025-05 发布原生音视频生成；后续<a href="https://arxiv.org/abs/2509.20328">研究</a>用黑盒 prompting 探测分割、边缘、物理属性、affordance、工具使用、迷宫与对称推理。<br><strong>控制/任务：</strong>文本/图像到视频与音频、创作控制。<br><strong>意义/边界：</strong>这些零样本能力不代表显式 perception head 或机器人闭环验证，任务专用模型通常仍更强，部分结果依赖多次采样；现有论文没有支持“深度估计”这一旧表述。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2509.20328">Paper</a> · <a href="https://deepmind.google/models/veo/">Project</a> · Code：未公开 · Weights：未公开 · <a href="https://labs.google/fx/tools/flow">Demo</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2025-genie3.jpg" alt="Genie 3 实时可交互动态世界概念图"></td>
+<td><strong>2025 — <a href="https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/">Genie 3</a></strong> <code>官方发布</code> <code>交互世界</code><br><strong>表示/机制：</strong>从文本生成 720p、24 FPS 的动态世界，并允许通过文本事件改变环境。<br><strong>控制/任务：</strong>实时导航与数分钟级交互一致性。<br><strong>意义/边界：</strong>仍是有限研究预览；官方列出动作空间、多智能体、地理准确性、文字渲染和持续时长等限制。<br><strong>资源：</strong><a href="https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/">Official Release</a> · <a href="https://deepmind.google/models/genie/">Project</a> · Code：未公开 · Weights：未公开 · <a href="https://labs.google/fx/projectgenie/">Demo（受地区/订阅限制）</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2025-matrix-game2.jpg" alt="Matrix-Game 2 流式交互视频世界概念图"></td>
+<td><strong>2025 — <a href="https://arxiv.org/abs/2508.13009">Matrix-Game 2</a></strong> <code>开放交互视频世界</code><br><strong>表示/机制：</strong>以 UE/GTA 等游戏数据和键鼠动作训练 few-step causal diffusion，逐帧生成可控画面。<br><strong>控制/任务：</strong>键盘鼠标驱动的流式游戏交互。<br><strong>意义/边界：</strong>论文报告约 1,200 小时数据、25 FPS 和分钟级交互；均是作者设置下的结果，不代表现实物理或跨游戏泛化。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2508.13009">Paper</a> · <a href="https://matrix-game-v2.github.io/">Project</a> · <a href="https://github.com/SkyworkAI/Matrix-Game">Code</a> · <a href="https://huggingface.co/Skywork/Matrix-Game-2.0">Weights</a> · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2025-marble.jpg" alt="Marble 显式三维世界生成概念图"></td>
+<td><strong>2025 — <a href="https://www.worldlabs.ai/blog/marble-world-model">Marble</a></strong> <code>官方发布</code> <code>显式 3D 世界</code><br><strong>表示/机制：</strong>从文本、图像、视频或粗略 3D 条件生成可持续、可编辑、可扩展的世界，并可导出 Gaussian splat、mesh 或视频。<br><strong>控制/任务：</strong>相机探索、世界编辑、扩展和资产导出。<br><strong>意义/边界：</strong>它补上显式三维表示路线；官方仍把动态交互列为后续方向，因此不应写成动作条件动态模拟器。<br><strong>资源：</strong><a href="https://www.worldlabs.ai/blog/marble-world-model">Official Release</a> · <a href="https://docs.worldlabs.ai/">Project</a> · Code：未公开 · Weights：未公开 · <a href="https://marble.worldlabs.ai/">Demo（需账号/付费）</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2025-sora2.jpg" alt="Sora 2 多镜头音视频与安全概念图"></td>
+<td><strong>2025 — <a href="https://openai.com/index/sora-2/">Sora 2</a></strong> <code>官方发布</code> <code>视频音频生成</code><br><strong>表示/机制：</strong>改进物理结果、多镜头控制和状态延续，并原生生成对白、环境声和音效。<br><strong>控制/任务：</strong>复杂镜头指令、参考主体与同步音视频。<br><strong>意义/边界：</strong><a href="https://openai.com/index/sora-2-system-card/">系统卡</a>仍记录物理、控制、肖像同意、误导性媒体与来源风险；官方页面注明 Sora 产品自 2026-04-26 起不再提供，但这不改变其历史技术节点地位。<br><strong>资源：</strong><a href="https://openai.com/index/sora-2-system-card/">System Card</a> · <a href="https://openai.com/index/sora-2/">Project</a> · Code：未公开 · Weights：未公开 · Demo：已下线</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2025-gwm1.jpg" alt="GWM-1 三个独立后训练分支概念图"></td>
+<td><strong>2025 — <a href="https://runway.com/research/introducing-runway-gwm-1">GWM-1</a></strong> <code>官方发布</code> <code>模型家族</code><br><strong>表示/机制：</strong>以 Gen-4.5 为共同底座，分别后训练 Worlds、Avatars/Characters 与 Robotics 三个模型。<br><strong>控制/任务：</strong>可探索世界、实时角色和机器人动作条件 rollout。<br><strong>意义/边界：</strong>不是一个 checkpoint 同时完成全部任务；官方展示最长约两分钟、720p 的实时逐帧生成，但缺少独立评测。<br><strong>资源：</strong>Paper/Report：— · <a href="https://runway.com/research/introducing-runway-gwm-1">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+---
+
+## World Model｜2026：世界—动作系统与可规划表征
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2026-cosmos3.jpg" alt="Cosmos 3 双塔多模态模型家族概念图"></td>
+<td><strong>2026 — <a href="https://arxiv.org/abs/2606.02800">Cosmos 3</a></strong> <code>Omnimodal 模型家族</code><br><strong>表示/机制：</strong>Edge、Nano、Super 等尺度共享自回归 reasoner 与 diffusion generator 双塔 Mixture-of-Transformers 架构。<br><strong>控制/任务：</strong>统一接收语言、图像、视频、音频和动作，并以不同后训练版本覆盖视觉语言推理、音视频生成、forward/inverse dynamics 和机器人策略。<br><strong>意义/边界：</strong>这是统一架构下的模型家族，不是一个 checkpoint 已同时解决全部 Physical AI 任务。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2606.02800">Paper</a> · <a href="https://research.nvidia.com/labs/cosmos-lab/cosmos3/">Project</a> · <a href="https://github.com/NVIDIA/cosmos">Code</a> · <a href="https://huggingface.co/collections/nvidia/cosmos3">Weights</a> · <a href="https://build.nvidia.com/models?q=cosmos">Demo</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2026-v-jepa21.jpg" alt="V-JEPA 2.1 稠密时空特征概念图"></td>
+<td><strong>2026 — <a href="https://arxiv.org/abs/2603.14482">V-JEPA 2.1</a></strong> <code>稠密表征</code><br><strong>表示/机制：</strong>通过 dense predictive loss、跨层 deep self-supervision、统一图像—视频输入表示和规模扩展学习 dense 时空特征。<br><strong>控制/任务：</strong>服务视觉理解、密集预测与机器人后训练。<br><strong>意义/边界：</strong>论文报告相对 V-JEPA 2-AC 抓取成功率提高 20 个百分点；它仍主要是 representation/world-modeling 方法，不是交互式像素世界生成器。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2603.14482">Paper</a> · <a href="https://ai.meta.com/research/vjepa/">Project</a> · <a href="https://github.com/facebookresearch/vjepa2">Code</a> · <a href="https://github.com/facebookresearch/vjepa2#v-jepa-21-pretrained-checkpoints">Weights</a> · <a href="https://github.com/facebookresearch/vjepa2#usage-demo">Demo</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2026-leworldmodel.jpg" alt="LeWorldModel 小型可规划 latent dynamics 概念图"></td>
+<td><strong>2026 — <a href="https://arxiv.org/abs/2603.19312">LeWorldModel</a></strong> <code>端到端 latent dynamics</code><br><strong>表示/机制：</strong>以 next-embedding prediction 和 Gaussian latent regularization，从原始像素稳定联合训练 encoder 与动作条件 dynamics。<br><strong>控制/任务：</strong>在 latent rollout 上执行 model predictive control。<br><strong>意义/边界：</strong>作者报告约 15M 参数、单 GPU 数小时训练和显著规划加速；证据来自小规模 2D/3D 控制实验，不能外推为 foundation-scale Physical AI。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2603.19312">Paper</a> · <a href="https://le-wm.github.io/">Project</a> · <a href="https://github.com/lucas-maes/le-wm">Code</a> · <a href="https://huggingface.co/collections/quentinll/lewm">Weights</a> · Demo：—</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2026-eb-jepa.jpg" alt="EB-JEPA 教学与模块化实验概念图"></td>
+<td><strong>2026 — <a href="https://arxiv.org/abs/2602.03604">EB-JEPA</a></strong> <code>教学/研究组件</code><br><strong>表示/机制：</strong>将 context encoder、predictor、collapse regularization 与 latent planning 拆成轻量模块。<br><strong>控制/任务：</strong>覆盖 CIFAR-10 表征、MovingMNIST 多步预测和 Two Rooms 动作规划。<br><strong>意义/边界：</strong>价值在于单卡、数小时级可复现实验；它是 toy-scale 教学库，不是现实世界 foundation model。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2602.03604">Paper</a> · <a href="https://github.com/facebookresearch/eb_jepa">Project</a> · <a href="https://github.com/facebookresearch/eb_jepa">Code</a> · Weights：未公开 · Demo：—</td>
+</tr>
+</table>
+
+---
+
+## 视频基础模型｜2026：原生音视频与多模态创作
+
+这些模型代表生成—参考—编辑一体化，但目前没有证据证明它们已经构成可用于机器人闭环控制的 Physical AI world model。
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2026-kling3.jpg" alt="Kling 3 多模态原生音视频创作概念图"></td>
+<td><strong>2026 — <a href="https://ir.kuaishou.com/news-releases/news-release-details/kling-ai-launches-30-model-ushering-era-where-everyone-can-be">Kling Video 3 / Video 3 Omni</a></strong> <code>官方发布</code> <code>创作模型</code><br><strong>表示/机制：</strong>以统一多模态输入输出支持文本、图像、音频和视频参考。<br><strong>控制/任务：</strong>文本/图像/参考到视频、视频内编辑、最长 15 秒多镜头 storyboard 与原生多语言/方言音频。<br><strong>意义/边界：</strong>代表创作控制和音视频联合生成进步；尚无机器人闭环或可规划状态证据。<br><strong>资源：</strong><a href="https://ir.kuaishou.com/news-releases/news-release-details/kling-ai-launches-30-model-ushering-era-where-everyone-can-be">Official Release</a> · <a href="https://kling.ai/quickstart/klingai-video-3-model-user-guide">Project</a> · Code：未公开 · Weights：未公开 · <a href="https://kling.ai/">Demo（需账号/地区限制）</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2026-seedance2.jpg" alt="Seedance 2.0 多模态音视频参考概念图"></td>
+<td><strong>2026 — <a href="https://seed.bytedance.com/en/blog/seedance-2-0-%E6%AD%A3%E5%BC%8F%E5%8F%91%E5%B8%83">Seedance 2.0</a></strong> <code>官方发布</code> <code>创作模型</code><br><strong>表示/机制：</strong>统一多模态音视频架构，可同时接收文本、图像、视频和音频参考。<br><strong>控制/任务：</strong>最多 9 张图像、3 段视频、3 段音频参考，生成最长 15 秒多镜头立体声音视频，并支持编辑与延展。<br><strong>意义/边界：</strong>官方仍列出细节稳定性、复杂动态、多主体、文字和音频失真等限制。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2604.14148">Paper</a> · <a href="https://seed.bytedance.com/seedance2_0">Project</a> · Code：未公开 · Weights：未公开 · <a href="https://jimeng.jianying.com/">Demo（需账号/地区限制）</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2026-minimax-h3.jpg" alt="MiniMax H3 全模态音视频与开放基础模型概念图"></td>
+<td><strong>2026 — <a href="https://www.minimax.io/blog/minimax-h3">MiniMax H3</a></strong> <code>开放权重</code> <code>全模态音视频</code><br><strong>表示/机制：</strong>将文本、图像、视频和音频编码为 packed multimodal sequence，由 33B dense single-stream H3-Omni-Transformer 联合预测视频与双声道音频 latent；视觉与音频分别使用 H3-VisualVAE 和 H3-AudioVAE。<br><strong>控制/任务：</strong>覆盖文本、首/尾帧和全模态参考生成；Ref2VA 最多接收 9 张图像、3 段视频和 3 段音频且总文件不超过 12 个，官方输出规格为 4–15 秒、24 FPS、32 kHz 立体声，2K 通过 in-context regeneration 获得。<br><strong>意义/边界：</strong><a href="https://www.minimax.io/news/minimax-h3-open-source">2026-08-03 开放</a>的是两个 CFG-distilled H3-Base checkpoint，本地 Base 工作流输出 768p；H3-Context-IR、H3-Regenerate-2K 与初版 sparse-attention 实现并未随首批权重开放，因此不能把完整托管 2K 系统笼统称为全部开源。<br><strong>资源：</strong><a href="https://www.minimax.io/blog/minimax-h3">Official Release</a> · <a href="https://www.minimax.io/research">Project</a> · <a href="https://github.com/MiniMax-AI/MiniMax-H3">Code</a> · <a href="https://huggingface.co/MiniMaxAI/MiniMax-H3">Weights</a> · <a href="https://hailuoai.video/">Demo（需账号/地区限制）</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="42%"><img src="../assets/timeline/2026-seedance25.jpg" alt="Seedance 2.5 长音视频延展与时间轴编辑概念图"></td>
+<td><strong>2026 — <a href="https://seed.bytedance.com/en/blog/one-take-creation-flexible-referencing-introducing-seedance-2-5">Seedance 2.5</a></strong> <code>官方发布</code> <code>创作模型</code><br><strong>表示/机制：</strong>在 Seedance 2.0 的联合音视频架构上强化长叙事、参考生成与局部编辑。<br><strong>控制/任务：</strong>单次最长 30 秒、支持多轮延展，最多 30 张图像、10 段视频和 10 段音频参考，并支持时间戳级编辑。<br><strong>意义/边界：</strong>截至 2026-08 是该路线更新节点；复杂物理、多主体与长时状态稳定性仍需独立评测。<br><strong>资源：</strong><a href="https://seed.bytedance.com/en/blog/one-take-creation-flexible-referencing-introducing-seedance-2-5">Official Release</a> · <a href="https://seed.bytedance.com/seedance2_5">Project</a> · Code：未公开 · Weights：未公开 · <a href="https://jimeng.jianying.com/">Demo（需账号/地区限制）</a></td>
+</tr>
+</table>
+
+---
+
+## 如何正确阅读这条时间线
+
+对每个节点都问四个问题：
+
+1. **表示是什么？** 原始像素、光流、离散 code、连续 latent、feature，还是显式 3D？
+2. **时间如何建模？** 帧重组、RNN、变换核、自回归、masked prediction、diffusion、速度场，还是动作条件 dynamics？
+3. **控制信号是什么？** 历史帧、文本、图像、音频、相机、键鼠、机器人动作，还是目标状态？
+4. **成功如何证明？** 画质、人评、likelihood、FVD、实时帧率、规划回报，还是现实任务成功率？
+
+最需要避免的四种推断是：
+
+- 画面逼真 ⇒ 物理正确；
+- 能预测视频 ⇒ 能支持规划；
+- 开环 demo 稳定 ⇒ 闭环控制可靠；
+- 官方 benchmark 领先 ⇒ 已被独立复现。
+
+JEPA 从图像表征、视频预测到动作条件规划的独立演化，见 [JEPA 参考阅读](jepa.md)。具体任务与模型则见 [任务与方法分类](taxonomy.md)、[评测指南](evaluation.md) 和 [开放模型与代码](../resources/open-models.md)。

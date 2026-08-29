@@ -1,78 +1,96 @@
 {
-  "as_of": "2026-08-09",
-  "fetched_at": "2026-08-09T10:43:57Z",
+  "as_of": "2026-08-29",
+  "fetched_at": "2026-08-29T07:45:57Z",
   "repositories": {
     "https://github.com/GameNGen/GameNGen.github.io": {
       "stars": 91
     },
     "https://github.com/NVIDIA/Cosmos": {
-      "stars": 11419
+      "stars": 11665
     },
     "https://github.com/Stability-AI/generative-models": {
-      "stars": 27249
+      "stars": 27273
     },
     "https://github.com/coxlab/prednet": {
-      "stars": 806
+      "stars": 803
     },
     "https://github.com/cvondrick/videogan": {
       "stars": 706
     },
     "https://github.com/danijar/dreamer": {
-      "stars": 619
+      "stars": 622
     },
     "https://github.com/danijar/dreamerv3": {
-      "stars": 3643
+      "stars": 3714
+    },
+    "https://github.com/dreamzero0/dreamzero": {
+      "stars": 2600
     },
     "https://github.com/edenton/svg": {
       "stars": 188
     },
     "https://github.com/facebookresearch/eb_jepa": {
-      "stars": 754
+      "stars": 765
     },
     "https://github.com/facebookresearch/ijepa": {
-      "stars": 3488
+      "stars": 3489
     },
     "https://github.com/facebookresearch/jepa": {
-      "stars": 4070
+      "stars": 4111
     },
     "https://github.com/facebookresearch/td_jepa": {
-      "stars": 54
+      "stars": 61
     },
     "https://github.com/facebookresearch/vjepa2": {
-      "stars": 4447
+      "stars": 4540
     },
     "https://github.com/galilai-group/lejepa": {
-      "stars": 1304
+      "stars": 1323
+    },
+    "https://github.com/gaoyuezhou/dino_wm": {
+      "stars": 558
     },
     "https://github.com/google-research/magvit": {
-      "stars": 1002
+      "stars": 1001
     },
     "https://github.com/google-research/planet": {
       "stars": 1260
     },
     "https://github.com/guoyww/AnimateDiff": {
-      "stars": 12212
+      "stars": 12229
     },
     "https://github.com/hardmaru/WorldModelsExperiments": {
-      "stars": 730
+      "stars": 734
     },
     "https://github.com/hojonathanho/diffusion": {
-      "stars": 5297
+      "stars": 5304
+    },
+    "https://github.com/junhyukoh/nips2015-action-conditional-video-prediction": {
+      "stars": 114
     },
     "https://github.com/lucas-maes/le-wm": {
-      "stars": 4269
+      "stars": 4355
     },
     "https://github.com/lucidrains/video-diffusion-pytorch": {
-      "stars": 1384
+      "stars": 1383
+    },
+    "https://github.com/nicklashansen/tdmpc2": {
+      "stars": 937
+    },
+    "https://github.com/nvidia-cosmos/cosmos-predict1": {
+      "stars": 468
+    },
+    "https://github.com/nvidia-cosmos/cosmos-predict2": {
+      "stars": 793
     },
     "https://github.com/sergeytulyakov/mocogan": {
       "stars": 603
     },
     "https://github.com/werner-duvaud/muzero-general": {
-      "stars": 2854
+      "stars": 2863
     },
     "https://github.com/wilson1yan/VideoGPT": {
-      "stars": 1079
+      "stars": 1081
     }
   }
 }

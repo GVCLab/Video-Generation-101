@@ -6,6 +6,20 @@
 
 本文的核心结论是：视频生成评测经历了从“对齐唯一参考答案”到“比较生成分布”，再到“分解开放世界能力”，最后到“验证干预和决策效用”的迁移。后一个阶段并没有淘汰前面的指标，而是把它们降为某些局部属性的诊断工具。
 
+对于 T2V 的任务定义、组合性失败模式和 prompt 结构化记录，参见[文本到视频](tasks/text-to-video.md)；本章作为全仓库统一的评测方法与实验协议入口。
+
+### 评测前先记录条件、时间尺度和交互方式
+
+模型的条件可分为语义、视觉、结构与运动、音频和智能体动作。测试时应明确记录文本、参考图、深度、轨迹、相机路径、语音或动作中的哪些条件被提供给模型。
+
+时间能力也应分层评测：帧内结构、短期运动、跨遮挡的场景状态，以及长时间叙事或任务进展。只在前两层表现好，不能证明模型具有长期记忆。
+
+对“可控”的声明，必须区分三层：
+
+1. **Prompt steerability**：修改文字能否改变输出。
+2. **Trajectory controllability**：给定轨迹、相机路径或动作后，输出是否按指定路径演化。
+3. **Closed-loop interactivity**：模型能否持续接收动作，低延迟响应并保持世界状态。
+
 ## 1. 一张图看懂评测范式的迁移
 
 ```mermaid
@@ -485,72 +499,72 @@ safety:
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] Mathieu, M., Couprie, C., & LeCun, Y. [Deep multi-scale video prediction beyond mean square error](https://arxiv.org/abs/1511.05440). arXiv, 2015.
+<a id="ref-1"></a>[1] [Deep multi-scale video prediction beyond mean square error](https://arxiv.org/abs/1511.05440). Michael Mathieu, Camille Couprie, Yann LeCun. ICLR. 2016.
 
-<a id="ref-2"></a>[2] ITU-T. [P.910: Subjective video quality assessment methods for multimedia applications](https://www.itu.int/rec/T-REC-P.910-202310-I/en). Recommendation P.910, 2023 edition.
+<a id="ref-2"></a>[2] [P.910: Subjective video quality assessment methods for multimedia applications](https://www.itu.int/rec/T-REC-P.910-202310-I/en). ITU-T. Recommendation P.910 (10/2023). 2023.
 
-<a id="ref-3"></a>[3] Wang, Z., Bovik, A. C., Sheikh, H. R., & Simoncelli, E. P. [Image quality assessment: From error visibility to structural similarity](https://doi.org/10.1109/TIP.2003.819861). IEEE Transactions on Image Processing, 2004.
+<a id="ref-3"></a>[3] [Image quality assessment: from error visibility to structural similarity](https://doi.org/10.1109/TIP.2003.819861). Zhou Wang, Alan C. Bovik, Hamid R. Sheikh, Eero P. Simoncelli. IEEE Transactions on Image Processing. 2004.
 
-<a id="ref-4"></a>[4] Netflix. [VMAF: Video Multi-Method Assessment Fusion](https://github.com/Netflix/vmaf). Official implementation and documentation.
+<a id="ref-4"></a>[4] [VMAF: Video Multi-Method Assessment Fusion](https://github.com/Netflix/vmaf). Netflix. Official implementation and documentation.
 
-<a id="ref-5"></a>[5] Denton, E., & Fergus, R. [Stochastic Video Generation with a Learned Prior](https://arxiv.org/abs/1802.07687). ICML, 2018.
+<a id="ref-5"></a>[5] [Stochastic Video Generation with a Learned Prior](https://arxiv.org/abs/1802.07687). Remi Denton, Rob Fergus. ICML. 2018.
 
-<a id="ref-6"></a>[6] Vondrick, C., Pirsiavash, H., & Torralba, A. [Generating Videos with Scene Dynamics](https://arxiv.org/abs/1609.02612). NeurIPS, 2016.
+<a id="ref-6"></a>[6] [Generating Videos with Scene Dynamics](https://arxiv.org/abs/1609.02612). Carl Vondrick, Hamed Pirsiavash, Antonio Torralba. NeurIPS. 2016.
 
-<a id="ref-7"></a>[7] Tulyakov, S., Liu, M.-Y., Yang, X., & Kautz, J. [MoCoGAN: Decomposing Motion and Content for Video Generation](https://arxiv.org/abs/1707.04993). CVPR, 2018.
+<a id="ref-7"></a>[7] [MoCoGAN: Decomposing Motion and Content for Video Generation](https://arxiv.org/abs/1707.04993). Sergey Tulyakov, Ming-Yu Liu, Xiaodong Yang, Jan Kautz. CVPR. 2018.
 
-<a id="ref-8"></a>[8] Salimans, T., et al. [Improved Techniques for Training GANs](https://arxiv.org/abs/1606.03498). NeurIPS, 2016.
+<a id="ref-8"></a>[8] [Improved Techniques for Training GANs](https://arxiv.org/abs/1606.03498). Tim Salimans, Ian Goodfellow, Wojciech Zaremba, Vicki Cheung, Alec Radford, Xi Chen. NeurIPS. 2016.
 
-<a id="ref-9"></a>[9] Heusel, M., et al. [GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium](https://arxiv.org/abs/1706.08500). NeurIPS, 2017.
+<a id="ref-9"></a>[9] [GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium](https://arxiv.org/abs/1706.08500). Martin Heusel, Hubert Ramsauer, Thomas Unterthiner, Bernhard Nessler, Sepp Hochreiter. NeurIPS. 2017.
 
-<a id="ref-10"></a>[10] Unterthiner, T., et al. [Towards Accurate Generative Models of Video: A New Metric & Challenges](https://arxiv.org/abs/1812.01717). arXiv, 2018/2019.
+<a id="ref-10"></a>[10] [Towards Accurate Generative Models of Video: A New Metric & Challenges](https://arxiv.org/abs/1812.01717). Thomas Unterthiner, Sjoerd van Steenkiste, Karol Kurach, Raphael Marinier, Marcin Michalski, Sylvain Gelly. arXiv preprint. 2018.
 
-<a id="ref-11"></a>[11] Luo, G. Y., et al. [Beyond FVD: Enhanced Evaluation Metrics for Video Generation Quality](https://arxiv.org/abs/2410.05203). arXiv, 2024.
+<a id="ref-11"></a>[11] [Beyond FVD: An Enhanced Evaluation Metrics for Video Generation Distribution Quality](https://arxiv.org/abs/2410.05203). Ge Ya Luo, Gian Mario Favero, Zhi Hao Luo, Alexia Jolicoeur-Martineau, Christopher Pal. ICLR. 2025.
 
-<a id="ref-12"></a>[12] Ge, S., Mahapatra, A., Parmar, G., Zhu, J.-Y., & Huang, J.-B. [On the Content Bias in Fréchet Video Distance](https://arxiv.org/abs/2404.12391). arXiv, 2024.
+<a id="ref-12"></a>[12] [On the Content Bias in Fréchet Video Distance](https://arxiv.org/abs/2404.12391). Songwei Ge, Aniruddha Mahapatra, Gaurav Parmar, Jun-Yan Zhu, Jia-Bin Huang. CVPR. 2024.
 
-<a id="ref-13"></a>[13] Zhang, R., Isola, P., Efros, A. A., Shechtman, E., & Wang, O. [The Unreasonable Effectiveness of Deep Features as a Perceptual Metric](https://openaccess.thecvf.com/content_cvpr_2018/html/Zhang_The_Unreasonable_Effectiveness_CVPR_2018_paper.html). CVPR, 2018.
+<a id="ref-13"></a>[13] [The Unreasonable Effectiveness of Deep Features as a Perceptual Metric](https://openaccess.thecvf.com/content_cvpr_2018/html/Zhang_The_Unreasonable_Effectiveness_CVPR_2018_paper.html). Richard Zhang, Phillip Isola, Alexei A. Efros, Eli Shechtman, Oliver Wang. CVPR. 2018.
 
-<a id="ref-14"></a>[14] Liu, Y., et al. [FETV: A Benchmark for Fine-Grained Evaluation of Open-Domain Text-to-Video Generation](https://proceedings.neurips.cc/paper_files/paper/2023/hash/c481049f7410f38e788f67c171c64ad5-Abstract-Datasets_and_Benchmarks.html). NeurIPS Datasets and Benchmarks, 2023.
+<a id="ref-14"></a>[14] [FETV: A Benchmark for Fine-Grained Evaluation of Open-Domain Text-to-Video Generation](https://proceedings.neurips.cc/paper_files/paper/2023/hash/c481049f7410f38e788f67c171c64ad5-Abstract-Datasets_and_Benchmarks.html). Yuanxin Liu, Lei Li, Shuhuai Ren, Rundong Gao, Shicheng Li, Sishuo Chen, et al. NeurIPS Datasets and Benchmarks. 2023.
 
-<a id="ref-15"></a>[15] Huang, Z., et al. [VBench: Comprehensive Benchmark Suite for Video Generative Models](https://openaccess.thecvf.com/content/CVPR2024/html/Huang_VBench_Comprehensive_Benchmark_Suite_for_Video_Generative_Models_CVPR_2024_paper.html). CVPR, 2024.
+<a id="ref-15"></a>[15] [VBench: Comprehensive Benchmark Suite for Video Generative Models](https://openaccess.thecvf.com/content/CVPR2024/html/Huang_VBench_Comprehensive_Benchmark_Suite_for_Video_Generative_Models_CVPR_2024_paper.html). Ziqi Huang, Yinan He, Jiashuo Yu, Fan Zhang, Chenyang Si, Yuming Jiang, et al. CVPR. 2024.
 
-<a id="ref-16"></a>[16] Liu, Y., et al. [EvalCrafter: Benchmarking and Evaluating Large Video Generation Models](https://openaccess.thecvf.com/content/CVPR2024/html/Liu_EvalCrafter_Benchmarking_and_Evaluating_Large_Video_Generation_Models_CVPR_2024_paper.html). CVPR, 2024.
+<a id="ref-16"></a>[16] [EvalCrafter: Benchmarking and Evaluating Large Video Generation Models](https://openaccess.thecvf.com/content/CVPR2024/html/Liu_EvalCrafter_Benchmarking_and_Evaluating_Large_Video_Generation_Models_CVPR_2024_paper.html). Yaofang Liu, Xiaodong Cun, Xuebo Liu, Xintao Wang, Yong Zhang, Haoxin Chen, et al. CVPR. 2024.
 
-<a id="ref-17"></a>[17] Wu, H., et al. [Exploring Video Quality Assessment on User Generated Contents from Aesthetic and Technical Perspectives](https://arxiv.org/abs/2211.04894). ICCV, 2023.
+<a id="ref-17"></a>[17] [Exploring Video Quality Assessment on User Generated Contents from Aesthetic and Technical Perspectives](https://arxiv.org/abs/2211.04894). Haoning Wu, Erli Zhang, Liang Liao, Chaofeng Chen, Jingwen Hou, Annan Wang, et al. ICCV. 2023.
 
-<a id="ref-18"></a>[18] Hessel, J., Holtzman, A., Forbes, M., Le Bras, R., & Choi, Y. [CLIPScore: A Reference-free Evaluation Metric for Image Captioning](https://aclanthology.org/2021.emnlp-main.595/). EMNLP, 2021.
+<a id="ref-18"></a>[18] [CLIPScore: A Reference-free Evaluation Metric for Image Captioning](https://aclanthology.org/2021.emnlp-main.595/). Jack Hessel, Ari Holtzman, Maxwell Forbes, Ronan Le Bras, Yejin Choi. EMNLP. 2021.
 
-<a id="ref-19"></a>[19] Lin, Z., et al. [GenAI-Bench: Evaluating and Improving Compositional Text-to-Visual Generation](https://arxiv.org/abs/2406.13743). arXiv/NeurIPS, 2024.
+<a id="ref-19"></a>[19] [GenAI-Bench: Evaluating and Improving Compositional Text-to-Visual Generation](https://arxiv.org/abs/2406.13743). Baiqi Li, Zhiqiu Lin, Deepak Pathak, Jiayao Li, Yixin Fei, Kewen Wu, et al. CVPR SynData4CV Workshop. 2024.
 
-<a id="ref-20"></a>[20] He, X., et al. [VideoScore: Building Automatic Metrics to Simulate Fine-grained Human Feedback for Video Generation](https://arxiv.org/abs/2406.15252). arXiv, 2024.
+<a id="ref-20"></a>[20] [VideoScore: Building Automatic Metrics to Simulate Fine-grained Human Feedback for Video Generation](https://arxiv.org/abs/2406.15252). Xuan He, Dongfu Jiang, Ge Zhang, Max Ku, Achint Soni, Sherman Siu, et al. EMNLP. 2024.
 
-<a id="ref-21"></a>[21] Feng, W., et al. [TC-Bench: Benchmarking Temporal Compositionality in Text-to-Video and Image-to-Video Generation](https://arxiv.org/abs/2406.08656). arXiv/ACL, 2024/2025.
+<a id="ref-21"></a>[21] [TC-Bench: Benchmarking Temporal Compositionality in Conditional Video Generation](https://arxiv.org/abs/2406.08656). Weixi Feng, Jiachen Li, Michael Saxon, Tsu-Jui Fu, Wenhu Chen, William Yang Wang. Findings of ACL. 2025.
 
-<a id="ref-22"></a>[22] Sun, K., et al. [T2V-CompBench: A Comprehensive Benchmark for Compositional Text-to-video Generation](https://openaccess.thecvf.com/content/CVPR2025/html/Sun_T2V-CompBench_A_Comprehensive_Benchmark_for_Compositional_Text-to-video_Generation_CVPR_2025_paper.html). CVPR, 2025.
+<a id="ref-22"></a>[22] [T2V-CompBench: A Comprehensive Benchmark for Compositional Text-to-video Generation](https://openaccess.thecvf.com/content/CVPR2025/html/Sun_T2V-CompBench_A_Comprehensive_Benchmark_for_Compositional_Text-to-video_Generation_CVPR_2025_paper.html). Kaiyue Sun, Kaiyi Huang, Xian Liu, Yue Wu, Zihan Xu, Zhenguo Li, et al. CVPR. 2025.
 
-<a id="ref-23"></a>[23] Bansal, H., et al. [VideoPhy: Evaluating Physical Commonsense for Video Generation](https://arxiv.org/abs/2406.03520). arXiv, 2024.
+<a id="ref-23"></a>[23] [VideoPhy: Evaluating Physical Commonsense for Video Generation](https://arxiv.org/abs/2406.03520). Hritik Bansal, Zongyu Lin, Tianyi Xie, Zeshun Zong, Michal Yarom, Yonatan Bitton, et al. ICLR. 2025.
 
-<a id="ref-24"></a>[24] Meng, F., et al. [Towards World Simulator: Crafting Physical Commonsense-Based Benchmark for Video Generation](https://arxiv.org/abs/2410.05363). arXiv/ICLR, 2024/2025.
+<a id="ref-24"></a>[24] [Towards World Simulator: Crafting Physical Commonsense-Based Benchmark for Video Generation](https://arxiv.org/abs/2410.05363). Fanqing Meng, Jiaqi Liao, Xinyu Tan, Quanfeng Lu, Wenqi Shao, Kaipeng Zhang, et al. ICML. 2025.
 
-<a id="ref-25"></a>[25] Bansal, H., et al. [VideoPhy-2: A Challenging Action-Centric Physical Commonsense Evaluation in Video Generation](https://arxiv.org/abs/2503.06800). arXiv, 2025.
+<a id="ref-25"></a>[25] [VideoPhy-2: A Challenging Action-Centric Physical Commonsense Evaluation in Video Generation](https://arxiv.org/abs/2503.06800). Hritik Bansal, Clark Peng, Yonatan Bitton, Roman Goldenberg, Aditya Grover, Kai-Wei Chang. ICLR. 2026.
 
-<a id="ref-26"></a>[26] Miao, Y., et al. [T2VSafetyBench: Evaluating the Safety of Text-to-Video Generative Models](https://proceedings.neurips.cc/paper_files/paper/2024/hash/74eed5f568354c2e77dd9b018f38a9d4-Abstract-Datasets_and_Benchmarks_Track.html). NeurIPS Datasets and Benchmarks, 2024.
+<a id="ref-26"></a>[26] [T2VSafetyBench: Evaluating the Safety of Text-to-Video Generative Models](https://proceedings.neurips.cc/paper_files/paper/2024/hash/74eed5f568354c2e77dd9b018f38a9d4-Abstract-Datasets_and_Benchmarks_Track.html). Yibo Miao, Yifan Zhu, Lijia Yu, Jun Zhu, Xiao-Shan Gao, Yinpeng Dong. NeurIPS Datasets and Benchmarks. 2024.
 
-<a id="ref-27"></a>[27] Coalition for Content Provenance and Authenticity. [C2PA Technical Specification](https://spec.c2pa.org/specifications/specifications/2.2/index.html). Version 2.2.
+<a id="ref-27"></a>[27] [C2PA Technical Specification, Version 2.2](https://spec.c2pa.org/specifications/specifications/2.2/index.html). Coalition for Content Provenance and Authenticity. Technical specification.
 
-<a id="ref-28"></a>[28] OpenAI. [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). Technical report, 2024.
+<a id="ref-28"></a>[28] [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). OpenAI. Technical report. 2024.
 
-<a id="ref-29"></a>[29] Hafner, D., et al. [Learning Latent Dynamics for Planning from Pixels](https://proceedings.mlr.press/v97/hafner19a.html). ICML, 2019.
+<a id="ref-29"></a>[29] [Learning Latent Dynamics for Planning from Pixels](https://proceedings.mlr.press/v97/hafner19a.html). Danijar Hafner, Timothy Lillicrap, Ian Fischer, Ruben Villegas, David Ha, Honglak Lee, et al. ICML. 2019.
 
-<a id="ref-30"></a>[30] Schrittwieser, J., et al. [Mastering Atari, Go, chess and shogi by planning with a learned model](https://www.nature.com/articles/s41586-020-03051-4). Nature, 2020.
+<a id="ref-30"></a>[30] [Mastering Atari, Go, chess and shogi by planning with a learned model](https://www.nature.com/articles/s41586-020-03051-4). Julian Schrittwieser, Ioannis Antonoglou, Thomas Hubert, Karen Simonyan, Laurent Sifre, Simon Schmitt, et al. Nature. 2020.
 
-<a id="ref-31"></a>[31] Hafner, D., Pasukonis, J., Ba, J., & Lillicrap, T. [Mastering diverse control tasks through world models](https://www.nature.com/articles/s41586-025-08744-2). Nature, 2025; preprint 2023.
+<a id="ref-31"></a>[31] [Mastering diverse control tasks through world models](https://www.nature.com/articles/s41586-025-08744-2). Danijar Hafner, Jurgis Pasukonis, Jimmy Ba, Timothy Lillicrap. Nature. 2025.
 
-<a id="ref-32"></a>[32] Li, D., et al. [WorldModelBench: Judging Video Generation Models As World Models](https://arxiv.org/abs/2502.20694). arXiv, 2025.
+<a id="ref-32"></a>[32] [WorldModelBench: Judging Video Generation Models As World Models](https://arxiv.org/abs/2502.20694). Dacheng Li, Yunhao Fang, Yukang Chen, Shuo Yang, Shiyi Cao, Justin Wong, et al. NeurIPS Datasets and Benchmarks. 2025.
 
-<a id="ref-33"></a>[33] Bruce, J., et al. [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). arXiv, 2024.
+<a id="ref-33"></a>[33] [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. ICML. 2024.
 
-<a id="ref-34"></a>[34] Assran, M., et al. [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). arXiv, 2025.
+<a id="ref-34"></a>[34] [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). Mahmoud Assran, Adrien Bardes, David Fan, Quentin Garrido, Russell Howes, Mojtaba Komeili, et al. arXiv preprint. 2025.
 
-<a id="ref-35"></a>[35] Yu, Y., Zhang, S., Sheng, Y., Ren, H., & Lin, H. [How Should World Models Be Evaluated? A Decision-Making-Centric Position](https://arxiv.org/abs/2606.15032). arXiv, 2026.
+<a id="ref-35"></a>[35] [How Should World Models Be Evaluated for Embodied Decision-Making? A Decision-Making-Centric Position](https://arxiv.org/abs/2606.15032). Yang Yu, Shiyuan Zhang, Yifei Sheng, Haoxiang Ren, Haoxin Lin. arXiv preprint. 2026.

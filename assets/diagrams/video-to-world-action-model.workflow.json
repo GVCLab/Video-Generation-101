@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "技术演化：从视频生成到 World Action Model",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "output": "assets/diagrams/video-to-world-action-model.html",
+    "legend": { "mode": "hidden" },
+    "viewBox": [960, 520]
+  },
+  "lanes": [
+    { "id": "video", "label": "视频生成｜生成视觉内容" },
+    { "id": "world", "label": "World Model｜预测世界状态" },
+    { "id": "action", "label": "World Action Model｜决策并改变世界" }
+  ],
+  "phases": [
+    { "id": "generation", "label": "从像素生成到时空建模", "fromCol": 0, "toCol": 1 },
+    { "id": "simulation", "label": "从视觉预测到可交互模拟", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "agency", "label": "从条件响应到自主行动", "fromCol": 4, "toCol": 5, "variant": "security" }
+  ],
+  "groups": [
+    { "id": "visual_generation", "label": "学习视频分布 p(x|c)", "lane": "video", "fromCol": 0, "toCol": 1 },
+    { "id": "state_dynamics", "label": "学习状态转移 p(sₜ₊₁|sₜ,aₜ)", "lane": "world", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "closed_loop", "label": "感知—预测—行动—反馈闭环", "lane": "action", "fromCol": 4, "toCol": 5, "variant": "security" }
+  ],
+  "mainPath": [
+    "video_models",
+    "foundation_video",
+    "latent_world",
+    "interactive_world",
+    "action_policy",
+    "world_action_model"
+  ],
+  "nodes": [
+    {
+      "id": "video_models",
+      "lane": "video",
+      "col": 0,
+      "type": "frontend",
+      "label": "视频生成模型",
+      "sublabel": "VAE / GAN / Diffusion",
+      "tag": "生成像真的视频"
+    },
+    {
+      "id": "foundation_video",
+      "lane": "video",
+      "col": 1,
+      "type": "cloud",
+      "label": "视频基础模型",
+      "sublabel": "Token + Transformer",
+      "tag": "规模化与多模态条件"
+    },
+    {
+      "id": "latent_world",
+      "lane": "world",
+      "col": 2,
+      "type": "database",
+      "label": "隐状态与动力学",
+      "sublabel": "state + dynamics",
+      "tag": "预测接下来会发生什么"
+    },
+    {
+      "id": "interactive_world",
+      "lane": "world",
+      "col": 3,
+      "type": "backend",
+      "label": "World Model",
+      "sublabel": "action-conditioned",
+      "tag": "模拟动作的后果"
+    },
+    {
+      "id": "action_policy",
+      "lane": "action",
+      "col": 4,
+      "type": "security",
+      "label": "目标与行动策略",
+      "sublabel": "goal + policy",
+      "tag": "选择下一步做什么"
+    },
+    {
+      "id": "world_action_model",
+      "lane": "action",
+      "col": 5,
+      "type": "external",
+      "label": "WAM",
+      "sublabel": "World Action Model",
+      "tag": "在闭环中改变世界"
+    },
+    {
+      "id": "physics",
+      "lane": "world",
+      "col": 0,
+      "type": "backend",
+      "label": "物理与因果先验",
+      "sublabel": "约束、对象、可验证状态"
+    }
+  ],
+  "edges": [
+    { "id": "e1", "from": "video_models", "to": "foundation_video", "variant": "default", "role": "main" },
+    { "id": "e2", "from": "foundation_video", "to": "latent_world", "label": "从生成画面到建模状态", "variant": "emphasis", "role": "main" },
+    { "id": "e3", "from": "latent_world", "to": "interactive_world", "variant": "emphasis", "role": "main" },
+    { "id": "e4", "from": "interactive_world", "to": "action_policy", "label": "用模拟结果支持规划", "variant": "security", "role": "main" },
+    { "id": "e5", "from": "action_policy", "to": "world_action_model", "variant": "security", "role": "main" },
+    { "id": "physics_world", "from": "physics", "to": "latent_world", "label": "结构化世界状态", "variant": "dashed", "role": "branch", "route": "straight", "labelAt": [205, 300] },
+    { "id": "closed_loop_feedback", "from": "world_action_model", "to": "latent_world", "label": "环境反馈：新观测 · 奖励 · 误差", "variant": "dashed", "role": "return", "route": "bottom-channel", "labelAt": [455, 445] }
+  ]
+}

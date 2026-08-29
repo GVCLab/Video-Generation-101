@@ -44,16 +44,16 @@ Frame interpolation 输入前后关键帧，生成中间帧。它常用于升帧
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] [An Iterative Image Registration Technique with an Application to Stereo Vision](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Bruce D. Lucas and Takeo Kanade. Proceedings of IJCAI. 1981.
+<a id="ref-1"></a>[1] [An Iterative Image Registration Technique with an Application to Stereo Vision](https://publications.ri.cmu.edu/storage/publications/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Bruce D. Lucas, Takeo Kanade. IJCAI. 1981.
 
-<a id="ref-2"></a>[2] [Determining optical flow](https://doi.org/10.1016/0004-3702(81)90024-2). Berthold K. P. Horn and Brian G. Schunck. Artificial Intelligence. 1981.
+<a id="ref-2"></a>[2] [Determining optical flow](https://doi.org/10.1016/0004-3702%2881%2990024-2). Berthold K. P. Horn, Brian G. Schunck. Artificial Intelligence. 1981.
 
-<a id="ref-3"></a>[3] [Video Diffusion Models](https://arxiv.org/abs/2204.03458). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. arXiv preprint. 2022.
+<a id="ref-3"></a>[3] [Video Diffusion Models](https://arxiv.org/abs/2204.03458). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. NeurIPS. 2022.
 
 <a id="ref-4"></a>[4] [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. arXiv preprint. 2023.
 
 <a id="ref-5"></a>[5] [AceVFI: A Comprehensive Survey of Advances in Video Frame Interpolation](https://arxiv.org/abs/2506.01061). Dahyeon Kye, Changhyun Roh, Sukhun Ko, Chanho Eom, Jihyong Oh. arXiv preprint. 2025.
 
-<a id="ref-6"></a>[6] [Adapting Image-to-Video Diffusion Models for Large-Motion Frame Interpolation](https://arxiv.org/abs/2412.17042). Luoxu Jin and Hiroshi Watanabe. arXiv preprint. 2024.
+<a id="ref-6"></a>[6] [Adapting Image-to-Video Diffusion Models for Large-Motion Frame Interpolation](https://arxiv.org/abs/2412.17042). Luoxu Jin, Hiroshi Watanabe. arXiv preprint. 2024.
 
 <a id="ref-7"></a>[7] [Towards Holistic Modeling for Video Frame Interpolation with Auto-regressive Diffusion Transformers](https://arxiv.org/abs/2601.14959). Xinyu Peng, Han Li, Yuyang Huang, Ziyang Zheng, Yaoming Wang, Xin Chen, et al. arXiv preprint. 2026.
