@@ -18,6 +18,8 @@ $$
 \text{monitoring and rollback}.
 $$
 
+本章关注系统落地；若要追踪能力来自哪里，行为偏好与奖励优化见[视频后训练与对齐](generative-models/video-post-training-alignment.md)，相机、对象轨迹、姿态与几何条件见[细粒度可控生成](tasks/controllable-video-generation.md)，声画在生成过程中的耦合与同步见[原生音视频生成](tasks/native-audio-video-generation.md)。三者都必须回到本章的任务合同和部署门槛验收。
+
 ## 1. 一张图看懂“模型能力”为什么还不是“应用”
 
 ![从能力主张到部署证据的六阶段流程。流程依次定义使用合同、输入与控制、模型工作流、人工选择与版本、验收协议，以及部署监测；验收与部署之间有通过或停止门。下方分别列出创意媒体、数字人、交互世界和物理智能需要的领域证据。](../assets/diagrams/capability-to-deployment-evidence.png)

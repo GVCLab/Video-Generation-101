@@ -15,6 +15,7 @@
 > - 每个节点的“资源”栏统一标记 Paper/Report、Project、Code、Weights 与 Demo；Code 只认作者或机构官方实现，`未公开` 表示截至核查日未找到官方公开资源，第三方复现不会冒充官方实现；`—` 表示没有独立入口或不适用，失效、归档、下线与访问受限会直接标注状态。
 > - 企业节点中的分辨率、速度、时长与性能，如无独立复现，均按“官方或作者报告”理解。
 > - 2025–2026 节点默认是 **frontier observation**：它们记录截止日可见的前沿方向，不把预印本、机构自评或宣传演示升格为已经独立验证的能力事实。
+> - 本轮新增的联合音视频、后训练和显式控制节点，其结构性纳入依据与一手来源交叉核验见[缺口审计](../sources/research_20260830_missing_subfields_integration.md)。
 > - 下列图片均由 imagegen 根据论文机制生成，属于**概念示意图，不是论文原图，也不代表模型真实输出**。
 
 ## 并行泳道索引
@@ -186,6 +187,10 @@ flowchart LR
 | Seedance 2.0 | 2026-02-12 官方产品发布；2026-04-15 arXiv model card，不是同行评议论文 | 统一多模态原生音视频的 frontier observation | 托管产品可访问，受账号/地区限制；无公开代码/权重 |
 | MiniMax H3 | 2026-07-31 官方发布；2026-08-03 开放基础模型；未找到同行评议论文 | 全模态音视频和部分开放系统的 frontier observation | 两个 H3-Base checkpoint 与代码可用，本地基础流程为 768p；Context-IR 与 2K regeneration 仍依赖托管 API |
 | Seedance 2.5 | 2026-07-31 官方产品发布；未找到论文或正式发表记录 | 长叙事、多参考与时间戳编辑的 frontier observation | 官方称已在即梦/Doubao Pro 逐步上线；发布页仍称 API 即将提供；无公开权重 |
+| Dual-IPO / BranchGRPO | ICLR 2026 正式 proceedings | 奖励模型—生成器迭代与去噪轨迹信用分配的研究里程碑 | 正式论文页可访问；本表未把论文实验等同于通用后训练 recipe 或独立复现 |
+| LAMP / FlashMotion / BulletTime | CVPR 2026 正式 proceedings | 语言到运动程序、少步轨迹控制与时间—视角解耦的 frontier observation | 各论文与补充材料入口可访问；工件范围逐项核验，三者不是一个统一控制系统 |
+| NAVA / Ripple | 2026-05-28、2026-07-29 arXiv v1；均为预印本 | 原生 AV 对齐与带跨模态记忆的流式联合生成 frontier observation | NAVA 项目样例与两篇预印本可访问；未把作者同步/速度结果写成开放权重或独立性能 |
+| 4DStreamCtrl | 2026-08-26 arXiv v1，2026-08-27 v2；预印本 | 相机、对象、深度与因果流式统一的最新 frontier observation | arXiv PDF/源码可访问；未在一手记录中确认官方代码或权重，20 FPS/长序列为作者协议结果 |
 
 ---
 

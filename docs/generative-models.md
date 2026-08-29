@@ -1,6 +1,6 @@
 # 视频生成系统：表示 × 分解 × 目标 × 骨干 × 部署
 
-> 一手来源审计截至 **2026-08-29**。本章把 representation、factorization、objective、backbone 和 deployment 分成五个交叉分类轴；2026 年尚未正式发表的系统只按作者技术报告解释，不把演示或作者自报速度当作独立复现。
+> 一手来源审计截至 **2026-08-30**。本章把 representation、factorization、objective、backbone 和 deployment 分成五个交叉分类轴；2026 年尚未正式发表的系统只按作者技术报告解释，不把演示或作者自报速度当作独立复现。
 
 视频生成模型不是只能贴一个“VAE”“自回归”“Diffusion”“Flow”或“Streaming”标签。一个真实系统通常同时回答五个不同问题：
 
@@ -18,7 +18,7 @@ $$
 
 例如，NOVA 是**连续 latent 表示**、**帧间与帧内集合式自回归分解**、**逐 token diffusion loss**和 Transformer 的组合；Pyramidal Flow 把**连续 latent**、**时间金字塔自回归**、**flow matching**与 DiT 组合；CausVid 则把双向视频 diffusion teacher 蒸馏成**时间因果**、**少步** student [[21]](#ref-21) [[20]](#ref-20) [[23]](#ref-23)。这些系统不能被放进一列互斥“模型家族”而不丢失关键信息。
 
-本章建立全局地图。DDPM、score、SDE/PF-ODE 的完整推导见[扩散模型专章](generative-models/diffusion-models.md)；FM、RF、Consistency、Shortcut 与 DMD 的差异见[Flow 与 Consistency 专章](generative-models/flow-consistency-models.md)；在线生成的暴露偏移、缓存和 SLO 见[因果、流式与实时专章](generative-models/causal-streaming-generation.md)。
+本章建立全局地图。DDPM、score、SDE/PF-ODE 的完整推导见[扩散模型专章](generative-models/diffusion-models.md)；FM、RF、Consistency、Shortcut 与 DMD 的差异见[Flow 与 Consistency 专章](generative-models/flow-consistency-models.md)；SFT、reward model、DPO/RWR、policy-gradient RL、推理期 guidance 与蒸馏的边界见[视频后训练与对齐专章](generative-models/video-post-training-alignment.md)；在线生成的暴露偏移、缓存和 SLO 见[因果、流式与实时专章](generative-models/causal-streaming-generation.md)。
 
 ## 1. 一张图看懂五个交叉分类轴
 
@@ -229,6 +229,8 @@ DMD 的核心是 distribution matching：用 target score 与 fake/student score
 ### 5.6 Preference、reward 与 RL
 
 偏好优化可以作用于已有 diffusion/flow generator，用人评、VLM、程序约束或 task reward 改变输出分布。它属于后训练 objective；不能从“用了 RL/DPO”推出 foundation objective 已改变，也不能用训练 reward 直接兼任最终裁判。
+
+这一行标签仍不够描述完整系统：SFT 改变条件遵循的初始化，reward model 把人评或程序信号压缩为训练信号，DPO/RWR 使用离线或在线偏好，policy-gradient 方法还要处理采样轨迹和信用分配，推理期 reward guidance 则不更新基础模型。Consistency/DMD 主要改变采样映射或学生分布，也不能因为和 reward 同训就自动归为“对齐”。完整的目标、数据、反馈时点、reference policy、训练成本、reward hacking 与独立验收合同见[视频后训练与对齐专章](generative-models/video-post-training-alignment.md)。
 
 ## 6. 第四轴：Backbone——谁来实现条件映射
 

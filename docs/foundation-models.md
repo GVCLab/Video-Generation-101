@@ -4,7 +4,7 @@
 
 视频基础模型不是“一个更大的 T2V 网络”，而是一条可复用、可后训练、可部署且可审计的链：数据治理产生训练语料，captioner 把视觉事实和创作语言对齐，tokenizer 决定学习空间，generator 学习条件分布，后训练与蒸馏改变行为和成本，超分、插帧、音频、安全及 API 再把 checkpoint 变成服务。Foundation model 的判据是广泛预训练后可跨任务适配，而非固定参数门槛 [[1]](#ref-1)。
 
-本章回答“一个视频基础模型系统怎样成立、证据应归因给哪一层”。表示、factorization、objective、backbone 与 deployment 的正交机制见[生成模型路线](generative-models.md)，逐年节点见[技术时间线](timeline.md)，动作条件、状态与规划证据见[World Model 专章](world-models.md)。
+本章回答“一个视频基础模型系统怎样成立、证据应归因给哪一层”。表示、factorization、objective、backbone 与 deployment 的正交机制见[生成模型路线](generative-models.md)，SFT/reward/DPO/RL 的细分见[视频后训练与对齐](generative-models/video-post-training-alignment.md)，相机/轨迹/姿态/几何条件见[细粒度可控生成](tasks/controllable-video-generation.md)，联合声画合同见[原生音视频生成](tasks/native-audio-video-generation.md)，逐年节点见[技术时间线](timeline.md)，动作条件、状态与规划证据见[World Model 专章](world-models.md)。
 
 ## 1. 先固定研究对象与证据单位
 
@@ -118,6 +118,8 @@ tokenizer 的验收必须同时覆盖：静态纹理、快速运动、镜头切�
 
 验收不能只报总偏好胜率。至少分解为文本事实、动作幅度、时序顺序、镜头遵循、主体一致、物理约束、安全和多样性；还要做 reward hacking、模式收缩、拒答率和不同人群偏差测试。2026 年的系统化视频后训练仍主要是预印本证据 [[13]](#ref-13)，应保留独立复现空白。
 
+后训练的反馈来源、优化时点、reference policy、去噪轨迹信用分配、离线/在线边界和独立验收矩阵见[视频后训练与对齐专章](generative-models/video-post-training-alignment.md)。
+
 ### 5.2 蒸馏与部署优化
 
 “蒸馏版”可能改变步数、CFG、模型大小、因果方向或输出分布，不能与 base checkpoint 混报。CausVid 把双向 teacher 蒸馏成少步因果 student，展示了质量、时间 factorization 和部署优化的耦合 [[14]](#ref-14)；LTX、HunyuanVideo-1.5、Wan 与 MAGI 又各自发布了不同粒度的蒸馏或任务资产。
@@ -144,6 +146,8 @@ tokenizer 的验收必须同时覆盖：静态纹理、快速运动、镜头切�
 | 单流/联合 latent 系统 | 一个主干预测视频与立体声音频 latent | LTX-2、MiniMax H3 [[19]](#ref-19) [[20]](#ref-20) | 模态帧率、静音/缺失条件、口型和事件级同步 |
 
 “接受音频参考”“输出有声音”和“原生联合生成”是三个不同声明。评测应同时做语义对应、毫秒级事件同步、说话人/场景身份、长时连续、音频伪影以及仅改变一模态条件的干预测试。
+
+这三类 factorization、跨模态信息交换位置、音视频 codec/噪声时钟、streaming memory、产品发布面与可证伪干预见[原生音视频生成专章](tasks/native-audio-video-generation.md)。
 
 ## 6. 从 checkpoint 到 API：能力归因与治理
 
@@ -261,7 +265,7 @@ M0–M7 不是按年份自动升级：一个闭源产品可能先达到系统部
 1. 先读第 1、2 节，建立“checkpoint ≠ family ≠ product ≠ API”的证据单位。
 2. 再读第 3–6 节，沿数据→caption→tokenizer→generator→post-train→部署→治理追踪因果链。
 3. 用第 7 节定位官方 artifact，再到[开放模型索引](../resources/open-models.md)核对权重与许可证。
-4. 用第 9、10 节设计验收；生成机制细节转到[生成模型路线](generative-models.md)，动作与规划声明转到[World Model 专章](world-models.md)。
+4. 用第 9、10 节设计验收；生成机制细节转到[生成模型路线](generative-models.md)，行为优化转到[视频后训练与对齐](generative-models/video-post-training-alignment.md)，创作控制转到[细粒度可控生成](tasks/controllable-video-generation.md)，动作与规划声明转到[World Model 专章](world-models.md)。
 
 本章的检索、筛选、证据分级和 release-surface 逐项记录见[研究日志](../sources/research_20260830_video_foundation_models.md)。
 

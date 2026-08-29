@@ -229,8 +229,8 @@
 
 ### 路线 B：我是内容创作者或产品使用者
 
-1. [任务地图](taxonomy.md)：先确定自己需要文生视频、图生视频、视频编辑还是数字人。
-2. 对应任务专章：例如 [文生视频](tasks/text-to-video.md)、[图生视频](tasks/image-to-video.md)、[视频到视频](tasks/video-to-video.md) 或 [数字人](tasks/digital-human.md)。
+1. [任务地图](taxonomy.md)：先确定自己需要文生视频、图生视频、视频编辑、数字人、原生音视频还是显式相机/轨迹控制。
+2. 对应任务专章：例如 [文生视频](tasks/text-to-video.md)、[图生视频](tasks/image-to-video.md)、[视频到视频](tasks/video-to-video.md)、[数字人](tasks/digital-human.md)、[原生音视频](tasks/native-audio-video-generation.md)或[细粒度可控生成](tasks/controllable-video-generation.md)。
 3. [相关应用](applications.md)：了解工作流怎样落到真实场景。
 4. [评测指南](evaluation.md)：建立自己的测试提示、失败标签和多次生成协议。
 
@@ -240,9 +240,10 @@
 
 1. [生成模型路线](generative-models.md)：理解 VAE、GAN、Diffusion 和 Flow 的关系。
 2. [大模型路线](foundation-models.md)：理解视频压缩、token、Transformer 和基础模型。
-3. [开放模型与代码](../resources/open-models.md)：选择可以实际运行的模型。
-4. [数据集索引](../resources/datasets.md)：了解训练与评测数据。
-5. [评测指南](evaluation.md)：设计可重复的比较实验。
+3. [视频后训练与对齐](generative-models/video-post-training-alignment.md)：区分 SFT、reward、DPO/RL、推理 guidance 与少步蒸馏。
+4. [开放模型与代码](../resources/open-models.md)：选择可以实际运行的模型。
+5. [数据集索引](../resources/datasets.md)：了解训练与评测数据。
+6. [评测指南](evaluation.md)：设计可重复的比较实验。
 
 建议先理解每种方法解决了什么问题，再进入公式和代码。
 
@@ -251,7 +252,7 @@
 1. [技术时间线](timeline.md)：理解这个领域为什么从运动预测走向 Diffusion 和 world model。
 2. [精选阅读列表](reading-list.md)：从最小阅读集开始，不要一开始追求读完所有论文。
 3. 选择一个具体轴：长时一致性、控制、物理、效率、评测或交互。
-4. 阅读对应专题，例如 [视频预测](tasks/video-prediction.md)、[物理一致性](physical-consistency.md) 或 [World Model](world-models.md)。
+4. 阅读对应专题，例如 [视频预测](tasks/video-prediction.md)、[视频后训练与对齐](generative-models/video-post-training-alignment.md)、[细粒度可控生成](tasks/controllable-video-generation.md)、[原生音视频](tasks/native-audio-video-generation.md)、[物理一致性](physical-consistency.md)或 [World Model](world-models.md)。
 5. 用 [引用与代码索引](bibliography.md) 找论文、官方代码和可复现 baseline。
 
 研究时不要只收集“最新模型”。更重要的是明确任务、比较对象、失败条件和验证证据。

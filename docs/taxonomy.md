@@ -91,7 +91,9 @@ Genie 把视频 tokenizer、autoregressive dynamics 与 latent action model 组�
 |---|---|---|---|---|---|---|
 | 无条件视频生成 | 无 / 类别 | 从零创作 | open-loop | 分布中的新视频样本 | 训练样本记忆、模式坍塌、类别泄漏 | [无条件生成](tasks/unconditional-video-generation.md) |
 | 文本到视频 | 文字 | 从零创作 | open-loop，可扩展多镜头 | 满足主体、关系、动作、镜头的片段 | 只出现关键词但关系/时间顺序错误 | [文生视频](tasks/text-to-video.md) |
+| 原生音视频生成 | 文字，可附图像 / 音频 / 音色参考 | 从零创作或参考约束 | open-loop 到流式 | 在同一生成过程中相互耦合、同步的画面与声音 | 实际只是视频后配音；事件、说话人与声源错绑 | [原生音视频](tasks/native-audio-video-generation.md) |
 | 图像到视频 | 首帧或参考图，常附文字 | 参考约束 | open-loop | 保持外观/构图并生成合理运动 | 参考身份或布局漂移、首帧不连续 | [图生视频](tasks/image-to-video.md) |
+| 细粒度可控生成 | 文字 / 图像 + 相机、轨迹、姿态或几何序列 | 从零创作、参考约束或变换 | open-loop，可扩展在线控制 | 按明确坐标与时间轴执行指定视角或运动的视频 | 控制被忽略、坐标误读、主体/背景串扰、遮挡与出画后失控 | [细粒度可控生成](tasks/controllable-video-generation.md) |
 | 视频到视频编辑 | 源视频 + 指令 / 参考 / 轨迹 | 变换 / 编辑 | open-loop 或跨段记忆 | 指定变化后的完整视频 | 未编辑区域变化、时间传播不一致 | [视频编辑](tasks/video-to-video.md) |
 | 视频修复 | 视频 + 时空 mask | 修复 / 补全 | open-loop 或长视频分段 | 缺失区域及其时间延续 | mask 外像素被改、边界 seam、重现被删对象 | [视频修复](tasks/video-inpainting.md) |
 | 帧插值 | 两侧或多侧已知帧 + 时间位置 | 修复 / 补全 | 固定区间 | 已知时刻之间的中间帧 | 端点不守恒、遮挡层次反转、时间位置错误 | [帧插值](tasks/frame-interpolation.md) |
@@ -103,7 +105,7 @@ Genie 把视频 tokenizer、autoregressive dynamics 与 latent action model 组�
 
 Video Diffusion Models 曾在同一研究框架里覆盖无条件生成、文本条件和视频预测；Stable Video Diffusion 又展示基础视频表示对 I2V 与相机控制适配的价值 [[1]](#ref-1) [[2]](#ref-2)。这类共享说明**模型可迁移**，不能把任务的输入输出与验收合同合并。
 
-## 4. 六组最容易混淆的边界
+## 4. 八组最容易混淆的边界
 
 ### 4.1 I2V 与帧插值
 
@@ -136,6 +138,18 @@ Video Diffusion Models 曾在同一研究框架里覆盖无条件生成、文本
 - 延长单镜头主要测试持续运动、对象存在和漂移。
 - 多镜头允许切镜，却必须保持人物、道具、地点、事件顺序与镜头意图。
 - 把若干独立短片拼接起来不构成多镜头叙事系统，除非存在跨镜头状态合同和冲突处理。
+
+### 4.7 原生联合音视频与视频后配音
+
+- Video-to-audio 学习 $p(a\mid v,y)$：画面已经确定，声音只能追随它；这仍可产生高质量同步音频，但不是联合生成视频。
+- 原生联合系统要公开支持 $p(v,a\mid y)$ 的耦合机制，例如生成期间的双向 cross-attention、共享去噪状态或跨模态递归记忆；“最终文件同时有声有画”不构成机制证据。
+- 交换音频条件、打乱时间或删除声音事件时，必须分别观察音频与视觉节奏是否响应；只报一个平均 AV score 会掩盖口型、事件 onset、说话人和声源方向的不同错误。Ovi 是双 backbone 交互的预印本例子，但其作者结果仍不等于所有产品的联合机制 [[12]](#ref-12)。
+
+### 4.8 视觉运动控制与环境动作
+
+- 相机 pose、2D/3D 轨迹、pose/depth/flow 等控制信号描述“希望画面怎样变化”，通常可在生成前一次性给完整序列。
+- 环境 action 则必须对应状态转移；若进一步声称交互，还要在模型返回新观测后重新规划。
+- 因此，准确沿轨迹移动不证明模型学会动作因果，反之，动作条件模型也未必提供可编辑的摄影机或对象路径。VideoComposer 展示多种时空条件的统一接口，但每种控制仍需独立误差与串扰测试 [[10]](#ref-10)。
 
 ## 5. 任务合同：一页纸写清“什么算成功”
 
@@ -207,11 +221,14 @@ $$
 |---|---|---|---|
 | 2015 / NeurIPS 2015 | Action-Conditional Video Prediction | 把动作作为显式控制量注入未来帧预测 [[3]](#ref-3) | Atari 域、像素误差偏置、随机未来和现实控制迁移 |
 | 2022 / 技术报告 | Video Diffusion Models | 同一 diffusion 框架覆盖无条件、文字条件、预测与扩展 [[1]](#ref-1) | 计算成本、长时状态、任务专属协议仍分离 |
+| 2023 / NeurIPS 2023 | VideoComposer | 把文字、空间条件、运动向量和条件序列放入可组合时空控制接口 [[10]](#ref-10) | 控制信号仍会冲突，精确 3D 相机/遮挡与大规模 DiT 迁移尚未解决 |
 | 2023 / 技术报告 | Stable Video Diffusion | 大规模视频预训练并展示 I2V / 相机适配 [[2]](#ref-2) | 参考保持不稳定，开放权重能力与产品能力不能混同 |
+| 2023 / SIGGRAPH 2024 | MotionCtrl | 在一个控制器中显式分离相机姿态与对象轨迹，并发布适配多个视频底座的工件 [[11]](#ref-11) | 2D/相对控制、估计噪声、遮挡与新视角几何仍限制精度 |
 | 2024 / ICML 2024 | Genie | 从无动作标签视频学习 latent actions，形成逐帧可控环境 [[4]](#ref-4) | 低分辨率域、动作语义、现实转移与部署时延 |
 | 2024 / ICLR 2024 | UniSim | 以统一 action-in/video-out 接口组合多域数据并支持交互模拟 [[7]](#ref-7) | “universal”是接口范围，不是模拟一切；声音等能力明确缺失 |
 | 2025 / ICCV 2025 | VACE | 统一 reference、editing 与 masked editing 条件接口 [[5]](#ref-5) | 统一模型不保证每个任务都达到专用模型的硬约束上限 |
 | 2025 / 技术报告 | OmniHuman-1.5 | 从低层音频节奏扩展到音频、图像与文字的语义表演条件 [[6]](#ref-6) | 长时身份、同意/冒用、复杂多人及独立复现 |
+| 2025 / 预印本 | Ovi | 在 twin backbone 中逐块双向交换音频与视频信息，使“有声视频”进入公开可检查的联合生成合同 [[12]](#ref-12) | 仍是作者预印本与工件证据；同步、音色与开放域安全需独立复核 |
 | 2025 / 技术报告 | DreamGen | 把视频世界模型生成的 neural trajectories 转成伪动作并评测下游策略 [[8]](#ref-8) | 视频正确性、逆动力学误差与真实策略收益仍会级联 |
 | 2026 / 技术报告 | Cosmos 3 | 在同一 omnimodal 家族中组合语言、图像、视频、音频和动作输入输出 [[9]](#ref-9) | 技术报告/作者榜单不等于独立闭环复现 |
 
@@ -235,7 +252,7 @@ DreamGen 的价值不在“生成了机器人视频”本身，而在把生成�
 
 1. 写出你的 $I,O,K,\Delta,H,E$；若写不清，先不要挑模型。
 2. 在第三节找到最近任务，再用第四节排除容易混淆的邻居。
-3. 进入对应专章，查看机制路线、数据、协议和最新论文。
+3. 进入对应专章，查看机制路线、数据、协议和最新论文；显式相机/轨迹/姿态条件见[细粒度可控生成](tasks/controllable-video-generation.md)，联合画面与声音见[原生音视频](tasks/native-audio-video-generation.md)。
 4. 若一个系统同时支持多个任务，为每个任务分别验收，不共享一个总分。
 5. 若目标涉及动作或现实决策，继续阅读[World Model](world-models.md)、[物理一致性](physical-consistency.md)和[相关应用](applications.md)。
 
@@ -258,3 +275,9 @@ DreamGen 的价值不在“生成了机器人视频”本身，而在把生成�
 <a id="ref-8"></a>[8] [DreamGen: Unlocking Generalization in Robot Learning through Video World Models](https://arxiv.org/abs/2505.12705). Joel Jang, Seonghyeon Ye, Zongyu Lin, Jiannan Xiang, Johan Bjorck, Yu Fang, et al. arXiv preprint. 2025.
 
 <a id="ref-9"></a>[9] [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800). NVIDIA et al. Technical report. 2026.
+
+<a id="ref-10"></a>[10] [VideoComposer: Compositional Video Synthesis with Motion Controllability](https://proceedings.neurips.cc/paper_files/paper/2023/hash/180f6184a3458fa19c28c5483bc61877-Abstract-Conference.html). Xiang Wang, Hangjie Yuan, Shiwei Zhang, Dayou Chen, Jiuniu Wang, Yingya Zhang, et al. NeurIPS. 2023.
+
+<a id="ref-11"></a>[11] [MotionCtrl: A Unified and Flexible Motion Controller for Video Generation](https://arxiv.org/abs/2312.03641). Zhouxia Wang, Ziyang Yuan, Xintao Wang, Yaowei Li, Tianshui Chen, Menghan Xia, et al. First preprint 2023; SIGGRAPH Conference Papers. 2024. [Official project and release surface](https://wzhouxiff.github.io/projects/MotionCtrl/).
+
+<a id="ref-12"></a>[12] [Ovi: Twin Backbone Cross-Modal Fusion for Audio-Video Generation](https://arxiv.org/abs/2510.01284). Ovi team. arXiv preprint. 2025. [Official code and weights](https://github.com/character-ai/Ovi).

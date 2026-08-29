@@ -2,7 +2,7 @@
 
 这不是按年份堆论文的 awesome list，而是一门可以执行、留痕和被证伪的路线式课程。目标不是“读过多少篇”，而是最终能回答四个问题：模型表示了什么、怎样沿时间生成、证据真正支持什么、下一次实验怎样推翻自己的判断。
 
-本页证据冻结于 **2026-08-30（Asia/Shanghai）**。检索式、纳入排除、正式发表状态和关键断言见[阅读路线研究日志](../sources/research_20260830_reading_routes.md)。完整书目信息与仓库索引仍见[引用与代码索引](bibliography.md)；专题细节分别见[生成模型](generative-models.md)、[因果流式生成](generative-models/causal-streaming-generation.md)、[评测](evaluation.md)、[World Model](world-models.md)与 [JEPA](jepa.md)。
+本页证据冻结于 **2026-08-30（Asia/Shanghai）**。检索式、纳入排除、正式发表状态和关键断言见[阅读路线研究日志](../sources/research_20260830_reading_routes.md)，新增三条结构性技术轴的选择依据见[缺口审计](../sources/research_20260830_missing_subfields_integration.md)。完整书目信息与仓库索引仍见[引用与代码索引](bibliography.md)；专题细节分别见[生成模型](generative-models.md)、[视频后训练与对齐](generative-models/video-post-training-alignment.md)、[因果流式生成](generative-models/causal-streaming-generation.md)、[原生音视频](tasks/native-audio-video-generation.md)、[细粒度可控生成](tasks/controllable-video-generation.md)、[评测](evaluation.md)、[World Model](world-models.md)与 [JEPA](jepa.md)。
 
 ## 0. 课程规则与证据标签
 
@@ -30,27 +30,30 @@
 | Diffusion / flow | 能画出 data → noise → data，并区分“训练目标”“数值求解步数”“网络调用次数” | [Diffusion](generative-models/diffusion-models.md)与 [Flow / consistency](generative-models/flow-consistency-models.md) |
 | 序列与系统 | 能解释 causal mask、KV cache、首帧时间、平均 FPS、p95 帧延迟为什么不是同一个量 | [因果流式生成](generative-models/causal-streaming-generation.md) |
 | 控制 | 能区分 observation、state、action、reward、open-loop rollout 与 receding-horizon control | [World Model](world-models.md) |
+| 视觉控制坐标 | 能区分 2D 像素轨迹、3D 世界轨迹、相机内外参、pose/depth/flow，并说明它们为何不是环境 action | [任务地图](taxonomy.md) |
 | 音视频时间轴 | 能把 24 FPS 视频与 48 kHz 音频放到同一秒表上，并定义事件 onset 偏差 | [文生视频的音视频边界](tasks/text-to-video.md) |
 
 最低入口产物是一页术语表：每个术语必须同时写“定义”“反例”和“怎样测”。如果只能写定义，说明还不能进入分支。
 
-## 2. 总路线图：一条主干，四条分支
+## 2. 总路线图：一条主干，五条分支
 
 ```mermaid
 flowchart TB
     accTitle: 视频生成论文课程的依赖路线
-    accDescr: 学习者先完成先修诊断，再通过表示、生成目标和评测组成的共同主干。之后可选择因果流式、少步与后训练、原生音视频、World Action 与 JEPA 四条分支。每条分支都进入共同验收，并以跨分支结课项目结束。
+    accDescr: 学习者先完成先修诊断，再通过表示、生成目标和评测组成的共同主干。之后可选择因果流式、少步与后训练、原生音视频、World Action 与 JEPA、细粒度可控生成五条分支。每条分支都进入共同验收，并以跨分支结课项目结束。
 
     P["先修诊断"] --> K["共同主干：表示 · 目标 · 评测"]
     K --> S["分支 A：因果 · 流式 · 实时"]
     K --> D["分支 B：少步 · 后训练 · 蒸馏"]
     K --> A["分支 C：原生音视频"]
     K --> W["分支 D：World Action · JEPA"]
+    K --> G["分支 E：细粒度可控生成"]
     D --> S
     S --> V["共同验收：复现 + 反证 + 边界"]
     D --> V
     A --> V
     W --> V
+    G --> V
     V --> C["跨分支结课项目"]
 
     classDef gate fill:#f2f2f2,stroke:#222,color:#111
@@ -59,11 +62,11 @@ flowchart TB
     classDef verify fill:#dff2e5,stroke:#147a4b,color:#111
     class P,C gate
     class K trunk
-    class S,D,A,W branch
+    class S,D,A,W,G branch
     class V verify
 ```
 
-文字替代：先通过六项先修诊断，再完成共同主干。主干之后选一条主修分支；少步蒸馏又是流式生成的常见前提，因此分支 B 连接分支 A。四条分支都必须经过同一套“复现、反证、证据边界”验收，最后再做跨分支项目。颜色只辅助分组，节点标签和箭头已经给出全部语义。
+文字替代：先通过先修诊断，再完成共同主干。主干之后选一条主修分支；少步蒸馏又是流式生成的常见前提，因此分支 B 连接分支 A。五条分支都必须经过同一套“复现、反证、证据边界”验收，最后再做跨分支项目。颜色只辅助分组，节点标签和箭头已经给出全部语义。
 
 ### 怎样选主修分支
 
@@ -73,6 +76,7 @@ flowchart TB
 | 怎样减少网络调用，同时避免奖励投机与多样性坍缩？ | B 少步/后训练 | A 因果/流式 |
 | 声音是否与画面共同生成，而不是事后配音？ | C 原生音视频 | B 后训练 |
 | 好看的 rollout 何时才对决策有用？ | D World Action/JEPA | A 因果/流式 |
+| 怎样精确指定相机、对象轨迹、姿态或几何，同时避免控制串扰？ | E 细粒度可控生成 | B 后训练或 A 因果/流式 |
 
 ## 3. 共同主干：表示、目标、时间与证据
 
@@ -275,22 +279,67 @@ flowchart TB
 
 **通关产物：** 一张能力阶梯表（representation → action dynamics → planner → closed-loop policy）、一组 paired-action 反事实和真实/模型环境 transfer gap。
 
-## 8. 所有分支共用的验证回路
+## 8. 分支 E：细粒度可控视频——先写坐标系，再谈遵循
+
+**入口依赖：** 能区分像素、相机、世界和人体坐标；知道 camera extrinsics/intrinsics、2D/3D trajectory、pose、depth、flow 与 mask 分别携带什么，也能解释这些视觉条件为何不自动成为环境 action。
+
+**为什么读：** “可控”不是一个总分。相机可能准确而对象漂移，对象轨迹可能准确而背景被拖动，姿态可能吻合而身份丢失；同一控制器还可能在遮挡、出画再入画或多条件冲突时失效。真正的技术路线要同时写清控制信号、坐标系、时间采样、注入位置、基础模型是否冻结，以及条件遵循与非目标保持怎样分账。
+
+### 阅读顺序
+
+| 阶段 | 论文 | 在路线中的作用 | 证据 |
+|---|---|---|---|
+| 组合条件接口 | [VideoComposer](https://proceedings.neurips.cc/paper_files/paper/2023/hash/180f6184a3458fa19c28c5483bc61877-Abstract-Conference.html) | 把文字、空间序列、运动向量与多类条件放入统一时空编码接口 | **A·正式发表** |
+| 相机/对象解耦 | [MotionCtrl](https://wzhouxiff.github.io/projects/MotionCtrl/) | 用 camera poses 与 object trajectories 分开控制两类运动，并展示多底座适配 | **A·SIGGRAPH 2024 正式论文；项目页含工件** |
+| DiT 轨迹注入 | [Tora](https://openaccess.thecvf.com/content/CVPR2025/html/Zhang_Tora_Trajectory-oriented_Diffusion_Transformer_for_Video_Generation_CVPR_2025_paper.html) | 把轨迹压成多层时空 motion patches，再注入 DiT blocks | **A·正式发表** |
+| 稀疏/稠密 motion prompt | [Motion Prompting](https://openaccess.thecvf.com/content/CVPR2025/html/Geng_Motion_Prompting_Controlling_Video_Generation_with_Motion_Trajectories_CVPR_2025_paper.html) | 用任意数量、稀疏度和对象/全局范围的轨迹统一表示运动请求 | **A·正式发表** |
+| 3D cache 与精确相机 | [GEN3C](https://openaccess.thecvf.com/content/CVPR2025/html/Ren_GEN3C_3D-Informed_World-Consistent_Video_Generation_with_Precise_Camera_Control_CVPR_2025_paper.html) | 将深度/历史形成的点云 cache 按目标相机渲染后再条件生成 | **A·正式发表** |
+| 语言到显式运动程序 | [LAMP](https://openaccess.thecvf.com/content/CVPR2026/html/Kizil_LAMP_Language-Assisted_Motion_Planning_for_Controllable_Video_Generation_CVPR_2026_paper.html) | 把摄影语言先编译为可检查 DSL 和 3D 对象/相机轨迹，再交给生成器 | **A·正式发表** |
+| 时间—视角解耦 | [BulletTime](https://openaccess.thecvf.com/content/CVPR2026/html/Wang_BulletTime_Decoupled_Control_of_Time_and_Camera_Pose_for_Video_Generation_CVPR_2026_paper.html) | 把 world time 与 camera pose 作为独立连续条件，测试同一事件的时间与视角重定向 | **A·正式发表** |
+| 少步控制适配 | [FlashMotion](https://openaccess.thecvf.com/content/CVPR2026/html/Li_FlashMotion_Few-Step_Controllable_Video_Generation_with_Trajectory_Guidance_CVPR_2026_paper.html) | 说明先蒸馏基础生成器会损伤原控制器，需要在 few-step student 上重新适配 | **A·正式发表** |
+| 在线 4D 前沿 | [4DStreamCtrl](https://arxiv.org/abs/2608.25479) | 将 3D 对象/相机控制、因果流式输出与长 rollout 放在同一系统合同中 | **B·2026-08-26 预印本；速度与时长均为作者协议** |
+
+### 带着这些问题读
+
+1. 控制量在哪个坐标系、用什么单位、以什么频率采样；相机内参与外参是否同时固定？
+2. 条件由额外通道、ControlNet/adapter、cross-attention、adaptive normalization、feature injection、latent optimization 还是推理期 guidance 注入？
+3. 基础生成器是否冻结；controller 在哪个底座与版本训练，迁移到蒸馏/量化/student 后是否重新校准？
+4. 多个控制互相矛盾时，系统拒绝、加权、投影到可行集，还是静默牺牲某一条件？
+5. 轨迹误差由哪个 tracker/depth/pose estimator 测得；评估器换模型、遇到遮挡或外观变化时结论是否稳定？
+6. 论文只读取预先给定的完整控制序列，还是允许生成中途修改并报告输入到画面响应延迟？后者才涉及在线控制，但仍不自动是 world model。
+
+### 最小复现与证伪任务
+
+冻结 12 个场景、4 个 seed、同一基础 checkpoint 与采样预算，建立三组可解析控制：相机 orbit/dolly、单对象 2D/3D 轨迹、pose/depth 等稠密结构条件。
+
+1. 对每组运行 `无控制 / 正常控制 / 时间反转 / 空间平移 / 强度缩放`，确认输出差异确由条件而非随机 seed 造成。
+2. 同时报 camera pose/trajectory error、对象跟踪误差、身份与背景保持、遮挡恢复、出画再入画、多样性和端到端延迟；评估器失败样例单独人工复核。
+3. 构造相机与对象轨迹冲突、pose 与 depth 冲突、两对象交叉遮挡三类压力测试，记录系统优先级和第一处串扰帧。
+4. 若有 adapter，分别在原多步底座与蒸馏 student 上测试；不允许把底座加速后的画质下降归因给 controller，也不能把 controller 失准藏在平均质量分里。
+5. 若声称 online/interactive，在 25%、50%、75% 时刻修改控制量，报告 TTFF、响应延迟、deadline miss、旧状态保持与修订窗口。
+
+**反证条件：** 空控制与目标控制差异不显著、控制误差下降但非目标内容大幅漂移、tracker 更换后排名翻转、遮挡后对象永久丢失，或“在线”系统只预读完整轨迹时，都要降级相应的精确、鲁棒、通用或交互主张。
+
+**通关产物：** 一张 `signal → coordinate → injection → effect → metric` 表、一组单变量控制干预、一个冲突矩阵和至少五个失败样例。不能用精选视频证明精确控制。
+
+## 9. 所有分支共用的验证回路
 
 ```mermaid
 flowchart LR
     accTitle: 从论文声明到保留或降级结论的验证回路
-    accDescr: 先把论文声明改写成可测量命题，再按声明类型选择质量、延迟、音视频同步或闭环控制协议。固定版本、条件和预算后运行最小复现，再加入最可能推翻结论的干预。证据通过则保留带边界的结论，否则降级并记录失败。
+    accDescr: 先把论文声明改写成可测量命题，再按声明类型选择质量、延迟、音视频同步、显式视觉控制或闭环控制协议。固定版本、条件和预算后运行最小复现，再加入最可能推翻结论的干预。证据通过则保留带边界的结论，否则降级并记录失败。
 
     C["提取一条声明"] --> M["改写成可测命题"]
     M --> T{"声明类型"}
     T --> Q["画质 / 时间一致"]
     T --> L["延迟 / 流式"]
     T --> A["音视频同步"]
+    T --> V["相机 / 轨迹 / 姿态控制"]
     T --> W["动作 / 闭环"]
     Q --> F["冻结版本 · 条件 · 预算"]
     L --> F
     A --> F
+    V --> F
     W --> F
     F --> R["最小复现"]
     R --> X["反证干预"]
@@ -304,13 +353,13 @@ flowchart LR
     classDef test fill:#fff0cc,stroke:#a65f00,color:#111
     classDef outcome fill:#dff2e5,stroke:#147a4b,color:#111
     class C,M,T claim
-    class Q,L,A,W,F,R,X,J test
+    class Q,L,A,V,W,F,R,X,J test
     class K,G,N outcome
 ```
 
-文字替代：先从论文中只取一条声明，把它改写为可测命题；根据声明属于画质、延迟、音视频同步还是动作闭环，选择相应协议。冻结模型版本、输入条件、预算和硬件后做最小复现，再加入最可能推翻结论的干预。证据仍成立时保留带适用边界的结论；不成立时降级结论并保存失败，两者都进入下一条声明。
+文字替代：先从论文中只取一条声明，把它改写为可测命题；根据声明属于画质、延迟、音视频同步、相机/轨迹/姿态控制还是动作闭环，选择相应协议。冻结模型版本、输入条件、预算和硬件后做最小复现，再加入最可能推翻结论的干预。证据仍成立时保留带适用边界的结论；不成立时降级结论并保存失败，两者都进入下一条声明。
 
-## 9. 跨分支结课项目
+## 10. 跨分支结课项目
 
 至少选择两个分支，不训练大模型也可以完成。交付一个可复核目录，包含 `claim-card.md`、配置、原始结果、失败样例、环境信息和结论。
 
@@ -320,10 +369,13 @@ flowchart LR
 | B 后训练 + C 音视频 | 对联合 AV checkpoint 做同步 reward 微调前后盲评 | reward 提高但说话人绑定、静默或视觉多样性恶化 |
 | A 因果 + D World Action | 在 prompt/action 中途切换时测响应延迟与闭环成功率 | 画面立即变化，但动作后果不符合环境或 replanning 无收益 |
 | C 音视频 + D World Action | 把声音事件作为可干预环境变量，比较 joint model 与 staged pipeline | 声音只装饰画面，对状态、动作或未来预测没有影响 |
+| B 后训练 + E 细粒度控制 | 用轨迹/相机 adherence reward 后训练同一 controller，比较控制误差与非目标保持 | reward 改善 tracker 分数，却造成身份、背景、多样性或遮挡恢复退化 |
+| A 因果 + E 细粒度控制 | 在流式生成中途反转相机或对象轨迹，测条件响应、deadline 与旧状态保持 | 系统预读整条轨迹，或快速响应只是重置场景而不是连续控制 |
+| D World Action + E 细粒度控制 | 对同一初态比较“摄影机轨迹”和“环境动作”两种条件的反事实 | 视觉控制精确，却无法预测 action 对状态的因果后果 |
 
 最终结论只能落在以下四种之一：`复现`、`部分复现`、`未复现`、`证据不足`。`看起来不错`不是第五种。
 
-## 10. 一页论文笔记模板
+## 11. 一页论文笔记模板
 
 ```markdown
 # Paper title
