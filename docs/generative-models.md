@@ -69,6 +69,14 @@ flowchart LR
 
 VAE 还容易同时指两件事：一是用 ELBO 学整个生成分布的潜变量模型；二是现代视频系统中只负责压缩与解码的 codec。后者的上层 generator 完全可以使用 diffusion、flow、AR 或 DMD。因此，“用了 VAE”往往只回答表示轴的一部分，而不是整个系统属于哪一派 [[1]](#ref-1)。
 
+### 2.1 三条常见兼容配置怎样串起来
+
+![三条视频 token 生成路线。A：像素视频经 causal 3D VAE 形成连续 latent grid，在 joint 或 frame/chunk 分解下由 diffusion/flow head 生成并解码；B：像素视频经 VQ、LFQ 或 BSQ 形成离散 token IDs，在 strict token 或 grouped AR 下用 categorical cross-entropy 预测并解码；C：部分 masked token set 经双向预测、置信度选择、提交高置信 token 和重掩码循环直至完成。页脚强调 representation、factorization、training head 与 deployment claim 不是同一概念。](../assets/diagrams/video-token-generation-routes.png)
+
+**图 2：三条常见配置，不是三个互斥且穷尽的“家族”。** A 路线把 codec 的重建上限、外层数据分解和内层去噪时钟分开；B 路线把词表与 token 数量连接到序列长度、缓存和串行深度；C 路线展示 masked/discrete-diffusion 的并行 refinement。现代系统可以把 frame/chunk AR 放在外层，再在组内运行 diffusion、flow 或 masked head；即使得到少步内循环，也仍要另外实测 TTFF、deadline 和长期漂移。图的语义规范、被拒绝首稿与灰度验收见[生成记录](../sources/research_20260830_token_generation_schematic.md)。
+
+顺序化文字替代：连续路线是 `pixel → causal 3D VAE → continuous latent → joint 或 frame/chunk factorization → diffusion/flow head → decode`；离散自回归路线是 `pixel → VQ/LFQ/BSQ → token IDs → strict 或 grouped AR → categorical CE → decode`；masked 路线从部分 mask 开始，经双向预测、置信度选择和提交，再把不确定位置 remask，循环到完整。三条路线只代表常见兼容配置；表示、分解、条件 head 与部署证据必须分别报告。
+
 ## 3. 第一轴：Representation——模型到底生成什么
 
 ### 3.1 Pixel space
@@ -416,7 +424,7 @@ evidence:
 
 <a id="ref-20"></a>[20] [Pyramidal Flow Matching for Efficient Video Generative Modeling](https://proceedings.iclr.cc/paper_files/paper/2025/hash/3ab228c4703c4459b1a600ebadc5732c-Abstract-Conference.html). Jin et al. ICLR. 2025.
 
-<a id="ref-21"></a>[21] [Autoregressive Video Generation without Vector Quantization](https://proceedings.iclr.cc/paper_files/paper/2025/hash/6e5112eaa45f8c30b242c5f576213a92-Abstract-Conference.html). Zhang et al. ICLR. 2025.
+<a id="ref-21"></a>[21] [Autoregressive Video Generation without Vector Quantization](https://proceedings.iclr.cc/paper_files/paper/2025/hash/6e5112eaa45f8c30b242c5f576213a92-Abstract-Conference.html). Deng et al. ICLR. 2025.
 
 <a id="ref-22"></a>[22] [Taming Teacher Forcing for Masked Autoregressive Video Generation](https://openaccess.thecvf.com/content/CVPR2025/html/Zhou_Taming_Teacher_Forcing_for_Masked_Autoregressive_Video_Generation_CVPR_2025_paper.html). Zhou et al. CVPR. 2025.
 
