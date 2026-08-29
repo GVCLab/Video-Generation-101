@@ -1,6 +1,8 @@
 # Video Reasoning：从 Zero-Shot Learners 到可验证闭环
 
-> 综述与引用核验截至 **2026 年 8 月 29 日**。本章以 2025 年 9 月的 *Video models are zero-shot learners and reasoners* 为叙事原点：先还原它观察到了什么、Chain-of-Frames 假说如何提出、证据到哪里为止；再向前追溯视觉思维与受控世界模型前史，向后展开 benchmark、监督训练、RLVR、去噪机制、推理时优化与闭环系统。VBVR 是其中的规模化基础设施节点，而不是整章中心。
+> 综述与引用核验截至 **2026 年 8 月 30 日（Asia/Shanghai）**。本章以 2025 年 9 月的 *Video models are zero-shot learners and reasoners* 为叙事原点：先还原它观察到了什么、Chain-of-Frames 假说如何提出、证据到哪里为止；再向前追溯视觉思维与受控世界模型前史，向后展开 benchmark、监督训练、RLVR、去噪机制、推理时优化与闭环系统。VBVR 是其中的规模化基础设施节点，而不是整章中心。
+
+2026 年夏季新增工作的标题、版本、代码、数据口径、venue 更正、图片生成记录与纳排边界，见[本轮增量检索审计](../sources/research_20260830_video_reasoning_refresh.md)；VBVR 的前后向引用核验仍见[专项审计](../sources/research_20260829_video_reasoning_vbvr.md)。
 
 ## 1. 原点论文：Video models are zero-shot learners and reasoners
 
@@ -222,6 +224,16 @@ VBVR 将 100 万训练 clips、任务专用规则 scorer、ID/OOD 拆分和 scal
 
 这一步把研究推向一个更现实的结论：近期最强方案往往不是“一个视频模型一次性想完”，而是让生成、选择、验证和重规划形成系统。
 
+### 6.8 2026 年 7—8 月：视觉轨迹、因果缺口与未见规则对照
+
+同一阶段出现三项容易被标题或任务表面混在一起、却应分别归类的工作：
+
+1. **UniVR 是视觉轨迹训练路线。** 它以 Emu3.5 为底座，把视觉推理过程表示为纯视觉 demonstration；官方仓库描述的 VR-X 原始集合约 150 万样本，训练配方使用约 31 万 SFT 样本和 3 千条 RL 样本，并以全局与步骤聚焦奖励联合训练 [[56]](#ref-56)。这里的“纯视觉”指 reasoning trajectory 的主要载体，不等于整个系统没有语言：输入仍含文字指令，奖励构造还使用 VLM 与视觉特征。
+2. **Thinking in Video 是因果—生成双判据。** 这篇 2026 年 7 月预印本与 2025 年的 *Thinking with Video* [[6]](#ref-6) 不是同一工作。它把显式因果感知和隐式未来生成放到 1,500 个视频的 Causal-Generative Dual-Judge 中比较，并报告两者存在明显缺口 [[57]](#ref-57)。因此，“未来画得合理”只能说明生成分布有可接受样本，不能单独证明模型显式识别了真实因果关系。
+3. **RuleMaze 是相邻的未见规则控制。** 它面向 MLLM 的规则约束视觉空间规划，公开数据卡在冻结日显示 119,595 条记录，并分开 seen-rule 与 unseen-rule split；方法把感知、执行和规则验证解耦 [[58]](#ref-58)。它为 video reasoning 提供严格 split、可执行 validator 和前缀进度指标，但模型输出主体不是视频，因而不能计作视频生成器已经通过的里程碑。
+
+这三项工作共同强化了一个验收原则：**视觉轨迹的训练规模、生成未来的可信度、显式因果判断和未见规则泛化是四项不同证据，不能由其中一项替代其余三项。**
+
 ---
 
 ## 7. 第一个响应：从成功案例到可重复 Benchmark
@@ -243,8 +255,10 @@ VBVR 将 100 万训练 clips、任务专用规则 scorer、ID/OOD 拆分和 scal
 | RISE-Video [[18]](#ref-18) | 467 个专家标注样本、8 类规则 | 从初始条件推演隐含世界规则 | TI2V、多项分解指标 | 以人类标注补足纯程序任务 | 样本量较小，开放规则的可重复评分更难 |
 | VBVR-Bench [[19]](#ref-19) | 100 个任务：50 ID + 50 OOD；每任务 5 个样本 | 感知、空间、转换、抽象、知识 | 任务专用确定性规则 scorer | 大规模训练、可验证评测和 OOD scaling 一体化 | 合成分布、开环生成；OOD 与 ID 仍有约 15% 差距 |
 | MME-CoF-Pro [[24]](#ref-24) | 303 个样本、16 类任务 | 必要中间步骤、文本/视觉提示作用 | Reasoning Score + 终态/质量指标 | 直接检查推理连贯性与提示干预 | 文本提示有时诱发不一致，说明语言解释不等于视觉执行 |
+| Thinking in Video / CGDJ [[57]](#ref-57) | 1,500 个视频：900 个 Video-MME 样本 + 600 个输入/真实未来配对 | 显式因果感知与隐式未来预测是否一致 | 因果问题 + 生成未来双判据 | 直接暴露 perception–prediction gap | 预印本；未来合理性仍受生成评价器与配对协议影响 |
 | CLVG-Bench [[27]](#ref-27) | 超过 1,000 个 metadata；6 类、47 子类 | 跨模态逻辑和交互能力 | AVE 自动评测器 | 扩展到更复杂的多模态推理 | 论文报告逻辑任务低于 25%，交互任务接近 0% |
 | VGI-Bench [[36]](#ref-36) | 27 个任务、810 个实例 | 过程有效性、输入敏感性、视觉智能 | 任务 scorer + 内部去噪分析 | 把行为测试与机制探针结合 | 最强 Seedance 2 仍约 51%；晚期去噪多在精修早期假设 |
+| RuleMaze（相邻 MLLM 对照） [[58]](#ref-58) | 数据卡 119,595 条；seen/unseen rule split | 规则约束的视觉空间规划 | 精确步骤、整迷宫正确率、前缀进度 | 提供未见规则与可执行 validator 的强控制 | 输出是 MLLM 规划轨迹而非生成视频，不能并入 VGM 排名 |
 
 ### 7.1 Benchmark 的四次迁移
 
@@ -281,6 +295,8 @@ VBVR 将 100 万训练 clips、任务专用规则 scorer、ID/OOD 拆分和 scal
 ### 8.2 从单一视频轨迹到视觉/文字 reasoning token
 
 OpenCoF 构建约 17K 样本、11 个任务族的数据，并同时建模视觉与文字 reasoning token，意图让低层空间先验和高层符号规则互补 [[33]](#ref-33)。这类 unified multimodal reasoning 的关键不在“是否加入文字”，而在信息是否真正双向流动：文字计划能否约束视觉状态，视觉失败能否反过来修改文字计划。
+
+UniVR 把另一条路线推进到统一视觉自回归模型：先用视觉 demonstration 做 SFT，再用 VR-GRPO 优化全局结果和高不确定步骤 [[56]](#ref-56)。其步骤奖励借助 VLM 评估与 CLIP 特征方差定位薄弱片段，因此最准确的归因是“视觉轨迹表征 + 外部构造的可验证奖励”，而不是“无需语言或外部裁判的内生视觉推理”。要判断它是否学到可组合算法，还需在未见规则、视觉风格和任务族上分别报告结果，而不能只看混合测试集平均分。
 
 ### 8.3 内生 latent thought 与层级推理
 
@@ -365,6 +381,47 @@ The Seriality Gap in Video Diffusion Models 用可控的多球依赖链指出：
 ### 10.5 三个“推理时钟”：统一表面冲突
 
 现有论文的机制结论经常互相冲突，一个根本原因是它们观测了不同时间轴：
+
+![视频推理的三个时钟：输出时间展示可观察帧轨迹，去噪时间从早期计划经过约束绑定到后期渲染，交互时间让动作、短 rollout、验证与重规划形成闭环；右侧证据从最终答案逐级上升到闭环回报。](../assets/diagrams/video-reasoning-three-clocks.png)
+
+**图注：** 三条横轴不是同一条时间线的不同名字。输出帧能让过程可读；去噪状态可能在整段视频成形前决定计划；只有交互时钟中的新观测与 verifier 才能改变下一次动作。右侧阶梯表示主张强度：结果正确、过程有效、因果干预和闭环效用需要逐级新增实验，不能互相替代。
+
+```mermaid
+flowchart TB
+    accTitle: 视频推理的三个时间轴与四级证据
+    accDescr: 输出时间沿帧序列展开可见轨迹，去噪时间从早期计划进入约束绑定和后期渲染，交互时间执行动作、短片段生成、验证与重规划。最终答案、过程有效、因果干预和闭环回报构成逐级增强的证据。
+
+    subgraph output_clock["1. Output time"]
+        direction LR
+        x_1["x1"] --> x_2["x2"] --> x_3["..."] --> x_t["xT"]
+    end
+
+    subgraph denoise_clock["2. Denoising time"]
+        direction LR
+        z_k["zK: noise"] --> early["early plan"] --> bind["constraint binding"] --> z_0["z0: rendering"]
+    end
+
+    subgraph interaction_clock["3. Interaction time"]
+        direction LR
+        action["action"] --> rollout["short rollout"] --> verify["verifier"] --> replan["replan"] --> next_action["next action"]
+        next_action --> action
+    end
+
+    final_answer["L1 final answer"] --> process_validity["L2 process validity"] --> causal_intervention["L3 causal intervention"] --> closed_loop_return["L4 closed-loop return"]
+    x_t -. "observable result" .-> final_answer
+    z_0 -. "probe plus intervention required" .-> process_validity
+    verify -. "counterfactual tests" .-> causal_intervention
+    next_action -. "decision utility" .-> closed_loop_return
+```
+
+**顺序化文字替代：**
+
+1. 输出时间从 $x_1$ 走到 $x_T$，提供可观察轨迹和最终答案，但不单独证明内部因果计算。
+2. 去噪时间从 $z_K$ 走到 $z_0$，可依次形成早期计划、绑定约束和完成渲染；必须配合 probe 与干预才构成机制证据。
+3. 交互时间依次执行动作、短 rollout、验证和重规划，再把下一动作送回环境；新反馈可以真正改变后续决策。
+4. 证据从最终答案、过程有效、因果干预逐级上升到闭环回报，每一级都需要新增对照。
+
+回到研究问题，三个时钟分别测量：
 
 1. **Output time：输出帧时间。** $x_1\rightarrow x_2\rightarrow\cdots\rightarrow x_T$ 是否构成可读的 Chain-of-Frames。
 2. **Denoising time：去噪时间。** 同一整段视频从噪声到成形的 $z_K\rightarrow\cdots\rightarrow z_0$ 中，何时决定全局计划、何时补全局部细节。
@@ -641,11 +698,11 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 
 <a id="ref-3"></a>[3] [Video models are zero-shot learners and reasoners](https://arxiv.org/abs/2509.20328). Thaddäus Wiedemer, Yuxuan Li, Paul Vicol, Shixiang Shane Gu, Nick Matarese, Kevin Swersky, et al. arXiv preprint. 2025.
 
-<a id="ref-4"></a>[4] [VChain: Chain-of-Visual-Thought for Reasoning in Video Generation](https://arxiv.org/abs/2510.05094). Ziqi Huang, Ning Yu, Gordon Chen, Haonan Qiu, Paul Debevec, Ziwei Liu. Findings of ACL. 2026.
+<a id="ref-4"></a>[4] [VChain: Chain-of-Visual-Thought for Reasoning in Video Generation](https://aclanthology.org/2026.findings-acl.12/). Ziqi Huang, Ning Yu, Gordon Chen, Haonan Qiu, Paul Debevec, Ziwei Liu. Findings of ACL, pages 226–250. 2026.
 
-<a id="ref-5"></a>[5] [Are Video Models Ready as Zero-Shot Reasoners? An Empirical Study with the MME-CoF Benchmark](https://arxiv.org/abs/2510.26802). Ziyu Guo, Xinyan Chen, Renrui Zhang, Ruichuan An, Yu Qi, Dongzhi Jiang, et al. CVPR. 2026.
+<a id="ref-5"></a>[5] [Are Video Models Ready as Zero-Shot Reasoners? An Empirical Study with the MME-CoF Benchmark](https://openaccess.thecvf.com/content/CVPR2026F/html/Guo_Are_Video_Models_Ready_as_Zero-Shot_Reasoners_An_Empirical_Study_CVPRF_2026_paper.html). Ziyu Guo, Xinyan Chen, Renrui Zhang, Ruichuan An, Yu Qi, Dongzhi Jiang, et al. Findings of CVPR, pages 9175–9184. 2026.
 
-<a id="ref-6"></a>[6] [Thinking with Video: Video Generation as a Promising Multimodal Reasoning Paradigm](https://arxiv.org/abs/2511.04570). Jingqi Tong, Yurong Mou, Hangcheng Li, Mingzhe Li, Yongzhuo Yang, Ming Zhang, et al. CVPR. 2026.
+<a id="ref-6"></a>[6] [Thinking with Video: Video Generation as a Promising Multimodal Reasoning Paradigm](https://openaccess.thecvf.com/content/CVPR2026/html/Tong_Thinking_with_Video_Video_Generation_as_a_Promising_Multimodal_Reasoning_CVPR_2026_paper.html). Jingqi Tong, Yurong Mou, Hangcheng Li, Mingzhe Li, Yongzhuo Yang, Ming Zhang, et al. CVPR, pages 41121–41129. 2026.
 
 <a id="ref-7"></a>[7] [TiViBench: Benchmarking Think-in-Video Reasoning for Video Generative Models](https://arxiv.org/abs/2511.13704). Harold Haodong Chen, Disen Lan, Wen-Jie Shu, Qingyang Liu, Zihan Wang, Sirui Chen, et al. CVPR. 2026.
 
@@ -663,7 +720,7 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 
 <a id="ref-14"></a>[14] [MMGR: Multi-Modal Generative Reasoning](https://arxiv.org/abs/2512.14691). Zefan Cai, Haoyi Qiu, Tianyi Ma, Haozhe Zhao, Gengze Zhou, Kung-Hsiang Huang, et al. arXiv preprint. 2025.
 
-<a id="ref-15"></a>[15] [Beyond the Last Frame: Process-aware Evaluation for Generative Video Reasoning](https://arxiv.org/abs/2512.24952). Yifan Li, Yukai Gu, Yingqian Min, Zikang Liu, Yifan Du, Kun Zhou, et al. ACL. 2026.
+<a id="ref-15"></a>[15] [Beyond the Last Frame: Process-aware Evaluation for Generative Video Reasoning](https://aclanthology.org/2026.acl-long.934/). Yifan Li, Yukai Gu, Yingqian Min, Zikang Liu, Yifan Du, Kun Zhou, et al. ACL, pages 20393–20409. 2026.
 
 <a id="ref-16"></a>[16] [CoF-T2I: Video Models as Pure Visual Reasoners for Text-to-Image Generation](https://arxiv.org/abs/2601.10061). Chengzhuo Tong, Mingkun Chang, Shenglong Zhang, Yuran Wang, Cheng Liang, Zhizheng Zhao, et al. arXiv preprint. 2026.
 
@@ -744,3 +801,9 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 <a id="ref-54"></a>[54] [Visual General Intelligence: A White Paper](https://arxiv.org/abs/2608.25924). Hirokatsu Kataoka, Yoshihiro Fukuhara, Yonglong Tian, Shangzhe Wu, Oishi Deb, Ryousuke Yamada, et al. arXiv preprint. 2026.
 
 <a id="ref-55"></a>[55] [Wan-R1: Verifiable-Reinforcement Learning for Video Reasoning](https://arxiv.org/abs/2603.27866). Ming Liu, Yunbei Zhang, Shilong Liu, Liwen Wang, Wensheng Zhang. arXiv preprint. 2026.
+
+<a id="ref-56"></a>[56] [UniVR: Thinking in Visual Space for Unified Visual Reasoning](https://arxiv.org/abs/2607.12800). Zhongwei Ren, Yunchao Wei, Yao Zhao, Weibo Gong, Xiao Liu, Anran Wang, Xiangtai Li, Xiaojie Jin. arXiv preprint. 2026. See also the [official repository](https://github.com/bytedance/UniVR).
+
+<a id="ref-57"></a>[57] [Thinking in Video: Can Video Generators Really Reason About the Real World?](https://arxiv.org/abs/2607.17523). Yongheng Zhang, Guang Yang, Ruihan Hou, Qiguang Chen, Ziang Liu, Xiaolong Liu, et al. arXiv preprint. 2026. See also the [official repository](https://github.com/BRZ911/Thinking-in-Video).
+
+<a id="ref-58"></a>[58] [Rule-Compliant Visual Spatial Planning for Multimodal Large Language Models](https://arxiv.org/abs/2608.20237). Yu Chen, Ting Lei, Yaoyi Li, Jia Cai, Zhecen Wu, Yang Liu. arXiv preprint. 2026. See also the [official repository](https://github.com/oceanflowlab/RuleMaze) and [dataset card](https://huggingface.co/datasets/Fish-03/RuleMaze).

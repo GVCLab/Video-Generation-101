@@ -1,283 +1,340 @@
-# JEPA 参考阅读：从表征预测到可规划 World Model
+# JEPA：从联合嵌入预测到可规划的潜变量世界模型
 
-JEPA（Joint-Embedding Predictive Architecture，联合嵌入预测架构）的核心主张是：**不要强迫模型预测未来世界的每个像素，而是在表征空间中预测那些稳定、可预测、对理解与行动有用的结构。**
+> **证据冻结日：2026-08-30。** 本页把 JEPA 当作一类架构合同，而不是某个固定模型名。核心模型预测表征兼容性；只有再加入动作、可滚动动力学、目标或代价、搜索与闭环重规划，才构成可检验的控制型 world model。像素可视化 decoder、生成式导航头和 probe 都是独立模块，不能倒推为基础 JEPA 的能力。
 
-这条路线与 diffusion 视频生成并行发展。Diffusion 追求从条件中还原完整视觉分布；JEPA 首先追求一个适合感知、预测和规划的 latent space。两者都可以处理视频，但优化目标、输出形式和验证方法不同。
+## 1. 先给结论
 
-> 一句话定位：JEPA 首先是一个自监督预测架构，不是某个固定网络，也不天然等于生成模型或完整 world model。
+- **I-JEPA 与 V-JEPA 是非生成式表征学习器。** 它们预测被遮挡图像或视频区域的 target embedding，而不是 RGB；V-JEPA 论文中的像素可视化由另训的条件 diffusion decoder 完成。[[3]](#ref-3), [[4]](#ref-4)
+- **V-JEPA 2 与 V-JEPA 2-AC 不是同一个能力层。** 前者是 action-free 视频 encoder；后者冻结视觉 encoder，再用不到 62 小时的 DROID 机器人轨迹训练约 3 亿参数的动作条件 predictor，并以 latent energy、CEM 和 MPC 规划。[[6]](#ref-6), [[7]](#ref-7)
+- **V-JEPA 2.1 主要升级 dense representation recipe。** 它不是新的动作模型；机器人结果来自以 2.1 encoder 重训动作 predictor。论文中抓取从 60% 到 80% 的配置同时改变了规划 horizon 与采样数，不能把全部增益单独归因给 encoder。[[9]](#ref-9)
+- **高 probe 分数只证明表征可读。** frozen probe、全量 finetune、latent prediction、动作反事实、状态充分性、闭环效用和 OOD 是不同证据，不能把分类或分割成绩外推成“学到了物理规律”。
+- **确定性 L1 JEPA 不自动表达多未来。** 原始 V-JEPA 的最优点预测可趋向条件中位数；分支集合、变分 latent 或下游 diffusion 可以表达多模态，但需要 proper score、覆盖率、校准和闭环效用另行验证。[[4]](#ref-4), [[16]](#ref-16), [[17]](#ref-17)
 
-本章引用的标准 BibTeX、仓库类型与 GitHub Star 快照见 [引用与代码索引](bibliography.md)。
+## 2. 精确的 JEPA 训练合同
 
-## 1. 核心机制
-
-给定同一观测的上下文部分 $x$ 与目标部分 $y$，JEPA 通常包含三个组件：
-
-- context encoder $f_\theta$：只编码模型可见的上下文；
-- target encoder $f_{\bar\theta}$：产生模型需要预测的目标表征；
-- predictor $g_\phi$：结合上下文表征和目标位置，预测目标表征。
-
-一个抽象目标可以写为：
+设完整样本为 `x`，上下文索引为 `C`，目标索引为 `T`，目标位置或掩码查询为 `q_T`。典型 teacher–student JEPA 写成：
 
 $$
-z_x=f_\theta(x),\qquad
-z_y=f_{\bar\theta}(y),\qquad
-\hat z_y=g_\phi(z_x,m)
+z_C=f_\theta(x_C),\qquad
+z_T=\operatorname{sg}\!\left(f_{\bar\theta}(x)_{T}\right),
 $$
 
 $$
-\mathcal{L}_{\text{pred}} = d\left(\hat z_y,\operatorname{stopgrad}(z_y)\right)
+\hat z_T=g_\phi(z_C,q_T[,a_{1:H}]),\qquad
+\mathcal L_{\mathrm{pred}}
+=\frac{1}{|T|}\sum_{i\in T}d(\hat z_i,z_i),
 $$
 
-其中 $m$ 表示被遮挡目标的位置或时空坐标，$d$ 可以是 L1、L2 或其他表征距离。实际方法还需要防止所有输入都映射到同一个常数向量的 **representation collapse**。
+$$
+\bar\theta\leftarrow \tau\bar\theta+(1-\tau)\theta .
+$$
+
+方括号里的动作只在 action-conditioned 变体出现。各组件的责任边界如下。
+
+| 组件 | 可见信息与更新方式 | 它不代表什么 |
+|---|---|---|
+| context encoder `f_\theta` | 只读取未遮挡 context token；由预测损失梯度更新 | 不能看到被遮挡像素，否则发生 target leakage |
+| target encoder `f_{\bar\theta}` | 通常读取完整、未遮挡样本，再只抽取 target 位置；输出经 stop-gradient | 不是可训练的 RGB decoder |
+| predictor `g_\phi` | 读取 context embedding 和目标时空位置；动作模型还读动作与 proprioception | 不一定是概率分布，也不自动可生成像素 |
+| mask / query `q_T` | 指定“预测哪里、何时”；I-JEPA 用大 target blocks，V-JEPA 用大比例时空 multi-block mask | mask 不是缺失内容本身，不能携带目标像素 |
+| stop-gradient `sg` | 阻断 target 分支的反向梯度，使在线 encoder/predictor 对齐一个暂时固定的目标 | 单独使用不构成防坍塌定理 |
+| EMA target | 用在线 encoder 的指数滑动平均更新 target encoder | 不是独立优化的第二个模型，也不是概率平均 |
+| 距离 `d` | I-JEPA 使用 target feature 的 L2 距离；V-JEPA / V2 常用逐 token L1；其他变体可换相似度或 energy | 低 feature error 不等于低像素误差或高控制回报 |
+
+I-JEPA 通过“大目标块 + 空间分散的 context”把任务推向对象级语义；V-JEPA 将 mask 扩展到时空 tube，并在论文配置中遮住约 90% token。target encoder 看完整视频，context encoder 丢弃 masked token，损失只在 target 位置计算。[[3]](#ref-3), [[4]](#ref-4)
 
 ```mermaid
 flowchart LR
-    X["原始图像或视频"] --> M["空间 / 时空遮挡"]
-    M --> C["Context encoder"]
-    X --> T["Target encoder"]
-    C --> P["Predictor + 目标位置"]
-    P --> ZP["预测的 target embedding"]
-    T --> ZT["目标 embedding"]
-    ZP --> L["表征预测损失"]
-    ZT --> L
+    accTitle: 典型 teacher student JEPA 的信息流与梯度边界
+    accDescr: 完整样本经过掩码后只有可见 token 进入 context encoder；完整样本进入 EMA target encoder，目标输出由 stop gradient 截断。predictor 使用 context 表征和目标位置预测被遮挡表征，损失只更新 context encoder 与 predictor，再由指数滑动平均更新 target encoder。
+    x_full["完整图像或视频 x"] --> mask["采样 context C 与 target T"]
+    mask --> x_context["仅可见 token x_C"]
+    x_context --> context["context encoder f_theta"]
+    mask --> query["目标位置 query q_T"]
+    context --> predictor["predictor g_phi"]
+    query --> predictor
+    x_full --> target["EMA target encoder f_bar_theta"]
+    target --> stopgrad["stop-gradient 后取 target token"]
+    predictor --> predicted["预测表征 z_hat_T"]
+    stopgrad --> target_z["目标表征 z_T"]
+    predicted --> loss["target-only latent loss"]
+    target_z --> loss
+    loss -->|"梯度"| context
+    loss -->|"梯度"| predictor
+    context -.->|"EMA 参数更新"| target
 ```
 
-这与像素生成最关键的差别是：目标 $z_y$ 可以主动忽略纹理噪声、精确光照或其他不可预测细节。模型不必因为“猫毛具体朝哪边”预测错误而受罚，但仍应保留对象、运动、交互和场景结构。
+**文字替代：** 完整样本分成可见 context 与被遮挡 target；在线 encoder 只看 context，predictor 再接收 target 位置。完整样本由 EMA target encoder 编码，target 输出被 stop-gradient 截断。两路表征在 target 位置比较，梯度只回到在线 encoder 和 predictor，在线权重再以 EMA 更新 target encoder。
 
-## 2. 主线谱系
+### 2.1 “能量”到底是什么
+
+能量模型用一个标量衡量变量之间的兼容性：
+
+$$
+E_\psi(x,y)\in\mathbb R,\qquad
+\hat y=\arg\min_y E_\psi(x,y).
+$$
+
+它不要求把所有 `y` 归一化成概率。普通 JEPA 可把 `E=d(g_\phi(z_C,q_T),z_T)` 视作兼容性能量；动作规划则可写成：
+
+$$
+E(a_{1:H};z_t,s_t,z_g)
+=\left\|P_\phi(z_t,s_t,a_{1:H})-z_g\right\|_1 .
+$$
+
+低能量只表示“按训练目标更兼容”，不天然等于高概率、已校准置信度或正确物理。要把 energy 当不确定性使用，仍需单独的归一化、校准或 proper-scoring 验证。[[2]](#ref-2), [[6]](#ref-6)
+
+## 3. 与像素生成和控制型 world model 的边界
+
+| 系统 | 训练时主要目标 | 部署时直接输出 | 多未来 | 能否仅凭该模块闭环规划 |
+|---|---|---|---|---|
+| I-JEPA / V-JEPA | masked target embedding prediction | 图像或视频 feature | 通常为确定性点预测 | 否：没有动作动力学、目标代价和 planner |
+| V-JEPA 像素可视化 | 冻结 JEPA 后另训条件 diffusion decoder | 条件 RGB 样本 | decoder 可采样 | 否：只是解释 feature 预测内容 |
+| V-JEPA 2 | action-free 视频表征预训练 | 视频 feature | 通常为确定性 encoder | 否：不能回答动作干预 |
+| V-JEPA 2-AC | 给定动作与 proprioception 的 future latent | action-conditioned rollout | 基础 predictor 仍为确定性 | 是：需再接 goal energy、CEM 与 MPC |
+| V-JEPA 2.1 | masked + visible context 的多层表征预测 | 更密集的 feature | 基础模型无显式分布 | 否：动作头需另训 |
+| 像素 / video-latent 生成式 world model | 条件视频分布或视觉 token likelihood | RGB、视觉 token 或可解码 latent | 可通过采样表达 | 只有动作、代价、搜索和闭环都存在时才是 |
+| LeWorldModel / EB-JEPA action 示例 | 从动作预测 future state embedding，并约束 latent | 可规划 latent | 依具体 predictor | 是：在各自小规模控制协议内验证 |
+
+![JEPA 从联合嵌入预测到动作条件 latent 规划的完整合同：上半部分只在预测 latent 与 stop-gradient 目标 latent 之间计算损失，可选 pixel decoder 仅用于可视化；下半部分比较多条动作序列的 latent rollout，只执行首个动作并用新观测重规划。](../assets/diagrams/jepa-latent-prediction-planning-loop.png)
+
+**图注：** 上半部分是 representation objective，不要求 RGB decoder；右侧四项是经验性的防坍塌监测与机制。下半部分才加入动作序列、latent world predictor、目标/价值和 receding-horizon control。最右证据阶梯强调：linear probe、future latent accuracy、action intervention 与 closed-loop return 是四项递进声明，JEPA 连接它们，但不自动保证后三级。
+
+**图的顺序化文字替代：**
+
+1. 视频被分成可见 context tube 与 masked target tube；context encoder 产生 $z_C$，EMA target encoder 产生 stop-gradient 的 $z_T$。
+2. predictor 使用 $z_C$ 与 mask-position token 预测 $\hat z_T$，latent loss 只比较 $\hat z_T$ 和 $z_T$；可选 pixel decoder 从 $\hat z_T$ 解码可视化，不进入基础目标。
+3. 控制阶段把同一当前状态与多条候选动作序列送入动作条件 latent predictor，得到不同 future latent trajectory，再由目标或价值头评分。
+4. planner 选择最佳序列，但只执行第一步；真实新观测重新编码后进入下一轮规划。
+5. 证据必须从表征可读性、未来 latent 准确性、动作干预逐级累积到闭环回报，不能由上游 probe 跨级替代。
+
+这里最容易混淆的是“latent”。生成模型的 video latent 往往是为了经 decoder 还原 RGB；JEPA latent 的首要合同是保留可预测、可迁移或可规划的信息，并不承诺可逆。二者可以组合，但“同样不在像素空间”并不让它们成为同一种模型。
+
+## 4. 防坍塌：经验非对称与显式分布约束
+
+如果所有输入都映射到同一常数，预测损失也可能很低。不同路线解决的是同一个失败，却有不同保证。
+
+1. **I/V-JEPA 的经验 recipe。** stop-gradient、EMA teacher、predictor 非对称、大范围 mask 与训练调度共同避免平凡解；它们在报告设置中有效，但不是“任意数据与网络都不会坍塌”的数学保证。[[3]](#ref-3), [[4]](#ref-4)
+2. **LeJEPA 的 SIGReg。** 该方法以随机一维投影的特征函数约束 embedding 接近各向同性高斯，并把预测与分布正则联合优化；作者在论文假设下给出保证，不再依赖 stop-gradient 或 EMA teacher。保证不能无条件外推到任意动作模型。[[10]](#ref-10)
+3. **LeWorldModel 的端到端控制。** encoder 与 action predictor 从像素共同训练，使用 prediction + SIGReg，无预训练视觉 encoder、EMA 或 stop-gradient；证据来自较小控制环境。论文同时承认高维 SIGReg 目标在简单数据上可能弱化，紧凑 latent 也可能丢失规划信息。[[11]](#ref-11)
+4. **EB-JEPA 的模块化正则。** 教程库展示 VICReg / SIGReg 等正则及动作条件 Two Rooms；其消融中移除 inverse-dynamics 类正则会破坏随机环境规划，说明“batch 方差不坍塌”与“动作因果可辨”不是同一要求。[[12]](#ref-12)
+
+建议同时记录至少四个健康度量：每维标准差、协方差谱或 effective rank、样本间最近邻多样性、与已知状态变量的可读性。只看训练 loss 无法排除常数解或低秩解。
+
+## 5. Dense feature 与 semantic feature 的真实权衡
+
+原始 masked JEPA 只在被遮挡 target 上给监督，容易偏向全局语义；dense prediction 还需要边界、位置和局部纹理。V-JEPA 2.1 的三项改动是：
+
+- **Dense Predictive Loss：** masked loss 之外，对可见 context token 也预测 target feature；context 权重随其到最近 mask 的时空距离增大而衰减。
+- **Deep Self-Supervision：** 融合在线 encoder 的多个中间层，让 predictor 同时对齐 target encoder 的多个层级。
+- **Multi-Modal Tokenizer：** 图像用 2D 卷积、视频用 3D 卷积，并加入 modality token，避免把静态图复制成伪视频。
+
+关键消融不是“dense loss 全面更强”：在论文设置中，context loss 令 ADE20K mIoU 从 22.2 升至 33.8，却把 Something-Something-v2 从 72.8 降到 62.5；加入 deep self-supervision 后分别达到 38.6 与 72.1。它证明局部可读性与时序语义会发生竞争，也说明中间层监督是恢复平衡的机制，而非单调扩大模型即可解决。[[9]](#ref-9)
+
+因此应把 probe 拆开报告：
+
+- frozen backbone + 线性或 attentive probe：测“现成表征可读性”；
+- 部分或全量 finetune：测“可适配性 + 优化预算”；
+- dense head：测空间局部信息；
+- action predictor finetune：测动作数据和动力学头的联合结果。
+
+这些协议不能混排成一个总榜。
+
+## 6. 可检验能力里程碑
 
 ```mermaid
 flowchart LR
-    A["2022<br>A Path Towards Autonomous Machine Intelligence"] --> B["2023<br>I-JEPA"]
-    B --> C["2023<br>MC-JEPA"]
-    B --> D["2024<br>V-JEPA"]
-    D --> E["2025<br>V-JEPA 2"]
-    E --> F["V-JEPA 2-AC<br>动作条件 + 规划"]
-    E --> G["2026<br>V-JEPA 2.1"]
-
-    B -. "训练稳定性" .-> H["2025<br>LeJEPA"]
-    H --> I["2026<br>LeWorldModel"]
-    D -. "教学与模块化" .-> J["2026<br>EB-JEPA"]
-    E -. "长期策略动力学" .-> K["2025<br>TD-JEPA"]
+    accTitle: JEPA 路线按可检验能力而不是模型年份分层
+    accDescr: 静态图像 masked embedding prediction 先扩展到视频时空表征，再由 action free 大规模视频 encoder 提供视觉先验。加入动作条件 rollout 后才可进行反事实预测，连接目标能量、搜索和真实观测重规划后才形成闭环控制。dense、自监督稳定性、长期策略动力学和多未来表达是横向分支，不能自动升级到更高控制层。
+    image["图像 masked embedding<br>I-JEPA"] --> video["视频时空表征<br>V-JEPA"]
+    video --> foundation["大规模 action-free encoder<br>V-JEPA 2"]
+    foundation --> action["动作条件 latent rollout<br>V-JEPA 2-AC"]
+    action --> planning["goal energy + CEM"]
+    planning --> closed["真实观测重规划<br>MPC 闭环"]
+    dense["dense / multi-level feature<br>V-JEPA 2.1"] -.-> foundation
+    stable["显式防坍塌<br>LeJEPA"] -.-> image
+    stable --> end2end["端到端动作 world model<br>LeWorldModel"]
+    longterm["策略条件长期动力学<br>TD-JEPA"] -.-> action
+    branches["分支或变分未来<br>Branch-JEPA / Var-JEPA"] -.-> action
 ```
 
-| 年份 | 工作 | 主要预测对象 | 历史角色 |
-|---:|---|---|---|
-| 2022 | A Path Towards Autonomous Machine Intelligence [[1]](#ref-1) | 分层抽象状态与行动结果 | 提出以 JEPA、能量模型和分层规划构造自主智能体的研究蓝图 |
-| 2023 | I-JEPA [[2]](#ref-2) | 图像中被遮挡区域的 embedding | 证明不重建像素也能学习强图像语义表征 |
-| 2023 | MC-JEPA [[3]](#ref-3) | 内容表征与光流 | 将“是什么”和“如何移动”放入共享 encoder |
-| 2024 | V-JEPA [[4]](#ref-4) | 视频中缺失时空区域的 embedding | 将 masked latent prediction 系统扩展到视频 |
-| 2025 | V-JEPA 2 [[5]](#ref-5) | 大规模视频的时空表征 | 从视频表征学习走向物理理解、预测和规划 |
-| 2025 | V-JEPA 2-AC [[5]](#ref-5) | 给定动作后的未来 latent | 用少量机器人数据把被动视频预训练连接到动作条件规划 |
-| 2026 | V-JEPA 2.1 [[6]](#ref-6) | 更密集、更稳定的图像与视频特征 | 用 dense predictive loss、deep self-supervision 等方法强化 dense feature |
+**文字替代：** 主线从图像 masked embedding、视频时空表征、大规模 action-free encoder、动作条件 rollout，依次进入目标能量、CEM 和 MPC 闭环。V-JEPA 2.1 解决 dense feature；LeJEPA / LeWorldModel 解决另一类稳定训练与端到端控制；TD-JEPA 研究长期策略动力学；Branch-JEPA / Var-JEPA 研究多未来。横向分支没有闭环证据时不能自动升到控制层。
+
+| 可检验能力 | 代表里程碑 | 当时新增证据 | 仍不能声称 |
+|---|---|---|---|
+| 静态 semantic feature | I-JEPA，CVPR 2023 [[3]](#ref-3) | 非像素 masked prediction；图像 frozen / finetune 迁移 | 时间动力学、动作因果、生成 |
+| 内容与运动联合 | MC-JEPA，2023 [[19]](#ref-19) | 内容自监督与 optical flow 共用 encoder | 长 rollout 或控制 |
+| 视频时空表征 | V-JEPA，TMLR 2024 [[4]](#ref-4) | 大时空遮挡；frozen video probes；点预测分析 | 动作反事实与规划 |
+| 规模化视频先验 | V-JEPA 2，2025 [[6]](#ref-6) | 超过百万小时视频 / 图像预训练；理解与预测 probe | encoder 本身不是动作模型 |
+| 真实机器人 latent MPC | V-JEPA 2-AC，2025 [[6]](#ref-6) | DROID 后训练；两实验室的 reach / grasp / pick-place | 跨 embodiment、长时任务或已校准不确定性 |
+| 显式分布正则 | LeJEPA，2025 [[10]](#ref-10) | SIGReg 与论文假设下的防坍塌分析 | 自动获得 world-model 能力 |
+| 长期策略 latent | TD-JEPA，ICLR 2026 [[13]](#ref-13) | reward-free offline transitions；13 个数据集的 zero-shot reward adaptation | 通用视频生成或真实机器人部署 |
+| 单卡教学与动作示例 | EB-JEPA，ICLR 2026 World Models Workshop [[12]](#ref-12) | 图像、视频、Two Rooms 的统一组件 | 大规模 foundation benchmark |
+| dense 多层表征 | V-JEPA 2.1，2026 [[9]](#ref-9) | context loss、deep supervision、多模态 tokenizer；dense / semantic 消融 | 基础 encoder 自带 action dynamics |
+| 端到端像素到 MPC | LeWorldModel，2026 [[11]](#ref-11) | 小型 action world model；CEM / MPC 与物理 probe | 互联网规模泛化 |
+| 轻量单 encoder 视频表征 | LeVJEPA，2026-08 预印本 [[15]](#ref-15) | SIGReg、token dropping、block-causal attention；代码与权重 | 尚无正式会议结论或动作规划 |
+
+DINO-WM 是重要邻近基线：它冻结 DINOv2 patch feature，学习动作条件 latent dynamics，并在六个环境通过动作优化完成 visual goal；它证明“可规划的预训练 feature”并不专属于 JEPA 训练。[[14]](#ref-14)
+
+## 7. 从动作条件预测到 MPC
+
+V-JEPA 2-AC 冻结 V-JEPA 2 ViT-g frame encoder，在少于 62 小时 DROID 轨迹上训练 block-causal predictor。输入含视觉 feature、7D 末端执行器动作与 proprioceptive state；训练包含 teacher-forced 单步预测和两步 rollout loss。部署时，视觉目标编码成 `z_g`，CEM 在固定候选预算内最小化终点 latent 与目标的 L1 energy，只执行首个动作，再用新观测重规划。[[6]](#ref-6)
+
+```mermaid
+flowchart LR
+    accTitle: 动作条件 latent 训练与闭环 MPC 是两个独立验收环
+    accDescr: 训练环把当前视觉、机器人状态和真实动作序列输入动作 predictor，并以未来 target encoder 表征监督。部署环从同一当前状态采样候选动作序列，滚动预测终点 latent，以目标 latent 能量排序并用 CEM 更新分布，只执行首个动作；环境返回真实观测后重新编码和规划。
+    current["当前观测 o_t"] --> frozen["冻结视觉 encoder"]
+    frozen --> z_now["当前 latent z_t"]
+    state["proprioception s_t"] --> train_predictor["动作 predictor"]
+    action_data["数据中的动作 a_t:t+H"] --> train_predictor
+    z_now --> train_predictor
+    future["真实未来观测"] --> target_future["future target latent"]
+    train_predictor --> predicted_future["预测 future latent"]
+    predicted_future --> train_loss["多步 latent loss"]
+    target_future --> train_loss
+    z_now --> rollout["候选动作序列 rollout"]
+    state --> rollout
+    sampler["CEM 候选分布"] --> rollout
+    rollout --> terminal["预测终点 latent"]
+    goal["视觉目标 latent z_g"] --> energy["目标 energy"]
+    terminal --> energy
+    energy --> sampler
+    energy --> first["选择序列并只执行第一步"]
+    first --> environment["真实机器人或环境"]
+    environment --> current
+```
+
+**文字替代：** 训练环用真实动作序列预测未来 target latent；部署环从当前 latent 和机器人状态出发，用 CEM 反复采样动作序列、latent rollout、按目标 energy 排序，只执行最佳序列第一步。环境的新观测回到 encoder，形成 receding-horizon MPC。
+
+“zero-shot”在这项机器人实验里有严格限定：部署实验室、具体对象和任务没有提供任务奖励或环境特定训练轨迹，但动作模型见过 DROID 的同类 Franka embodiment，且长任务需要人工提供视觉子目标。论文在两个实验室、每项 10 次试验下报告 reach 100%、cup / box grasp 65% / 25%、cup / box pick-place 80% / 65%；这些是小样本协议结果，不是跨机器人通用成功率。[[6]](#ref-6), [[7]](#ref-7)
+
+还应记录系统预算。论文示例中 V-JEPA 2-AC 在 RTX 4090 上以 800 个样本、10 次 CEM iteration、horizon 1 约需 16 秒/动作；该数字依赖硬件与实现，不能当作架构常数。长 horizon 会同时带来 rollout 误差累积与搜索空间爆炸。[[6]](#ref-6)
+
+## 8. 不确定性与多模态未来
+
+基础 V-JEPA 的确定性 L1 predictor 对同一 context 输出一个 target。若未来有多种合理结果，单点目标可能落在表示空间的“折中”位置。可选路线包括：
+
+| 路线 | 表达对象 | 必须补充的验证 |
+|---|---|---|
+| 多个 latent 分支 + 权重 | Branch-JEPA 用有限 successor set 表示多个结果 [[16]](#ref-16) | Energy Score、分支利用率、覆盖与校准；不能只报 oracle best-of-K |
+| 变分 latent | Var-JEPA 以变分目标表达 latent 不确定性 [[17]](#ref-17) | 截至冻结日主要是理论与表格实例，不能外推为视频 / 控制证据 |
+| latent diffusion 下游头 | V-JEPA 2.1 导航实验用 conditional diffusion Transformer 生成轨迹 [[9]](#ref-9) | 多样性、可行性、碰撞率与闭环导航；能力归属于下游生成头 |
+| 像素 diffusion decoder | V-JEPA 的另训 decoder 将 feature prediction 可视化 [[4]](#ref-4) | 只能解释 feature 中保留的内容，不改变基础 JEPA 目标 |
+| ensemble / energy landscape | 多模型或多候选的分歧 | 需校准到真实错误，不能把 energy 数值直接叫概率 |
+
+对控制最危险的不是“画面不够逼真”，而是 predictor 对 OOD 状态过度自信，planner 进一步利用模型误差。应报告 coverage–risk 曲线、模型分歧、动作序列下的误差增长，以及拒绝或回退策略。
+
+## 9. 评测矩阵：每个主张只接受对应证据
+
+| 主张 | 最低协议 | 关键对照与报告项 | 不能由什么替代 |
+|---|---|---|---|
+| latent 含语义 | 冻结 encoder；线性或固定容量 attentive probe | probe 参数、训练数据、增强、分辨率、5 seeds | 全量 finetune |
+| 表征可适配 | 明确 finetune 层数和训练预算 | 同 backbone / 同 optimizer / 同数据 | frozen probe 排名 |
+| 能预测未来 latent | horizon 1 / 4 / 8 的 held-out target feature error | persistence、copy-last、action-free、pixel / latent baseline | 动作分类分数 |
+| 对动作敏感 | 同一初始状态的配对动作干预 | 动作置换、动作取反、no-action；方向与幅值误差 | 自然视频相关性 |
+| latent 状态充分 | frozen readout 预测位置、速度、接触、遮挡对象和 proprioception | 线性与小 MLP 分开；报告不可读变量 | 只报全局分类 |
+| 规划有用 | 固定 CEM 样本、iteration、horizon 与墙钟预算的闭环任务 | reactive policy、oracle dynamics、随机 planner、消融 | open-loop feature loss |
+| 学到可迁移规律 | 受控 OOD：材质、质量、相机、动力学、embodiment 分开移动 | ID / OOD 差值、置信区间、失败视频 | 单一 benchmark 平均分 |
+| 会表达未知 | calibrated likelihood / proper score、coverage–risk 或 ensemble error correlation | 与真实错误校准；拒绝策略 | 原始 L1 energy |
+
+probe 分数只说明某个有限容量读出器能恢复标签。它既可能来自外观捷径，也不要求 predictor 对动作干预、碰撞或长期 rollout 正确。反过来，控制有用的紧凑 latent 也未必在线性语义 benchmark 上最优。证据必须停在实际通过的层级。
+
+## 10. 最小可复现实验与证伪门
+
+下面是一套单机可执行的小型实验设计；具体数值是**预注册示例门槛**，应在看结果前按任务难度固定，而不是文献中的通用阈值。
+
+### 10.1 数据与模型
+
+1. 在可复位的 2D 推物或 Two Rooms 环境采集 5 个随机种子；每个初始状态执行成对的相反动作，保存 RGB、动作、位置、速度、接触和目标。
+2. 按场景 seed 划分训练 / ID test；OOD test 分别只改变纹理、相机、对象质量和摩擦，避免把多种 shift 混在一起。
+3. 训练同容量的三组模型：EMA + stop-gradient JEPA、去除关键防坍塌组件的 ablation、动作不可见的 predictor。若算力允许，再加 pixel-prediction 或 DINO feature dynamics 基线。
+4. 不训练像素 decoder；可视化只使用最近邻 target frame，防止把 decoder 画质误当动力学准确性。
+
+### 10.2 预注册门槛
+
+- **泄漏门：** context 输入中 target token 数必须为 0；用目标区域随机替换后，context embedding 不应变化。失败即停止。
+- **坍塌门：** held-out embedding 的 effective rank 至少为 `max(8, 0.1d)`，且每维标准差中位数不得接近数值精度；ablation 应能暴露 loss 低而谱坍塌的反例。失败则不得报告 probe。
+- **动作门：** 在配对干预中，预测的状态变化方向准确率至少 80%，并比 no-action / shuffled-action 高至少 15 个百分点，bootstrap 95% CI 不跨 0。失败则只能声称 action correlation。
+- **状态门：** frozen linear readout 对位置 / 速度的归一化误差和接触 AUC 必须预先达标；小 MLP 成功而线性失败要单独标注，不能合并。
+- **rollout 门：** 同时报 horizon 1 / 4 / 8 的 median、P90 与失败率；若长程改善只来自 teacher forcing，或 closed-loop rollout 显著崩溃，则否定“可滚动动力学”。
+- **规划门：** 固定 CEM 预算后，MPC 成功率相对 reactive 与 random-shooting 基线至少提高 15 个百分点，且 95% CI 不跨 0；同时报告真实交互数、墙钟延迟与碰撞。
+- **OOD 门：** 每种单因素 shift 都报告相对跌幅；若 feature probe 保持而动作或规划跌幅超过预注册阈值，只保留“表征迁移”声明。
 
-## 3. 2022：JEPA 作为自主智能架构蓝图
+最关键的否证模式是：**frozen probe 很高，但动作置换不改变预测，或 MPC 不优于 no-action baseline。** 这时模型是有用的视觉表征器，却不是已验证的动作 world model。相反，若 pixel 预测更模糊但 latent MPC 更强，应把结论限定为“规划充分”，而不是“生成更真实”。
 
-Yann LeCun 的 [A Path Towards Autonomous Machine Intelligence](https://openreview.net/forum?id=BZ5a1r-kVsf) 不是一篇常规 benchmark 论文，而是一份架构提案。它设想的智能体包含感知、world model、短期记忆、actor、cost 和 configurator，并在多个抽象层级上预测与规划。
+## 11. 截至冻结日的发布面
 
-这份提案中最重要的判断是：真实世界包含大量不可预测细节。如果模型被要求生成所有细节，它可能把容量浪费在对行动无关的像素上；在抽象表征空间预测，才可能让模型专注于可预测的高层结构。
+| 项目 | 代码 / 权重 / 配置 / 训练评测 | 冻结日核验与边界 |
+|---|---|---|
+| I-JEPA [[5]](#ref-5) | 官方训练代码、配置、日志和多个 checkpoint | 仓库已 archived；HEAD `52c1ae9`。GitHub API 未给出明确 SPDX，不能仅凭仓库名宣称许可证 |
+| V-JEPA [[5]](#ref-5) | 官方预训练 / 评测代码、配置和 checkpoints | HEAD `51c59d5`；像素 decoder 是解释工具，不是基础模型生成接口 |
+| V-JEPA 2 / 2-AC [[8]](#ref-8) | V2 300M / 600M / 1B / 1B@384，2-AC checkpoint，训练评测代码与 PyTorch Hub | HEAD `204698b`；仓库说明主体为 MIT，部分文件另列 Apache-2.0 |
+| V-JEPA 2.1 [[8]](#ref-8) | 80M / 300M / 1B / 2B@384 的直链权重与配置；同仓库代码 | 2026-03-16 release；README 的 2.1 论文链接仍残留 `arxiv.org/abs/TODO`，应以正式 arXiv 号 2603.14482 为准 |
+| 官方 Hugging Face [[18]](#ref-18) | 冻结日 collection 列出 V2 encoder / probe cards | 未列 V2.1 card；这不等于 2.1 未开放，因为官方仓库已有直链权重 |
+| LeJEPA / LeWorldModel [[10]](#ref-10), [[11]](#ref-11) | 作者仓库提供代码；LeWorldModel 给 checkpoint / data 链接 | 分别 HEAD `c293d29` / `8edfeb3`；结果协议小于 V-JEPA foundation scale |
+| EB-JEPA [[12]](#ref-12) | Apache-2.0 官方教程库与可运行示例 | HEAD `966e61e`；论文是 ICLR 2026 World Models Workshop，不是 ICLR main track |
+| LeVJEPA [[15]](#ref-15) | 作者代码和 VideoMix-Large 权重 | HEAD `941526c`；代码总体 MIT，但适配文件与权重另有条款，加载卡要求 `trust_remote_code=True`，应先审计 |
 
-因此，后来的 I-JEPA 和 V-JEPA 只能算这份蓝图的部分实现：它们验证了 latent prediction 能否学习表征，但并没有一次性实现分层规划、长期记忆、内在成本和完整自主智能体。
+发布面必须拆成五列理解：论文、推理代码、训练代码、权重、数据 / 许可证。存在模型名或项目页不等于五项都开放；GitHub HEAD 也只是冻结日快照，不是永久版本。
 
-## 4. 2023：I-JEPA 证明“预测语义而非像素”可行
+## 12. 研究问题与阅读顺序
 
-[I-JEPA](https://arxiv.org/abs/2301.08243) 从一张图像中采样一个较大的 context block 和多个 target block。context encoder 看不到 target 内容，predictor 根据 context token 和目标位置 token 预测 target encoder 产生的表征。
+### 仍未解决
 
-关键设计包括：
+1. 什么 latent 粒度能同时保留语义、接触与速度，又不把不可预测纹理带入规划？
+2. 大规模被动视频提供的是视觉先验，还是可经少量交互可靠转化的动作因果结构？
+3. 如何把多模态 successor、校准 uncertainty 与实时 MPC 结合，而不让搜索成本爆炸？
+4. 如何区分“planner 利用模型漏洞”与“模型学到可迁移规律”？
+5. 跨相机、实验室、embodiment 与长任务时，成功率如何随 shift 逐项退化？
 
-- target block 要足够大，使预测任务偏向对象级语义，而不是局部纹理补全；
-- context 要有足够分散的信息，同时不能泄漏 target 像素；
-- target encoder 通过 context encoder 的指数滑动平均更新，形成非对称 teacher–student 结构；
-- 不使用负样本，也不要求 decoder 重建像素。
+### 最小阅读顺序
 
-I-JEPA 的意义不是“会生成缺失图像”，而是证明 masked prediction 可以在 latent space 中学习可迁移视觉特征。它仍然是**静态图像表征模型**，没有时间、动作和 rollout，不能单独视为决策型 world model。
+1. 蓝图与能量定义：LeCun 2022、energy-based learning tutorial。[[1]](#ref-1), [[2]](#ref-2)
+2. 表征机制：I-JEPA、V-JEPA。[[3]](#ref-3), [[4]](#ref-4)
+3. 动作与规划：V-JEPA 2 / 2-AC、DINO-WM。[[6]](#ref-6), [[14]](#ref-14)
+4. dense / collapse：V-JEPA 2.1、LeJEPA。[[9]](#ref-9), [[10]](#ref-10)
+5. 小型可复现 world model：EB-JEPA、LeWorldModel。[[12]](#ref-12), [[11]](#ref-11)
+6. 长期与多未来：TD-JEPA、Branch-JEPA、Var-JEPA。[[13]](#ref-13), [[16]](#ref-16), [[17]](#ref-17)
 
-- Paper：[`assran2023selfsupervised`](../bibliography/references.bib)
-- Official code：[facebookresearch/ijepa](https://github.com/facebookresearch/ijepa)（已归档）
-
-## 5. 2023：MC-JEPA 显式连接内容与运动
-
-[MC-JEPA](https://arxiv.org/abs/2307.12698) 处在 I-JEPA 与 V-JEPA 之间。它将自监督内容表征和光流估计放进共享 encoder，希望运动任务帮助模型保留位置与动态，内容任务则帮助运动估计理解对象边界和语义。
-
-它的重要性在于指出：对视频而言，仅学习“帧里有什么”不够；一个有用的预测表征还应编码“什么在移动、朝哪里移动”。不过 MC-JEPA 更接近联合表征与 optical flow 学习，还不是长时间 latent rollout 或动作条件 world model。
-
-- Paper：[`bardes2023mcjepa`](../bibliography/references.bib)
-- Code：截至 2026-08 未发现作者公开的论文专属 GitHub 仓库
-
-## 6. 2024：V-JEPA 将目标扩展到时空区域
-
-[V-JEPA](https://arxiv.org/abs/2404.08471) 不再只遮挡二维图像块，而是从视频中遮挡大面积时空区域，让 predictor 根据可见视频上下文预测缺失区域的 latent representation。
-
-V-JEPA 的训练目标有几个重要边界：
-
-- 只使用视频像素，不依赖文本、人工标签、负样本或预训练图像 encoder；
-- predictor 输出 feature，不输出 RGB 帧；
-- 论文中的可视化像素来自额外训练的 decoder，decoder 不属于 JEPA 预训练目标；
-- 主要证据来自 frozen backbone 加轻量 probe 的动作识别、动作预判等任务。
-
-因此，V-JEPA 可以学习运动和时间结构，但它首先仍是 **video representation learner**。没有动作输入时，它不能回答“采取另一个动作会怎样”；没有闭环规划实验时，也不能仅凭 feature prediction 被判定为决策 world model。
-
-- Paper：[`bardes2024revisiting`](../bibliography/references.bib)
-- Official code：[facebookresearch/jepa](https://github.com/facebookresearch/jepa)
-
-## 7. 2025：V-JEPA 2 从理解走向预测与规划
-
-[V-JEPA 2](https://arxiv.org/abs/2506.09985) 将被动视频自监督扩展到超过一百万小时的互联网视频与图像数据。它先训练通用 action-free encoder，再通过不同下游接口评估运动理解、动作预判、视频问答和物理推理。
-
-真正让它进入 world model 讨论的是 **V-JEPA 2-AC**：
-
-1. 从 action-free V-JEPA 2 表征开始；
-2. 使用少于 62 小时的机器人轨迹视频进行动作条件后训练；
-3. 学习给定当前视觉状态和候选动作后的 future latent；
-4. 在 latent space rollout 多个候选动作序列；
-5. 选择预测 latent 最接近图像目标的动作并执行。
-
-这条路径说明大规模被动视频可以提供视觉先验，而少量带动作数据负责把相关性连接到可干预动力学。但这里仍需区分两部分：**V-JEPA 2 encoder 本身不是动作模型；V-JEPA 2-AC 的 action-conditioned predictor 才承担规划所需的 dynamics。**
-
-- Paper：[`assran2025vjepa2`](../bibliography/references.bib)
-- Official code：[facebookresearch/vjepa2](https://github.com/facebookresearch/vjepa2)
-
-## 8. 2026：V-JEPA 2.1 强化 dense feature
-
-[V-JEPA 2.1](https://arxiv.org/abs/2603.14482) 并不是 V-JEPA 3，也不是新的动作条件 world model。它主要改进 V-JEPA 2 的自监督训练 recipe，使表征同时适合全局理解与密集预测：
-
-- **Dense Predictive Loss**：让可见 context token 和 masked token 都参与预测目标；
-- **Deep Self-Supervision**：在多个中间层施加自监督信号；
-- **Multi-Modal Tokenizers**：统一处理静态图像与视频输入；
-- **Model and data scaling**：继续考察架构和数据规模的收益。
-
-它在路线中的角色是提升 encoder 的空间细节和时间一致性，而不是替代 V-JEPA 2-AC 的动作条件规划模块。
-
-- Paper：[`murlabadia2026vjepa21`](../bibliography/references.bib)
-- Official code：与 V-JEPA 2 共用 [facebookresearch/vjepa2](https://github.com/facebookresearch/vjepa2)
-
-## 9. 训练稳定性与可规划分支
-
-### LeJEPA [[7]](#ref-7)：用显式分布约束替代 teacher–student 启发式
-
-[LeJEPA](https://arxiv.org/abs/2511.08544) 重新讨论 representation collapse。它提出 Sketched Isotropic Gaussian Regularization（SIGReg），直接约束 embedding 接近各向同性高斯分布，从而减少 stop-gradient、EMA teacher 和复杂 scheduler 等机制依赖。
-
-它首先解决的是 **JEPA 如何稳定、简洁地学表征**，不是直接解决视频生成。
-
-- Paper：[`balestriero2025lejepa`](../bibliography/references.bib)
-- Official code：[galilai-group/lejepa](https://github.com/galilai-group/lejepa)
-
-### LeWorldModel [[8]](#ref-8)：从 raw pixels 端到端学习 latent dynamics
-
-[LeWorldModel](https://arxiv.org/abs/2603.19312) 将 JEPA prediction 与 SIGReg 用于动作条件 world model。模型从原始像素训练 encoder 和 dynamics，用 future latent prediction 支持 model predictive control，而不需要像素 decoder 参与规划。
-
-这项工作代表另一种通向 world model 的路径：不先训练超大视频 foundation model，再用机器人数据后训练；而是在较小控制环境中从头学习对规划有用的 latent state 与 action dynamics。
-
-- Paper：[`maes2026leworldmodel`](../bibliography/references.bib)
-- Official code：[lucas-maes/le-wm](https://github.com/lucas-maes/le-wm)
-
-### EB-JEPA [[9]](#ref-9)：把架构拆成可复现教学组件
-
-[EB-JEPA](https://arxiv.org/abs/2602.03604) 是 Meta FAIR 发布的轻量库，覆盖图像表征、Moving MNIST 视频多步预测和动作条件导航规划。它的价值不在于刷新大规模 benchmark，而在于用单卡、数小时级实验展示 context encoder、predictor、collapse regularization 和 latent planning 如何连接。
-
-- Paper：[`terver2026lightweight`](../bibliography/references.bib)
-- Official code：[facebookresearch/eb_jepa](https://github.com/facebookresearch/eb_jepa)
-
-### TD-JEPA [[10]](#ref-10)：用 temporal difference 学长期策略动力学
-
-[TD-JEPA](https://arxiv.org/abs/2510.00739) 面向 reward-free offline transitions 和 zero-shot reinforcement learning。它不只做单步 future embedding prediction，而是通过 temporal-difference 目标学习多策略下的长期 latent dynamics，并在测试时适配新的 reward function。
-
-它展示了 JEPA 思想可以从视觉 masked prediction 延伸到 policy-conditioned representation learning，但任务设定与 V-JEPA 的互联网视频预训练不同。
-
-- Paper：[`bagatella2025tdjepa`](../bibliography/references.bib)
-- Official code：[facebookresearch/td_jepa](https://github.com/facebookresearch/td_jepa)
-
-## 10. JEPA、视频生成和其他 World Model 的区别
-
-| 路线 | 训练目标 | 模型主要输出 | 是否直接生成像素 | 不确定性表达 | 主要验证方式 |
-|---|---|---|---|---|---|
-| Video diffusion | 匹配完整视频数据分布 | RGB 或 video latent | 是 | 较强，可采样多个未来 | 画质、文本遵循、运动、人工偏好 |
-| Token video model | 预测离散视觉 token | token 序列 | 经 decoder 生成 | 可通过自回归分布表达 | likelihood、FVD、生成质量 |
-| I-JEPA / V-JEPA | 预测缺失区域表征 | image / video feature | 否 | 通常不是显式概率分布 | frozen probe、迁移、预测一致性 |
-| V-JEPA 2-AC / LeWorldModel | 预测动作后的 future latent | action-conditioned state | 否 | 依实现而定，通常有限 | rollout、MPC、真实任务成功率 |
-| Dreamer-style model | 学 latent transition、reward 与 value | stochastic latent state | 可选 decoder | 显式或隐式随机 latent | 样本效率、控制回报、任务成功率 |
-
-三个结论尤其重要：
-
-1. **不生成像素不等于不能建模世界。** 对规划而言，正确的 latent dynamics 可能比逼真的 RGB 更有用。
-2. **能预测 feature 不等于已经具备因果动作模型。** 需要动作条件数据和干预测试。
-3. **JEPA 与 diffusion 可以组合。** 可以用 JEPA 学状态或评价预测，再用生成 decoder 负责可视化；也可以让生成模型提供数据或视觉先验。
-
-## 11. 应该怎样评测 JEPA World Model
-
-### Representation quality
-
-冻结 encoder，只训练轻量 probe，测试动作识别、动作预判、深度、分割和对象状态等任务。该评测回答“latent 是否有用”，不回答“rollout 是否准确”。
-
-### Latent prediction
-
-在不同预测跨度、遮挡比例和场景分布下计算 feature error，并检查误差是否随 rollout 长度快速累积。
-
-### Action sensitivity
-
-保持当前观测相同，只改变动作；预测 latent 应产生方向正确、幅度合理的差异。
-
-### Goal-conditioned planning
-
-在统一候选动作预算下比较 JEPA planner、无模型策略、oracle simulator 和其他 learned world model 的成功率、规划时间与真实执行次数。
-
-### State sufficiency
-
-通过 linear probe、反事实任务和失败案例检查 latent 是否丢失接触、速度、遮挡对象、关节状态等对控制关键的信息。
-
-### Uncertainty and out-of-distribution behavior
-
-确定性 feature predictor 可能把多个未来平均成一个 latent。需要测试陌生对象、罕见碰撞和不可预测事件，并检查模型是否能表达“不知道”。
-
-## 12. 常见误解
-
-- **“V-JEPA 能生成视频。”** 核心模型预测 latent；论文中的像素可视化依赖额外 decoder。
-- **“JEPA 完全不需要防坍塌设计。”** I-JEPA/V-JEPA 使用 EMA target encoder 等非对称机制；LeJEPA/LeWorldModel 则使用显式 embedding regularization。
-- **“任何 masked autoencoder 都是 JEPA。”** 如果目标是直接重建像素或 token，它更接近生成式 masked modeling；JEPA 的关键是 target embedding prediction。
-- **“V-JEPA 2 就是机器人控制模型。”** 通用 encoder 是 action-free；V-JEPA 2-AC 才加入动作条件 dynamics 和规划。
-- **“latent 越抽象越好。”** 如果抽象过程丢掉速度、接触或对象永久性，规划会失败。
-- **“闭环成功说明模型理解了完整物理。”** planner 可能只在窄数据分布中有效，仍需跨环境、反事实和 OOD 测试。
-
-## 13. 推荐复现路径
-
-1. **先跑 EB-JEPA 图像示例**：理解 predictor、target encoder 和 collapse regularization。
-2. **阅读并运行 I-JEPA checkpoint**：比较 feature prediction 与 pixel reconstruction 的差异。
-3. **使用 V-JEPA / V-JEPA 2 预训练模型做 frozen probing**：不要一开始尝试从头复现超大规模训练。
-4. **在小型环境运行 EB-JEPA action-conditioned 或 LeWorldModel**：观察 latent rollout 如何进入 MPC。
-5. **设计 action intervention 测试**：同一初始状态替换动作，检查模型是否预测正确的反事实结果。
-6. **最后再接生成 decoder**：将“规划 latent 是否正确”和“生成画面是否逼真”分开评价。
-
-## 14. 最小阅读集
-
-如果只读六项，建议按这个顺序：
-
-1. [A Path Towards Autonomous Machine Intelligence](https://openreview.net/forum?id=BZ5a1r-kVsf)：理解完整研究设想。
-2. [I-JEPA](https://arxiv.org/abs/2301.08243)：理解图像 latent prediction。
-3. [V-JEPA](https://arxiv.org/abs/2404.08471)：理解时空遮挡与视频表征。
-4. [V-JEPA 2](https://arxiv.org/abs/2506.09985)：理解规模化视频预训练与动作条件后训练。
-5. [LeJEPA](https://arxiv.org/abs/2511.08544)：理解 collapse 与训练稳定性的另一种解法。
-6. [LeWorldModel](https://arxiv.org/abs/2603.19312)：理解 latent prediction 如何真正进入规划。
-
-论文与仓库核验记录保存在 [JEPA research audit](../sources/papers_20260809_jepa_lineage.md)。
+检索式、纳排理由、版本快照、逐项来源和负面核验见 [JEPA research audit](../sources/research_20260830_jepa.md)。
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] [A Path Towards Autonomous Machine Intelligence](https://openreview.net/forum?id=BZ5a1r-kVsf). Yann LeCun. OpenReview working paper (v0.9.2). 2022.
+<a id="ref-1"></a>[1] Yann LeCun. [A Path Towards Autonomous Machine Intelligence](https://openreview.net/forum?id=BZ5a1r-kVsf). OpenReview working paper, v0.9.2, 2022.
 
-<a id="ref-2"></a>[2] [Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture](https://arxiv.org/abs/2301.08243). Mahmoud Assran, Quentin Duval, Ishan Misra, Piotr Bojanowski, Pascal Vincent, Michael Rabbat, et al. CVPR. 2023.
+<a id="ref-2"></a>[2] Yann LeCun, Sumit Chopra, Raia Hadsell, Marc'Aurelio Ranzato, Fu Jie Huang. [A Tutorial on Energy-Based Learning](http://yann.lecun.com/exdb/publis/pdf/lecun-06.pdf). Predicting Structured Data, 2006.
 
-<a id="ref-3"></a>[3] [MC-JEPA: A Joint-Embedding Predictive Architecture for Self-Supervised Learning of Motion and Content Features](https://arxiv.org/abs/2307.12698). Adrien Bardes, Jean Ponce, Yann LeCun. arXiv preprint. 2023.
+<a id="ref-3"></a>[3] Mahmoud Assran et al. [Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture](https://openaccess.thecvf.com/content/CVPR2023/html/Assran_Self-Supervised_Learning_From_Images_With_a_Joint-Embedding_Predictive_Architecture_CVPR_2023_paper.html). CVPR, 2023.
 
-<a id="ref-4"></a>[4] [Revisiting Feature Prediction for Learning Visual Representations from Video](https://arxiv.org/abs/2404.08471). Adrien Bardes, Quentin Garrido, Jean Ponce, Xinlei Chen, Michael Rabbat, Yann LeCun, et al. arXiv preprint. 2024.
+<a id="ref-4"></a>[4] Adrien Bardes et al. [Revisiting Feature Prediction for Learning Visual Representations from Video](https://openreview.net/forum?id=QaCCuDfBk2). TMLR, 2024. [arXiv:2404.08471](https://arxiv.org/abs/2404.08471).
 
-<a id="ref-5"></a>[5] [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). Mahmoud Assran, Adrien Bardes, David Fan, Quentin Garrido, Russell Howes, Mojtaba Komeili, et al. arXiv preprint. 2025.
+<a id="ref-5"></a>[5] Meta FAIR. [I-JEPA official repository](https://github.com/facebookresearch/ijepa); [V-JEPA official repository](https://github.com/facebookresearch/jepa). Accessed 2026-08-30.
 
-<a id="ref-6"></a>[6] [V-JEPA 2.1: Unlocking Dense Features in Video Self-Supervised Learning](https://arxiv.org/abs/2603.14482). Lorenzo Mur-Labadia, Matthew Muckley, Amir Bar, Mido Assran, Koustuv Sinha, Mike Rabbat, et al. arXiv preprint. 2026.
+<a id="ref-6"></a>[6] Mahmoud Assran et al. [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). arXiv, 2025. [Meta research page](https://ai.meta.com/research/publications/v-jepa-2-self-supervised-video-models-enable-understanding-prediction-and-planning/).
 
-<a id="ref-7"></a>[7] [LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics](https://arxiv.org/abs/2511.08544). Randall Balestriero, Yann LeCun. arXiv preprint. 2025.
+<a id="ref-7"></a>[7] Meta AI. [V-JEPA 2: A world model for physical reasoning](https://ai.meta.com/blog/v-jepa-2-world-model-benchmarks/). Official project / release article, 2025.
 
-<a id="ref-8"></a>[8] [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312). Lucas Maes, Quentin Le Lidec, Damien Scieur, Yann LeCun, Randall Balestriero. arXiv preprint. 2026.
+<a id="ref-8"></a>[8] Meta FAIR. [V-JEPA 2, V-JEPA 2-AC and V-JEPA 2.1 official repository](https://github.com/facebookresearch/vjepa2). Accessed 2026-08-30.
 
-<a id="ref-9"></a>[9] [A Lightweight Library for Energy-Based Joint-Embedding Predictive Architectures](https://arxiv.org/abs/2602.03604). Basile Terver, Randall Balestriero, Megi Dervishi, David Fan, Quentin Garrido, Tushar Nagarajan, et al. arXiv preprint. 2026.
+<a id="ref-9"></a>[9] Lorenzo Mur-Labadia et al. [V-JEPA 2.1: Unlocking Dense Features in Video Self-Supervised Learning](https://arxiv.org/abs/2603.14482). arXiv, 2026.
 
-<a id="ref-10"></a>[10] [TD-JEPA: Latent-predictive Representations for Zero-Shot Reinforcement Learning](https://arxiv.org/abs/2510.00739). Marco Bagatella, Matteo Pirotta, Ahmed Touati, Alessandro Lazaric, Andrea Tirinzoni. ICLR. 2026.
+<a id="ref-10"></a>[10] Randall Balestriero, Yann LeCun. [LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics](https://arxiv.org/abs/2511.08544). arXiv, 2025. [Official repository](https://github.com/galilai-group/lejepa).
+
+<a id="ref-11"></a>[11] Lucas Maes et al. [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312). arXiv, 2026. [Official repository](https://github.com/lucas-maes/le-wm).
+
+<a id="ref-12"></a>[12] Basile Terver et al. [A Lightweight Library for Energy-Based Joint-Embedding Predictive Architectures](https://openreview.net/forum?id=ZVAMdXGCUC). ICLR 2026 Workshop on World Models. [Official repository](https://github.com/facebookresearch/eb_jepa).
+
+<a id="ref-13"></a>[13] Marco Bagatella et al. [TD-JEPA: Latent-predictive Representations for Zero-Shot Reinforcement Learning](https://openreview.net/forum?id=SzXDuBN8M1). ICLR, 2026. [Official repository](https://github.com/facebookresearch/td_jepa).
+
+<a id="ref-14"></a>[14] Philippe Hansen-Estruch et al. [DINO-WM: World Models on Pre-trained Visual Features Enable Zero-shot Planning](https://arxiv.org/abs/2411.04983). ICML, 2025. [Official repository](https://github.com/gaoyuezhou/dino_wm).
+
+<a id="ref-15"></a>[15] Andreas Kuhn et al. [LeVJEPA: A Lean Video Joint-Embedding Predictive Architecture without the Heuristics](https://arxiv.org/abs/2608.27395). arXiv preprint, submitted 2026-08-27. [Official repository](https://github.com/MLO-lab/LeVJEPA); [official model card](https://huggingface.co/galilai-group/LeVJEPA-VideoMix-Large).
+
+<a id="ref-16"></a>[16] [Branch-JEPA: Branching Joint-Embedding Predictive Architectures](https://arxiv.org/abs/2607.05238). arXiv preprint, v2, 2026.
+
+<a id="ref-17"></a>[17] [Var-JEPA: Variational Joint-Embedding Predictive Architectures](https://arxiv.org/abs/2603.20111). arXiv preprint, 2026.
+
+<a id="ref-18"></a>[18] Meta. [V-JEPA 2 official Hugging Face collection](https://huggingface.co/collections/facebook/v-jepa-2); [V-JEPA 2 ViT-H model card](https://huggingface.co/facebook/vjepa2-vith-fpc64-256). Accessed 2026-08-30.
+
+<a id="ref-19"></a>[19] Adrien Bardes, Jean Ponce, Yann LeCun. [MC-JEPA: A Joint-Embedding Predictive Architecture for Self-Supervised Learning of Motion and Content Features](https://arxiv.org/abs/2307.12698). arXiv preprint, 2023.

@@ -13,7 +13,7 @@ This is the working gap matrix for the long-term goal: every subfield should hav
 - **P1:** route is sound but misses mechanisms, milestones, quantitative evidence or a major recent branch.
 - **P2:** presentation, visual coverage, metadata normalization or secondary breadth.
 
-Counts are a repository snapshot after adding the causal-streaming chapter, with the mechanism, foundation, task-map, application, interpolation, inpainting, text-to-video, image-to-video, video-prediction, interactive-world, digital-human, story/multi-shot, unconditional-video and open-model rows refreshed on 2026-08-30. “Visual” counts Mermaid blocks plus embedded images; a visual can still fail the scientific-quality gate.
+Counts are a repository snapshot after adding the causal-streaming chapter, with the mechanism, foundation, task-map, application, interpolation, inpainting, text-to-video, image-to-video, video-to-video, video-prediction, action-conditioned prediction, interactive-world, digital-human, story/multi-shot, unconditional-video, open-model, video-reasoning and JEPA rows refreshed on 2026-08-30. “Visual” counts Mermaid blocks plus embedded images; a visual can still fail the scientific-quality gate.
 
 ## A. Generation mechanisms and foundation models
 
@@ -48,11 +48,11 @@ Modern systems routinely choose one item from several axes. Diffusion Forcing, C
 |---|---:|---:|---:|---:|---|---|
 | `text-to-video.md` | 455 | 36 | 4 | 4 | Rewritten around a strict task boundary, orthogonal route matrix, runtime condition contract, optional post-training, native AV, release surfaces and acceptance evidence; next gate is matched open-checkpoint reproduction | P2 |
 | `image-to-video.md` | 465 | 34 | 3 | 4 | Rewritten around pixel/latent/soft temporal anchors, full condition tensors, motion/camera/audio routes, preservation–motion trade-offs and versioned evidence; next gate is matched checkpoint/control reproduction | P2 |
-| `video-to-video.md` | 303 | 22 | 0 | 3 | Strongest task review; add mechanism-choice visual and split benchmark/data milestones; fresh JoyAI entry is now marked provisional | P1 |
+| `video-to-video.md` | 439 | 47 | 3 | 4 | Rewritten around a strict source-time-axis contract, route-specific preservation assumptions, formal/release status, eight-axis evaluation, multi-turn non-destructive editing and causal streaming; next gate is matched-checkpoint editing reproduction | P2 |
 | `digital-human.md` | 366 | 45 | 3 | 4 | Rewritten around seven non-interchangeable tasks, time/sync/identity/authorization contracts, release surfaces, loss conflicts, leakage, counterfactuals and 2026 long-duration/streaming/full-body work; old unlabelled-score PNG is no longer cited and a score-free contract visual was verified; next gate is matched open-checkpoint reproduction | P2 |
 | `frame-interpolation.md` | 480 | 32 | 4 | 4 | Rewritten as correspondence/reconstruction versus generative routes, with hard endpoint constraints, milestone-date rules, protocol traps, failure analysis and a reproducible evidence log; next gate is matched-data/runtime reproduction | P2 |
 | `video-prediction.md` | 466 | 30 | 3 | 4 | Rewritten around train-only versus deployment-GT boundaries, deterministic/stochastic/latent/diffusion routes, forcing distinctions, calibrated rollout and an evidence ladder; next gate is matched long-rollout and downstream-utility reproduction | P2 |
-| `action-conditioned-prediction.md` | 76 | 15 | 0 | 2 | Needs action-intervention, counterfactual, model-exploitation and closed-loop benchmark protocols | P1 |
+| `action-conditioned-prediction.md` | 447 | 33 | 3 | 4 | Rewritten around action clocks, intervention versus logged correlation, pixel/probabilistic/task/representation/generative routes, model exploitation, calibrated futures and real closed-loop utility; next gate is the preregistered ActionFork-2D reproduction | P2 |
 | `video-inpainting.md` | 545 | 38 | 3 | 4 | Rewritten from valid-pixel propagation through missing-region synthesis and global temporal verification, with mask-outside preservation, scene-cut reset, benchmark traps and a reproducible evidence log; next gate is controlled mask/protocol reproduction | P2 |
 | `story-multishot.md` | 391 | 34 | 3 | 4 | Rewritten around shot contracts, planner/joint/memory/storyboard/streaming routes, state transactions, conflict rollback, current formal venues and release surfaces; SVD misclassification removed; next gate is matched long-story reproduction | P2 |
 | `interactive-world-generation.md` | 463 | 39 | 3 | 4 | Rewritten around action schedules, dual clocks, speculative versus authoritative memory, formal 2026 frontiers, model/product/artifact release surfaces, external interlock and post-hoc audit; next gate is common-hardware closed-loop reproduction | P2 |
@@ -62,11 +62,11 @@ Modern systems routinely choose one item from several axes. Diffusion Forcing, C
 
 | File | Lines | Refs | Visuals | Current depth | Main gap | Priority |
 |---|---:|---:|---:|---:|---|---|
-| `video-reasoning.md` | 746 | 55 | 1 | 3.5 | Integrate already-audited 2026 Thinking in Video, UniVR and RuleMaze; normalize MME-CoF/VChain/VIPER venue status | P1 |
+| `video-reasoning.md` | 809 | 58 | 3 | 4 | Added UniVR, the causal-generative gap and RuleMaze as a scoped adjacent control; normalized MME-CoF/VChain/Thinking-with-Video/VIPER venues and separated output, denoising and interaction clocks; next gate is causal-state and closed-loop reproduction | P2 |
 | `world-models.md` | 523 | 33 | 3 | 4 | Rewritten around cascaded versus joint world-action routes, receding-horizon execution, pseudo-action recovery, verifier scope, persistent memory, uncertainty and decision utility; next gate is independent closed-loop reproduction | P2 |
 | `physical-consistency.md` | 528 | 41 | 3 | 4 | Rewritten with a six-level concept taxonomy, one canonical L0–L7 evidence ladder, 2024–26 method/benchmark registries, grouped interventions, program measurements, counterfactuals and closed-loop validation; an independent primary-source audit closed four evidence-level P1s, and the next gate is independent GAUGE/robotics replication | P2 |
 | `evaluation.md` | 845 | 62 | 3 | 4 | Rewritten with 2025–26 generation/editing/reasoning/world-model families, evaluator stress tests, pairwise statistics, judge/arena calibration, SLO/energy, watermark and C2PA 2.4; independent audit passed after citation and standards-boundary fixes, and the next gate is evaluator/inter-validator replication | P2 |
-| `jepa.md` | 283 | 10 | 2 | 3 | Add quantitative comparison, uncertainty/multimodality and action-conditioned planning loop; distinguish probe evidence from physical law | P1 |
+| `jepa.md` | 340 | 19 | 4 | 4 | Rewritten around the exact teacher–student contract, collapse, dense/semantic trade-off, action-conditioned latent MPC, V2.1 attribution, multi-future uncertainty, release surfaces and claim-specific tests; next gate is matched latent-control reproduction | P2 |
 
 ## D. Navigation, applications and resources
 
@@ -114,14 +114,15 @@ Each visual must have an explicit learning objective, editable/accessible altern
 | Done | Interactive-world closed-loop stack | Separate causal action flow, memory read/update, external pre-execution interlock and post-hoc evidence audit |
 | Done | VFI dual branch | Flow/depth/occlusion deterministic branch vs diffusion/DiT generative branch |
 | Done | Video inpainting pipeline | Valid-pixel propagation→missing-region synthesis→global consistency→outside-mask protection |
-| P1 | Video reasoning three clocks | Output-time, denoising-time and interaction-time reasoning with intervention points |
-| P1 | Evaluation evidence ladder | L0 visual plausibility through L7 real-world closed-loop utility |
+| Done | Video reasoning three clocks | Output-time, denoising-time and interaction-time reasoning with intervention points |
+| Done | Evaluation evidence ladder | L0 visual plausibility through L7 real-world closed-loop utility |
 | Done | Multi-shot memory workflow | Script/character bible→shot plan→references→generation→memory update→conflict/rollback |
 | Done | Unconditional-generation evidence chain | No external condition→marginal model→sampling→fixed output contract→quality/coverage/tail/memorization evidence |
 | Done | Digital-human condition and sync contract | Authorized inputs→timeline alignment→condition fusion→generation→separate sync/identity/motion/media gates |
 | Done | Open-model release surface | Official identity→version→artifact split→license intersection→hardware→smoke test→reproducibility manifest |
-| P1 | V2V method selector | Local/global, appearance/motion, new-view and multi-turn requirements to method families |
-| P1 | JEPA MPC loop | Encoder→action-conditioned predictor→cost→planner→action→new observation |
+| Done | V2V method selector | Local/global, appearance/motion, new-view and multi-turn requirements to method families |
+| Done | Action-conditioned intervention-to-control loop | Observed history→action schedule→counterfactual rollouts→fresh-observation planning loop |
+| Done | JEPA MPC loop | Encoder→action-conditioned predictor→cost→planner→action→new observation |
 
 ## Primary-source refresh queues
 
@@ -132,6 +133,22 @@ Before editing each field, verify its queue at the primary paper or official pro
 - **World/action:** WAM survey, World Action Verifier, DreamGen, ViPRA, WorldPack, Infinite-World, ReWorld.
 - **Tasks:** IFRNet, EDEN, BiM-VFI, LDF-VFI; MCVD/FramePack; STTN/FuseFormer/E²FGVI/ProPainter; STIV/ReasonDiff; ShotAdapter/OneStory/MultiShotMaster; VACE/EasyV2V/Editto; Exploration-Driven GIE/Vid2World/Dexterous World Models.
 - **Resources:** InternVid, OpenVid-1M, Physion/CLEVRER/PHYRE, NewtonBench-60K, VBVR, AgiBot World, RoboMIND/RH20T, modern audio-video and multi-view/3D sets.
+
+## Batch verification — action/V2V/reasoning/JEPA refresh
+
+Final checks on 2026-08-30 covered the four chapters, four dated research records and this audit:
+
+| Check | Result |
+|---|---|
+| Markdown | markdownlint-cli2 0.23.2 / markdownlint 0.41.1: 9 files, 0 issues |
+| Reference closure | action 33 refs / 67 citations; V2V 47 / 119; reasoning 58 / 155; JEPA 19 / 60; no missing or orphan anchor |
+| Local links and images | 31 chapter-local targets resolved; 0 missing |
+| Mermaid | 8 blocks total; all contain accessibility metadata and all 8 rendered with Mermaid CLI plus system Chrome to non-empty PNG/SVG audit artifacts |
+| Mermaid visual check | 2 action, 2 V2V, 1 reasoning and 3 JEPA charts inspected individually/contact-sheet; no clipping, broken branch or unreadable terminal node |
+| Generated PNGs | 4 teaching assets inspected at original detail; dimensions, SHA-256, grayscale contrast, prompt and scientific boundary are recorded in the corresponding dated research file |
+| Patch hygiene | `git diff --check` returned no error |
+
+Temporary Mermaid renderings and the contact sheet remain outside the repository. This batch does not run model checkpoints, does not constitute R1/R2 reproduction, and does not commit or push.
 
 ## Definition of done for one subfield
 
