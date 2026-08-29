@@ -19,14 +19,14 @@ Counts are a repository snapshot after adding the causal-streaming chapter. “V
 
 | File | Lines | Refs | Visuals | Current depth | Main gap | Priority |
 |---|---:|---:|---:|---:|---|---|
-| `docs/generative-models.md` | 168 | 13 | 0 | 2 | Still presents several orthogonal axes as one mechanism list; needs representation × factorization × objective × backbone map | P0 |
+| `docs/generative-models.md` | 441 | 32 | 3 | 4 | Rewritten as a five-axis cross-classification map with compatibility constraints, 2024–26 milestones, claim-specific evidence and an independently audited visual; next gate is controlled implementation comparison | P2 |
 | `recurrent-prediction.md` | 89 | 5 | 0 | 2 | Missing SV2P/SVG-LP/SAVP/VideoFlow comparison and teacher/open-loop/self-forcing bridge | P1 |
 | `variational-generation.md` | 77 | 5 | 0 | 1.5 | Mixes stochastic latent models with tokenizer/codec role; no tensor shapes, causal padding or compression trade-off | P0 |
 | `adversarial-generation.md` | 63 | 5 | 0 | 2 | Stops at DVD-GAN; misses StyleGAN-V/DIGAN and GAN's current decoder/distillation role | P1 |
 | `autoregressive-generation.md` | 74 | 5 | 0 | 2 | Does not separate pixel, discrete-token, continuous-latent and chunk-wise AR; no KV/cache complexity | P1 |
 | `masked-generation.md` | 75 | 5 | 0 | 2 | Missing absorbing-state/discrete diffusion link, confidence calibration and tube/frame/block schedules | P1 |
-| `diffusion-models.md` | 94 | 7 | 0 | 2.5 | Missing ELBO–score SDE–PF-ODE bridge, parameterization/SNR/solver distinctions and modern video attention | P0 |
-| `flow-consistency-models.md` | 83 | 5 | 0 | 1.5 | Almost entirely generic/image-side; lacks video RF/FM and detailed CM/DMD distillation | P0 |
+| `diffusion-models.md` | 413 | 24 | 2 | 4 | Rewritten across DDPM→score→reverse SDE→PF-ODE, parameterization, weighting, architecture and acceleration; next gate is numerical notebook reproduction | P2 |
+| `flow-consistency-models.md` | 546 | 20 | 2 | 4 | Rewritten across FM/RF/reflow, CM/sCM/rCM, Shortcut/MeanFlow/FACM/AlphaFlow and DMD/DMD2 with video evidence boundaries; next gate is matched-budget reproduction | P2 |
 | `causal-streaming-generation.md` | 376 | 25 | 2 | 3.5 | New focused review; next gate is independent reproduction/benchmark integration, not more paper names | P2 |
 | `foundation-models.md` | 236 | 22 | 1 | 2.5 | Needs data→captioner→tokenizer→generator→post-train→distill→SR/audio/safety/API system view and current open models | P0 |
 
@@ -64,8 +64,8 @@ Modern systems routinely choose one item from several axes. Diffusion Forcing, C
 |---|---:|---:|---:|---:|---|---|
 | `video-reasoning.md` | 746 | 55 | 1 | 3.5 | Integrate already-audited 2026 Thinking in Video, UniVR and RuleMaze; normalize MME-CoF/VChain/VIPER venue status | P1 |
 | `world-models.md` | 304 | 26 | 1 | 2.5 | Add cascaded vs joint WAM, action verifier, persistent memory and decision-utility benchmarks; label repository synthesis | P0 |
-| `physical-consistency.md` | 231 | 10 | 0 | 2 | Missing late-2025/2026 physics benchmark and interpretation wave; lacks physical quantity→intervention→measurement→evidence matrix | P0 |
-| `evaluation.md` | 570 | 35 | 1 | 3.5 method / 2 freshness | Add 2025–26 benchmark families; C2PA 2.2 is stale versus official 2.4; report benchmark/version/protocol | P0 |
+| `physical-consistency.md` | 528 | 41 | 3 | 4 | Rewritten with a six-level concept taxonomy, one canonical L0–L7 evidence ladder, 2024–26 method/benchmark registries, grouped interventions, program measurements, counterfactuals and closed-loop validation; an independent primary-source audit closed four evidence-level P1s, and the next gate is independent GAUGE/robotics replication | P2 |
+| `evaluation.md` | 845 | 62 | 3 | 4 | Rewritten with 2025–26 generation/editing/reasoning/world-model families, evaluator stress tests, pairwise statistics, judge/arena calibration, SLO/energy, watermark and C2PA 2.4; independent audit passed after citation and standards-boundary fixes, and the next gate is evaluator/inter-validator replication | P2 |
 | `jepa.md` | 283 | 10 | 2 | 3 | Add quantitative comparison, uncertainty/multimodality and action-conditioned planning loop; distinguish probe evidence from physical law | P1 |
 
 ## D. Navigation, applications and resources
@@ -76,7 +76,7 @@ Modern systems routinely choose one item from several axes. Diffusion Forcing, C
 | `applications.md` | 118 | 9 | 0 | 1.5 | Missing digital-human applications and capability→system requirement→acceptance metric→failure/safety gate mapping | P0 |
 | `timeline.md` | 722 | 0 local anchors | 1 Mermaid + 76 images | 3 breadth | Image-rich but relation-poor; add mechanism evolution lanes and separate recent preprints as frontier observations | P1 |
 | `reading-list.md` | 252 | 47 | 0 | 2.5 | Needs route-oriented prerequisites and current causal/streaming, post-training and native AV reading paths | P1 |
-| `resources/datasets.md` | 100 | 5 | 0 | 1 | Highest structural deficit: no scale/duration/FPS/modalities/actions/license/version/provenance/download fields; major modern groups absent | P0 |
+| `resources/datasets.md` | 795 | 38 | 2 | 4 | Rewritten as a current scoping review with release-surface taxonomy, an exact ten-stage data-engine path plus governance loop, rights/provenance, action/physics branches, manifest and fixed-compute validation; release-unit claims passed independent audit, and the next gate is acquisition/decode-yield replication | P2 |
 | `resources/open-models.md` | 77 | 8 | 0 | 1 | Stale 2026 list; conflates paper/code/weights; missing license, memory, checkpoint date and reproducibility status | P0 |
 | `bibliography.md` / registry | 82 / registry | 58 registered core items | 0 | 2 | At least 31 arXiv IDs used by audited mechanism/foundation pages are not registered; metadata/code status inconsistencies remain | P0 infrastructure |
 
@@ -103,7 +103,7 @@ Each visual must have an explicit learning objective, editable/accessible altern
 | P0 | Video tokenizer tensor pipeline | Show causal 3D encoding, spatial/temporal compression, latent shape, generator and decoder bottlenecks |
 | P0 | DDPM–SDE–PF-ODE–FM/RF–CM/DMD map | Prevent the most common diffusion/flow/consistency terminology errors |
 | Done | Offline bidirectional vs causal streaming | Separate full-clip denoising from chunk-causal output, bounded memory and new-condition loop |
-| P0 | Data/provenance pipeline | Source→shot split→dedup→filter→caption→license/provenance→versioned split |
+| Done | Data/provenance pipeline | Source→shot split→dedup→filter→caption→license/provenance→versioned split; generated figure plus accessible Mermaid alternative verified |
 | P0 | Physics evidence loop | Condition→state→generator/simulator→measurement→constraint/reward→falsification |
 | P0 | WAM dual route | Compare cascaded planner+generator with joint action-video model and verifier |
 | P0 | Three-axis task map | Condition source, source-preservation strength and open-loop→closed-loop |

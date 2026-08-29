@@ -1,6 +1,6 @@
 # 视频生成与世界模型评测：方法、历史与实践
 
-> 本文讨论的是“视频生成模型”的 evaluation。检索与整理截至 **2026 年 8 月**。这里的 evaluation 既包括视频样本本身的质量，也包括条件遵循、分布覆盖、安全性，以及模型被称为 world model 时的动作响应、反事实预测和闭环决策价值。
+> 本文讨论的是“视频生成模型”的 evaluation。检索与整理截至 **2026-08-29**。这里的 evaluation 既包括视频样本本身的质量，也包括条件遵循、分布覆盖、安全性，以及模型被称为 World Model 时的动作响应、反事实预测和闭环决策价值。
 
 视频生成没有一个类似分类准确率的充分统计量。原因不是指标设计得还不够巧，而是“好视频”同时涉及单帧外观、时间连续性、运动、语义、物理、叙事、多样性和使用风险；对同一个条件又常常存在许多同样合理的未来。一个样本可以逐帧清晰却完全不动，可以文本语义正确却违反重力，也可以作为短片很逼真却无法根据智能体动作预测下一状态。因此，可靠评测必须回答两个问题：**模型声称具有什么能力，以及当前证据真正验证了哪一层能力。**
 
@@ -8,7 +8,7 @@
 
 对于 T2V 的任务定义、组合性失败模式和 prompt 结构化记录，参见[文本到视频](tasks/text-to-video.md)；本章作为全仓库统一的评测方法与实验协议入口。
 
-### 评测前先记录条件、时间尺度和交互方式
+## 评测前先记录条件、时间尺度和交互方式
 
 模型的条件可分为语义、视觉、结构与运动、音频和智能体动作。测试时应明确记录文本、参考图、深度、轨迹、相机路径、语音或动作中的哪些条件被提供给模型。
 
@@ -20,25 +20,53 @@
 2. **Trajectory controllability**：给定轨迹、相机路径或动作后，输出是否按指定路径演化。
 3. **Closed-loop interactivity**：模型能否持续接收动作，低延迟响应并保持世界状态。
 
-## 1. 一张图看懂评测范式的迁移
+## 1. 一张图看懂：先分任务，再选择证据
+
+![视频生成评测证据链：能力声明进入任务分流，分别进入开放生成、视频编辑、Video Reasoning 或 World Model；自动指标先接受压力测试，再用冻结人类 Gold Set 校准 Judge，并完成盲测人评；最后检查 SLO、安全、水印和 C2PA，只报告分项结果、失败分类与 Pareto。World Model 还需从视觉诊断升级到动作干预和闭环决策。](../assets/diagrams/video-evaluation-evidence-chain.png)
+
+**图 1：评测不是把所有视频送进同一个总分。** 先把能力声明写成可证伪的 claim card，再按任务选择成功条件；自动指标只有通过受控破坏和人类 gold set 校准，才有资格参与最终报告。World Model 分支额外要求动作干预和闭环决策证据。
+
+下面是同一逻辑的可编辑、可搜索版本：
+
+```mermaid
+flowchart TD
+    accTitle: 视频生成评测证据链
+    accDescr: 能力声明先按开放生成、视频编辑、视频推理或世界模型分流，再依次通过自动指标压力测试、冻结人类样本校准、盲测人评和部署门槛，最后只报告分项结果、失败分类与 Pareto；世界模型还需动作干预与闭环证据。
+    A["能力声明<br/>任务、条件、用途、失败代价"] --> B{"任务分流"}
+    B -->|开放生成| G["质量 + 覆盖 + 条件 + 时间"]
+    B -->|视频编辑| E["编辑成功 + 源保留 + 局部性 + 时间"]
+    B -->|Video Reasoning| R["问题保持 + 结果 + 过程 + 预算"]
+    B -->|World Model| W{"是否动作条件化？"}
+    W -->|否| W0["只支持 L0–L2<br/>视觉与物理诊断"]
+    W -->|是| W1["动作干预 → rollout<br/>策略排序与现实效用"]
+    G --> M["自动指标 + 受控破坏压力测试"]
+    E --> M
+    R --> M
+    W0 --> M
+    W1 --> M
+    M --> J["冻结人类 Gold Set<br/>Judge 校准与拒答测试"]
+    J --> H["盲测成对人评<br/>BT / Thurstone + prompt-cluster CI"]
+    H --> S["部署门槛<br/>SLO + 安全 + 水印 + C2PA"]
+    S --> P["分项结果 + 失败分类 + Pareto<br/>不强制合成总分"]
+    J -.->|校准失败则修订指标| M
+```
+
+顺序化文字替代：声明任务和失败代价；按开放生成、编辑、推理或 World Model 分流；先压力测试自动指标，再用冻结人类样本校准；完成人工盲测与部署门槛；最后发布分项结果、置信区间、失败类型和质量—速度—成本 Pareto。
+
+### 1.1 历史范式为什么不断扩大
 
 ```mermaid
 flowchart LR
+    accTitle: 视频生成评测范式演化
+    accDescr: 评测从传统视频质量与逐帧保真，扩展到随机生成的真实性和多样性、FVD 时空分布、多维能力与人类偏好，最终进入动作干预、闭环和规划效用。
     A["传统视频质量<br/>编码、传输、重建"] --> B["早期视频预测<br/>像素与感知保真"]
     B --> C["GAN / 随机生成<br/>真实性与多样性"]
     C --> D["FVD 时代<br/>时空特征分布"]
     D --> E["大模型时代<br/>多维能力与人类偏好"]
-    E --> F["World model 时代<br/>干预、闭环与规划效用"]
-
-    A -. "PSNR / SSIM / MOS" .-> A1["有参考的失真"]
-    B -. "LPIPS / best-of-N" .-> B1["一个未来是否接近真值"]
-    C -. "IS / FID / 人评" .-> C1["样本是否真实且多样"]
-    D -. "I3D + Fréchet" .-> D1["视频分布是否接近真实数据"]
-    E -. "VBench / FETV / VLM judge" .-> E1["具体能力哪里成功、哪里失败"]
-    F -. "counterfactual / rollout / return" .-> F1["模型是否支持可靠决策"]
+    E --> F["World Model 时代<br/>干预、闭环与规划效用"]
 ```
 
-这条时间线也对应三种逐渐扩大的评测单位。最早的单位是一个预测帧与一个真实帧；随后变成一组生成视频与一组真实视频；大模型时代则以“prompt—多次采样—多维判断”为单位；world model 的最小评测单位最终变成“初始状态—动作序列—环境后果—策略收益”。
+这条时间线也对应逐渐扩大的评测单位。最早的单位是一个预测帧与一个真实帧；随后变成一组生成视频与一组真实视频；大模型时代以“prompt—多次采样—多维判断”为单位；World Model 的最小评测单位最终变成“初始状态—动作序列—环境后果—策略收益”。
 
 ## 2. 为什么视频生成比图像生成更难评
 
@@ -105,7 +133,7 @@ $$
 
 ### 4.1 从单样本误差转向真实性与多样性
 
-VideoGAN、MoCoGAN 等生成模型不再承诺重建某个未来，而是学习整个视频数据分布 [[6]](#ref-6)[[7]](#ref-7)。这使两两像素误差失去中心地位，图像生成领域的 Inception Score（IS）和 Fréchet Inception Distance（FID）被移植到视频。
+VideoGAN、MoCoGAN 等生成模型不再承诺重建某个未来，而是学习整个视频数据分布 [[6]](#ref-6) [[7]](#ref-7)。这使两两像素误差失去中心地位，图像生成领域的 Inception Score（IS）和 Fréchet Inception Distance（FID）被移植到视频。
 
 IS 通过分类器输出衡量单个样本类别分布是否尖锐、整个样本集合的边缘类别分布是否多样：
 
@@ -120,7 +148,7 @@ $$
 \mathrm{Tr}\left(\Sigma_r+\Sigma_g-2(\Sigma_r\Sigma_g)^{1/2}\right).
 $$
 
-FID 同时对特征均值和协方差敏感，较 IS 更能检测生成分布与真实分布的偏移 [[8]](#ref-8)[[9]](#ref-9)。但若逐帧计算，它完全不知道帧的先后顺序。
+FID 同时对特征均值和协方差敏感，较 IS 更能检测生成分布与真实分布的偏移 [[8]](#ref-8) [[9]](#ref-9)。但若逐帧计算，它完全不知道帧的先后顺序。
 
 ### 4.2 FVD 的出现与影响
 
@@ -182,26 +210,124 @@ VideoScore/VideoFeedback 使用来自多个生成模型的 3.76 万条视频多�
 
 ### 5.5 安全、拒绝与来源也进入评测对象
 
-视频比静态图像多出动作持续、行为模仿和跨帧升级等风险。T2VSafetyBench 将文本生成视频安全拆为 12 个方面，并同时检查恶意 prompt、模型输出和可用性—安全权衡 [[26]](#ref-26)。生产评测还应记录正常 prompt 的误拒率、恶意 prompt 的攻击成功率、肖像与版权风险、未成年人内容、误导性内容以及水印/来源信息在转码、裁剪和上传后的保留率。C2PA 提供的是可验证的媒体来源和编辑历史标准，而不是“画面内容一定真实”的分类器 [[27]](#ref-27)。
+视频比静态图像多出动作持续、行为模仿、跨帧语境改变和时序升级等风险。T2VSafetyBench 的 NeurIPS 2024 camera-ready 版本采用 **4 个一级类别、14 个安全方面**，并评测 9 个 T2V 模型 [[26]](#ref-26)。当前 arXiv v3 摘要仍写 12 个方面，与正式会议版存在版本冲突；引用时必须注明所用版本，不能混用数字。
+
+生产评测至少分开四层，任何一层都不能替代其余三层：
+
+1. **行为安全：** 恶意请求攻击成功率、正常请求误拒率、跨帧风险升级、人物/未成年人/版权/隐私风险。
+2. **AI 检测：** 真实/生成分类器在域外生成器、重压缩、假水印和去水印条件下的 `TPR@固定FPR`。
+3. **水印：** 检测、载荷、定位和抗攻击能力；需要独立测试删除和伪造，而不只是普通压缩。
+4. **来源凭证：** C2PA 对签名声明、内容绑定和处理链做加密验证；它不是 deepfake 分类器，也不保证声明本身为真。
+
+生产报告还应保存拒绝、超时和被安全过滤的样本。只对通过过滤的输出打分，会让高拒绝模型看起来既安全又高质量。
 
 ### 5.6 大模型时代的 benchmark 谱系
 
-| 年份 | 代表工作 | 评测重心 | 相比上一阶段的推进 | 仍需警惕 |
-|---:|---|---|---|---|
-| 2018/2019 | FVD | 时空特征分布 | 不再只逐帧评价 | I3D 偏置、样本量、不可解释 |
-| 2023 | FETV | prompt 分类、人工细粒度评分 | 检查不同条件下的能力与指标可靠性 | 规模和模型快照会过时 |
-| 2024 | VBench | 16 个解耦维度 | 可诊断、可自动化的统一套件 | 代理模型误差、维度聚合权重 |
-| 2024 | EvalCrafter | 视觉/内容/运动/对齐，拟合人类意见 | 用真实用户 prompt 与人评校准指标 | 拟合权重可能分布依赖 |
-| 2024 | VideoScore | 人类多维反馈学习评测器 | 从手工代理指标转向 human-aligned judge | reward hacking、域外泛化 |
-| 2024—2025 | TC-Bench、T2V-CompBench | 时序转变和组合绑定 | 从关键词共现转向关系与状态验证 | 检测/跟踪/VLM 链式误差 |
-| 2024—2025 | VideoPhy、PhyGenBench、VideoPhy-2 | 物理常识与规则 | 将“像世界”变成可测试的物理子能力 | 常识判断不等于动作可控模拟 |
-| 2024 | T2VSafetyBench | 安全与误拒 | 质量之外评估部署风险 | 攻击面持续变化 |
-| 2025 | WorldModelBench | 指令与物理违规、人类偏好 | 直接检验“视频 world model”声明 | 仍主要评价已生成视频，而非规划效用 |
-| 2026 | 决策中心评测框架 | 反事实、策略排序、闭环与优化增益 | 将模型价值绑定到实际决策 | 尚未形成单一成熟公共标准 |
+不能把所有 benchmark 排成一个“谁更新谁更好”的榜单。更准确的做法是按它们回答的问题分族：
+
+| 家族 | 2023—2026 代表工作 | 关键规模或设计 | 真正增加的证据 | 仍不能推出 |
+|---|---|---|---|---|
+| 开放域多维 | FETV、VBench、EvalCrafter | prompt 分类、16 维诊断、真实用户 prompt | 质量问题可定位到内容/运动/条件维度 | 指标代理就是人类真值 |
+| 任务扩展 | VBench++ [[36]](#ref-36) | 在 VBench 体系上加入 I2V 与 trustworthiness | 同一套件覆盖更多生成条件 | 与 VBench-2.0 是同一版本 |
+| 内在忠实度 | VBench-2.0 [[37]](#ref-37) | Human Fidelity、Controllability、Creativity、Physics、Commonsense 五个一级维度 | 从表面质量转向生成结果的内在忠实度 | 五维总分可替代分项诊断 |
+| 组合与世界知识 | T2V-CompBench、T2VWorldBench [[22]](#ref-22) [[38]](#ref-38) | 前者 1,400 prompts/7 类组合；后者 1,200 prompts/6 类、60 子类 | 属性、关系、动作绑定和开放世界知识被单独测量 | 能支持闭环规划 |
+| 评测器元评测 | SLVMEval [[39]](#ref-39) | 最长 10,486 秒、10 类受控退化 | 直接检验 evaluator 是否识别长视频错误 | 某个 judge 在新域必然可靠 |
+| 人体运动 | HuM-Eval / HuM-Bench [[40]](#ref-40) | 1,000 prompts；VLM 粗评 + 2D pose + 3D motion 细评 | 人体运动不再被整体 VQA 掩盖 | 姿态正确等于接触和动力学正确 |
+| 视频编辑 | VE-Bench、FiVE-Bench、IVEBench [[41]](#ref-41) [[42]](#ref-42) [[43]](#ref-43) | 从整体编辑质量推进到对象 mask、长序列和多类指令 | 同时检查“改对”和“未要求部分保住” | 开放式 T2V 覆盖能力 |
+| 物理与 World Model | VideoPhy、PhyGenBench、VideoPhy-2、Physics-IQ、WorldModelBench、WorldMark [[23]](#ref-23) [[24]](#ref-24) [[25]](#ref-25) [[44]](#ref-44) [[32]](#ref-32) [[45]](#ref-45) | 常识/规律 → 视觉违规 → 动作响应 | 物理和动作响应形成独立证据链 | 视觉 plausibility 自动等于决策效用 |
+| Video Reasoning | MME-CoF、TiViBench、Gen-ViRe、V-ReasonBench、VBVR、World Reasoning Arena、VBVR-Pro [[46]](#ref-46) [[47]](#ref-47) [[48]](#ref-48) [[49]](#ref-49) [[50]](#ref-50) [[51]](#ref-51) [[52]](#ref-52) | 结果、过程、预算与可验证状态 | 生成过程可作为推理轨迹被检查 | 漂亮中间帧就是合法推理 |
+| 安全与来源 | T2VSafetyBench、VideoMarkBench、SIGMark、C2PA 2.4 [[26]](#ref-26) [[54]](#ref-54) [[55]](#ref-55) [[56]](#ref-56) | 行为风险、水印攻击和来源凭证分层 | 部署风险进入可复现协议 | 有水印/C2PA 就代表内容真实 |
+
+这条谱系的主线是：**单一总分 → 多维诊断 → 任务专项 benchmark → 对 evaluator 本身做压力测试 → 将生成质量与决策、部署证据分开。**
+
+### 5.7 四类任务必须使用不同的成功定义
+
+| 任务 | 基本评测单位 | 必须回答 | 典型指标 | 不能由此推出 |
+|---|---|---|---|---|
+| 开放生成 | `prompt × seed` | 好看吗、动了吗、条件正确吗、覆盖困难 prompt 吗 | 分项质量、组合事实、时间/物理、拒绝率、人评 | 动作因果或规划价值 |
+| 视频编辑 | `source × instruction × seed`，mask 可选 | 改对了吗、原视频保住了吗、影响是否越界、时间上稳定吗 | edit success、source fidelity、locality、identity/motion preservation | 开放生成的多样性和覆盖 |
+| Video Reasoning | `question/initial state × seed × budget` | 问题约束保留了吗、答案对吗、中间状态合法吗 | exact/program score、process violation、pass@1/pass@k、预算 | 存在可用于控制的 World Model |
+| World Model | `initial state × action branch × horizon × policy` | 动作后果、反事实、长 rollout 和策略排序可靠吗 | action alignment、regret、return gap、optimization lift | 跨域通用世界理解 |
+
+#### 视频编辑的三角约束
+
+编辑质量不是“编辑后视频越像 prompt 越好”。如果源视频中的人物、相机、背景和未指定对象全部被重画，文本对齐可能很高但编辑失败。最小三角是：
+
+1. **Edit success：** 指令要求改变的属性、对象或运动是否改变；
+2. **Source preservation：** 未指定内容、身份、几何、纹理和运动是否保留；
+3. **Locality and temporal stability：** 改动是否局限在目标区域/时间段，是否产生闪烁和跨帧泄漏。
+
+VE-Bench 同时建模文本—编辑结果、源—编辑结果和感知质量；FiVE-Bench 引入对象级指令与 mask；IVEBench 再扩展到 600 个源视频、32–1,024 帧、8 大类/35 子类 [[41]](#ref-41) [[42]](#ref-42) [[43]](#ref-43)。`VE-Bench`（编辑输出质量）不要与 2026 年评估 MLLM 视频编辑知识的 `VEBench` 混写 [[62]](#ref-62)。
+
+#### Video Reasoning 要把“答案”和“过程”分开
+
+同一个正确答案可能来自非法中间状态、状态复制、穿越障碍或最后一帧猜测。Reasoning 报告至少拆成：问题/初始条件保持、最终答案或目标状态、中间状态合法性、读出方式与预算。`best-frame`、`best-of-k` 和多次重试都会扩大搜索预算，必须与 `pass@1` 分开报告。对可程序验证的任务优先使用确定性 scorer，MLLM 只处理无法形式化的开放语义。
+
+### 5.8 自动评测器先接受受控破坏，再评价模型
+
+给一条本来正确的视频构造只破坏单一能力的反事实版本。如果指标声称测该能力，分数应随破坏强度单调恶化，而对无关变化相对稳定。
+
+| 受控破坏 | 目标能力 | 应保持近似不变 | 失效说明 |
+|---|---|---|---|
+| 帧乱序、局部倒放 | 事件顺序、时间理解 | 单帧画质、对象集合 | 逐帧 CLIP 均值对此天然不敏感 |
+| 冻结、重复帧 | 动态程度、运动连续 | 主体和场景语义 | 高画质静态复制可能骗过内容型指标 |
+| 速度/FPS 改变 | 运动节奏和动力学 | 事件类别 | evaluator 可能只看稀疏关键帧 |
+| 删除关键片段 | 叙事/动作完成 | 开头与结尾外观 | 均匀采帧可能完全漏掉错误 |
+| codec 重压缩、resize | 技术质量鲁棒性 | 高层语义与顺序 | judge 可能把压缩伪影误判为语义失败 |
+| 颜色/数量交换 | 属性与计数绑定 | 场景、动作 | 整体文本相似度可能仍很高 |
+| 关系/动作反转 | 组合语义 | 对象类别和画质 | bag-of-concepts 指标无法判断方向 |
+| 短暂身份漂移 | 长时实体一致性 | 大部分帧 | 低频采样与平均分会掩盖短错误 |
+
+SLVMEval 的意义正在于把“评模型”前置为“先评测量仪器”：其论文报告人类成对判断准确率为 84.7%–96.8%，而所测自动 evaluator 在 9/10 个方面落后；这些数字是该论文实验结果，不应外推成所有域的固定差距 [[39]](#ref-39)。
+
+### 5.9 建立版本化 benchmark registry
+
+Benchmark 名称不足以复现结果。仓库或论文附录应为每次运行保存：
+
+```yaml
+benchmark:
+  name:
+  task_family: [generation, editing, reasoning, world_model]
+  version_or_commit:
+  release_date:
+  accessed_at:
+  prompt_count_and_categories:
+  license:
+evaluator:
+  name_and_checkpoint:
+  code_commit:
+  frame_sampling:
+  resolution_and_codec:
+  judge_prompt_hash:
+  calibration_gold_set_hash:
+  abstention_policy:
+generation_protocol:
+  model_or_api_version:
+  seeds_and_retries:
+  duration_fps_resolution_audio:
+  prompt_rewrite_and_postprocess:
+evidence:
+  controlled_corruptions:
+  human_protocol:
+  contamination_risk:
+  limitations:
+```
+
+同名 benchmark 的论文版、项目页版和 leaderboard 当前版可能不同；API 模型和 judge 也会静默更新。版本、访问日期和 prompt hash 是结果的一部分，而不是补充信息。
 
 ## 6. 自动指标到底测什么
 
 为了避免“指标名很多但证据重复”，可以把自动评价分成六类。
+
+| 指标 | 机制上测量什么 | 主要假设 | 典型失效 |
+|---|---|---|---|
+| IS | 分类器对单样本的置信度与样本集类别边际熵 | 标签域能代表生成质量/多样性 | 不看真实集；不测类内覆盖；可被分类器伪影利用 |
+| FID | 图像特征均值与协方差的二阶距离 | 特征近似高斯、backbone 合适 | 有限样本有偏且偏差依模型；逐帧计算不感知顺序 [[53]](#ref-53) |
+| FVD | 视频特征上的 Fréchet 距离 | I3D 时空特征与二阶统计代表目标能力 | 内容偏置、预处理敏感、严重时间破坏可能低敏感 |
+| CLIPScore | 图像—文本兼容性 | 视觉概念共现足以表示条件遵循 | 帧均值对帧置换不变；数量、否定、关系、动作和状态转移弱 |
+| Reward / VLM Judge | 训练分布中的人类评分或语言判定 | judge 泛化到新模型、新 prompt 和新帧采样 | 位置、verbosity/self-preference、域偏移、reward hacking [[60]](#ref-60) [[61]](#ref-61) |
+
+这些指标不是同一把尺子的不同精度，而是在不同特征空间回答不同问题。即使两个分数都与人评相关，也不意味着它们具有相同的因果解释。
 
 ### 6.1 有参考的保真指标
 
@@ -235,7 +361,17 @@ must_persist:
 
 ### 6.5 人类偏好或学习式 judge
 
-人评、VideoScore 和 MLLM judge 回答“用户认为哪个更好”。它们可以融合难以手工编码的因素，却受标注人群、任务说明、视频播放方式和模型偏见影响。judge 必须在当前 prompt 域和当前模型输出上重新与人工标注做相关性、成对准确率和校准测试；只引用其原论文相关性不足以证明本实验可靠。
+人评、VideoScore 和 MLLM judge 回答“用户认为哪个更好”。它们可以融合难以手工编码的因素，却受标注人群、任务说明、视频播放方式和模型偏见影响；视频专项元评测也观察到 judge 的位置偏差、能力切片差异和分布外可靠性问题 [[60]](#ref-60)，通用 arena 研究则系统讨论了 position、verbosity 与 self-enhancement bias [[61]](#ref-61)。只引用 judge 原论文上的相关性，不足以证明它在当前输出分布可靠。
+
+最低校准闸门包括：
+
+1. 在本次模型、prompt 类别和失败模式上冻结独立 human gold set；
+2. 将视频 A/B 左右互换，测 position consistency；
+3. 对采帧数、采帧位置、分辨率和 codec 做 sweep；
+4. 分别报告视觉、条件、时间、物理等能力切片，不能只给总体相关；
+5. 对概率输出做 reliability diagram、Brier/ECE；
+6. 允许 `abstain`，报告 coverage—risk，而不是强迫所有样本给结论；
+7. 将训练 reward judge、开发 judge 和最终冻结 judge 隔离，避免同一测量目标同时用于优化和验收。
 
 ### 6.6 任务与闭环指标
 
@@ -258,6 +394,18 @@ must_persist:
 ### 7.4 做元评测，而不只是做评测
 
 自动评测器的质量应通过独立的人类 gold set 验证，至少报告 Spearman/Kendall 排序相关、成对偏好准确率、不同能力切片的结果和置信区间。还应加入已知破坏的 sensitivity test：打乱帧序、复制帧、冻结画面、改变速度、交换对象颜色、删除关键事件、制造短暂身份漂移，检查指标是否朝预期方向变化。若指标连这些合成破坏都不敏感，就不应作为相应能力的证据。
+
+### 7.5 成对比较需要显式统计模型
+
+若模型 $i$ 与 $j$ 的潜在质量分别为 $\theta_i,\theta_j$，Bradley–Terry 模型写为：
+
+$$
+P(i \succ j)=\sigma(\theta_i-\theta_j).
+$$
+
+也可用 Thurstone/probit 形式。协议必须允许平局、“都差”和“无法判断”，并说明它们是单独建模、丢弃还是拆分权重。模型比较图需要连通，否则不同连通分量的强度不可识别。置信区间应以 prompt 为 cluster bootstrap；若同一标注者反复评样本，再加入 annotator random effect。
+
+公开 arena 还要披露用户来源、时间窗口、模型版本、匹配调度、重复/机器人过滤和位置偏差 [[61]](#ref-61)。Elo 或胜率是特定时间和人群下的相对偏好快照，不是跨版本稳定的绝对质量。
 
 ## 8. World model 应该如何评测
 
@@ -339,12 +487,16 @@ WorldModelBench 在 2025 年开始专门用指令遵循、物理违规和大规�
 | 时间质量 | 闪烁、平滑、运动幅度 | motion/flow/track 指标 + 人评 | 合成时间破坏的 sensitivity 验证 |
 | 分布 | fidelity、coverage、多样性 | 同协议 FVD + precision/recall | 多 backbone、bootstrap CI、分层结果 |
 | 条件 | 文本/图像/姿态/轨迹遵循 | 原子事实与约束核验 | 检测、跟踪、VQA、人评交叉验证 |
+| 编辑 | edit success、源保留、局部性 | source/instruction 双条件 + mask/track 可选 | 真实长序列上的对象级与时间级副作用审计 |
+| 推理 | 问题、答案、合法中间状态、预算 | deterministic scorer + process violation | OOD 状态、长链、预算受控的 pass@k |
 | 长时结构 | 身份、状态、叙事、镜头 | horizon 切片与失败分类 | 回环、遮挡恢复、跨镜头实体测试 |
 | 物理 | 接触、重力、材料、守恒 | 专项 prompt + 物理人评 | 可控状态变量和仿真 ground truth |
 | 世界模型 | 动作、反事实、闭环 | paired intervention + rollout | 策略排序、实际任务 optimization lift |
-| 安全 | 有害输出、误拒、肖像/版权 | 红队 prompt + refusal/output taxonomy | 持续攻击、人工复核、部署监测 |
-| 来源 | 水印、C2PA、日志 | 生成与转码后验证 | 鲁棒性、密钥/签名与审计链测试 |
-| 效率 | 延迟、吞吐、成本、能耗 | 统一硬件/API 预算 | 质量—成本 Pareto frontier |
+| 行为安全 | 有害输出、误拒、肖像/版权 | 红队 prompt + refusal/output taxonomy | 持续攻击、人工复核、部署监测 |
+| AI 检测 | 真实/生成分类与域外泛化 | `TPR@固定FPR` + 未见生成器/重压缩 | 假水印、去水印、域外真实视频 |
+| 水印 | 嵌入、提取、载荷、定位、删除/伪造 | BER、容量、`TPR@固定FPR` + 攻击套件 | 白盒、黑盒、no-box 与屏摄测试 |
+| 来源凭证 | C2PA、签名、内容绑定、ingredient | 生成与转码后的独立 validator | 密钥/撤销、篡改、跨工具互操作测试 |
+| 效率 | TTFF、尾延迟、吞吐、成本、能耗 | 统一硬件/API 预算和成功率分母 | 质量—速度—能耗—成本 Pareto frontier |
 
 ## 10. 一套可复现的评测协议
 
@@ -376,6 +528,54 @@ WorldModelBench 在 2025 年开始专门用指令遵循、物理违规和大规�
 
 视觉质量、动态程度、条件遵循、多样性、安全和成本之间存在真实权衡。若业务必须给总分，应在评测前确定权重，并同时发布各维原始分、归一化方式和权重敏感性分析。更诚实的方式是报告 Pareto frontier：在同等成本下谁更好，或达到同等质量需要多少成本。
 
+### 10.7 延迟、显存、能耗与 SLO 必须按使用方式测
+
+“生成一个 5 秒视频用了 20 秒”仍不足以复现效率。至少拆成三套协议：
+
+| 使用方式 | 必须报告 | 常见遗漏 |
+|---|---|---|
+| 离线批量 | 冷/热启动、videos/hour、生成帧率、`RTF = 计算秒 / 输出视频秒`、峰值 device allocated/reserved、host RAM、offload、墙上能耗 | 只报最快一批；忽略编解码、加载与失败重试 |
+| 交互/streaming | time-to-first-frame/chunk、控制到可见响应、inter-frame p50/p95/p99、jitter、deadline miss、可持续 horizon、缓存/显存增长、miss 后恢复 | 只报平均延迟；短 demo 掩盖内存增长和尾延迟 |
+| 商业 API | 上传、排队、推理、编码、下载的端到端分解；I2V/编辑还要计源视频上传 | 只使用服务端宣称的 inference time；不计拒绝、超时和网络 |
+
+功耗应与 workload window 同步；优先用墙上功率，同时报告 gross energy 与扣除 idle baseline 后的 net energy。若只有 GPU telemetry，必须标为部分系统能耗。MLPerf Power 提供了同步负载窗口的工程参考 [[58]](#ref-58)；商业 API 可借鉴行业测量按 p05/p25/median/p75/p95 报端到端时间，但应标明其不是同行评审标准 [[59]](#ref-59)。
+
+核心部署量不是最好一次的速度，而是：
+
+$$
+\text{time-to-usable-video},\qquad
+\text{energy-per-accepted-second},\qquad
+\text{cost-per-accepted-video}.
+$$
+
+其中分母必须只计满足预设质量和安全门槛的输出，分子则包含拒绝、失败、超时和重试成本。SLO 可写成 `p95 latency ≤ T`，或等价地写“至少 95% 的合格请求在 $T$ 秒内完成”，避免混用比例与分位数，也避免把不可用视频算作吞吐。
+
+### 10.8 行为安全、水印和 C2PA 2.4 的完整协议
+
+#### 行为安全与生成检测
+
+行为安全应同时报告恶意 prompt 的攻击成功率与正常 prompt 的误拒率，并按内容、法律/权利、社会和时间风险切片。检测器则在固定低 FPR 下报告 TPR，测试未见生成器、重压缩、resize/crop、域外真实视频、假水印和去水印；只在训练生成器上报告 accuracy 会严重高估泛化。
+
+#### 水印既要测“活下来”，也要测“能否被伪造”
+
+至少报告 `TPR@固定FPR`、bit error rate、载荷、定位精度、嵌入/提取时延与感知代价。扰动套件应覆盖 H.264/H.265、resize/crop、overlay、trim/drop/reorder/interpolate、FPS/speed、屏摄和生成式重编辑；攻击者模型分 white-box、black-box 和 no-box，并分别尝试 removal 与 forgery。VideoMarkBench 以多生成器、风格、水印、聚合和 12 类扰动组织这种测试；SIGMark 提供 2026 年的另一条鲁棒水印路线 [[54]](#ref-54) [[55]](#ref-55)。
+
+#### C2PA 2.4 是来源声明，不是内容真伪裁判
+
+截至 2026-08-29，C2PA 官方当前规范为 **2.4（April 2026）** [[27]](#ref-27)。它通过 manifest、content binding、claim signature 和 trust model 提供可验证 provenance。官方规范也明确：系统不应对 provenance 数据作“好/坏”价值判断，只验证断言是否与资产关联、格式正确且未被篡改。因此：
+
+- 没有 C2PA 不等于内容是假的；
+- 签名有效不等于画面所表达的事件真实；
+- `manifest present` 不等于签名可信或 provenance 完整；
+- 环境能耗等签名字段是声明，不自动证明测量方法正确。
+
+作为评测协议而非 C2PA 合规条文，本章建议将审计结果拆成 `manifest presence`、`cryptographic validity`、`trusted signer` 和 `provenance completeness`；后者是本章的覆盖度字段，不是标准 validation status。本章还建议执行两组测试：
+
+1. **正常变换：** transcode、rewrap、resize、crop、trim、concat、overlay、社交平台上传；
+2. **对抗变换：** 字节/断言篡改、签名替换、ingredient 删除、过期/撤销/不受信密钥、内容替换，以及直播分段的乱序、删除和重复。
+
+C2PA 2.4 还扩展了 repository receipt、environmental sustainability assertion、crJSON 派生视图与 live-video/dynamic packaging 支持；crJSON 是互操作/报告视图，本身不能脱离原 manifest 独立验证。直播协议宜测试分段连续性和顺序；官方当前 live-video 方案面向 ISO BMFF/CMAF，不应默认 MPEG-TS 具有相同支持 [[56]](#ref-56)。AI/ML 实施还应按官方 guidance 为生成资产记录 `c2pa.created` 与 `trainedAlgorithmicMedia` 等动作/来源类型 [[57]](#ref-57)。作为本章互操作审计建议，至少使用两个独立 generator/validator 交叉验证，防止把单一实现 bug 误写成标准性质。
+
 ## 11. 失败分类比一个总分更能推动研究
 
 建议每个失败样本允许多标签，并至少覆盖：
@@ -398,6 +598,15 @@ conditioning:
   - wrong_spatial_relation
   - wrong_motion_or_action
   - camera_control_failure
+editing:
+  - requested_edit_failed
+  - source_identity_or_motion_lost
+  - spatial_or_temporal_edit_leakage
+reasoning:
+  - question_or_constraint_drift
+  - wrong_final_state
+  - illegal_intermediate_state
+  - budget_or_readout_mismatch
 physics:
   - contact_failure
   - gravity_or_collision_failure
@@ -441,6 +650,7 @@ safety:
 ## 1. Claims and intended use
 - task / modality:
 - claimed capabilities:
+- falsification criteria and failure cost:
 - evidence level for world-model claims (L0-L7):
 
 ## 2. Models
@@ -458,7 +668,10 @@ safety:
 ## 4. Output specification and budget
 - resolution / fps / duration / audio:
 - post-processing:
-- latency, cost, hardware, energy if available:
+- cold/warm latency, TTFF, p50/p95/p99 and deadline miss:
+- hardware, peak device/host memory and offload:
+- gross/net energy, energy per accepted second:
+- cost per accepted video:
 - failures, refusals, timeouts included:
 
 ## 5. Metrics
@@ -467,9 +680,14 @@ safety:
 - distributional metrics and exact implementation:
 - condition / fact verification:
 - human evaluation protocol:
-- evaluator meta-evaluation:
+- controlled-corruption meta-evaluation:
+- judge gold set, calibration, frame sweep and abstention:
 
-## 6. World-model tests, if claimed
+## 6. Task-specific tests
+- editing: edit success / source preservation / locality:
+- reasoning: answer / legal process / pass@1, pass@k / budget:
+
+## 7. World-model tests, if claimed
 - one-step versus free rollout:
 - action sensitivity and no-op baseline:
 - counterfactual consistency:
@@ -478,24 +696,27 @@ safety:
 - policy ranking / regret / optimization lift:
 - independent or real-environment validation:
 
-## 7. Statistics
+## 8. Statistics
 - unit of analysis:
 - confidence intervals:
 - annotator agreement:
+- pairwise model and tie handling:
 - multiple-comparison handling:
 
-## 8. Failure and safety analysis
+## 9. Failure, safety and provenance
 - taxonomy and severity:
 - representative random cases, not selected demos:
 - false refusal / attack success:
-- provenance and watermark robustness:
+- detection and watermark removal/forgery robustness:
+- C2PA presence / validity / trusted signer / completeness:
+- deployment SLO and quality-cost Pareto:
 ```
 
 ## 14. 结论：评测必须跟随声明升级
 
-视频生成评测的发展并不是 PSNR 被 FVD 替代、FVD 又被 VLM 替代。更准确的理解是：PSNR/SSIM 测参考保真，LPIPS 测感知差异，FVD 测某个特征空间中的生成分布，VBench/FETV 等拆解开放域能力，人类与学习式 judge 测偏好和复杂语义，而 world model 的反事实、闭环和规划实验测决策价值。它们回答的是不同问题。
+视频生成评测的发展并不是 PSNR 被 FVD 替代、FVD 又被 VLM 替代。更准确的理解是：PSNR/SSIM 测参考保真，LPIPS 测感知差异，FVD 测某个特征空间中的生成分布，VBench/FETV 等拆解开放域能力，编辑 benchmark 测“改对且保住”，reasoning benchmark 测结果与合法过程，人类与学习式 judge 测偏好和复杂语义，而 World Model 的反事实、闭环和规划实验测决策价值。它们回答的是不同问题。
 
-如果模型声称“电影级生成”，就要测镜头、叙事、身份、声音和用户偏好；声称“物理理解”，就要做可控物理状态和反事实干预；声称“world model”，就必须展示动作条件、长期 rollout、不确定性、策略排序和独立环境中的闭环收益。最可信的评测不是找到一个万能分数，而是让每项能力声明都对应一组难以被投机的证据。
+如果模型声称“电影级生成”，就要测镜头、叙事、身份、声音和用户偏好；声称“物理理解”，就要做可控物理状态和反事实干预；声称“World Model”，就必须展示动作条件、长期 rollout、不确定性、策略排序和独立环境中的闭环收益。自动 evaluator 还要先通过受控破坏和冻结人类 gold set。最可信的评测不是找到一个万能分数，而是让每项能力声明都对应一组难以被投机的证据，并把安全、来源、尾延迟、能耗和失败样本纳入同一验收台账。
 
 ## 参考文献
 
@@ -519,7 +740,7 @@ safety:
 
 <a id="ref-10"></a>[10] [Towards Accurate Generative Models of Video: A New Metric & Challenges](https://arxiv.org/abs/1812.01717). Thomas Unterthiner, Sjoerd van Steenkiste, Karol Kurach, Raphael Marinier, Marcin Michalski, Sylvain Gelly. arXiv preprint. 2018.
 
-<a id="ref-11"></a>[11] [Beyond FVD: An Enhanced Evaluation Metrics for Video Generation Distribution Quality](https://arxiv.org/abs/2410.05203). Ge Ya Luo, Gian Mario Favero, Zhi Hao Luo, Alexia Jolicoeur-Martineau, Christopher Pal. ICLR. 2025.
+<a id="ref-11"></a>[11] [Beyond FVD: Enhanced Evaluation Metrics for Video Generation Quality](https://arxiv.org/abs/2410.05203). Ge Ya Luo, Gian Mario Favero, Zhi Hao Luo, Alexia Jolicoeur-Martineau, Christopher Pal. ICLR. 2025.
 
 <a id="ref-12"></a>[12] [On the Content Bias in Fréchet Video Distance](https://arxiv.org/abs/2404.12391). Songwei Ge, Aniruddha Mahapatra, Gaurav Parmar, Jun-Yan Zhu, Jia-Bin Huang. CVPR. 2024.
 
@@ -551,7 +772,7 @@ safety:
 
 <a id="ref-26"></a>[26] [T2VSafetyBench: Evaluating the Safety of Text-to-Video Generative Models](https://proceedings.neurips.cc/paper_files/paper/2024/hash/74eed5f568354c2e77dd9b018f38a9d4-Abstract-Datasets_and_Benchmarks_Track.html). Yibo Miao, Yifan Zhu, Lijia Yu, Jun Zhu, Xiao-Shan Gao, Yinpeng Dong. NeurIPS Datasets and Benchmarks. 2024.
 
-<a id="ref-27"></a>[27] [C2PA Technical Specification, Version 2.2](https://spec.c2pa.org/specifications/specifications/2.2/index.html). Coalition for Content Provenance and Authenticity. Technical specification.
+<a id="ref-27"></a>[27] [C2PA Technical Specification, Version 2.4](https://spec.c2pa.org/specifications/specifications/2.4/specs/C2PA_Specification.html). Coalition for Content Provenance and Authenticity. April 2026.
 
 <a id="ref-28"></a>[28] [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). OpenAI. Technical report. 2024.
 
@@ -568,3 +789,57 @@ safety:
 <a id="ref-34"></a>[34] [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). Mahmoud Assran, Adrien Bardes, David Fan, Quentin Garrido, Russell Howes, Mojtaba Komeili, et al. arXiv preprint. 2025.
 
 <a id="ref-35"></a>[35] [How Should World Models Be Evaluated for Embodied Decision-Making? A Decision-Making-Centric Position](https://arxiv.org/abs/2606.15032). Yang Yu, Shiyuan Zhang, Yifei Sheng, Haoxiang Ren, Haoxin Lin. arXiv preprint. 2026.
+
+<a id="ref-36"></a>[36] [VBench++: Comprehensive and Versatile Benchmark Suite for Video Generative Models](https://doi.org/10.1109/TPAMI.2025.3633890). Huang et al. IEEE TPAMI. 2025.
+
+<a id="ref-37"></a>[37] [VBench-2.0: Advancing Video Generation Benchmark Suite for Intrinsic Faithfulness](https://arxiv.org/abs/2503.21755). Zheng et al. arXiv preprint. 2025.
+
+<a id="ref-38"></a>[38] [T2VWorldBench: A Benchmark for Evaluating World Knowledge in Text-to-Video Generation](https://openaccess.thecvf.com/content/WACV2026/html/Chen_T2VWorldBench_A_Benchmark_for_Evaluating_World_Knowledge_in_Text-to-Video_Generation_WACV_2026_paper.html). WACV. 2026.
+
+<a id="ref-39"></a>[39] [SLVMEval: Synthetic Meta Evaluation Benchmark for Text-to-Long Video Generation](https://arxiv.org/abs/2603.29186). Matsuda et al. CVPR. 2026.
+
+<a id="ref-40"></a>[40] [HuM-Eval: A Coarse-to-Fine Framework for Human-Centric Video Evaluation](https://arxiv.org/abs/2604.25361). arXiv preprint; accepted to ICME. 2026.
+
+<a id="ref-41"></a>[41] [VE-Bench: Subjective-Aligned Benchmark Suite for Text-Driven Video Editing Quality Assessment](https://ojs.aaai.org/index.php/AAAI/article/view/32763). AAAI. 2025.
+
+<a id="ref-42"></a>[42] [FiVE-Bench: A Fine-grained Video Editing Benchmark for Evaluating Emerging Diffusion and Rectified Flow Models](https://openaccess.thecvf.com/content/ICCV2025/html/Li_FiVE-Bench_A_Fine-grained_Video_Editing_Benchmark_for_Evaluating_Emerging_Diffusion_ICCV_2025_paper.html). ICCV. 2025.
+
+<a id="ref-43"></a>[43] [IVEBench: Modern Benchmark Suite for Instruction-Guided Video Editing Assessment](https://iclr.cc/virtual/2026/poster/10007517). ICLR. 2026.
+
+<a id="ref-44"></a>[44] [Do Generative Video Models Understand Physical Principles?](https://openaccess.thecvf.com/content/WACV2026/html/Motamed_Do_Generative_Video_Models_Understand_Physical_Principles_WACV_2026_paper.html). Physics-IQ. WACV. 2026.
+
+<a id="ref-45"></a>[45] [WorldMark: A Unified Benchmark Suite for Interactive Video World Models](https://arxiv.org/abs/2604.21686). arXiv preprint. 2026.
+
+<a id="ref-46"></a>[46] [Are Video Models Ready as Zero-Shot Reasoners? An Empirical Study with the MME-CoF Benchmark](https://arxiv.org/abs/2510.26802). arXiv preprint. 2025.
+
+<a id="ref-47"></a>[47] [TiViBench: Benchmarking Think-in-Video Reasoning for Video Generative Models](https://arxiv.org/abs/2511.13704). arXiv preprint. 2025.
+
+<a id="ref-48"></a>[48] [Can World Simulators Reason? Gen-ViRe: A Generative Visual Reasoning Benchmark](https://arxiv.org/abs/2511.13853). arXiv preprint. 2025.
+
+<a id="ref-49"></a>[49] [V-ReasonBench: Toward Unified Reasoning Benchmark Suite for Video Generation Models](https://arxiv.org/abs/2511.16668). arXiv preprint. 2025.
+
+<a id="ref-50"></a>[50] [A Very Big Video Reasoning Suite](https://arxiv.org/abs/2602.20159). VBVR. arXiv preprint. 2026.
+
+<a id="ref-51"></a>[51] [World Reasoning Arena](https://arxiv.org/abs/2603.25887). arXiv preprint. 2026.
+
+<a id="ref-52"></a>[52] [VBVR-Pro: A Scalable and Verifiable Suite for Native Visual Reasoning](https://arxiv.org/abs/2608.26105). arXiv preprint. 2026.
+
+<a id="ref-53"></a>[53] [Effectively Unbiased FID and Inception Score and Where to Find Them](https://openaccess.thecvf.com/content_CVPR_2020/html/Chong_Effectively_Unbiased_FID_and_Inception_Score_and_Where_to_Find_CVPR_2020_paper.html). Chong and Forsyth. CVPR. 2020.
+
+<a id="ref-54"></a>[54] [VideoMarkBench: Benchmarking Robustness of Video Watermarking](https://arxiv.org/abs/2505.21620). arXiv preprint. 2025.
+
+<a id="ref-55"></a>[55] [SIGMark: Scalable In-Generation Watermark with Blind Extraction for Video Diffusion](https://proceedings.iclr.cc/paper_files/paper/2026/hash/f3f6f1739b646e0bd20111261ce23adb-Abstract-Conference.html). ICLR. 2026.
+
+<a id="ref-56"></a>[56] [C2PA Specifications 2.4 index](https://spec.c2pa.org/specifications/specifications/2.4/index.html). Coalition for Content Provenance and Authenticity. April 2026.
+
+<a id="ref-57"></a>[57] [C2PA Implementation Guidance, Version 2.4](https://spec.c2pa.org/specifications/specifications/2.4/guidance/Guidance.html). Coalition for Content Provenance and Authenticity. 2026.
+
+<a id="ref-58"></a>[58] [MLPerf Inference: Power Measurement](https://docs.mlcommons.org/inference/power/). MLCommons. Official methodology, accessed 2026-08-29.
+
+<a id="ref-59"></a>[59] [Video Model Benchmark Methodology](https://artificialanalysis.ai/video/methodology). Artificial Analysis. Industry methodology, accessed 2026-08-29.
+
+<a id="ref-60"></a>[60] [Is Your Video Language Model a Reliable Judge?](https://arxiv.org/abs/2503.05977). Ming Liu and Wensheng Zhang. arXiv preprint. 2025.
+
+<a id="ref-61"></a>[61] [Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena](https://arxiv.org/abs/2306.05685). Zheng et al. NeurIPS Datasets and Benchmarks. 2023.
+
+<a id="ref-62"></a>[62] [VEBench: Benchmarking Large Multimodal Models for Real-World Video Editing](https://arxiv.org/abs/2605.03276). CVPR Findings. 2026.
