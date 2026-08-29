@@ -1,4 +1,4 @@
-# Repository coverage, depth and visual audit — 2026-08-29
+# Repository coverage, depth and visual audit — 2026-08-30
 
 This is the working gap matrix for the long-term goal: every subfield should have an understandable visual summary, a current technical route, defensible milestones, detailed paper review and explicit evidence limits.
 
@@ -13,7 +13,7 @@ This is the working gap matrix for the long-term goal: every subfield should hav
 - **P1:** route is sound but misses mechanisms, milestones, quantitative evidence or a major recent branch.
 - **P2:** presentation, visual coverage, metadata normalization or secondary breadth.
 
-Counts are a repository snapshot after adding the causal-streaming chapter, with the mechanism, foundation, task-map, application, interpolation, inpainting and world-model rows refreshed on 2026-08-30. “Visual” counts Mermaid blocks plus embedded images; a visual can still fail the scientific-quality gate.
+Counts are a repository snapshot after adding the causal-streaming chapter, with the mechanism, foundation, task-map, application, interpolation, inpainting, text-to-video, image-to-video, video-prediction, interactive-world, digital-human, story/multi-shot, unconditional-video and open-model rows refreshed on 2026-08-30. “Visual” counts Mermaid blocks plus embedded images; a visual can still fail the scientific-quality gate.
 
 ## A. Generation mechanisms and foundation models
 
@@ -46,17 +46,17 @@ Modern systems routinely choose one item from several axes. Diffusion Forcing, C
 
 | File | Lines | Refs | Visuals | Current depth | Main gap or correction | Priority |
 |---|---:|---:|---:|---:|---|---|
-| `text-to-video.md` | 207 | 12 | 0 | 2.5 | 2025–26 model claims lack direct citations; missing native audio-video, post-training/RL, long video and model-availability boundary | P0 |
-| `image-to-video.md` | 63 | 9 | 0 | 1.5 | Generic ancestors are presented too close to I2V milestones; missing STIV, subject/reference-time, identity and camera/3D control protocols | P0 |
+| `text-to-video.md` | 455 | 36 | 4 | 4 | Rewritten around a strict task boundary, orthogonal route matrix, runtime condition contract, optional post-training, native AV, release surfaces and acceptance evidence; next gate is matched open-checkpoint reproduction | P2 |
+| `image-to-video.md` | 465 | 34 | 3 | 4 | Rewritten around pixel/latent/soft temporal anchors, full condition tensors, motion/camera/audio routes, preservation–motion trade-offs and versioned evidence; next gate is matched checkpoint/control reproduction | P2 |
 | `video-to-video.md` | 303 | 22 | 0 | 3 | Strongest task review; add mechanism-choice visual and split benchmark/data milestones; fresh JoyAI entry is now marked provisional | P1 |
-| `digital-human.md` | 237 | 22 | 1 | 3 | Correct Hallo/SadTalker date convention; generated PNG contains unlabelled illustrative scores; add 2026 long-duration/camera-control work | P0 factual, then P1 |
+| `digital-human.md` | 366 | 45 | 3 | 4 | Rewritten around seven non-interchangeable tasks, time/sync/identity/authorization contracts, release surfaces, loss conflicts, leakage, counterfactuals and 2026 long-duration/streaming/full-body work; old unlabelled-score PNG is no longer cited and a score-free contract visual was verified; next gate is matched open-checkpoint reproduction | P2 |
 | `frame-interpolation.md` | 480 | 32 | 4 | 4 | Rewritten as correspondence/reconstruction versus generative routes, with hard endpoint constraints, milestone-date rules, protocol traps, failure analysis and a reproducible evidence log; next gate is matched-data/runtime reproduction | P2 |
-| `video-prediction.md` | 72 | 13 | 0 | 1.5 | Missing MCVD; FramePack venue stale; must separate pixel/distribution/latent prediction and planning utility | P0 |
+| `video-prediction.md` | 466 | 30 | 3 | 4 | Rewritten around train-only versus deployment-GT boundaries, deterministic/stochastic/latent/diffusion routes, forcing distinctions, calibrated rollout and an evidence ladder; next gate is matched long-rollout and downstream-utility reproduction | P2 |
 | `action-conditioned-prediction.md` | 76 | 15 | 0 | 2 | Needs action-intervention, counterfactual, model-exploitation and closed-loop benchmark protocols | P1 |
 | `video-inpainting.md` | 545 | 38 | 3 | 4 | Rewritten from valid-pixel propagation through missing-region synthesis and global temporal verification, with mask-outside preservation, scene-cut reset, benchmark traps and a reproducible evidence log; next gate is controlled mask/protocol reproduction | P2 |
-| `story-multishot.md` | 64 | 9 | 0 | 1 | SVD does not support the claimed LLM storyboard route; ShotAdapter venue stale; missing OneStory/MultiShotMaster and benchmark protocol | P0 |
-| `interactive-world-generation.md` | 75 | 13 | 0 | 1.5 | Mixes demos, papers and platforms; needs FPS/resolution/horizon/loop-memory/closed-loop evidence matrix | P0 |
-| `unconditional-video-generation.md` | 68 | 15 | 0 | 1.5 | Sora and Cosmos are conditional foundation/world models, not representative unconditional methods | P0 factual |
+| `story-multishot.md` | 391 | 34 | 3 | 4 | Rewritten around shot contracts, planner/joint/memory/storyboard/streaming routes, state transactions, conflict rollback, current formal venues and release surfaces; SVD misclassification removed; next gate is matched long-story reproduction | P2 |
+| `interactive-world-generation.md` | 463 | 39 | 3 | 4 | Rewritten around action schedules, dual clocks, speculative versus authoritative memory, formal 2026 frontiers, model/product/artifact release surfaces, external interlock and post-hoc audit; next gate is common-hardware closed-loop reproduction | P2 |
+| `unconditional-video-generation.md` | 456 | 35 | 3 | 4 | Rewritten around strict deployment-time $p(X)$ boundaries, GAN/token/diffusion/flow routes, fidelity–coverage–tail–memorization evidence, protocol traps and a reproducible experiment; Sora/Cosmos moved to adjacent conditional systems; next gate is matched-data reproduction | P2 |
 
 ## C. Reasoning, world models, physics and evaluation
 
@@ -77,7 +77,7 @@ Modern systems routinely choose one item from several axes. Diffusion Forcing, C
 | `timeline.md` | 722 | 0 local anchors | 1 Mermaid + 76 images | 3 breadth | Image-rich but relation-poor; add mechanism evolution lanes and separate recent preprints as frontier observations | P1 |
 | `reading-list.md` | 252 | 47 | 0 | 2.5 | Needs route-oriented prerequisites and current causal/streaming, post-training and native AV reading paths | P1 |
 | `resources/datasets.md` | 795 | 38 | 2 | 4 | Rewritten as a current scoping review with release-surface taxonomy, an exact ten-stage data-engine path plus governance loop, rights/provenance, action/physics branches, manifest and fixed-compute validation; release-unit claims passed independent audit, and the next gate is acquisition/decode-yield replication | P2 |
-| `resources/open-models.md` | 77 | 8 | 0 | 1 | Stale 2026 list; conflates paper/code/weights; missing license, memory, checkpoint date and reproducibility status | P0 |
+| `resources/open-models.md` | 449 | 35 | 4 | 4 | Rewritten as a dated release-surface audit using a nine-axis vector and R0–R4 evidence levels, current version corrections, model/task/hardware selection, smoke tests, licenses and a reproducibility card; next gate is clean-environment checkpoint reproduction | P2 |
 | `bibliography.md` / registry | 82 / registry | 58 registered core items | 0 | 2 | At least 31 arXiv IDs used by audited mechanism/foundation pages are not registered; metadata/code status inconsistencies remain | P0 infrastructure |
 
 ## P0 factual and evidence corrections
@@ -86,10 +86,10 @@ These should be fixed before broad stylistic expansion:
 
 1. Reclassify IFRNet as an efficient convolutional encoder–decoder/feature-refinement method, not a Transformer.
 2. Stop using general Video GAN, MoCoGAN, SVG, SVD or Video Diffusion Models as direct task-specific milestones without an explicit “technical ancestor” label.
-3. Remove or replace SVD as evidence for an LLM storyboard/multi-shot pipeline.
-4. Remove Sora and Cosmos from the representative unconditional-generation route.
-5. Standardize dates as “first preprint year / formal publication year”; this affects Hallo, SadTalker, FramePack, ShotAdapter and LDF-VFI.
-6. Mark the digital-human overview's `Identity 0.92` and `Temporal Consistency 0.90` as illustrative or regenerate it without fabricated-looking scores.
+3. ~~Remove or replace SVD as evidence for an LLM storyboard/multi-shot pipeline.~~ Corrected on 2026-08-30; the story chapter now separates SVD as an unrelated ancestor and audits current multi-shot routes.
+4. ~~Remove Sora and Cosmos from the representative unconditional-generation route.~~ Corrected on 2026-08-30; both are now adjacent conditional systems, not direct milestones.
+5. Standardize dates as “first preprint year / formal publication year”; FramePack, Hallo, SadTalker and ShotAdapter are now corrected, while LDF-VFI still requires the same audit.
+6. ~~Mark the digital-human overview's `Identity 0.92` and `Temporal Consistency 0.90` as illustrative or regenerate it without fabricated-looking scores.~~ Corrected on 2026-08-30: the legacy file is retained but uncited; the chapter uses a score-free generated contract visual.
 7. Update C2PA from 2.2 to the official 2.4 specification and preserve the version date.
 8. Split model technical significance from current product availability; a discontinued product does not erase its research milestone, but should not be presented as currently available.
 
@@ -108,11 +108,18 @@ Each visual must have an explicit learning objective, editable/accessible altern
 | P0 | Physics evidence loop | Condition→state→generator/simulator→measurement→constraint/reward→falsification |
 | Done | WAM dual route | Compare cascaded planner+generator with joint action-video model and verifier |
 | Done | Three-axis task map | Condition source, source-preservation strength and open-loop→closed-loop |
+| Done | T2V prompt-to-evidence contract | Separate pure text, source-pixel hybrid and closed-loop tasks; connect runtime conditions, optional post-training, generation and acceptance gates |
+| Done | I2V anchor-and-control contract | Separate pixel/latent/soft anchors and trace image, motion, camera and audio conditions into the denoiser and preservation/motion gates |
+| Done | Video-prediction deployment contract | Separate train-only future supervision from deployment rollout and connect claim strength to calibration, intervention and closed-loop evidence |
+| Done | Interactive-world closed-loop stack | Separate causal action flow, memory read/update, external pre-execution interlock and post-hoc evidence audit |
 | Done | VFI dual branch | Flow/depth/occlusion deterministic branch vs diffusion/DiT generative branch |
 | Done | Video inpainting pipeline | Valid-pixel propagation→missing-region synthesis→global consistency→outside-mask protection |
 | P1 | Video reasoning three clocks | Output-time, denoising-time and interaction-time reasoning with intervention points |
 | P1 | Evaluation evidence ladder | L0 visual plausibility through L7 real-world closed-loop utility |
-| P1 | Multi-shot memory workflow | Script/character bible→shot plan→references→generation→memory update→conflict/rollback |
+| Done | Multi-shot memory workflow | Script/character bible→shot plan→references→generation→memory update→conflict/rollback |
+| Done | Unconditional-generation evidence chain | No external condition→marginal model→sampling→fixed output contract→quality/coverage/tail/memorization evidence |
+| Done | Digital-human condition and sync contract | Authorized inputs→timeline alignment→condition fusion→generation→separate sync/identity/motion/media gates |
+| Done | Open-model release surface | Official identity→version→artifact split→license intersection→hardware→smoke test→reproducibility manifest |
 | P1 | V2V method selector | Local/global, appearance/motion, new-view and multi-turn requirements to method families |
 | P1 | JEPA MPC loop | Encoder→action-conditioned predictor→cost→planner→action→new observation |
 
