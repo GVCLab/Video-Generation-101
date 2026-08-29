@@ -40,6 +40,13 @@ STATUS_LABELS = {
     "community-implementation": "社区实现",
     "official-project-page": "官方项目页（非模型代码）",
 }
+ARXIV_BATCH_SIZE = 40
+CORPORATE_AUTHORS = {
+    "NVIDIA": "{NVIDIA}",
+    "Sand. ai": "{Sand.ai}",
+    "Team Seedance": "{Seedance Team}",
+    "Team Wan": "{Wan Team}",
+}
 
 
 def request_bytes(url: str, timeout: int = 30) -> bytes:
@@ -66,12 +73,22 @@ def validate_registry(registry: dict[str, Any]) -> None:
     if not entries:
         raise ValueError("registry contains no entries")
 
+    sections = registry.get("sections", {})
+    if not sections:
+        raise ValueError("registry contains no section labels")
+    scope = registry.get("scope", {})
+    if not scope.get("include_if_any") or not scope.get("excluded_by_default"):
+        raise ValueError("registry must document its core inclusion and exclusion policy")
+
     keys: set[str] = set()
+    sources: set[tuple[str, str]] = set()
     for entry in entries:
         key = entry.get("citekey")
-        if not key or key in keys:
+        if not key or not re.fullmatch(r"[a-z][a-z0-9]+", key) or key in keys:
             raise ValueError(f"missing or duplicate citekey: {key!r}")
         keys.add(key)
+        if entry.get("section") not in sections:
+            raise ValueError(f"{key}: unknown bibliography section")
 
         source = entry.get("source", {})
         if source.get("kind") not in {"arxiv", "doi", "manual"}:
@@ -80,10 +97,31 @@ def validate_registry(registry: dict[str, Any]) -> None:
             raise ValueError(f"{key}: manual source requires metadata")
         if source["kind"] != "manual" and not source.get("id"):
             raise ValueError(f"{key}: source identifier is missing")
+        if source["kind"] == "arxiv" and not re.fullmatch(r"\d{4}\.\d{4,5}", source["id"]):
+            raise ValueError(f"{key}: invalid or versioned arXiv identifier")
+
+        if source["kind"] == "manual":
+            metadata = source["metadata"]
+            missing = {field for field in ("title", "authors", "year", "url") if not metadata.get(field)}
+            if missing:
+                raise ValueError(f"{key}: manual metadata is missing {sorted(missing)}")
+            identifier = normalize_space(metadata["url"]).rstrip("/")
+        else:
+            identifier = normalize_space(source["id"])
+            if source["kind"] == "doi":
+                identifier = identifier.lower().removeprefix("https://doi.org/")
+        source_key = (source["kind"], identifier)
+        if source_key in sources:
+            raise ValueError(f"{key}: duplicate source identifier {source_key!r}")
+        sources.add(source_key)
 
         repository = entry.get("github")
         if repository and repository.get("status") not in STATUS_LABELS:
             raise ValueError(f"{key}: unsupported GitHub status")
+        if repository and not re.fullmatch(
+            r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository.get("url", "")
+        ):
+            raise ValueError(f"{key}: GitHub URL must identify one repository root")
 
 
 def normalize_space(value: str | None) -> str:
@@ -137,6 +175,13 @@ def crossref_metadata(doi: str) -> dict[str, Any]:
 
 
 def arxiv_metadata_batch(ids: list[str]) -> dict[str, dict[str, Any]]:
+    results: dict[str, dict[str, Any]] = {}
+    for start in range(0, len(ids), ARXIV_BATCH_SIZE):
+        results.update(arxiv_metadata_query(ids[start : start + ARXIV_BATCH_SIZE]))
+    return results
+
+
+def arxiv_metadata_query(ids: list[str]) -> dict[str, dict[str, Any]]:
     params = urllib.parse.urlencode({"id_list": ",".join(ids), "max_results": len(ids)})
     root = ET.fromstring(request_bytes(f"https://export.arxiv.org/api/query?{params}", timeout=60))
     results: dict[str, dict[str, Any]] = {}
@@ -151,14 +196,14 @@ def arxiv_metadata_batch(ids: list[str]) -> dict[str, dict[str, Any]]:
             for author in item.findall("atom:author", ATOM_NS)
         ]
         authors = [author for author in authors if author and author != ":"]
-        if authors and authors[0] == "NVIDIA":
-            authors[0] = "{NVIDIA}"
+        if authors and authors[0] in CORPORATE_AUTHORS:
+            authors[0] = CORPORATE_AUTHORS[authors[0]]
         published = item.findtext("atom:published", "", ATOM_NS)
         primary = item.find("arxiv:primary_category", ATOM_NS)
         doi = normalize_space(item.findtext("arxiv:doi", "", ATOM_NS))
         journal_ref = normalize_space(item.findtext("arxiv:journal_ref", "", ATOM_NS))
         metadata: dict[str, Any] = {
-            "entry_type": "article" if doi else "misc",
+            "entry_type": "misc",
             "title": normalize_space(item.findtext("atom:title", "", ATOM_NS)),
             "authors": " and ".join(authors),
             "year": published[:4],
@@ -328,6 +373,7 @@ def markdown_escape(value: str) -> str:
 
 
 def render_index(registry: dict[str, Any], metadata: dict[str, Any], stars: dict[str, Any]) -> str:
+    scope = registry["scope"]
     lines = [
         "<!-- Generated by scripts/update_bibliography.py. Edit bibliography/registry.json instead. -->",
         "",
@@ -339,14 +385,41 @@ def render_index(registry: dict[str, Any], metadata: dict[str, Any], stars: dict
         "- [引用与仓库登记表](../bibliography/registry.json)",
         "- [Star 原始快照](../bibliography/github-stars.json)",
         "- 刷新命令：`python scripts/update_bibliography.py --all`",
+        "- 只读一致性检查：`python scripts/update_bibliography.py --check`",
         "",
-        "这里的“代码仓库”表示可公开访问的 GitHub 实现；是否属于 OSI 定义的开源软件、权重是否开放，以及可否商用，仍需逐项查看仓库许可证。",
+        "## 核心注册表边界",
         "",
-        "仓库状态分为：**官方代码**（作者或机构维护）、**官方研究产物**（作者实验代码，但不是标准复现包）、**官方相关代码**（同团队的相关项目，不是该论文实现）、**社区实现**（第三方复现）与**官方项目页**（只有网页源码）。标记“未发现”的条目表示截至快照日未找到论文作者公开的 GitHub 仓库，并不等价于绝对不存在代码。",
+        "本页不是全仓逐链接书目，而是跨章节复用的核心入口。候选必须满足以下至少一项，并经人工判断为跨章节核心入口后才纳入：",
         "",
-        "| 章节 | Cite key | 论文 / 报告 | 年份 | GitHub 与可用性 | Stars |",
-        "| --- | --- | --- | ---: | --- | ---: |",
     ]
+    lines.extend(f"- {item}" for item in scope["include_if_any"])
+    lines.extend(
+        [
+            "",
+            "以下内容默认留在相应章节的完整参考文献中，不机械并入核心表：",
+            "",
+        ]
+    )
+    lines.extend(f"- {item}" for item in scope["excluded_by_default"])
+    lines.extend(
+        [
+            "",
+            f"本轮边界审计日期：**{scope['audited_through']}**。章节字母含义：",
+            "",
+        ]
+    )
+    lines.extend(f"- **{key}**：{label}" for key, label in registry["sections"].items())
+    lines.extend(
+        [
+            "",
+            "这里的“代码仓库”表示可公开访问的 GitHub 实现；是否属于 OSI 定义的开源软件、权重是否开放，以及可否商用，仍需逐项查看仓库许可证。",
+            "",
+            "仓库状态分为：**官方代码**（作者或机构维护）、**官方研究产物**（作者实验代码，但不是标准复现包）、**官方相关代码**（同团队的相关项目，不是该论文实现）、**社区实现**（第三方复现）与**官方项目页**（只有网页源码）。标记“未发现”的条目表示截至快照日未找到论文作者公开的 GitHub 仓库，并不等价于绝对不存在代码。",
+            "",
+            "| 章节 | Cite key | 论文 / 报告 | 年份 | GitHub 与可用性 | Stars |",
+            "| --- | --- | --- | ---: | --- | ---: |",
+        ]
+    )
 
     for entry in registry["entries"]:
         item = metadata[entry["citekey"]]
@@ -391,6 +464,13 @@ def parse_args() -> argparse.Namespace:
     group.add_argument("--metadata", action="store_true", help="refresh citation metadata and regenerate outputs")
     group.add_argument("--stars", action="store_true", help="refresh GitHub stars and regenerate outputs")
     group.add_argument("--offline", action="store_true", help="regenerate outputs from committed snapshots")
+    group.add_argument(
+        "--check",
+        "--dry-run",
+        dest="check",
+        action="store_true",
+        help="validate snapshots and generated outputs without network access or writes",
+    )
     return parser.parse_args()
 
 
@@ -399,7 +479,7 @@ def main() -> int:
     registry = load_json(REGISTRY_PATH)
     validate_registry(registry)
 
-    refresh_all = args.all or not any((args.metadata, args.stars, args.offline))
+    refresh_all = args.all or not any((args.metadata, args.stars, args.offline, args.check))
     metadata = load_json(METADATA_PATH, {})
     stars = load_json(STARS_PATH, {})
 
@@ -417,8 +497,21 @@ def main() -> int:
     if set(stars.get("repositories", {})) != expected_repos:
         raise RuntimeError("star snapshot does not match registry; run with --stars")
 
-    BIBTEX_PATH.write_text(render_bibtex(registry, metadata, stars), encoding="utf-8")
-    INDEX_PATH.write_text(render_index(registry, metadata, stars), encoding="utf-8")
+    rendered_bibtex = render_bibtex(registry, metadata, stars)
+    rendered_index = render_index(registry, metadata, stars)
+    if args.check:
+        stale = []
+        if BIBTEX_PATH.read_text(encoding="utf-8") != rendered_bibtex:
+            stale.append(str(BIBTEX_PATH.relative_to(ROOT)))
+        if INDEX_PATH.read_text(encoding="utf-8") != rendered_index:
+            stale.append(str(INDEX_PATH.relative_to(ROOT)))
+        if stale:
+            raise RuntimeError(f"generated outputs are stale: {', '.join(stale)}")
+        print("registry, snapshots, and generated outputs are consistent")
+        return 0
+
+    BIBTEX_PATH.write_text(rendered_bibtex, encoding="utf-8")
+    INDEX_PATH.write_text(rendered_index, encoding="utf-8")
     print(f"wrote {BIBTEX_PATH.relative_to(ROOT)}")
     print(f"wrote {INDEX_PATH.relative_to(ROOT)}")
     return 0

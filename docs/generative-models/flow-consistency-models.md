@@ -1,6 +1,6 @@
 # Flow、Consistency 与 Few-Step 生成：从概率流到分布蒸馏
 
-> 本章截至 2026-08-29，依据正式会议论文与作者官方材料整理。核心目标不是背方法名，而是判断一个方法究竟在学习什么、依赖谁提供监督、采样时真正调用网络多少次，以及它是否真的解决了视频的时间因果与在线服务问题。
+> 本章截至 2026-08-30，依据正式会议论文与作者官方材料整理。核心目标不是背方法名，而是判断一个方法究竟在学习什么、依赖谁提供监督、采样时真正调用网络多少次，以及它是否真的解决了视频的时间因果与在线服务问题。
 
 ## 📋 1. 先建立正确坐标系
 
@@ -160,6 +160,96 @@ v_\theta(\hat X_s,s),
 $$
 
 这三层不能混写。即使每个端点对的条件路径是直线，不同条件路径在同一位置会发生平均，边缘场未必是常向量；有限数据、有限模型与有限 NFE 又会使学习轨迹偏离理想边缘流。因此，“直线插值”不推出“所有生成轨迹都是直线”，更不推出“一步无损”。
+
+<a id="five-layer-map"></a>
+
+### 2.4 五层地图：不要把 objective、dynamics、solver、student 和 serving 画成一条线
+
+最容易误读的地方不是某个公式，而是同一篇论文可能同时改动多个层次。一个方法至少要回答五个互相独立的问题：网络在训练时拟合什么统计量；该统计量定义或参数化什么连续过程；推理时是否只换数值求解器；是否另训练少步 student；视频数据时间上是否因果、分块并持续交付。下面的 PNG 用五行矩阵帮助记忆，随后 Mermaid 才给出可编辑、可审计的谱系关系。
+
+![Diffusion、Flow 与少步生成的五层分类矩阵：训练统计量、连续过程、不重训求解器、需训练的少步学生和部署轴分别列出，并强调 v-prediction 不等于 flow velocity、PF-ODE 不等于 Flow Matching、few-step 不等于 streaming。](../../assets/diagrams/diffusion-flow-few-step-five-layers.png)
+
+**图：五层不能压成一个方法名。** 第一、二层描述模型学到的场与对应连续过程；第三层只替换已有模型的积分方法或时间网格；第四层会优化新的参数或 student；第五层处理视频时间 $k$ 上的因果性和系统交付。图中 `CM / PD` 是紧凑记忆标签，不表示二者损失相同；`Shortcut / MeanFlow` 也只表示两者都学习跨区间运输信息。
+
+~~~mermaid
+flowchart TB
+    accTitle: DDPM、SDE、PF-ODE、Flow Matching、Rectified Flow、Consistency 与 DMD 的五层关系
+    accDescr: 训练层分为 diffusion 或 score 与 Flow Matching 或 Rectified Flow；连续过程层分为 reverse SDE、PF-ODE 与学习 ODE；不重训层只更换 DDIM 或 DPM-Solver；另训练的少步层按轨迹或 flow map、分布、区间运输分开；因果、分块、KV cache 与持续发帧属于正交部署轴。
+
+    subgraph train["1 · 训练统计量 / objective"]
+        direction LR
+        diff["DDPM / score<br/>ε、x0、v 或 score 回归"]
+        fm["Flow Matching<br/>条件速度回归"]
+        rf["Rectified Flow / reflow<br/>直线条件桥与重耦合"]
+        fm -->|一种路径与耦合选择| rf
+    end
+
+    subgraph dynamics["2 · 连续过程 / dynamics"]
+        direction LR
+        rsde["Reverse SDE<br/>随机样本路径"]
+        pfode["PF-ODE<br/>确定样本路径"]
+        learnedode["Learned ODE<br/>积分边缘速度场"]
+    end
+
+    diff -->|同一 score，不同动力学| rsde
+    diff -->|同一 score，不同动力学| pfode
+    fm -->|学习边缘速度| learnedode
+    rf -->|学习更易积分的速度场| learnedode
+
+    subgraph solver["3 · 只改推理 / no retraining"]
+        direction LR
+        fastsolver["DDIM / DPM-Solver / 时间网格<br/>复用已有 denoiser 或 score"]
+    end
+
+    diff -->|不训练新 student| fastsolver
+
+    subgraph student["4 · 另训练少步模型 / new parameters"]
+        direction LR
+        trajectory["PD / CD / CM<br/>教师轨迹或终点 flow map"]
+        standalone["Standalone CT<br/>可不依赖外部教师"]
+        distribution["DMD / DMD2<br/>目标 score − fake score；分布对齐"]
+        interval["Shortcut / MeanFlow / α-Flow<br/>步长条件或区间平均运输"]
+        standalone -.->|CM 的另一训练路线| trajectory
+    end
+
+    pfode -->|常见参考轨迹；PD 也可用确定性 sampler| trajectory
+    diff -->|预训练教师 score| distribution
+    fm -->|trajectory FM 与 bootstrap| interval
+    rf -.->|可提供重耦合轨迹| interval
+
+    subgraph deployment["5 · 视频部署轴 / orthogonal axis"]
+        direction LR
+        serving["causal attention · chunking · KV cache<br/>首帧延迟 · 稳态吞吐 · 持续发帧"]
+    end
+
+    fastsolver -.->|仍需另选视频 factorization| serving
+    trajectory -.->|仍需另选视频 factorization| serving
+    distribution -.->|仍需另选视频 factorization| serving
+    interval -.->|仍需另选视频 factorization| serving
+
+    classDef diffusion fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
+    classDef flow fill:#ffedd5,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    classDef few fill:#f3e8ff,stroke:#7e22ce,stroke-width:2px,color:#581c87
+    classDef deploy fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    class diff,rsde,pfode,fastsolver diffusion
+    class fm,rf,learnedode flow
+    class trajectory,standalone,distribution,interval few
+    class serving deploy
+~~~
+
+**顺序化文字替代：** 第一，DDPM/score 训练学习可换算的 denoiser 或 score，既能驱动随机 reverse SDE，也能驱动确定 PF-ODE；第二，FM/RF 回归的是由所选概率路径和耦合诱导的边缘速度，生成时积分 learned ODE；第三，DDIM、DPM-Solver 或新时间网格通常复用已有场，不产生新 student；第四，PD/CD/CM 对齐轨迹或 flow map，DMD/DMD2 对齐教师与学生分布，Shortcut/MeanFlow/$\alpha$-Flow 学习跨步长或区间运输；第五，以上任一路线都还需独立选择 causal attention、chunking、KV cache 和服务流水线，少 NFE 本身不提供 streaming。
+
+| 看到的词 | 它真正改变什么 | 不能据此推出什么 | 最低复现字段 |
+|---|---|---|---|
+| diffusion 的 $v$ prediction | 同一高斯扰动下的输出参数化 | 采用 RF 或 FM | $\alpha/\sigma$ 约定、目标换算、loss weighting |
+| PF-ODE | 从 score-SDE 导出的确定动力学 | 训练目标是 FM | score 参数化、ODE 方程、solver、时间网格 |
+| FM / RF | 概率路径、耦合与速度回归目标 | 轨迹天然一步、语义线性 | 条件路径、端点耦合、时间采样、NFE |
+| DDIM / DPM-Solver | sampler、solver 或离散节点 | 训练了少步生成器 | checkpoint、NFE、阶数、CFG 调用、容差 |
+| PD / CM | 确定性教师轨迹压缩或 flow-map 一致性 | CM 必然有教师、部署必为 1 NFE | CT/CD、teacher、target/EMA、refinement 步数 |
+| DMD / DMD2 | 用 target/fake score 做分布蒸馏；DMD2 再加具体稳定化和 GAN 信号 | 与 CM 同一目标、不会丢模式 | teacher、fake-score 更新比、GAN、on-policy 状态、覆盖指标 |
+| causal / streaming | 视频时间上的信息可见性、状态缓存与交付协议 | 噪声轴 NFE 自动减少 | chunk、lookahead、KV 状态、首帧延迟、稳态吞吐、无限续写协议 |
+
+这张谱系图的边只表示**常见构造或监督来源**，不是唯一依赖关系。例如 CM 既可做 consistency distillation，也可 standalone consistency training [[7]](#ref-7)；FACM 把 FM 锚点与 shortcut objective 组合，$\alpha$-Flow 则把 trajectory FM、Shortcut 与 MeanFlow 放进统一目标族 [[14]](#ref-14) [[15]](#ref-15)。这类 2026 汇合工作说明边界可以被联合优化，但没有让五个层次变成同义词。
 
 ## 📚 3. Flow Matching、Rectified Flow 与 reflow
 

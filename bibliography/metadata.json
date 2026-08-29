@@ -43,6 +43,17 @@
     "url": "https://arxiv.org/abs/2511.08544",
     "year": "2025"
   },
+  "ban2026stream4d": {
+    "arxiv_id": "2608.19556",
+    "authors": "Yuanhao Ban and Jiaqi Feng and Hengguang Zhou and Xiaohuan Pei and Justin Cui and Cho-Jui Hsieh",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2608.19556",
+    "source_kind": "arxiv",
+    "title": "Stream4D: 4D-Consistency for Streaming Autoregressive Diffusion Video Models",
+    "url": "https://arxiv.org/abs/2608.19556",
+    "year": "2026"
+  },
   "bardes2023mcjepa": {
     "arxiv_id": "2307.12698",
     "authors": "Adrien Bardes and Jean Ponce and Yann LeCun",
@@ -120,6 +131,28 @@
     "url": "https://arxiv.org/abs/2402.15391",
     "year": "2024"
   },
+  "chen2024diffusionforcing": {
+    "arxiv_id": "2407.01392",
+    "authors": "Boyuan Chen and Diego Marti Monso and Yilun Du and Max Simchowitz and Russ Tedrake and Vincent Sitzmann",
+    "entry_type": "misc",
+    "primary_class": "cs.LG",
+    "source_id": "2407.01392",
+    "source_kind": "arxiv",
+    "title": "Diffusion Forcing: Next-token Prediction Meets Full-Sequence Diffusion",
+    "url": "https://arxiv.org/abs/2407.01392",
+    "year": "2024"
+  },
+  "chen2025skyreelsv2": {
+    "arxiv_id": "2504.13074",
+    "authors": "Guibin Chen and Dixuan Lin and Jiangping Yang and Chunze Lin and Junchen Zhu and Mingyuan Fan and Hao Zhang and Sheng Chen and Zheng Chen and Chengcheng Ma and Weiming Xiong and Wei Wang and Nuo Pang and Kang Kang and Zhiheng Xu and Yuzhe Jin and Yupeng Liang and Yubing Song and Peng Zhao and Boyuan Xu and Di Qiu and Debang Li and Zhengcong Fei and Yang Li and Yahui Zhou",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2504.13074",
+    "source_kind": "arxiv",
+    "title": "SkyReels-V2: Infinite-length Film Generative Model",
+    "url": "https://arxiv.org/abs/2504.13074",
+    "year": "2025"
+  },
   "clark2019adversarial": {
     "arxiv_id": "1907.06571",
     "authors": "Aidan Clark and Jeff Donahue and Karen Simonyan",
@@ -177,6 +210,17 @@
     "volume": "51",
     "year": "2003"
   },
+  "fiebelman2026mvforcing": {
+    "arxiv_id": "2607.05376",
+    "authors": "Gal Fiebelman and Hadar Averbuch-Elor and Sagie Benaim",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2607.05376",
+    "source_kind": "arxiv",
+    "title": "MV-Forcing: Long Multi-View Video Generation via 4D-Grounded Spatio-Temporal Self-Forcing",
+    "url": "https://arxiv.org/abs/2607.05376",
+    "year": "2026"
+  },
   "finn2016unsupervised": {
     "arxiv_id": "1605.07157",
     "authors": "Chelsea Finn and Ian Goodfellow and Sergey Levine",
@@ -187,6 +231,17 @@
     "title": "Unsupervised Learning for Physical Interaction through Video Prediction",
     "url": "https://arxiv.org/abs/1605.07157",
     "year": "2016"
+  },
+  "fuest2025maskflow": {
+    "arxiv_id": "2502.11234",
+    "authors": "Michael Fuest and Vincent Tao Hu and Björn Ommer",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2502.11234",
+    "source_kind": "arxiv",
+    "title": "MaskFlow: Discrete Flows For Flexible and Efficient Long Video Generation",
+    "url": "https://arxiv.org/abs/2502.11234",
+    "year": "2025"
   },
   "guo2023animatediff": {
     "arxiv_id": "2307.04725",
@@ -199,15 +254,50 @@
     "url": "https://arxiv.org/abs/2307.04725",
     "year": "2023"
   },
-  "ha2018worldmodels": {
-    "authors": "David Ha and Jürgen Schmidhuber",
+  "guo2026vrae": {
+    "arxiv_id": "2608.13556",
+    "authors": "Minghui Guo and Shengqiong Wu and Hao Fei",
     "entry_type": "misc",
-    "howpublished": "arXiv preprint arXiv:1803.10122 (NeurIPS 31 version titled: Recurrent World Models Facilitate Policy Evolution)",
-    "source_id": "https://arxiv.org/abs/1803.10122",
-    "source_kind": "manual",
+    "primary_class": "cs.CV",
+    "source_id": "2608.13556",
+    "source_kind": "arxiv",
+    "title": "V-RAE: Rethinking Video Latent Spaces for Generation",
+    "url": "https://arxiv.org/abs/2608.13556",
+    "year": "2026"
+  },
+  "ha2018worldmodels": {
+    "arxiv_id": "1803.10122",
+    "authors": "David Ha and Jürgen Schmidhuber",
+    "doi": "10.5281/zenodo.1207631",
+    "entry_type": "misc",
+    "primary_class": "cs.LG",
+    "source_id": "1803.10122",
+    "source_kind": "arxiv",
     "title": "World Models",
     "url": "https://arxiv.org/abs/1803.10122",
     "year": "2018"
+  },
+  "hacohen2024ltxvideo": {
+    "arxiv_id": "2501.00103",
+    "authors": "Yoav HaCohen and Nisan Chiprut and Benny Brazowski and Daniel Shalem and Dudu Moshe and Eitan Richardson and Eran Levin and Guy Shiran and Nir Zabari and Ori Gordon and Poriya Panet and Sapir Weissbuch and Victor Kulikov and Yaki Bitterman and Zeev Melumian and Ofir Bibi",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2501.00103",
+    "source_kind": "arxiv",
+    "title": "LTX-Video: Realtime Video Latent Diffusion",
+    "url": "https://arxiv.org/abs/2501.00103",
+    "year": "2024"
+  },
+  "hacohen2026ltx2": {
+    "arxiv_id": "2601.03233",
+    "authors": "Yoav HaCohen and Benny Brazowski and Nisan Chiprut and Yaki Bitterman and Andrew Kvochko and Avishai Berkowitz and Daniel Shalem and Daphna Lifschitz and Dudu Moshe and Eitan Porat and Eitan Richardson and Guy Shiran and Itay Chachy and Jonathan Chetboun and Michael Finkelson and Michael Kupchick and Nir Zabari and Nitzan Guetta and Noa Kotler and Ofir Bibi and Ori Gordon and Poriya Panet and Roi Benita and Shahar Armon and Victor Kulikov and Yaron Inger and Yonatan Shiftan and Zeev Melumian and Zeev Farbman",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2601.03233",
+    "source_kind": "arxiv",
+    "title": "LTX-2: Efficient Joint Audio-Visual Foundation Model",
+    "url": "https://arxiv.org/abs/2601.03233",
+    "year": "2026"
   },
   "hafner2018learning": {
     "arxiv_id": "1811.04551",
@@ -264,6 +354,17 @@
     "url": "https://arxiv.org/abs/2006.11239",
     "year": "2020"
   },
+  "ho2022classifierfree": {
+    "arxiv_id": "2207.12598",
+    "authors": "Jonathan Ho and Tim Salimans",
+    "entry_type": "misc",
+    "primary_class": "cs.LG",
+    "source_id": "2207.12598",
+    "source_kind": "arxiv",
+    "title": "Classifier-Free Diffusion Guidance",
+    "url": "https://arxiv.org/abs/2207.12598",
+    "year": "2022"
+  },
   "ho2022imagen": {
     "arxiv_id": "2210.02303",
     "authors": "Jonathan Ho and William Chan and Chitwan Saharia and Jay Whang and Ruiqi Gao and Alexey Gritsenko and Diederik P. Kingma and Ben Poole and Mohammad Norouzi and David J. Fleet and Tim Salimans",
@@ -312,6 +413,72 @@
     "url": "https://arxiv.org/abs/2309.17080",
     "year": "2023"
   },
+  "hu2026longliverag": {
+    "arxiv_id": "2606.02553",
+    "authors": "Qixin Hu and Shuai Yang and Wei Huang and Song Han and Yukang Chen",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2606.02553",
+    "source_kind": "arxiv",
+    "title": "LongLive-RAG: A General Retrieval-Augmented Framework for Long Video Generation",
+    "url": "https://arxiv.org/abs/2606.02553",
+    "year": "2026"
+  },
+  "huang2025selfforcing": {
+    "arxiv_id": "2506.08009",
+    "authors": "Xun Huang and Zhengqi Li and Guande He and Mingyuan Zhou and Eli Shechtman",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2506.08009",
+    "source_kind": "arxiv",
+    "title": "Self Forcing: Bridging the Train-Test Gap in Autoregressive Video Diffusion",
+    "url": "https://arxiv.org/abs/2506.08009",
+    "year": "2025"
+  },
+  "huszar2015how": {
+    "arxiv_id": "1511.05101",
+    "authors": "Ferenc Huszár",
+    "entry_type": "misc",
+    "primary_class": "stat.ML",
+    "source_id": "1511.05101",
+    "source_kind": "arxiv",
+    "title": "How (not) to Train your Generative Model: Scheduled Sampling, Likelihood, Adversary?",
+    "url": "https://arxiv.org/abs/1511.05101",
+    "year": "2015"
+  },
+  "ji2026forcingkv": {
+    "arxiv_id": "2605.09681",
+    "authors": "Yicheng Ji and Zhizhou Zhong and Jun Zhang and Qin Yang and XiTai Jin and Ying Qin and Wenhan Luo and Shuiyang Mao and Wei Liu and Huan Li",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2605.09681",
+    "source_kind": "arxiv",
+    "title": "Forcing-KV: Hybrid KV Cache Compression for Efficient Autoregressive Video Diffusion Models",
+    "url": "https://arxiv.org/abs/2605.09681",
+    "year": "2026"
+  },
+  "kingma2013autoencoding": {
+    "arxiv_id": "1312.6114",
+    "authors": "Diederik P Kingma and Max Welling",
+    "entry_type": "misc",
+    "primary_class": "stat.ML",
+    "source_id": "1312.6114",
+    "source_kind": "arxiv",
+    "title": "Auto-Encoding Variational Bayes",
+    "url": "https://arxiv.org/abs/1312.6114",
+    "year": "2013"
+  },
+  "kong2024hunyuanvideo": {
+    "arxiv_id": "2412.03603",
+    "authors": "Weijie Kong and Qi Tian and Zijian Zhang and Rox Min and Zuozhuo Dai and Jin Zhou and Jiangfeng Xiong and Xin Li and Bo Wu and Jianwei Zhang and Kathrina Wu and Qin Lin and Junkun Yuan and Yanxin Long and Aladdin Wang and Andong Wang and Changlin Li and Duojun Huang and Fang Yang and Hao Tan and Hongmei Wang and Jacob Song and Jiawang Bai and Jianbing Wu and Jinbao Xue and Joey Wang and Kai Wang and Mengyang Liu and Pengyu Li and Shuai Li and Weiyan Wang and Wenqing Yu and Xinchi Deng and Yang Li and Yi Chen and Yutao Cui and Yuanbo Peng and Zhentao Yu and Zhiyu He and Zhiyong Xu and Zixiang Zhou and Zunnan Xu and Yangyu Tao and Qinglin Lu and Songtao Liu and Dax Zhou and Hongfa Wang and Yong Yang and Di Wang and Yuhong Liu and Jie Jiang and Caesar Zhong",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2412.03603",
+    "source_kind": "arxiv",
+    "title": "HunyuanVideo: A Systematic Framework For Large Video Generative Models",
+    "url": "https://arxiv.org/abs/2412.03603",
+    "year": "2024"
+  },
   "lecun2022path": {
     "authors": "Yann LeCun",
     "entry_type": "misc",
@@ -321,6 +488,94 @@
     "title": "A Path Towards Autonomous Machine Intelligence",
     "url": "https://openreview.net/forum?id=BZ5a1r-kVsf",
     "year": "2022"
+  },
+  "lee2018stochastic": {
+    "arxiv_id": "1804.01523",
+    "authors": "Alex X. Lee and Richard Zhang and Frederik Ebert and Pieter Abbeel and Chelsea Finn and Sergey Levine",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "1804.01523",
+    "source_kind": "arxiv",
+    "title": "Stochastic Adversarial Video Prediction",
+    "url": "https://arxiv.org/abs/1804.01523",
+    "year": "2018"
+  },
+  "li2026aad1": {
+    "arxiv_id": "2606.03972",
+    "authors": "Haobo Li and Yanhong Zeng and Yunhong Lu and Jiapeng Zhu and Hao Ouyang and Qiuyu Wang and Ka Leong Cheng and Yujun Shen and Zhipeng Zhang",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2606.03972",
+    "source_kind": "arxiv",
+    "title": "AAD-1: Asymmetric Adversarial Distillation for One-Step Autoregressive Video Generation",
+    "url": "https://arxiv.org/abs/2606.03972",
+    "year": "2026"
+  },
+  "li2026attendlocally": {
+    "arxiv_id": "2605.16579",
+    "authors": "Kunyang Li and Mubarak Shah and Yuzhang Shang",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2605.16579",
+    "source_kind": "arxiv",
+    "title": "Attend Locally, Remember Linearly: Linear Attention as Cross-Frame Memory for Autoregressive Video Diffusion",
+    "url": "https://arxiv.org/abs/2605.16579",
+    "year": "2026"
+  },
+  "li2026rollingsink": {
+    "arxiv_id": "2602.07775",
+    "authors": "Haodong Li and Shaoteng Liu and Zhe Lin and Manmohan Chandraker",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2602.07775",
+    "source_kind": "arxiv",
+    "title": "Rolling Sink: Bridging Limited-Horizon Training and Open-Ended Testing in Autoregressive Video Diffusion",
+    "url": "https://arxiv.org/abs/2602.07775",
+    "year": "2026"
+  },
+  "li2026skyreelsv3": {
+    "arxiv_id": "2601.17323",
+    "authors": "Debang Li and Zhengcong Fei and Tuanhui Li and Yikun Dou and Zheng Chen and Jiangping Yang and Mingyuan Fan and Jingtao Xu and Jiahua Wang and Baoxuan Gu and Mingshan Chang and Wenjing Cai and Yuqiang Xie and Binjie Mao and Youqiang Zhang and Nuo Pang and Hao Zhang and Yuzhe Jin and Zhiheng Xu and Dixuan Lin and Guibin Chen and Yahui Zhou",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2601.17323",
+    "source_kind": "arxiv",
+    "title": "SkyReels-V3 Technique Report",
+    "url": "https://arxiv.org/abs/2601.17323",
+    "year": "2026"
+  },
+  "lin2024animatedifflightning": {
+    "arxiv_id": "2403.12706",
+    "authors": "Shanchuan Lin and Xiao Yang",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2403.12706",
+    "source_kind": "arxiv",
+    "title": "AnimateDiff-Lightning: Cross-Model Diffusion Distillation",
+    "url": "https://arxiv.org/abs/2403.12706",
+    "year": "2024"
+  },
+  "lin2024sdxllightning": {
+    "arxiv_id": "2402.13929",
+    "authors": "Shanchuan Lin and Anran Wang and Xiao Yang",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2402.13929",
+    "source_kind": "arxiv",
+    "title": "SDXL-Lightning: Progressive Adversarial Diffusion Distillation",
+    "url": "https://arxiv.org/abs/2402.13929",
+    "year": "2024"
+  },
+  "liu2025rollingforcing": {
+    "arxiv_id": "2509.25161",
+    "authors": "Kunhao Liu and Wenbo Hu and Jiale Xu and Ying Shan and Shijian Lu",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2509.25161",
+    "source_kind": "arxiv",
+    "title": "Rolling Forcing: Autoregressive Long Video Diffusion in Real Time",
+    "url": "https://arxiv.org/abs/2509.25161",
+    "year": "2025"
   },
   "lotter2016deep": {
     "arxiv_id": "1605.08104",
@@ -333,16 +588,60 @@
     "url": "https://arxiv.org/abs/1605.08104",
     "year": "2016"
   },
+  "low2025ovi": {
+    "arxiv_id": "2510.01284",
+    "authors": "Chetwin Low and Weimin Wang and Calder Katyal",
+    "entry_type": "misc",
+    "primary_class": "cs.MM",
+    "source_id": "2510.01284",
+    "source_kind": "arxiv",
+    "title": "Ovi: Twin Backbone Cross-Modal Fusion for Audio-Video Generation",
+    "url": "https://arxiv.org/abs/2510.01284",
+    "year": "2025"
+  },
+  "lu2026fademem": {
+    "arxiv_id": "2606.10671",
+    "authors": "Yu Lu and Junjie Yang and Piotr Koniusz and YuXin Song and Yi Yang",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2606.10671",
+    "source_kind": "arxiv",
+    "title": "FadeMem: Distance-Aware Memory Consolidation for Autoregressive Video Diffusion",
+    "url": "https://arxiv.org/abs/2606.10671",
+    "year": "2026"
+  },
   "lucas1981iterative": {
     "authors": "Bruce D. Lucas and Takeo Kanade",
     "booktitle": "Proceedings of the 7th International Joint Conference on Artificial Intelligence (IJCAI)",
     "entry_type": "inproceedings",
     "pages": "674--679",
-    "source_id": "https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf",
+    "source_id": "https://publications.ri.cmu.edu/storage/publications/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf",
     "source_kind": "manual",
     "title": "An Iterative Image Registration Technique with an Application to Stereo Vision",
     "url": "https://publications.ri.cmu.edu/storage/publications/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf",
     "year": "1981"
+  },
+  "lv2026lightforcing": {
+    "arxiv_id": "2602.04789",
+    "authors": "Chengtao Lv and Yumeng Shi and Yushi Huang and Ruihao Gong and Shen Ren and Wenya Wang",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2602.04789",
+    "source_kind": "arxiv",
+    "title": "Light Forcing: Accelerating Autoregressive Video Diffusion via Sparse Attention",
+    "url": "https://arxiv.org/abs/2602.04789",
+    "year": "2026"
+  },
+  "ma2025stepvideo": {
+    "arxiv_id": "2502.10248",
+    "authors": "Guoqing Ma and Haoyang Huang and Kun Yan and Liangyu Chen and Nan Duan and Shengming Yin and Changyi Wan and Ranchen Ming and Xiaoniu Song and Xing Chen and Yu Zhou and Deshan Sun and Deyu Zhou and Jian Zhou and Kaijun Tan and Kang An and Mei Chen and Wei Ji and Qiling Wu and Wen Sun and Xin Han and Yanan Wei and Zheng Ge and Aojie Li and Bin Wang and Bizhu Huang and Bo Wang and Brian Li and Changxing Miao and Chen Xu and Chenfei Wu and Chenguang Yu and Dapeng Shi and Dingyuan Hu and Enle Liu and Gang Yu and Ge Yang and Guanzhe Huang and Gulin Yan and Haiyang Feng and Hao Nie and Haonan Jia and Hanpeng Hu and Hanqi Chen and Haolong Yan and Heng Wang and Hongcheng Guo and Huilin Xiong and Huixin Xiong and Jiahao Gong and Jianchang Wu and Jiaoren Wu and Jie Wu and Jie Yang and Jiashuai Liu and Jiashuo Li and Jingyang Zhang and Junjing Guo and Junzhe Lin and Kaixiang Li and Lei Liu and Lei Xia and Liang Zhao and Liguo Tan and Liwen Huang and Liying Shi and Ming Li and Mingliang Li and Muhua Cheng and Na Wang and Qiaohui Chen and Qinglin He and Qiuyan Liang and Quan Sun and Ran Sun and Rui Wang and Shaoliang Pang and Shiliang Yang and Sitong Liu and Siqi Liu and Shuli Gao and Tiancheng Cao and Tianyu Wang and Weipeng Ming and Wenqing He and Xu Zhao and Xuelin Zhang and Xianfang Zeng and Xiaojia Liu and Xuan Yang and Yaqi Dai and Yanbo Yu and Yang Li and Yineng Deng and Yingming Wang and Yilei Wang and Yuanwei Lu and Yu Chen and Yu Luo and Yuchu Luo and Yuhe Yin and Yuheng Feng and Yuxiang Yang and Zecheng Tang and Zekai Zhang and Zidong Yang and Binxing Jiao and Jiansheng Chen and Jing Li and Shuchang Zhou and Xiangyu Zhang and Xinhao Zhang and Yibo Zhu and Heung-Yeung Shum and Daxin Jiang",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2502.10248",
+    "source_kind": "arxiv",
+    "title": "Step-Video-T2V Technical Report: The Practice, Challenges, and Future of Video Foundation Model",
+    "url": "https://arxiv.org/abs/2502.10248",
+    "year": "2025"
   },
   "maes2026leworldmodel": {
     "arxiv_id": "2603.19312",
@@ -440,6 +739,17 @@
     "url": "https://openai.com/index/video-generation-models-as-world-simulators/",
     "year": "2024"
   },
+  "polyak2024moviegen": {
+    "arxiv_id": "2410.13720",
+    "authors": "Adam Polyak and Amit Zohar and Andrew Brown and Andros Tjandra and Animesh Sinha and Ann Lee and Apoorv Vyas and Bowen Shi and Chih-Yao Ma and Ching-Yao Chuang and David Yan and Dhruv Choudhary and Dingkang Wang and Geet Sethi and Guan Pang and Haoyu Ma and Ishan Misra and Ji Hou and Jialiang Wang and Kiran Jagadeesh and Kunpeng Li and Luxin Zhang and Mannat Singh and Mary Williamson and Matt Le and Matthew Yu and Mitesh Kumar Singh and Peizhao Zhang and Peter Vajda and Quentin Duval and Rohit Girdhar and Roshan Sumbaly and Sai Saketh Rambhatla and Sam Tsai and Samaneh Azadi and Samyak Datta and Sanyuan Chen and Sean Bell and Sharadh Ramaswamy and Shelly Sheynin and Siddharth Bhattacharya and Simran Motwani and Tao Xu and Tianhe Li and Tingbo Hou and Wei-Ning Hsu and Xi Yin and Xiaoliang Dai and Yaniv Taigman and Yaqiao Luo and Yen-Cheng Liu and Yi-Chiao Wu and Yue Zhao and Yuval Kirstain and Zecheng He and Zijian He and Albert Pumarola and Ali Thabet and Artsiom Sanakoyeu and Arun Mallya and Baishan Guo and Boris Araya and Breena Kerr and Carleigh Wood and Ce Liu and Cen Peng and Dimitry Vengertsev and Edgar Schonfeld and Elliot Blanchard and Felix Juefei-Xu and Fraylie Nord and Jeff Liang and John Hoffman and Jonas Kohler and Kaolin Fire and Karthik Sivakumar and Lawrence Chen and Licheng Yu and Luya Gao and Markos Georgopoulos and Rashel Moritz and Sara K. Sampson and Shikai Li and Simone Parmeggiani and Steve Fine and Tara Fowler and Vladan Petrovic and Yuming Du",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2410.13720",
+    "source_kind": "arxiv",
+    "title": "Movie Gen: A Cast of Media Foundation Models",
+    "url": "https://arxiv.org/abs/2410.13720",
+    "year": "2024"
+  },
   "runway2025gwm1": {
     "authors": "{Runway}",
     "entry_type": "misc",
@@ -448,6 +758,28 @@
     "source_kind": "manual",
     "title": "Introducing Runway GWM-1",
     "url": "https://runway.com/research/introducing-runway-gwm-1",
+    "year": "2025"
+  },
+  "samuel2026fastautoregressive": {
+    "arxiv_id": "2602.01801",
+    "authors": "Dvir Samuel and Issar Tzachor and Matan Levy and Michael Green and Gal Chechik and Rami Ben-Ari",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2602.01801",
+    "source_kind": "arxiv",
+    "title": "Fast Autoregressive Video Diffusion and World Models with Temporal Cache Compression and Sparse Attention",
+    "url": "https://arxiv.org/abs/2602.01801",
+    "year": "2026"
+  },
+  "sandai2025magi1": {
+    "arxiv_id": "2505.13211",
+    "authors": "{Sand.ai} and Hansi Teng and Hongyu Jia and Lei Sun and Lingzhi Li and Maolin Li and Mingqiu Tang and Shuai Han and Tianning Zhang and W. Q. Zhang and Weifeng Luo and Xiaoyang Kang and Yuchen Sun and Yue Cao and Yunpeng Huang and Yutong Lin and Yuxin Fang and Zewei Tao and Zheng Zhang and Zhongshu Wang and Zixun Liu and Dai Shi and Guoli Su and Hanwen Sun and Hong Pan and Jie Wang and Jiexin Sheng and Min Cui and Min Hu and Ming Yan and Shucheng Yin and Siran Zhang and Tingting Liu and Xianping Yin and Xiaoyu Yang and Xin Song and Xuan Hu and Yankai Zhang and Yuqiao Li",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2505.13211",
+    "source_kind": "arxiv",
+    "title": "MAGI-1: Autoregressive Video Generation at Scale",
+    "url": "https://arxiv.org/abs/2505.13211",
     "year": "2025"
   },
   "schodl2000video": {
@@ -478,6 +810,17 @@
     "volume": "588",
     "year": "2020"
   },
+  "seedance2026seedance2": {
+    "arxiv_id": "2604.14148",
+    "authors": "{Seedance Team} and De Chen and Liyang Chen and Xin Chen and Ying Chen and Zhuo Chen and Zhuowei Chen and Feng Cheng and Tianheng Cheng and Yufeng Cheng and Mojie Chi and Xuyan Chi and Jian Cong and Qinpeng Cui and Fei Ding and Qide Dong and Yujiao Du and Haojie Duanmu and Junliang Fan and Jiarui Fang and Jing Fang and Zetao Fang and Chengjian Feng and Yu Gao and Diandian Gu and Dong Guo and Hanzhong Guo and Qiushan Guo and Boyang Hao and Hongxiang Hao and Haoxun He and Jiaao He and Qian He and Tuyen Hoang and Heng Hu and Ruoqing Hu and Yuxiang Hu and Jiancheng Huang and Weilin Huang and Zhaoyang Huang and Zhongyi Huang and Jishuo Jin and Ming Jing and Ashley Kim and Shanshan Lao and Yichong Leng and Bingchuan Li and Gen Li and Haifeng Li and Huixia Li and Jiashi Li and Ming Li and Xiaojie Li and Xingxing Li and Yameng Li and Yiying Li and Yu Li and Yueyan Li and Chao Liang and Han Liang and Jianzhong Liang and Ying Liang and Wang Liao and J. H. Lien and Shanchuan Lin and Xi Lin and Feng Ling and Yue Ling and Fangfang Liu and Jiawei Liu and Jihao Liu and Jingtuo Liu and Shu Liu and Sichao Liu and Wei Liu and Xue Liu and Zuxi Liu and Ruijie Lu and Lecheng Lyu and Jingting Ma and Tianxiang Ma and Xiaonan Nie and Jingzhe Ning and Junjie Pan and Xitong Pan and Ronggui Peng and Xueqiong Qu and Yuxi Ren and Yuchen Shen and Guang Shi and Lei Shi and Yinglong Song and Fan Sun and Li Sun and Renfei Sun and Wenjing Tang and Boyang Tao and Zirui Tao and Dongliang Wang and Feng Wang and Hulin Wang and Ke Wang and Qingyi Wang and Rui Wang and Shuai Wang and Shulei Wang and Weichen Wang and Xuanda Wang and Yanhui Wang and Yue Wang and Yuping Wang and Yuxuan Wang and Zijie Wang and Ziyu Wang and Guoqiang Wei and Meng Wei and Di Wu and Guohong Wu and Hanjie Wu and Huachao Wu and Jian Wu and Jie Wu and Ruolan Wu and Shaojin Wu and Xiaohu Wu and Xinglong Wu and Yonghui Wu and Ruiqi Xia and Xin Xia and Xuefeng Xiao and Shuang Xu and Bangbang Yang and Jiaqi Yang and Runkai Yang and Tao Yang and Yihang Yang and Zhixian Yang and Ziyan Yang and Fulong Ye and Bingqian Yi and Xing Yin and Yongbin You and Linxiao Yuan and Weihong Zeng and Xuejiao Zeng and Yan Zeng and Siyu Zhai and Zhonghua Zhai and Bowen Zhang and Chenlin Zhang and Heng Zhang and Jun Zhang and Manlin Zhang and Peiyuan Zhang and Shuo Zhang and Xiaohe Zhang and Xiaoying Zhang and Xinyan Zhang and Xinyi Zhang and Yichi Zhang and Zixiang Zhang and Haiyu Zhao and Huating Zhao and Liming Zhao and Yian Zhao and Guangcong Zheng and Jianbin Zheng and Xiaozheng Zheng and Zerong Zheng and Kuan Zhu and Feilong Zuo",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2604.14148",
+    "source_kind": "arxiv",
+    "title": "Seedance 2.0: Advancing Video Generation for World Complexity",
+    "url": "https://arxiv.org/abs/2604.14148",
+    "year": "2026"
+  },
   "shi2015convolutional": {
     "arxiv_id": "1506.04214",
     "authors": "Xingjian Shi and Zhourong Chen and Hao Wang and Dit-Yan Yeung and Wai-kin Wong and Wang-chun Woo",
@@ -489,6 +832,17 @@
     "url": "https://arxiv.org/abs/1506.04214",
     "year": "2015"
   },
+  "shutkin2026kvae": {
+    "arxiv_id": "2608.05798",
+    "authors": "Andrey Shutkin and Denis Parkhomenko and Ivan Kirillov and Kirill Chernyshev and Kirill Malakhov and Ilia Vasiliev and Ilia Trushkin and Valeriya Kobenko and David Chikovani and Alexander Ivanov and Azat Saginbaev and Egor Silvestrov and Ivan Mikheev and Konstantin Zakharov",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2608.05798",
+    "source_kind": "arxiv",
+    "title": "KVAE: Family of Tokenizers for Multimodal Generative Models",
+    "url": "https://arxiv.org/abs/2608.05798",
+    "year": "2026"
+  },
   "singer2022make": {
     "arxiv_id": "2209.14792",
     "authors": "Uriel Singer and Adam Polyak and Thomas Hayes and Xi Yin and Jie An and Songyang Zhang and Qiyuan Hu and Harry Yang and Oron Ashual and Oran Gafni and Devi Parikh and Sonal Gupta and Yaniv Taigman",
@@ -499,6 +853,17 @@
     "title": "Make-A-Video: Text-to-Video Generation without Text-Video Data",
     "url": "https://arxiv.org/abs/2209.14792",
     "year": "2022"
+  },
+  "song2020scorebased": {
+    "arxiv_id": "2011.13456",
+    "authors": "Yang Song and Jascha Sohl-Dickstein and Diederik P. Kingma and Abhishek Kumar and Stefano Ermon and Ben Poole",
+    "entry_type": "misc",
+    "primary_class": "cs.LG",
+    "source_id": "2011.13456",
+    "source_kind": "arxiv",
+    "title": "Score-Based Generative Modeling through Stochastic Differential Equations",
+    "url": "https://arxiv.org/abs/2011.13456",
+    "year": "2020"
   },
   "srivastava2015unsupervised": {
     "arxiv_id": "1502.04681",
@@ -533,6 +898,17 @@
     "url": "https://arxiv.org/abs/1707.04993",
     "year": "2017"
   },
+  "unterthiner2018towards": {
+    "arxiv_id": "1812.01717",
+    "authors": "Thomas Unterthiner and Sjoerd van Steenkiste and Karol Kurach and Raphael Marinier and Marcin Michalski and Sylvain Gelly",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "1812.01717",
+    "source_kind": "arxiv",
+    "title": "Towards Accurate Generative Models of Video: A New Metric & Challenges",
+    "url": "https://arxiv.org/abs/1812.01717",
+    "year": "2018"
+  },
   "valevski2024diffusion": {
     "arxiv_id": "2408.14837",
     "authors": "Dani Valevski and Yaniv Leviathan and Moab Arar and Shlomi Fruchter",
@@ -566,6 +942,17 @@
     "url": "https://arxiv.org/abs/1609.02612",
     "year": "2016"
   },
+  "wan2025wan": {
+    "arxiv_id": "2503.20314",
+    "authors": "{Wan Team} and Ang Wang and Baole Ai and Bin Wen and Chaojie Mao and Chen-Wei Xie and Di Chen and Feiwu Yu and Haiming Zhao and Jianxiao Yang and Jianyuan Zeng and Jiayu Wang and Jingfeng Zhang and Jingren Zhou and Jinkai Wang and Jixuan Chen and Kai Zhu and Kang Zhao and Keyu Yan and Lianghua Huang and Mengyang Feng and Ningyi Zhang and Pandeng Li and Pingyu Wu and Ruihang Chu and Ruili Feng and Shiwei Zhang and Siyang Sun and Tao Fang and Tianxing Wang and Tianyi Gui and Tingyu Weng and Tong Shen and Wei Lin and Wei Wang and Wei Wang and Wenmeng Zhou and Wente Wang and Wenting Shen and Wenyuan Yu and Xianzhong Shi and Xiaoming Huang and Xin Xu and Yan Kou and Yangyu Lv and Yifei Li and Yijing Liu and Yiming Wang and Yingya Zhang and Yitong Huang and Yong Li and You Wu and Yu Liu and Yulin Pan and Yun Zheng and Yuntao Hong and Yupeng Shi and Yutong Feng and Zeyinzi Jiang and Zhen Han and Zhi-Fan Wu and Ziyu Liu",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2503.20314",
+    "source_kind": "arxiv",
+    "title": "Wan: Open and Advanced Large-Scale Video Generative Models",
+    "url": "https://arxiv.org/abs/2503.20314",
+    "year": "2025"
+  },
   "worldlabs2025marble": {
     "authors": "{World Labs}",
     "entry_type": "misc",
@@ -575,6 +962,72 @@
     "title": "Marble: A Multimodal World Model",
     "url": "https://www.worldlabs.ai/blog/marble-world-model",
     "year": "2025"
+  },
+  "wu2025hunyuanvideo15": {
+    "arxiv_id": "2511.18870",
+    "authors": "Bing Wu and Chang Zou and Changlin Li and Duojun Huang and Fang Yang and Hao Tan and Jack Peng and Jianbing Wu and Jiangfeng Xiong and Jie Jiang and Linus and Patrol and Peizhen Zhang and Peng Chen and Penghao Zhao and Qi Tian and Songtao Liu and Weijie Kong and Weiyan Wang and Xiao He and Xin Li and Xinchi Deng and Xuefei Zhe and Yang Li and Yanxin Long and Yuanbo Peng and Yue Wu and Yuhong Liu and Zhenyu Wang and Zuozhuo Dai and Bo Peng and Coopers Li and Gu Gong and Guojian Xiao and Jiahe Tian and Jiaxin Lin and Jie Liu and Jihong Zhang and Jiesong Lian and Kaihang Pan and Lei Wang and Lin Niu and Mingtao Chen and Mingyang Chen and Mingzhe Zheng and Miles Yang and Qiangqiang Hu and Qi Yang and Qiuyong Xiao and Runzhou Wu and Ryan Xu and Rui Yuan and Shanshan Sang and Shisheng Huang and Siruis Gong and Shuo Huang and Weiting Guo and Xiang Yuan and Xiaojia Chen and Xiawei Hu and Wenzhi Sun and Xiele Wu and Xianshun Ren and Xiaoyan Yuan and Xiaoyue Mi and Yepeng Zhang and Yifu Sun and Yiting Lu and Yitong Li and You Huang and Yu Tang and Yixuan Li and Yuhang Deng and Yuan Zhou and Zhichao Hu and Zhiguang Liu and Zhihe Yang and Zilin Yang and Zhenzhi Lu and Zixiang Zhou and Zhao Zhong",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2511.18870",
+    "source_kind": "arxiv",
+    "title": "HunyuanVideo 1.5 Technical Report",
+    "url": "https://arxiv.org/abs/2511.18870",
+    "year": "2025"
+  },
+  "xi2026quantvideogen": {
+    "arxiv_id": "2602.02958",
+    "authors": "Haocheng Xi and Shuo Yang and Yilong Zhao and Muyang Li and Han Cai and Xingyang Li and Yujun Lin and Zhuoyang Zhang and Jintao Zhang and Xiuyu Li and Zhiying Xu and Jun Wu and Chenfeng Xu and Ion Stoica and Song Han and Kurt Keutzer",
+    "entry_type": "misc",
+    "primary_class": "cs.LG",
+    "source_id": "2602.02958",
+    "source_kind": "arxiv",
+    "title": "Quant VideoGen: Auto-Regressive Long Video Generation via 2-Bit KV-Cache Quantization",
+    "url": "https://arxiv.org/abs/2602.02958",
+    "year": "2026"
+  },
+  "xiao2026joyaivideoedit": {
+    "arxiv_id": "2608.03974",
+    "authors": "Yicheng Xiao and Wenxun Dai and Xinran Qin and Lin Song and Maoquan Zhang and Hang Xu and Yukang Chen and Yitong Li and Guohui Zhang and Yuan Zhang and Xuying Zhang and Tommy Zhang and Jianlong Yuan and Peihao Li and Shuai Lu and Siming Fu and Chuyang Zhao and Xin Han and Jie Huang and Wenbo Li and Guoqing Ma and Wei Huang and Xiaojuan Qi and Haoyang Huang and Nan Duan",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2608.03974",
+    "source_kind": "arxiv",
+    "title": "JoyAI-Video-Edit: Real-Time Open-Ended Video Editing with Autoregressive Diffusion",
+    "url": "https://arxiv.org/abs/2608.03974",
+    "year": "2026"
+  },
+  "xie2026videorae": {
+    "arxiv_id": "2607.14088",
+    "authors": "Zhihao Xie and Junfeng Wu and Xinting Hu and Junchao Huang and Li Jiang",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2607.14088",
+    "source_kind": "arxiv",
+    "title": "VideoRAE: Taming Video Foundation Models for Generative Modeling via Representation Autoencoders",
+    "url": "https://arxiv.org/abs/2607.14088",
+    "year": "2026"
+  },
+  "xu2026sparseforcing": {
+    "arxiv_id": "2604.21221",
+    "authors": "Boxun Xu and Yuming Du and Zichang Liu and Siyu Yang and Ziyang Jiang and Siqi Yan and Rajasi Saha and Albert Pumarola and Wenchen Wang and Peng Li",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2604.21221",
+    "source_kind": "arxiv",
+    "title": "Sparse Forcing: Native Trainable Sparse Attention for Real-time Autoregressive Diffusion Video Generation",
+    "url": "https://arxiv.org/abs/2604.21221",
+    "year": "2026"
+  },
+  "xue2026systematic": {
+    "arxiv_id": "2604.25427",
+    "authors": "Zeyue Xue and Siming Fu and Jie Huang and Shuai Lu and Haoran Li and Yijun Liu and Yuming Li and Xiaoxuan He and Mengzhao Chen and Haoyang Huang and Nan Duan and Ping Luo",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2604.25427",
+    "source_kind": "arxiv",
+    "title": "A Systematic Post-Train Framework for Video Generation",
+    "url": "https://arxiv.org/abs/2604.25427",
+    "year": "2026"
   },
   "yan2021videogpt": {
     "arxiv_id": "2104.10157",
@@ -598,6 +1051,17 @@
     "url": "https://arxiv.org/abs/2310.06114",
     "year": "2023"
   },
+  "yang2025longlive": {
+    "arxiv_id": "2509.22622",
+    "authors": "Shuai Yang and Wei Huang and Ruihang Chu and Yicheng Xiao and Yuyang Zhao and Xianbang Wang and Muyang Li and Enze Xie and Yingcong Chen and Yao Lu and Song Han and Yukang Chen",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2509.22622",
+    "source_kind": "arxiv",
+    "title": "LongLive: Real-time Interactive Long Video Generation",
+    "url": "https://arxiv.org/abs/2509.22622",
+    "year": "2025"
+  },
   "ye2026worldaction": {
     "arxiv_id": "2602.15922",
     "authors": "Seonghyeon Ye and Yunhao Ge and Kaiyuan Zheng and Shenyuan Gao and Sihyun Yu and George Kurian and Suneel Indupuru and You Liang Tan and Chuning Zhu and Jiannan Xiang and Ayaan Malik and Kyungmin Lee and William Liang and Nadun Ranawaka and Jiasheng Gu and Yinzhen Xu and Guanzhi Wang and Fengyuan Hu and Avnish Narayan and Johan Bjorck and Jing Wang and Gwanghyun Kim and Dantong Niu and Ruijie Zheng and Yuqi Xie and Jimmy Wu and Qi Wang and Ryan Julian and Danfei Xu and Yilun Du and Yevgen Chebotar and Scott Reed and Jan Kautz and Yuke Zhu and Linxi \"Jim\" Fan and Joel Jang",
@@ -608,6 +1072,28 @@
     "title": "World Action Models are Zero-shot Policies",
     "url": "https://arxiv.org/abs/2602.15922",
     "year": "2026"
+  },
+  "yesiltepe2026videomla": {
+    "arxiv_id": "2605.30351",
+    "authors": "Hidir Yesiltepe and Jiazhen Hu and Tuna Han Salih Meral and Adil Kaan Akan and Kaan Oktay and Hoda Eldardiry and Pinar Yanardag",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2605.30351",
+    "source_kind": "arxiv",
+    "title": "VideoMLA: Low-Rank Latent KV Cache for Minute-Scale Autoregressive Video Diffusion",
+    "url": "https://arxiv.org/abs/2605.30351",
+    "year": "2026"
+  },
+  "yin2024causvid": {
+    "arxiv_id": "2412.07772",
+    "authors": "Tianwei Yin and Qiang Zhang and Richard Zhang and William T. Freeman and Fredo Durand and Eli Shechtman and Xun Huang",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2412.07772",
+    "source_kind": "arxiv",
+    "title": "From Slow Bidirectional to Fast Autoregressive Video Diffusion Models",
+    "url": "https://arxiv.org/abs/2412.07772",
+    "year": "2024"
   },
   "yu2022magvit": {
     "arxiv_id": "2212.05199",
@@ -631,6 +1117,61 @@
     "url": "https://arxiv.org/abs/2310.05737",
     "year": "2023"
   },
+  "yu2025videossm": {
+    "arxiv_id": "2512.04519",
+    "authors": "Yifei Yu and Xiaoshan Wu and Xinting Hu and Tao Hu and Yangtian Sun and Xiaoyang Lyu and Bo Wang and Lin Ma and Yuewen Ma and Zhongrui Wang and Xiaojuan Qi",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2512.04519",
+    "source_kind": "arxiv",
+    "title": "VideoSSM: Autoregressive Long Video Generation with Hybrid State-Space Memory",
+    "url": "https://arxiv.org/abs/2512.04519",
+    "year": "2025"
+  },
+  "yu2026videomirai": {
+    "arxiv_id": "2606.03971",
+    "authors": "Yonghao Yu and Lang Huang and Runyi Li and Zerun Wang and Toshihiko Yamasaki",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2606.03971",
+    "source_kind": "arxiv",
+    "title": "Video-Mirai: Autoregressive Video Diffusion Models Need Foresight",
+    "url": "https://arxiv.org/abs/2606.03971",
+    "year": "2026"
+  },
+  "zhao2026causalforcingpp": {
+    "arxiv_id": "2605.15141",
+    "authors": "Min Zhao and Hongzhou Zhu and Kaiwen Zheng and Zihan Zhou and Bokai Yan and Xinyuan Li and Xiao Yang and Chongxuan Li and Jun Zhu",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2605.15141",
+    "source_kind": "arxiv",
+    "title": "Causal Forcing++: Scalable Few-Step Autoregressive Diffusion Distillation for Real-Time Interactive Video Generation",
+    "url": "https://arxiv.org/abs/2605.15141",
+    "year": "2026"
+  },
+  "zheng2025opensora2": {
+    "arxiv_id": "2503.09642",
+    "authors": "Zangwei Zheng and Xiangyu Peng and Yuxuan Lou and Chenhui Shen and Tom Young and Xinying Guo and Binluo Wang and Hang Xu and Hongxin Liu and Mingyan Jiang and Wenjun Li and Yuhui Wang and Anbang Ye and Gang Ren and Qianran Ma and Wanying Liang and Xiang Lian and Xiwen Wu and Yuting Zhong and Zhuangyan Li and Chaoyu Gong and Guojun Lei and Leijun Cheng and Limin Zhang and Minghao Li and Ruijie Zhang and Silan Hu and Shijie Huang and Xiaokang Wang and Yuanheng Zhao and Yuqi Wang and Ziang Wei and Yang You",
+    "entry_type": "misc",
+    "primary_class": "cs.GR",
+    "source_id": "2503.09642",
+    "source_kind": "arxiv",
+    "title": "Open-Sora 2.0: Training a Commercial-Level Video Generation Model in $200k",
+    "url": "https://arxiv.org/abs/2503.09642",
+    "year": "2025"
+  },
+  "zheng2026causalrcm": {
+    "arxiv_id": "2606.25473",
+    "authors": "Kaiwen Zheng and Guande He and Min Zhao and Jintao Zhang and Huayu Chen and Jianfei Chen and Chen-Hsuan Lin and Ming-Yu Liu and Jun Zhu and Qianli Ma",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2606.25473",
+    "source_kind": "arxiv",
+    "title": "Causal-rCM: A Unified Teacher-Forcing and Self-Forcing Open Recipe for Autoregressive Diffusion Distillation in Streaming Video Generation and Interactive World Models",
+    "url": "https://arxiv.org/abs/2606.25473",
+    "year": "2026"
+  },
   "zhou2024dinowm": {
     "arxiv_id": "2411.04983",
     "authors": "Gaoyue Zhou and Hengkai Pan and Yann LeCun and Lerrel Pinto",
@@ -641,5 +1182,27 @@
     "title": "DINO-WM: World Models on Pre-trained Visual Features enable Zero-shot Planning",
     "url": "https://arxiv.org/abs/2411.04983",
     "year": "2024"
+  },
+  "zhu2026causalforcing": {
+    "arxiv_id": "2602.02214",
+    "authors": "Hongzhou Zhu and Min Zhao and Guande He and Hang Su and Chongxuan Li and Jun Zhu",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2602.02214",
+    "source_kind": "arxiv",
+    "title": "Causal Forcing: Autoregressive Diffusion Distillation Done Right for High-Quality Real-Time Interactive Video Generation",
+    "url": "https://arxiv.org/abs/2602.02214",
+    "year": "2026"
+  },
+  "zhuang2026selfgradient": {
+    "arxiv_id": "2607.20368",
+    "authors": "Junhao Zhuang and Shiyi Zhang and Yuxuan Bian and Yaowei Li and Yawen Luo and Yijun Liu and Weiyang Jin and Songchun Zhang and Xianglong He and Xuying Zhang and Haoran Li and Haoyang Huang and Zeyue Xue and Nan Duan",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2607.20368",
+    "source_kind": "arxiv",
+    "title": "Self Gradient Forcing: Native Long Video Extrapolation",
+    "url": "https://arxiv.org/abs/2607.20368",
+    "year": "2026"
   }
 }

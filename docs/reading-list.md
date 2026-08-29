@@ -1,263 +1,365 @@
-# 精选阅读列表
+# 视频生成论文阅读课程：从会生成到可验证
 
-本页不是追求数量的 awesome list，而是按概念演化挑选的阅读路径。建议优先阅读原始论文，并结合项目页中的视频与失败案例。
+这不是按年份堆论文的 awesome list，而是一门可以执行、留痕和被证伪的路线式课程。目标不是“读过多少篇”，而是最终能回答四个问题：模型表示了什么、怎样沿时间生成、证据真正支持什么、下一次实验怎样推翻自己的判断。
 
-全部条目的标准引用、代码仓库类型和带日期的 GitHub Star 快照见 [引用与代码索引](bibliography.md)，也可直接下载 [完整 BibTeX](../bibliography/references.bib)。
+本页证据冻结于 **2026-08-30（Asia/Shanghai）**。检索式、纳入排除、正式发表状态和关键断言见[阅读路线研究日志](../sources/research_20260830_reading_routes.md)。完整书目信息与仓库索引仍见[引用与代码索引](bibliography.md)；专题细节分别见[生成模型](generative-models.md)、[因果流式生成](generative-models/causal-streaming-generation.md)、[评测](evaluation.md)、[World Model](world-models.md)与 [JEPA](jepa.md)。
 
-本页把 JEPA 放在参考阅读中，而不是作为视频生成主线章节。若需要理解 latent prediction、V-JEPA 2-AC 与生成式 world model 的差别，可读 [JEPA 参考阅读](jepa.md)。
+## 0. 课程规则与证据标签
 
-## 最小阅读集：8 篇建立全局观
+先读共同主干，再选择一条主修分支和一条交叉分支。建议主干用 4 个半天，每条分支用 3–5 个半天；每次只交付一张 claim card、一份最小实验记录和一个“当前仍不知道什么”的列表。
 
-1. **Video Textures [[1]](#ref-1)** — Schödl et al., 2000
+本页对论文状态使用固定标签：
 
-   [Paper](https://dl.acm.org/doi/10.1145/344779.345012) · 理解数据驱动视频合成在深度学习之前如何工作。
+| 标签 | 含义 | 可以怎样写 | 不可以怎样写 |
+|---|---|---|---|
+| **A·正式发表** | 已在正式 proceedings、期刊或同行评审入口出现 | “论文提出/报告；发表于……” | 把作者实验写成独立复现 |
+| **A*·正式接收** | 官方会议名单可核验接收，但冻结日未定位到正式 proceedings 页面 | “已被会议接收；正文当前见作者稿” | 把作者稿误写成已经出版的版本 |
+| **B·预印本** | 作者 arXiv 论文，可能附代码或权重 | “作者提出/报告；截至冻结日为预印本” | 写成同行评审共识或统一 SOTA |
+| **C·技术报告** | 机构或团队技术报告，无同等级正式论文 | “报告披露/展示” | 由报告反推完整训练配方或可复现性 |
+| **D·官方发布** | 官方 system card、项目页、模型卡或仓库；不是论文 | “提供方声明/发布” | 当作论文机制证据或开放 checkpoint 证明 |
+| **S·课程综合** | 本页设计的路线、实验或判断规则 | “本课程要求” | 冒充论文结论 |
 
-2. **Deep Multi-Scale Video Prediction Beyond Mean Square Error [[2]](#ref-2)** — Mathieu et al., 2015
+代码、权重和数据是 release surface，不是证据等级。一个 B 级预印本可以有完整工件，一个 A 级论文也可能没有可运行代码。
 
-   [Paper](https://arxiv.org/abs/1511.05440) · 理解为什么像素 MSE 会导致模糊。
+## 1. 先修诊断：不过关就先补，不要硬读
 
-3. **Unsupervised Learning for Physical Interaction [[3]](#ref-3) through Video Prediction** — Finn et al., 2016
+| 先修能力 | 30 分钟自测 | 不通过时先读 |
+|---|---|---|
+| 概率与生成建模 | 能解释联合分布与自回归分解的差别，并说明“多种合理未来”为何使逐像素 MSE 变模糊 | [生成模型总览](generative-models.md) |
+| 视频表示 | 能区分 pixel、连续 latent、离散 token、结构化 state，并写出压缩率与重建误差的取舍 | [分类体系](taxonomy.md) |
+| Diffusion / flow | 能画出 data → noise → data，并区分“训练目标”“数值求解步数”“网络调用次数” | [Diffusion](generative-models/diffusion-models.md)与 [Flow / consistency](generative-models/flow-consistency-models.md) |
+| 序列与系统 | 能解释 causal mask、KV cache、首帧时间、平均 FPS、p95 帧延迟为什么不是同一个量 | [因果流式生成](generative-models/causal-streaming-generation.md) |
+| 控制 | 能区分 observation、state、action、reward、open-loop rollout 与 receding-horizon control | [World Model](world-models.md) |
+| 音视频时间轴 | 能把 24 FPS 视频与 48 kHz 音频放到同一秒表上，并定义事件 onset 偏差 | [文生视频的音视频边界](tasks/text-to-video.md) |
 
-   [Paper](https://arxiv.org/abs/1605.07157) · 理解动作条件、像素变换和机器人视频预测。
+最低入口产物是一页术语表：每个术语必须同时写“定义”“反例”和“怎样测”。如果只能写定义，说明还不能进入分支。
 
-4. **VideoGPT [[4]](#ref-4): Video Generation using VQ-VAE and Transformers** — Yan et al., 2021
+## 2. 总路线图：一条主干，四条分支
 
-   [Paper](https://arxiv.org/abs/2104.10157) · 理解视频 tokenizer 和自回归 Transformer。
+```mermaid
+flowchart TB
+    accTitle: 视频生成论文课程的依赖路线
+    accDescr: 学习者先完成先修诊断，再通过表示、生成目标和评测组成的共同主干。之后可选择因果流式、少步与后训练、原生音视频、World Action 与 JEPA 四条分支。每条分支都进入共同验收，并以跨分支结课项目结束。
 
-5. **Video Diffusion Models [[5]](#ref-5)** — Ho et al., 2022
+    P["先修诊断"] --> K["共同主干：表示 · 目标 · 评测"]
+    K --> S["分支 A：因果 · 流式 · 实时"]
+    K --> D["分支 B：少步 · 后训练 · 蒸馏"]
+    K --> A["分支 C：原生音视频"]
+    K --> W["分支 D：World Action · JEPA"]
+    D --> S
+    S --> V["共同验收：复现 + 反证 + 边界"]
+    D --> V
+    A --> V
+    W --> V
+    V --> C["跨分支结课项目"]
 
-   [Paper](https://arxiv.org/abs/2204.03458) · 理解 diffusion 如何扩展到时间维。
+    classDef gate fill:#f2f2f2,stroke:#222,color:#111
+    classDef trunk fill:#d9ecff,stroke:#0067a5,color:#111
+    classDef branch fill:#fff0cc,stroke:#a65f00,color:#111
+    classDef verify fill:#dff2e5,stroke:#147a4b,color:#111
+    class P,C gate
+    class K trunk
+    class S,D,A,W branch
+    class V verify
+```
 
-6. **Video Generation Models as World Simulators [[6]](#ref-6)** — OpenAI, 2024
+文字替代：先通过六项先修诊断，再完成共同主干。主干之后选一条主修分支；少步蒸馏又是流式生成的常见前提，因此分支 B 连接分支 A。四条分支都必须经过同一套“复现、反证、证据边界”验收，最后再做跨分支项目。颜色只辅助分组，节点标签和箭头已经给出全部语义。
 
-   [Technical report](https://openai.com/index/video-generation-models-as-world-simulators/) · 理解 spacetime patch、规模化和“world simulator”主张。
+### 怎样选主修分支
 
-7. **World Models [[7]](#ref-7)** — Ha & Schmidhuber, 2018
+| 你真正想回答的问题 | 主修 | 建议交叉分支 |
+|---|---|---|
+| 怎样边生成边播放，并接受中途条件变化？ | A 因果/流式 | B 少步/蒸馏 |
+| 怎样减少网络调用，同时避免奖励投机与多样性坍缩？ | B 少步/后训练 | A 因果/流式 |
+| 声音是否与画面共同生成，而不是事后配音？ | C 原生音视频 | B 后训练 |
+| 好看的 rollout 何时才对决策有用？ | D World Action/JEPA | A 因果/流式 |
 
-   [Paper](https://arxiv.org/abs/1803.10122) · 理解决策型 world model 的 latent imagination 路线。
+## 3. 共同主干：表示、目标、时间与证据
 
-8. **Genie [[8]](#ref-8): Generative Interactive Environments** — Bruce et al., 2024
+### 为什么先读这条主干
 
-   [Paper](https://arxiv.org/abs/2402.15391) · 理解无动作标签视频、latent action 与交互生成的结合。
+四个前沿分支常把不同层级的词混在一起：tokenizer 是表示，DiT 是骨干，diffusion/flow 是训练与采样路径，causal 是信息访问约束，DPO 是后训练，world model 是任务合同。主干的作用是先把这些坐标拆开，否则读新论文时很容易把“换了 objective”误写成“换了整个系统”。
 
-## A. 传统方法与状态空间
+### 阅读顺序
 
-- **Lucas–Kanade optical flow** — Lucas & Kanade, 1981. [Paper](https://www.ri.cmu.edu/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf) [[9]](#ref-9)
-- **Horn–Schunck optical flow** — Horn & Schunck, 1981. [DOI](https://doi.org/10.1016/0004-3702%2881%2990024-2) [[10]](#ref-10)
-- **Video Textures** — Schödl et al., 2000. [Paper](https://dl.acm.org/doi/10.1145/344779.345012)
-- **Dynamic Textures [[11]](#ref-11)** — Doretto et al., 2003. [DOI](https://doi.org/10.1023/A:1021669406132)
+| 顺序 | 论文 | 带着什么问题读 | 证据 |
+|---:|---|---|---|
+| 1 | [Deep Multi-Scale Video Prediction Beyond Mean Square Error](https://arxiv.org/abs/1511.05440)（[ICLR 2016 目录](https://iclr.cc/archive/www/2016.html)） | 单一像素回归怎样平均掉多种未来？感知锐利是否等于动力学正确？ | **A·正式发表** |
+| 2 | [Neural Discrete Representation Learning / VQ-VAE](https://proceedings.neurips.cc/paper/2017/hash/7a98af17e63a0ac09ce2e96d03992fbc-Abstract.html) | 压缩让序列变短时，哪些细节和动作信息被丢掉？ | **A·正式发表** |
+| 3 | [Denoising Diffusion Probabilistic Models](https://proceedings.neurips.cc/paper/2020/hash/4c5bcfec8584af0d967f1ab10179ca4b-Abstract.html) | 训练时预测什么？采样慢来自哪里？ | **A·正式发表** |
+| 4 | [Flow Matching for Generative Modeling](https://openreview.net/forum?id=PqvMRDCJT9t) | 向量场回归与 diffusion path 有什么关系？ODE 步数为何仍需单独报告？ | **A·正式发表** |
+| 5 | [Video Diffusion Models](https://proceedings.neurips.cc/paper_files/paper/2022/hash/39235c56aef13fb05a6adc95eb9d8d66-Abstract-Conference.html) | 图像扩散加上时间维后，联合生成、续写与级联分别承担什么？ | **A·正式发表** |
+| 6 | [MAGVIT](https://openaccess.thecvf.com/content/CVPR2023/html/Yu_MAGVIT_Masked_Generative_Video_Transformer_CVPR_2023_paper.html) | tokenizer、masked generation 与多任务条件怎样组合？ | **A·正式发表** |
+| 7 | [VBench](https://openaccess.thecvf.com/content/CVPR2024/html/Huang_VBench_Comprehensive_Benchmark_Suite_for_Video_Generative_Models_CVPR_2024_paper.html) | 一个总分掩盖了哪些失败？自动指标与人工判断怎样对齐？ | **A·正式发表** |
 
-阅读问题：这些方法显式保留了哪些结构？现代生成模型又牺牲了哪些可解释性？
+### 主干阅读问题
 
-## B. 深度视频预测
+1. 论文建模的随机变量究竟是 RGB、latent、token、state，还是 action？
+2. 时间依赖是 recurrent、autoregressive、masked、bidirectional denoising，还是 rolling window？
+3. 一次“step”是求解器步、denoiser 前向、视频块，还是环境动作？
+4. 训练、采样、解码、超分、插帧和安全过滤分别花了多少时间？
+5. 指标证明了画质、提示遵循、时间稳定、多样性中的哪一项？又漏掉哪一项？
 
-- **Unsupervised Learning of Video Representations using LSTMs** — Srivastava et al., 2015. [Paper](https://arxiv.org/abs/1502.04681)
-- **Convolutional LSTM Network [[12]](#ref-12)** — Shi et al., 2015. [Paper](https://arxiv.org/abs/1506.04214)
-- **Beyond MSE** — Mathieu et al., 2015. [Paper](https://arxiv.org/abs/1511.05440)
-- **Unsupervised Learning for Physical Interaction through Video Prediction** — Finn et al., 2016. [Paper](https://arxiv.org/abs/1605.07157)
-- **Deep Predictive Coding Networks for Video Prediction and Unsupervised Learning [[13]](#ref-13)** — Lotter et al., 2016. [Paper](https://arxiv.org/abs/1605.08104)
+### 最小复现与反证任务
 
-阅读问题：模型是在预测像素、运动，还是隐藏状态？多种合理未来如何表达？
+用一个“移动方块在岔路口向左或向右”的小数据集，固定相同历史但保留两个合理未来：
 
-## C. 生成模型路线：VAE 与 GAN
+1. 实现或复用 MSE predictor、离散分类/混合分布和 stochastic generator 三类最小模型；模型可以很小，但数据划分与随机种子必须固定。
+2. 同时报 pixel error、分支覆盖率、最优样本与平均样本；观察 MSE 是否用模糊平均换取更低误差。
+3. 对同一段 16 帧视频做 codec 重建，报告压缩后 token 数、重建误差和运动事件是否保存。
+4. 写一张六列模型卡：`representation / temporal factorization / objective / conditions / network calls / evidence`。
 
-- **Generating Videos with Scene Dynamics** — Vondrick et al., 2016. [Paper](https://arxiv.org/abs/1609.02612)
-- **MoCoGAN: Decomposing Motion and Content for Video Generation [[14]](#ref-14)** — Tulyakov et al., 2017. [Paper](https://arxiv.org/abs/1707.04993)
-- **Stochastic Video Generation with a Learned Prior [[15]](#ref-15)** — Denton & Fergus, 2018. [Paper](https://arxiv.org/abs/1802.07687)
-- **Adversarial Video Generation on Complex Datasets [[16]](#ref-16) / DVD-GAN** — Clark et al., 2019. [Paper](https://arxiv.org/abs/1907.06571)
+**反证条件：** 如果你无法仅凭方法和实验部分填完六列，或把重建误差当成生成质量，就不能进入分支。主干通关产物不是排行榜，而是一张能容纳后续所有论文的比较表。
 
-阅读问题：内容与运动是否真的被解耦？判别器在检查单帧还是检查时间结构？
+## 4. 分支 A：因果、流式与实时视频
 
-## D. Tokenizer 与 Transformer
+**入口依赖：** 完成主干，并能解释 causal attention、teacher forcing、KV cache、denoising step 和端到端播放 deadline。
 
-- **Neural Discrete Representation Learning [[17]](#ref-17) / VQ-VAE** — van den Oord et al., 2017. [Paper](https://arxiv.org/abs/1711.00937)
-- **VideoGPT** — Yan et al., 2021. [Paper](https://arxiv.org/abs/2104.10157)
-- **Phenaki [[18]](#ref-18)** — Villegas et al., 2022. [Paper](https://arxiv.org/abs/2210.02399)
-- **MAGVIT [[19]](#ref-19)** — Yu et al., 2022/2023. [Paper](https://arxiv.org/abs/2212.05199)
-- **Language Model Beats Diffusion — Tokenizer Is Key to Visual Generation / MAGVIT-v2** — Yu et al., 2023. [Paper](https://arxiv.org/abs/2310.05737) [[20]](#ref-20)
+**为什么读：** 这条线不是把全片 diffusion 的 mask 改成三角形，而是同时处理信息因果性、自生成历史、少步采样、长期记忆和在线 serving。论文之间的速度数字不能直接横比；真正的研究对象是质量—延迟—时长—交互四者的耦合。
 
-阅读问题：压缩率、重建质量、token 数量和生成难度之间如何权衡？
+### 阅读顺序
 
-## E. 生成模型路线：Diffusion、Flow 与大规模视频生成
+| 阶段 | 论文 | 在路线中的作用 | 证据 |
+|---|---|---|---|
+| 因果训练起点 | [Diffusion Forcing](https://proceedings.neurips.cc/paper_files/paper/2024/hash/2aee1c4159e48407d68fe16ae8e6e49e-Abstract-Conference.html) | 用 per-token noise 统一变长、rolling 与可引导序列生成 | **A·正式发表** |
+| 教师到学生 | [CausVid](https://openaccess.thecvf.com/content/CVPR2025/html/Yin_From_Slow_Bidirectional_to_Fast_Autoregressive_Video_Diffusion_Models_CVPR_2025_paper.html) | 双向教师、因果学生、DMD、4-step 与 KV cache 的组合 | **A·正式发表** |
+| 训练—推理对齐 | [Self Forcing](https://proceedings.neurips.cc/paper_files/paper/2025/hash/f4823f831af67a3ef15e41a85434422a-Abstract-Conference.html) | 在自生成历史上训练，直接研究 exposure bias | **A·正式发表** |
+| 因果初始化 | [Causal Forcing](https://arxiv.org/abs/2602.02214)（[ICML 2026 官方名单](https://icml.cc/Downloads/2026)） | 先训练 AR teacher，再做 causal flow-map/ODE 初始化 | **A*·正式接收** |
+| 在线系统 | [StreamDiffusionV2](https://proceedings.mlsys.org/paper_files/paper/2026/hash/698cfaf72a208aef2e78bcac55b74328-Abstract-Conference.html) | 把 TTFF、deadline、jitter、调度与多 GPU pipeline 纳入问题 | **A·正式发表** |
+| 长时前沿 | [LongLive](https://arxiv.org/abs/2509.22622)与 [Rolling Forcing](https://arxiv.org/abs/2509.25161) | prompt recache、sink、rolling window 与 train-long-test-long | **B·预印本** |
+| 少步前沿 | [Causal Forcing++](https://arxiv.org/abs/2605.15141)与 [Causal-rCM](https://arxiv.org/abs/2606.25473) | frame-wise 1–2 step 与 teacher-/self-forcing 组合 recipe | **B·预印本** |
 
-- **Denoising Diffusion Probabilistic Models [[21]](#ref-21)** — Ho et al., 2020. [Paper](https://arxiv.org/abs/2006.11239)
-- **Video Diffusion Models** — Ho et al., 2022. [Paper](https://arxiv.org/abs/2204.03458)
-- **Make-A-Video [[22]](#ref-22)** — Singer et al., 2022. [Paper](https://arxiv.org/abs/2209.14792)
-- **Imagen Video [[23]](#ref-23)** — Ho et al., 2022. [Paper](https://arxiv.org/abs/2210.02303)
-- **Align Your Latents** — Blattmann et al., 2023. [Paper](https://arxiv.org/abs/2304.08818) [[24]](#ref-24)
-- **AnimateDiff [[25]](#ref-25)** — Guo et al., 2023. [Paper](https://arxiv.org/abs/2307.04725)
-- **Stable Video Diffusion [[26]](#ref-26)** — Blattmann et al., 2023. [Paper](https://arxiv.org/abs/2311.15127)
-- **Lumiere [[27]](#ref-27)** — Bar-Tal et al., 2024. [Paper](https://arxiv.org/abs/2401.12945)
-- **Sora technical report** — OpenAI, 2024. [Project](https://openai.com/index/video-generation-models-as-world-simulators/)
+### 带着这些问题读
 
-阅读问题：模型是在整段视频上联合去噪，还是分块、分帧或分辨率级联？时间层如何复用图像预训练？
+1. “causal”约束的是 attention 访问，还是作者真的做了动作反事实与物理因果测试？
+2. 模型训练时看到 ground-truth history、带噪 history，还是完整的 self-generated history？梯度跨多少块？
+3. 少步来自 consistency、DMD、flow-map 初始化还是缓存；哪一项改变画质，哪一项只改变系统吞吐？
+4. 历史是全保留、窗口、sink、压缩、检索还是递归 state？显存怎样随时长增长？
+5. “实时”是否包含文本编码、VAE decode、调度和输出；是否给 TTFF、p95/p99 与 deadline miss？
 
-### E.1 因果、流式与实时生成
+### 最小复现与证伪任务
 
-- **Diffusion Forcing** — Chen et al., 2024. [Paper](https://arxiv.org/abs/2407.01392)
-- **CausVid / From Slow Bidirectional to Fast Autoregressive Video Diffusion Models** — Yin et al., 2024/2025. [Paper](https://arxiv.org/abs/2412.07772)
-- **Self Forcing** — Huang et al., 2025. [Paper](https://arxiv.org/abs/2506.08009)
-- **Rolling Forcing / LongLive** — joint rolling denoising、attention sink、prompt recache 与 train-long-test-long。[Rolling Forcing](https://arxiv.org/abs/2509.25161) · [LongLive](https://arxiv.org/abs/2509.22622)
-- **StreamDiffusionV2** — Feng et al., MLSys 2026. [Proceedings](https://proceedings.mlsys.org/paper_files/paper/2026/hash/698cfaf72a208aef2e78bcac55b74328-Abstract-Conference.html)
-- **Causal Forcing → Causal Forcing++ → Causal-rCM** — causal flow-map initialization、frame-wise 1–2 step 与统一蒸馏 recipe。[Causal Forcing](https://arxiv.org/abs/2602.02214) · [Causal Forcing++](https://arxiv.org/abs/2605.15141) · [Causal-rCM](https://arxiv.org/abs/2606.25473)
+固定 8 个 prompt、3 个 seed、同一分辨率/帧率和同一 GPU，比较一个离线基线与一个因果 checkpoint：
 
-阅读问题：论文解决的是 causal factorization、少步蒸馏、self-generated history、长期 memory，还是 serving SLO？FPS 是否在相同硬件、分辨率、步数和端到端计时口径下报告？完整比较见[因果、流式与实时视频生成专章](generative-models/causal-streaming-generation.md)。
+1. 生成训练窗口内、4 倍窗口和 12 倍窗口三档长度；逐块记录显存、首帧时间、p50/p95 帧间隔、实际播放 deadline miss。
+2. 对同一模型分别用 ground-truth history 与 self-generated history，画出误差或人工失败率随 rollout 长度的曲线。
+3. 在第 25%、50%、75% 时刻切换 prompt，测条件变化到可见响应的帧数，并记录旧身份/布局是否被错误重置。
+4. 给每个结果标第一处身份漂移、冻结、循环、几何崩坏和声音/画面停顿；不要只挑最好样例。
 
-## F. 决策型 World Model
+**反证条件：** 解码后达不到目标播放 deadline、显存随时长无界增长、超出训练窗后失败率陡升，或 prompt 切换只改变纹理而不改变预期事件时，都要下调“实时”“开放时长”或“交互式”的表述。
 
-- **World Models** — Ha & Schmidhuber, 2018. [Paper](https://arxiv.org/abs/1803.10122)
-- **Learning Latent Dynamics for Planning from Pixels [[28]](#ref-28) / PlaNet** — Hafner et al., 2018/2019. [Paper](https://arxiv.org/abs/1811.04551)
-- **Dream to Control [[29]](#ref-29) / Dreamer** — Hafner et al., 2019/2020. [Paper](https://arxiv.org/abs/1912.01603)
-- **Mastering Atari, Go, Chess and Shogi by Planning with a Learned Model / MuZero** — Schrittwieser et al., 2019/2020. [Paper](https://arxiv.org/abs/1911.08265)
-- **Mastering Diverse Domains through World Models [[31]](#ref-31) / DreamerV3** — Hafner et al., 2023. [Paper](https://arxiv.org/abs/2301.04104)
-- **GAIA-1: A Generative World Model for Autonomous Driving [[32]](#ref-32)** — Hu et al., 2023. [Paper](https://arxiv.org/abs/2309.17080)
+**通关产物：** 一张 latency breakdown、一张 drift curve、一份硬件与计时口径完整的失败日志。不能再用单个 FPS 概括系统。
 
-阅读问题：模型是否需要重建像素？它学习的是环境本身，还是仅足以预测价值与策略的状态？
+## 5. 分支 B：少步生成、后训练与蒸馏
 
-## G. 大模型路线：视频基础模型与交互世界
+**入口依赖：** 完成 DDPM、flow matching 与 VBench；能区分 teacher trajectory matching、distribution matching、consistency 与 preference optimization。
 
-- **Genie** — Bruce et al., 2024. [Paper](https://arxiv.org/abs/2402.15391)
-- **GameNGen** — Valevski et al., 2024. [Paper](https://arxiv.org/abs/2408.14837) [[33]](#ref-33)
-- **Cosmos World Foundation Model Platform** — NVIDIA, 2025. [Paper](https://arxiv.org/abs/2501.03575) [[34]](#ref-34)
-- **Genie 3 [[35]](#ref-35)** — Google DeepMind, 2025. [Project](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/)
-- **GWM-1** — Runway, 2025. [Project](https://runway.com/research/introducing-runway-gwm-1) [[36]](#ref-36)
-- **Cosmos 3 [[37]](#ref-37)** — NVIDIA, 2026. [Project](https://research.nvidia.com/labs/cosmos-lab/cosmos3/)
+**为什么读：** 少步回答“怎样更快采样”，后训练回答“模型更偏向什么输出”。两者可以联合，但目标不同：把 50 步压到 4 步不自动改善提示遵循；提高 reward 也可能损害运动、多样性和安全。
 
-阅读问题：动作是什么？状态保存多久？模型是否实时？规划收益是在模型内部还是真实环境中测量？
+### 两条并行阅读线
 
-## H. 参考阅读：JEPA 路线
+| 线路 | 论文 | 在路线中的作用 | 证据 |
+|---|---|---|---|
+| 少步基础 | [Consistency Models](https://proceedings.mlr.press/v202/song23a.html) | 一步/少步映射、蒸馏与独立训练的共同起点 | **A·正式发表** |
+| 少步基础 | [DMD2](https://proceedings.neurips.cc/paper_files/paper/2024/hash/54dcf25318f9de5a7a01f0a4125c541e-Abstract-Conference.html) | 分布匹配、two-time-scale 更新与 train–test input mismatch | **A·正式发表** |
+| 视频基线 | [VideoLCM](https://arxiv.org/abs/2312.09109) | 将 latent consistency 迁移到视频的简单基线 | **B·预印本** |
+| 少步 + 奖励 | [T2V-Turbo](https://proceedings.neurips.cc/paper_files/paper/2024/hash/8a57aa8e8b57e64a42e95f7dceb0adb9-Abstract-Conference.html) | consistency distillation 与混合可微 reward 同训 | **A·正式发表** |
+| 少步 + 因果 | [CausVid](https://openaccess.thecvf.com/content/CVPR2025/html/Yin_From_Slow_Bidirectional_to_Fast_Autoregressive_Video_Diffusion_Models_CVPR_2025_paper.html) | 4-step 蒸馏进入流式因果学生 | **A·正式发表** |
+| 奖励微调 | [InstructVideo](https://openaccess.thecvf.com/content/CVPR2024/html/Yuan_InstructVideo_Instructing_Video_Diffusion_Models_with_Human_Feedback_CVPR_2024_paper.html) | 用局部采样链和图像 reward 做早期视频反馈微调 | **A·正式发表** |
+| 奖励建模 | [VideoPrefer / VideoRM](https://proceedings.neurips.cc/paper_files/paper/2024/hash/fbe2b2f74a2ece8070d8fb073717bda6-Abstract-Conference.html) | MLLM 偏好数据与视频 reward model | **A·正式发表** |
+| 偏好优化 | [VideoDPO](https://openaccess.thecvf.com/content/CVPR2025/html/Liu_VideoDPO_Omni-Preference_Alignment_for_Video_Diffusion_Generation_CVPR_2025_paper.html) | 将多维 preference pair 用于 diffusion DPO | **A·正式发表** |
+| 无标注动态偏好 | [DynamicsBoost](https://openaccess.thecvf.com/content/CVPR2026/html/Li_DynamicsBoost_Dynamic_Plausible_Video_Generation_via_Annotation-Free_Continuation_Preference_Optimization_CVPR_2026_paper.html) | 用不同 continuation 条件量构造动态偏好顺序 | **A·正式发表** |
 
-- **A Path Towards Autonomous Machine Intelligence [[38]](#ref-38)** — LeCun, 2022. [OpenReview](https://openreview.net/forum?id=BZ5a1r-kVsf)
-- **I-JEPA** — Assran et al., 2023. [Paper](https://arxiv.org/abs/2301.08243) [[39]](#ref-39)
-- **MC-JEPA [[40]](#ref-40)** — Bardes et al., 2023. [Paper](https://arxiv.org/abs/2307.12698)
-- **V-JEPA** — Bardes et al., 2024. [Paper](https://arxiv.org/abs/2404.08471) [[41]](#ref-41)
-- **V-JEPA 2 [[42]](#ref-42)** — Assran et al., 2025. [Paper](https://arxiv.org/abs/2506.09985)
-- **V-JEPA 2.1 [[43]](#ref-43)** — Mur-Labadia et al., 2026. [Paper](https://arxiv.org/abs/2603.14482)
-- **LeJEPA [[44]](#ref-44) / LeWorldModel [[45]](#ref-45) / EB-JEPA / TD-JEPA [[47]](#ref-47)** — 训练稳定性、动作条件 latent dynamics 与强化学习延伸。详见 [JEPA 参考阅读](jepa.md)。
+### 带着这些问题读
 
-阅读问题：JEPA 预测的是像素、token 还是 latent？哪些工作只是表征学习，哪些工作真的接入了动作、rollout 或 planning？
+1. 学生拟合教师的单条 ODE 轨迹、边缘分布，还是同一轨迹上的一致映射？
+2. 一步模型的多样性、CFG 可控性和编辑能力是否保留？
+3. 训练时的 student input 是否来自推理分布，还是仍依赖教师生成的干净配对？
+4. reward 数据、调参 prompt 与最终测试 prompt 是否隔离？reward model 是否参与最终评价？
+5. 偏好只覆盖画质/语义，还是覆盖运动、时间关系、音视频同步、安全和多样性？
 
-## 建议的论文笔记模板
+### 最小复现与证伪任务
+
+建立 32 个 prompt 的冻结测试集，每个 prompt 至少 4 个 seed：
+
+1. 比较同一 teacher 的 25/50-step 输出与 student 的 1/2/4-step 输出；固定 VAE、分辨率、时长、CFG、精度和硬件。
+2. 报告 denoiser 调用数、完整 wall time、VAE decode 时间、显存、能耗代理、逐维质量与 seed 间多样性。
+3. 把 prompt 分为 reward-train、开发与最终测试三组；最终评价器不得与训练 reward 相同。
+4. 随机抽取 reward 上升最大与下降最大的各 20 对，做盲评并查找语义篡改、静态化、重复运动、过饱和和安全拒绝变化。
+
+**反证条件：** 加上 decode/后处理后速度优势消失、reward 上升但盲评下降、seed 间结果趋同，或 prompt optimizer 改写了任务语义，都不能称为“无损加速”或“整体对齐改善”。
+
+**通关产物：** 一张 Pareto 图（质量—延迟—多样性）、一个 reward disagreement 表和至少五个失败样例。不能只报 teacher 与 student 的单一总分。
+
+## 6. 分支 C：原生音视频，不把后配音写成联合生成
+
+**入口依赖：** 能把音频 waveform/latent 与视频 frame/latent 映射到同一时间轴；能写出 `p(v | y)p(a | v,y)` 与 `p(v,a | y)` 的差别。
+
+**为什么读：** “视频有声音”可能来自视频到音频、统一 token 的多任务模型、耦合双流、单流联合 latent，或不透明产品后端。只有在生成过程中两种模态共享或交换信息，才有资格讨论 joint/native AV；同步仍需单独测。
+
+### 阅读顺序
+
+| 阶段 | 论文/官方材料 | 在路线中的作用 | 证据 |
+|---|---|---|---|
+| 统一多模态 token | [VideoPoet](https://proceedings.mlr.press/v235/kondratyuk24a.html) | 理解统一输入/输出 token 与多任务生成；不等于同时联合采样 AV | **A·正式发表** |
+| staged 对照 | [Movie Gen](https://arxiv.org/abs/2410.13720) | Video 与独立 Audio 模型家族，建立“先视频、后音频”的强对照 | **C·技术报告** |
+| staged 音频基线 | [MMAudio](https://openaccess.thecvf.com/content/CVPR2025/html/Cheng_MMAudio_Taming_Multimodal_Joint_Training_for_High-Quality_Video-to-Audio_Synthesis_CVPR_2025_paper.html) | 给定视频和可选文本生成同步音频；“joint training”不等于联合生成视频 | **A·正式发表** |
+| 联合双塔 | [Ovi](https://arxiv.org/abs/2510.01284) | twin-DiT、逐块双向跨模态融合 | **B·预印本** |
+| 非对称双流 | [LTX-2](https://arxiv.org/abs/2601.03233) | 不同容量的 audio/video stream、双向 cross-attention 与共享时间条件 | **B·预印本** |
+| 单流开放发布 | [MiniMax H3](https://www.minimax.io/blog/minimax-h3)与[官方仓库](https://github.com/MiniMax-AI/MiniMax-H3) | 33B 单流联合 AV 与开放 Base/托管完整系统的边界 | **D·官方发布；未定位正式论文** |
+| 产品证据边界 | [Sora 2 system card](https://openai.com/index/sora-2-system-card/) | 练习怎样只引用提供方声明；页面同时记录产品已于 2026-04-26 停止可用 | **D·官方发布；不是论文** |
+
+### 带着这些问题读
+
+1. 系统是在采样前、每层、每 block，还是只在解码后交换 AV 信息？
+2. 两种模态的 token rate、噪声时间和 CFG 怎样对齐？容量是否对称？
+3. 对白、音效、环境声与音乐的控制信号来自同一 prompt 还是独立条件？
+4. 论文测的是 onset 同步、语义匹配、说话人绑定、声源方向，还是只有整体偏好？
+5. 公开的是论文 checkpoint、后续版本、部分 VAE/LoRA，还是完整生产 pipeline？
+
+### 最小复现与证伪任务
+
+设计 12 个带秒级事件的 prompt，例如“1.5 秒关门、随后两拍静默、右侧人物再说话”，每个 prompt 4 个 seed：
+
+1. 无大 GPU 时，用论文/官方发布的完整样例做盲评；能运行开放 checkpoint 时，再固定版本和 seed 重做。
+2. 标注事件—音效 onset 偏差、口型—语音同步、说话人绑定、声源方向、静默违例、音乐节拍和视觉质量。
+3. 做三种干预：交换两条音频条件、打乱音频时间、把 prompt 中声音事件删除；观察视频节奏与音频是否双向响应。
+4. 把“论文模型”“当前仓库 checkpoint”“托管产品”分成三行，禁止合并结果。
+
+**反证条件：** 若音频只追随已经固定的视频、交换音频条件不改变视觉时序，或只展示带声样例却没有联合机制证据，就降级为 staged/video-to-audio，而不是 native joint AV。
+
+**通关产物：** 一张 AV factorization 图、一份时间戳误差表和一张 release-surface 表。不能用“有同步声音”替代架构与干预测试。
+
+## 7. 分支 D：World Action Model 与 JEPA
+
+**入口依赖：** 能区分 forward dynamics、inverse dynamics、policy、planner、reward/value model 与环境；能解释 feature probe 不等于闭环控制。
+
+**为什么读：** 这条路线专门防止“能生成未来画面”被直接升级为“理解世界并能行动”。决策型 world model、交互视频生成器、latent predictor、JEPA representation learner 与 joint video-action policy 可以互相借用组件，但证据合同不同。
+
+### 四级阅读阶梯
+
+| 阶段 | 论文 | 带着什么问题读 | 证据 |
+|---|---|---|---|
+| 控制根基 | [PlaNet](https://proceedings.mlr.press/v97/hafner19a.html) | RSSM 怎样同时保留随机与确定性状态，CEM 怎样只执行第一步再规划？ | **A·正式发表** |
+| 控制根基 | [DreamerV3 / Mastering Diverse Control Tasks through World Models](https://www.nature.com/articles/s41586-025-08744-2) | learned dynamics、actor、critic 与 imagination 各自负责什么？ | **A·正式发表** |
+| 生成式 simulator | [Genie](https://proceedings.mlr.press/v235/bruce24a.html) | 无动作标签视频怎样学习 latent action？latent action 是否等同机器人控制量？ | **A·正式发表** |
+| 生成式 simulator | [DIAMOND](https://proceedings.neurips.cc/paper_files/paper/2024/hash/6bdde0373d53d4a501249547084bed43-Abstract-Conference.html) | 视觉细节何时影响 agent，模型漏洞又怎样被 policy 利用？ | **A·正式发表** |
+| 生成式 simulator | [GameNGen](https://openreview.net/forum?id=P8pqeEkn1H) | action-conditioned diffusion 的实时交互证据是否超出单一游戏？ | **A·正式发表** |
+| JEPA 表征 | [V-JEPA](https://openreview.net/forum?id=QaCCuDfBk2) | masked latent prediction、EMA target 与非生成式边界是什么？ | **A·正式发表（TMLR）** |
+| latent planning | [DINO-WM](https://proceedings.mlr.press/v267/zhou25t.html) | frozen visual feature + action dynamics + visual-goal planning 能否替代 RGB 重建？ | **A·正式发表** |
+| action-conditioned JEPA | [V-JEPA 2 / V-JEPA 2-AC](https://arxiv.org/abs/2506.09985) | action-free encoder 与 action predictor 怎样分工？MPC 的 energy 从哪里来？ | **B·预印本** |
+| dense / end-to-end 前沿 | [V-JEPA 2.1](https://arxiv.org/abs/2603.14482)与 [LeWorldModel](https://arxiv.org/abs/2603.19312) | dense feature、下游生成头和端到端 action latent 各改变了哪一层？ | **B·预印本** |
+| world model → 数据 → policy | [DreamGen](https://proceedings.mlr.press/v305/jang25a.html) | synthetic video、pseudo-action 与 policy training 是离线数据路线还是在线 planner？ | **A·正式发表** |
+| WAM 汇合 | [DreamZero / World Action Models are Zero-shot Policies](https://arxiv.org/abs/2602.15922) | joint video-action prediction 何时能直接成为闭环 policy？ | **B·预印本** |
+
+### 带着这些问题读
+
+1. action 是真实控制量、离散键位、latent action、相机控制，还是只是一段文本？
+2. predictor 预测 RGB、latent、reward/value、action，还是它们的联合分布？
+3. 规划使用真实环境反馈、模型 rollout、oracle goal，还是离线生成数据？
+4. 表征 probe、held-out prediction、paired action intervention、MPC success 和真实机器人成功率分别在哪一级？
+5. “zero-shot”没有见过的是任务、对象、场景、实验室还是 embodiment？训练数据是否仍含同类机器人？
+6. 像素更真实是否真的提高决策，还是只让人类更难看出 simulator 是假的？
+
+### 最小复现与证伪任务
+
+选择一个可复现的二维环境或小型控制任务，冻结训练/验证/测试布局：
+
+1. 对同一初始 observation 配对至少两个相反 action，检查 predicted next state/latent 是否显著分开；再做 action shuffle 负对照。
+2. 比较 pixel predictor 与 latent predictor 的一步误差、多步误差、state readout 和固定预算 CEM/MPC 成功率。
+3. JEPA 路线必须审计 target 是否泄漏、embedding 是否 collapse、decoder 是否只是后接可视化模块；把 V-JEPA encoder 与 V-JEPA 2-AC predictor 分开记账。
+4. 部署时只执行规划序列第一步并读取真实新 observation；与 open-loop 全序列执行比较失败率。
+5. 记录 model exploitation：如果 agent 在 learned simulator 得高分却在真实/原始环境失败，保存轨迹而不是删掉异常值。
+
+**反证条件：** action shuffle 后预测几乎不变、feature probe 高但控制不改善、planner 偷看真实未来，或 learned-simulator 成绩不能迁移到原环境，都不能称为可行动 world model。
+
+**通关产物：** 一张能力阶梯表（representation → action dynamics → planner → closed-loop policy）、一组 paired-action 反事实和真实/模型环境 transfer gap。
+
+## 8. 所有分支共用的验证回路
+
+```mermaid
+flowchart LR
+    accTitle: 从论文声明到保留或降级结论的验证回路
+    accDescr: 先把论文声明改写成可测量命题，再按声明类型选择质量、延迟、音视频同步或闭环控制协议。固定版本、条件和预算后运行最小复现，再加入最可能推翻结论的干预。证据通过则保留带边界的结论，否则降级并记录失败。
+
+    C["提取一条声明"] --> M["改写成可测命题"]
+    M --> T{"声明类型"}
+    T --> Q["画质 / 时间一致"]
+    T --> L["延迟 / 流式"]
+    T --> A["音视频同步"]
+    T --> W["动作 / 闭环"]
+    Q --> F["冻结版本 · 条件 · 预算"]
+    L --> F
+    A --> F
+    W --> F
+    F --> R["最小复现"]
+    R --> X["反证干预"]
+    X --> J{"证据仍成立？"}
+    J -->|"是"| K["保留结论并写边界"]
+    J -->|"否"| G["降级结论并保存失败"]
+    K --> N["下一条声明"]
+    G --> N
+
+    classDef claim fill:#d9ecff,stroke:#0067a5,color:#111
+    classDef test fill:#fff0cc,stroke:#a65f00,color:#111
+    classDef outcome fill:#dff2e5,stroke:#147a4b,color:#111
+    class C,M,T claim
+    class Q,L,A,W,F,R,X,J test
+    class K,G,N outcome
+```
+
+文字替代：先从论文中只取一条声明，把它改写为可测命题；根据声明属于画质、延迟、音视频同步还是动作闭环，选择相应协议。冻结模型版本、输入条件、预算和硬件后做最小复现，再加入最可能推翻结论的干预。证据仍成立时保留带适用边界的结论；不成立时降级结论并保存失败，两者都进入下一条声明。
+
+## 9. 跨分支结课项目
+
+至少选择两个分支，不训练大模型也可以完成。交付一个可复核目录，包含 `claim-card.md`、配置、原始结果、失败样例、环境信息和结论。
+
+| 组合 | 最小项目 | 关键否证 |
+|---|---|---|
+| A 因果 + B 少步 | 同一 causal student 比较 1/2/4 step 的端到端直播 deadline 与长时 drift | 更少 step 只提高平均 FPS，却增加 p95 卡顿或长期崩坏 |
+| B 后训练 + C 音视频 | 对联合 AV checkpoint 做同步 reward 微调前后盲评 | reward 提高但说话人绑定、静默或视觉多样性恶化 |
+| A 因果 + D World Action | 在 prompt/action 中途切换时测响应延迟与闭环成功率 | 画面立即变化，但动作后果不符合环境或 replanning 无收益 |
+| C 音视频 + D World Action | 把声音事件作为可干预环境变量，比较 joint model 与 staged pipeline | 声音只装饰画面，对状态、动作或未来预测没有影响 |
+
+最终结论只能落在以下四种之一：`复现`、`部分复现`、`未复现`、`证据不足`。`看起来不错`不是第五种。
+
+## 10. 一页论文笔记模板
 
 ```markdown
 # Paper title
 
-## Problem
-这篇工作真正解决了什么？
+## Status and source
+A / A* / B / C / D；正式入口、作者稿、代码与 checkpoint 分开列。
 
-## Representation
-pixel / continuous latent / discrete token / structured state
+## Claim under test
+只写一个可测量主张；注明适用任务、版本、硬件和时长。
 
-## Temporal mechanism
-recurrent / autoregressive / masked / diffusion / flow / state-space
+## Prerequisites
+读懂本论文必须先知道的表示、objective、时间机制与控制概念。
 
-## Conditions
-text / image / video / audio / camera / action
+## Model contract
+- Representation:
+- Temporal factorization:
+- Objective:
+- Conditions:
+- Outputs:
+- Train-time history:
+- Inference-time history:
 
 ## Evidence
-数据、指标、人工评测、闭环任务分别证明了什么？
+论文数据、指标、人工评测、系统测量与闭环任务各证明了什么？
 
-## Failure modes
-作者展示了什么？还有什么没有测？
+## Minimum reproduction
+固定数据、prompt、seed、版本、硬件、预算和成功标准。
 
-## Historical role
-它改变了表示、架构、规模、控制还是评测？
+## Falsifier
+最可能推翻主张的干预、负对照或超出训练窗测试。
+
+## Result
+复现 / 部分复现 / 未复现 / 证据不足。
+
+## Boundary
+哪些结论不能从本论文推出？下一项最有信息量的实验是什么？
 ```
 
-本页主要参考工作：Mastering Atari, Go, chess and shogi by planning with a learned model [[30]](#ref-30)、A Lightweight Library for Energy-Based Joint-Embedding Predictive Architectures [[46]](#ref-46)。
-
-## 参考文献
-
-<a id="ref-1"></a>[1] [Video textures](https://doi.org/10.1145/344779.345012). Arno Schödl, Richard Szeliski, David H. Salesin, Irfan Essa. SIGGRAPH. 2000.
-
-<a id="ref-2"></a>[2] [Deep multi-scale video prediction beyond mean square error](https://arxiv.org/abs/1511.05440). Michael Mathieu, Camille Couprie, Yann LeCun. ICLR. 2016.
-
-<a id="ref-3"></a>[3] [Unsupervised Learning for Physical Interaction through Video Prediction](https://arxiv.org/abs/1605.07157). Chelsea Finn, Ian Goodfellow, Sergey Levine. NeurIPS. 2016.
-
-<a id="ref-4"></a>[4] [VideoGPT: Video Generation using VQ-VAE and Transformers](https://arxiv.org/abs/2104.10157). Wilson Yan, Yunzhi Zhang, Pieter Abbeel, Aravind Srinivas. arXiv preprint. 2021.
-
-<a id="ref-5"></a>[5] [Video Diffusion Models](https://arxiv.org/abs/2204.03458). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. NeurIPS. 2022.
-
-<a id="ref-6"></a>[6] [Video Generation Models as World Simulators](https://openai.com/index/video-generation-models-as-world-simulators/). OpenAI. Technical report. 2024.
-
-<a id="ref-7"></a>[7] [World Models](https://arxiv.org/abs/1803.10122). David Ha, Jürgen Schmidhuber. arXiv preprint. 2018.
-
-<a id="ref-8"></a>[8] [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391). Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, et al. ICML. 2024.
-
-<a id="ref-9"></a>[9] [An Iterative Image Registration Technique with an Application to Stereo Vision](https://publications.ri.cmu.edu/storage/publications/pub_files/pub3/lucas_bruce_d_1981_1/lucas_bruce_d_1981_1.pdf). Bruce D. Lucas, Takeo Kanade. IJCAI. 1981.
-
-<a id="ref-10"></a>[10] [Determining optical flow](https://doi.org/10.1016/0004-3702%2881%2990024-2). Berthold K. P. Horn, Brian G. Schunck. Artificial Intelligence. 1981.
-
-<a id="ref-11"></a>[11] [Dynamic Textures](https://doi.org/10.1023/A:1021669406132). Gianfranco Doretto, Alessandro Chiuso, Ying Nian Wu, Stefano Soatto. International Journal of Computer Vision. 2003.
-
-<a id="ref-12"></a>[12] [Convolutional LSTM Network: A Machine Learning Approach for Precipitation Nowcasting](https://arxiv.org/abs/1506.04214). Xingjian Shi, Zhourong Chen, Hao Wang, Dit-Yan Yeung, Wai-kin Wong, Wang-chun Woo. NeurIPS. 2015.
-
-<a id="ref-13"></a>[13] [Deep Predictive Coding Networks for Video Prediction and Unsupervised Learning](https://arxiv.org/abs/1605.08104). William Lotter, Gabriel Kreiman, David Cox. ICLR. 2017.
-
-<a id="ref-14"></a>[14] [MoCoGAN: Decomposing Motion and Content for Video Generation](https://arxiv.org/abs/1707.04993). Sergey Tulyakov, Ming-Yu Liu, Xiaodong Yang, Jan Kautz. CVPR. 2018.
-
-<a id="ref-15"></a>[15] [Stochastic Video Generation with a Learned Prior](https://arxiv.org/abs/1802.07687). Remi Denton, Rob Fergus. ICML. 2018.
-
-<a id="ref-16"></a>[16] [Adversarial Video Generation on Complex Datasets](https://arxiv.org/abs/1907.06571). Aidan Clark, Jeff Donahue, Karen Simonyan. arXiv preprint. 2019.
-
-<a id="ref-17"></a>[17] [Neural Discrete Representation Learning](https://arxiv.org/abs/1711.00937). Aaron van den Oord, Oriol Vinyals, Koray Kavukcuoglu. NeurIPS. 2017.
-
-<a id="ref-18"></a>[18] [Phenaki: Variable Length Video Generation from Open Domain Textual Descriptions](https://arxiv.org/abs/2210.02399). Ruben Villegas, Mohammad Babaeizadeh, Pieter-Jan Kindermans, Hernan Moraldo, Han Zhang, Mohammad Taghi Saffar, et al. ICLR. 2023.
-
-<a id="ref-19"></a>[19] [MAGVIT: Masked Generative Video Transformer](https://arxiv.org/abs/2212.05199). Lijun Yu, Yong Cheng, Kihyuk Sohn, José Lezama, Han Zhang, Huiwen Chang, et al. CVPR. 2023.
-
-<a id="ref-20"></a>[20] [Language Model Beats Diffusion -- Tokenizer is Key to Visual Generation](https://arxiv.org/abs/2310.05737). Lijun Yu, José Lezama, Nitesh B. Gundavarapu, Luca Versari, Kihyuk Sohn, David Minnen, et al. ICLR. 2024.
-
-<a id="ref-21"></a>[21] [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239). Jonathan Ho, Ajay Jain, Pieter Abbeel. NeurIPS. 2020.
-
-<a id="ref-22"></a>[22] [Make-A-Video: Text-to-Video Generation without Text-Video Data](https://arxiv.org/abs/2209.14792). Uriel Singer, Adam Polyak, Thomas Hayes, Xi Yin, Jie An, Songyang Zhang, et al. ICLR. 2023.
-
-<a id="ref-23"></a>[23] [Imagen Video: High Definition Video Generation with Diffusion Models](https://arxiv.org/abs/2210.02303). Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey Gritsenko, et al. arXiv preprint. 2022.
-
-<a id="ref-24"></a>[24] [Align your Latents: High-Resolution Video Synthesis with Latent Diffusion Models](https://arxiv.org/abs/2304.08818). Andreas Blattmann, Robin Rombach, Huan Ling, Tim Dockhorn, Seung Wook Kim, Sanja Fidler, et al. CVPR. 2023.
-
-<a id="ref-25"></a>[25] [AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning](https://arxiv.org/abs/2307.04725). Yuwei Guo, Ceyuan Yang, Anyi Rao, Zhengyang Liang, Yaohui Wang, Yu Qiao, et al. ICLR. 2024.
-
-<a id="ref-26"></a>[26] [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. arXiv preprint. 2023.
-
-<a id="ref-27"></a>[27] [Lumiere: A Space-Time Diffusion Model for Video Generation](https://arxiv.org/abs/2401.12945). Omer Bar-Tal, Hila Chefer, Omer Tov, Charles Herrmann, Roni Paiss, Shiran Zada, et al. SIGGRAPH Asia. 2024.
-
-<a id="ref-28"></a>[28] [Learning Latent Dynamics for Planning from Pixels](https://arxiv.org/abs/1811.04551). Danijar Hafner, Timothy Lillicrap, Ian Fischer, Ruben Villegas, David Ha, Honglak Lee, et al. ICML. 2019.
-
-<a id="ref-29"></a>[29] [Dream to Control: Learning Behaviors by Latent Imagination](https://arxiv.org/abs/1912.01603). Danijar Hafner, Timothy Lillicrap, Jimmy Ba, Mohammad Norouzi. ICLR. 2020.
-
-<a id="ref-30"></a>[30] [Mastering Atari, Go, chess and shogi by planning with a learned model](https://doi.org/10.1038/s41586-020-03051-4). Julian Schrittwieser, Ioannis Antonoglou, Thomas Hubert, Karen Simonyan, Laurent Sifre, Simon Schmitt, et al. Nature. 2020.
-
-<a id="ref-31"></a>[31] [Mastering Diverse Domains through World Models](https://arxiv.org/abs/2301.04104). Danijar Hafner, Jurgis Pasukonis, Jimmy Ba, Timothy Lillicrap. arXiv preprint. 2023.
-
-<a id="ref-32"></a>[32] [GAIA-1: A Generative World Model for Autonomous Driving](https://arxiv.org/abs/2309.17080). Anthony Hu, Lloyd Russell, Hudson Yeo, Zak Murez, George Fedoseev, Alex Kendall, et al. arXiv preprint. 2023.
-
-<a id="ref-33"></a>[33] [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837). Dani Valevski, Yaniv Leviathan, Moab Arar, Shlomi Fruchter. ICLR. 2025.
-
-<a id="ref-34"></a>[34] [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). Niket Agarwal, Arslan Ali, Maciej Bala, Yogesh Balaji, Erik Barker, Tiffany Cai, et al. arXiv preprint. 2025.
-
-<a id="ref-35"></a>[35] [Genie 3: A New Frontier for World Models](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/). Google DeepMind. Project report. 2025.
-
-<a id="ref-36"></a>[36] [Introducing Runway GWM-1](https://runway.com/research/introducing-runway-gwm-1). Runway. Project report. 2025.
-
-<a id="ref-37"></a>[37] [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800). NVIDIA. arXiv preprint. 2026.
-
-<a id="ref-38"></a>[38] [A Path Towards Autonomous Machine Intelligence](https://openreview.net/forum?id=BZ5a1r-kVsf). Yann LeCun. OpenReview working paper (v0.9.2). 2022.
-
-<a id="ref-39"></a>[39] [Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture](https://arxiv.org/abs/2301.08243). Mahmoud Assran, Quentin Duval, Ishan Misra, Piotr Bojanowski, Pascal Vincent, Michael Rabbat, et al. CVPR. 2023.
-
-<a id="ref-40"></a>[40] [MC-JEPA: A Joint-Embedding Predictive Architecture for Self-Supervised Learning of Motion and Content Features](https://arxiv.org/abs/2307.12698). Adrien Bardes, Jean Ponce, Yann LeCun. arXiv preprint. 2023.
-
-<a id="ref-41"></a>[41] [Revisiting Feature Prediction for Learning Visual Representations from Video](https://arxiv.org/abs/2404.08471). Adrien Bardes, Quentin Garrido, Jean Ponce, Xinlei Chen, Michael Rabbat, Yann LeCun, et al. arXiv preprint. 2024.
-
-<a id="ref-42"></a>[42] [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). Mahmoud Assran, Adrien Bardes, David Fan, Quentin Garrido, Russell Howes, Mojtaba Komeili, et al. arXiv preprint. 2025.
-
-<a id="ref-43"></a>[43] [V-JEPA 2.1: Unlocking Dense Features in Video Self-Supervised Learning](https://arxiv.org/abs/2603.14482). Lorenzo Mur-Labadia, Matthew Muckley, Amir Bar, Mido Assran, Koustuv Sinha, Mike Rabbat, et al. arXiv preprint. 2026.
-
-<a id="ref-44"></a>[44] [LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics](https://arxiv.org/abs/2511.08544). Randall Balestriero, Yann LeCun. arXiv preprint. 2025.
-
-<a id="ref-45"></a>[45] [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312). Lucas Maes, Quentin Le Lidec, Damien Scieur, Yann LeCun, Randall Balestriero. arXiv preprint. 2026.
-
-<a id="ref-46"></a>[46] [A Lightweight Library for Energy-Based Joint-Embedding Predictive Architectures](https://arxiv.org/abs/2602.03604). Basile Terver, Randall Balestriero, Megi Dervishi, David Fan, Quentin Garrido, Tushar Nagarajan, et al. arXiv preprint. 2026.
-
-<a id="ref-47"></a>[47] [TD-JEPA: Latent-predictive Representations for Zero-Shot Reinforcement Learning](https://arxiv.org/abs/2510.00739). Marco Bagatella, Matteo Pirotta, Ahmed Touati, Alessandro Lazaric, Andrea Tirinzoni. ICLR. 2026.
+读完一条路线后，回看笔记中的 falsifier。如果所有实验都只能“证明论文正确”，路线尚未完成。

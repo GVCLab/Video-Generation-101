@@ -1,6 +1,6 @@
 # 物理一致性的视频生成
 
-> 一手来源审计截至 **2026-08-29**。本文把视觉真实感、时间连贯性、物理合理性、物理一致性、物理忠实度和决策忠实度分开；所有 2026 年未正式发表的工作均按预印本解释，不把作者自报结果当作独立复现。
+> 一手来源审计截至 **2026-08-30**。本文把视觉真实感、时间连贯性、物理合理性、物理一致性、物理忠实度和决策忠实度分开；所有 2026 年未正式发表的工作均按预印本解释，不把作者自报结果当作独立复现。
 
 视频生成中的“物理一致性”不是让画面看起来足够真实，而是让对象、材料和环境在时间演化中遵守可检验的约束：物体应当持续存在，接触应当产生合理后果，运动应当与重力、惯性、碰撞、摩擦和材料属性相符，同一初始状态在不同外力或动作下还应产生正确的不同未来。
 
@@ -366,6 +366,72 @@ VLM 适合开放域事件、宏观顺序和显眼穿透/悬浮的筛查；它不
 Physics-IQ Verified 说明 ground truth、prompt 和聚合方式的修订足以改变模型排序 [[12]](#ref-12)。因此冻结 judge 后，还应加入已知正确/违规反事实，检查帧采样敏感性、左右位置偏差、概率校准和 coverage—risk；已用于训练 reward 的 judge 不得直接兼任最终裁判。
 
 ## 7. 训练、后训练与验证闭环
+
+### 7.1 先冻结 claim contract，再允许模型看训练 reward
+
+“物理更好”无法被证伪，因此也不是合格实验声明。运行实验前应冻结一个 claim contract：
+
+$$
+\mathcal C=
+(\mathcal D,H,c,\mathcal O,M,\delta,\alpha,\ell),
+$$
+
+其中 $\mathcal D$ 是对象、材料和场景域，$H$ 是预测或控制 horizon，$c=(s_0,u,\theta,b)$ 包含初态、动作、物性和边界，$\mathcal O$ 是可观察量，$M$ 是连同提取器版本一起冻结的测量程序，$\delta$ 是每个误差门槛，$\alpha$ 是不确定性或置信约定，$\ell$ 是声明不得超过的 L0–L7 证据级别。任何一项在看过 test 结果后才补写，都会把验证变成事后解释。
+
+![物理证据闭环：条件合同进入状态表示与生成器或模拟器，rollout 经轨迹、接触、守恒和不确定性测量后形成约束或奖励，再由封存参照和独立环境执行证伪 gate；通过才报告 L0–L7 claim，失败则定位数据、模型或 evaluator 并重新开始。](../assets/diagrams/physics-evidence-falsification-loop.png)
+
+**图：claim 必须在独立证据上存活。** 训练 reward 可以帮助改模型，却不能自动充当终评；封存参照或独立环境只流向测量与证伪 gate，不回流给生成器。图中的“换 evaluator”不是调到结果变好，而是当提取器或标注协议被校准样本证明失效时，版本化修正并重新评估全部模型。
+
+```mermaid
+flowchart TB
+    accTitle: 物理一致性的可证伪证据闭环
+    accDescr: 预先冻结初态、动作、物性、边界和随机种子，经状态表示进入生成器或模拟器；rollout 用程序测量和不确定性形成约束或奖励；封存参照或独立环境只进入测量与证伪门；通过才按 L0 到 L7 报告，失败则定位数据、模型、测量器或声明并重新运行。
+
+    subgraph setup["A · 冻结生成合同"]
+        direction LR
+        contract["条件合同<br/>s0 · action u · 参数 θ · 边界 b · seeds"] --> state["状态接口<br/>track · depth · 3D/4D · field · latent"]
+        state --> model["Generator / simulator<br/>固定 checkpoint 与推理配置"]
+        model --> rollout["rollout<br/>保留失败和测量缺失样本"]
+    end
+
+    subgraph audit["B · 独立测量与证伪"]
+        direction LR
+        measure["测量 + 不确定性<br/>轨迹 · 接触 · 守恒账 · 反事实差分"] --> signal["constraint / reward / diagnostic<br/>每项单独报告"]
+        signal --> gate{"预注册证伪 gate<br/>阈值 · coverage · seeds · OOD"}
+        sealed["封存参照 / 独立环境<br/>真实标定 · 未见干预 · task return"] -.->|只供终评| measure
+        sealed -.->|防止 evaluator 投机| gate
+    end
+
+    rollout --> measure
+    gate -->|全部必要 gate 通过| claim["只报告已通过的 L0–L7<br/>附适用域与失败覆盖"]
+    gate -->|任一必要 gate 失败| diagnose["定位失败来源<br/>condition · state · model · extractor · evaluator"]
+    diagnose -->|版本化修改并重跑| contract
+
+    classDef input fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
+    classDef process fill:#ffedd5,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    classDef evidence fill:#f3e8ff,stroke:#7e22ce,stroke-width:2px,color:#581c87
+    classDef gateStyle fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
+    classDef pass fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    class contract,state,sealed input
+    class model,rollout process
+    class measure,signal evidence
+    class gate,diagnose gateStyle
+    class claim pass
+```
+
+顺序化文字替代：第一，冻结初态、动作、物性、边界、种子和允许的 claim；第二，把条件转换为适合材料的显式或 latent 状态；第三，用冻结配置生成 rollout，并保留生成失败和测量缺失；第四，用带提取器误差的程序测量得到轨迹、接触、守恒账与反事实差分；第五，把各项约束、reward 或诊断分开；第六，封存真实参照或独立环境只在终评时进入测量和 gate；第七，所有必要 gate 通过才报告相应 L0–L7，任一失败就定位 condition、state、model、extractor 或 evaluator，版本化修改后从合同重跑。
+
+一个 gate 不应把七个维度先加权平均。若接触时刻完全错误，较高的清晰度不能把它“平均及格”；若 tracker 在困难样本上失效，删除这些样本会制造选择偏差。至少同时报告：每项误差的分布与置信区间、有效测量 coverage、失败率、多个 seed、ID 与 OOD 切片，以及所有必要 gate 的逐项通过率。GAUGE 把真实标定轨迹、物理 metadata 和不确定性一起纳入协议，说明“方程形状看似正确”仍可能恢复出错误加速度、动量传递或振荡时刻 [[17]](#ref-17)。
+
+| 预注册 claim | 必须固定的条件 | 合格终评 | 能达到的最高层级 |
+|---|---|---|---|
+| “开放域视频较少显眼物理错误” | prompt、模型/API 日期、采样、VLM/human rubric | 人类校准的逐规则违规率、`abstain` 与解析失败 | L2；不能写成 physical fidelity |
+| “给定重力/恢复系数时动力学忠实” | 标定相机、$s_0$、参数范围、系统边界、多个 seed | 轨迹/接触/参数误差、提取器不确定性、成组干预和 OOD | 通过测量到 L3，正确反事实到 L4 |
+| “world model 改善决策” | 动作空间、planner 预算、环境版本、风险和 stopping rule | 独立环境中的 policy ranking、regret、成功率、碰撞和失败恢复 | 持续反馈到 L5，决策到 L6，真实收益才到 L7 |
+
+训练 evaluator 与封存 evaluator 必须物理和治理上分离。前者可反复查询并参与 SFT、DPO/RL、search 或 rejection；后者要冻结 checkpoint/API 日期、prompt、frame sampler、解析器与阈值，并用已知正确/违规的校准组验证。Physics-IQ Verified 已显示 ground truth、prompt、权重和聚合修订足以改变模型排序 [[12]](#ref-12)；因此“换 judge 后仍更好”只有在预先定义的版本迁移和全量重跑下才是证据，而不是选择最有利裁判。
+
+### 7.2 约束可以在哪里注入，终评证据必须独立汇合
 
 ```mermaid
 flowchart LR

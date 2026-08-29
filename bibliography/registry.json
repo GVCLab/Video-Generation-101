@@ -1,5 +1,31 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "scope": {
+    "audited_through": "2026-08-30",
+    "include_if_any": [
+      "作为机制总览、机制分章或视频基础模型主章的技术路线锚点、定义性论文或里程碑。",
+      "在两个及以上机制或基础模型发布页重复支撑跨路线主张，适合作为统一 BibTeX 与代码状态入口。",
+      "虽为机构技术报告或项目报告，但它是核心系统、模型家族或发布面的唯一一手出处。"
+    ],
+    "excluded_by_default": [
+      "仅在单个任务、评测、数据集、时间线或研究记录中作局部证据的条目。",
+      "二手综述、新闻、聚合页，以及与核心论文无直接对应关系的社区实现。",
+      "仓库、许可证、标准或产品页本身；它们继续留在章末参考文献中，除非是核心系统唯一的一手报告。"
+    ]
+  },
+  "sections": {
+    "A": "经典视觉、运动与动态纹理",
+    "B": "循环预测与物理交互",
+    "C": "对抗视频生成与分布评测",
+    "D": "离散表征、token 与自回归生成",
+    "E": "扩散视频生成",
+    "F": "潜变量世界模型与控制",
+    "G": "交互式世界基础模型",
+    "H": "JEPA 表征与规划",
+    "I": "跨路线生成基础、测量与 tokenizer",
+    "J": "现代视频基础模型与系统报告",
+    "K": "因果、自回归流式生成与加速"
+  },
   "entries": [
     {
       "citekey": "doretto2003dynamic",
@@ -410,15 +436,8 @@
       "citekey": "ha2018worldmodels",
       "section": "F",
       "source": {
-        "kind": "manual",
-        "metadata": {
-          "entry_type": "misc",
-          "title": "World Models",
-          "authors": "David Ha and Jürgen Schmidhuber",
-          "year": "2018",
-          "url": "https://arxiv.org/abs/1803.10122",
-          "howpublished": "arXiv preprint arXiv:1803.10122 (NeurIPS 31 version titled: Recurrent World Models Facilitate Policy Evolution)"
-        }
+        "kind": "arxiv",
+        "id": "1803.10122"
       },
       "github": {
         "url": "https://github.com/hardmaru/WorldModelsExperiments",
@@ -722,6 +741,549 @@
           "howpublished": "Position paper, version 0.9.2",
           "url": "https://openreview.net/forum?id=BZ5a1r-kVsf"
         }
+      },
+      "github": null
+    },
+    {
+      "citekey": "kingma2013autoencoding",
+      "section": "I",
+      "source": {
+        "kind": "arxiv",
+        "id": "1312.6114"
+      },
+      "github": null
+    },
+    {
+      "citekey": "huszar2015how",
+      "section": "I",
+      "source": {
+        "kind": "arxiv",
+        "id": "1511.05101"
+      },
+      "github": null
+    },
+    {
+      "citekey": "lee2018stochastic",
+      "section": "I",
+      "source": {
+        "kind": "arxiv",
+        "id": "1804.01523"
+      },
+      "github": {
+        "url": "https://github.com/alexlee-gk/video_prediction",
+        "status": "official-code",
+        "note": "作者发布的 SAVP 官方实现"
+      }
+    },
+    {
+      "citekey": "unterthiner2018towards",
+      "section": "I",
+      "source": {
+        "kind": "arxiv",
+        "id": "1812.01717"
+      },
+      "github": null
+    },
+    {
+      "citekey": "song2020scorebased",
+      "section": "I",
+      "source": {
+        "kind": "arxiv",
+        "id": "2011.13456"
+      },
+      "github": {
+        "url": "https://github.com/yang-song/score_sde",
+        "status": "official-code",
+        "note": "论文作者发布的 ICLR 2021 官方实现"
+      }
+    },
+    {
+      "citekey": "ho2022classifierfree",
+      "section": "I",
+      "source": {
+        "kind": "arxiv",
+        "id": "2207.12598"
+      },
+      "github": null
+    },
+    {
+      "citekey": "lin2024sdxllightning",
+      "section": "I",
+      "source": {
+        "kind": "arxiv",
+        "id": "2402.13929"
+      },
+      "github": null
+    },
+    {
+      "citekey": "lin2024animatedifflightning",
+      "section": "I",
+      "source": {
+        "kind": "arxiv",
+        "id": "2403.12706"
+      },
+      "github": null
+    },
+    {
+      "citekey": "fuest2025maskflow",
+      "section": "I",
+      "source": {
+        "kind": "arxiv",
+        "id": "2502.11234"
+      },
+      "github": {
+        "url": "https://github.com/CompVis/maskflow",
+        "status": "official-code",
+        "note": "CompVis 发布的论文官方实现"
+      }
+    },
+    {
+      "citekey": "xie2026videorae",
+      "section": "I",
+      "source": {
+        "kind": "arxiv",
+        "id": "2607.14088"
+      },
+      "github": null
+    },
+    {
+      "citekey": "shutkin2026kvae",
+      "section": "I",
+      "source": {
+        "kind": "arxiv",
+        "id": "2608.05798"
+      },
+      "github": null
+    },
+    {
+      "citekey": "guo2026vrae",
+      "section": "I",
+      "source": {
+        "kind": "arxiv",
+        "id": "2608.13556"
+      },
+      "github": null
+    },
+    {
+      "citekey": "polyak2024moviegen",
+      "section": "J",
+      "source": {
+        "kind": "arxiv",
+        "id": "2410.13720"
+      },
+      "github": null
+    },
+    {
+      "citekey": "kong2024hunyuanvideo",
+      "section": "J",
+      "source": {
+        "kind": "arxiv",
+        "id": "2412.03603"
+      },
+      "github": {
+        "url": "https://github.com/Tencent-Hunyuan/HunyuanVideo",
+        "status": "official-code",
+        "note": "腾讯混元官方代码与权重仓库"
+      }
+    },
+    {
+      "citekey": "hacohen2024ltxvideo",
+      "section": "J",
+      "source": {
+        "kind": "arxiv",
+        "id": "2501.00103"
+      },
+      "github": {
+        "url": "https://github.com/Lightricks/LTX-Video",
+        "status": "official-code",
+        "note": "Lightricks 官方代码、权重与训练工具"
+      }
+    },
+    {
+      "citekey": "ma2025stepvideo",
+      "section": "J",
+      "source": {
+        "kind": "arxiv",
+        "id": "2502.10248"
+      },
+      "github": {
+        "url": "https://github.com/stepfun-ai/Step-Video-T2V",
+        "status": "official-code",
+        "note": "阶跃星辰官方代码、权重与评测入口"
+      }
+    },
+    {
+      "citekey": "zheng2025opensora2",
+      "section": "J",
+      "source": {
+        "kind": "arxiv",
+        "id": "2503.09642"
+      },
+      "github": {
+        "url": "https://github.com/hpcaitech/Open-Sora",
+        "status": "official-code",
+        "note": "Open-Sora 2.0 官方训练代码与 checkpoints"
+      }
+    },
+    {
+      "citekey": "wan2025wan",
+      "section": "J",
+      "source": {
+        "kind": "arxiv",
+        "id": "2503.20314"
+      },
+      "github": {
+        "url": "https://github.com/Wan-Video/Wan2.1",
+        "status": "official-code",
+        "note": "Wan 2.1 官方代码、权重与模型卡"
+      }
+    },
+    {
+      "citekey": "chen2025skyreelsv2",
+      "section": "J",
+      "source": {
+        "kind": "arxiv",
+        "id": "2504.13074"
+      },
+      "github": {
+        "url": "https://github.com/SkyworkAI/SkyReels-V2",
+        "status": "official-code",
+        "note": "Skywork AI 官方代码与权重"
+      }
+    },
+    {
+      "citekey": "sandai2025magi1",
+      "section": "J",
+      "source": {
+        "kind": "arxiv",
+        "id": "2505.13211"
+      },
+      "github": {
+        "url": "https://github.com/SandAI-org/MAGI-1",
+        "status": "official-code",
+        "note": "Sand.ai 官方代码、权重及蒸馏与量化版本"
+      }
+    },
+    {
+      "citekey": "low2025ovi",
+      "section": "J",
+      "source": {
+        "kind": "arxiv",
+        "id": "2510.01284"
+      },
+      "github": {
+        "url": "https://github.com/character-ai/Ovi",
+        "status": "official-code",
+        "note": "Character.AI 官方代码与权重"
+      }
+    },
+    {
+      "citekey": "wu2025hunyuanvideo15",
+      "section": "J",
+      "source": {
+        "kind": "arxiv",
+        "id": "2511.18870"
+      },
+      "github": {
+        "url": "https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5",
+        "status": "official-code",
+        "note": "腾讯混元 1.5 官方代码、权重与训练更新"
+      }
+    },
+    {
+      "citekey": "hacohen2026ltx2",
+      "section": "J",
+      "source": {
+        "kind": "arxiv",
+        "id": "2601.03233"
+      },
+      "github": {
+        "url": "https://github.com/Lightricks/LTX-2",
+        "status": "official-code",
+        "note": "Lightricks 官方音视频推理与 LoRA 训练仓库"
+      }
+    },
+    {
+      "citekey": "li2026skyreelsv3",
+      "section": "J",
+      "source": {
+        "kind": "arxiv",
+        "id": "2601.17323"
+      },
+      "github": {
+        "url": "https://github.com/SkyworkAI/SkyReels-V3",
+        "status": "official-code",
+        "note": "Skywork AI 官方推理代码与任务权重"
+      }
+    },
+    {
+      "citekey": "seedance2026seedance2",
+      "section": "J",
+      "source": {
+        "kind": "arxiv",
+        "id": "2604.14148"
+      },
+      "github": null
+    },
+    {
+      "citekey": "chen2024diffusionforcing",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2407.01392"
+      },
+      "github": {
+        "url": "https://github.com/buoyancy99/diffusion-forcing",
+        "status": "official-code",
+        "note": "论文作者发布的官方实现"
+      }
+    },
+    {
+      "citekey": "yin2024causvid",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2412.07772"
+      },
+      "github": {
+        "url": "https://github.com/tianweiy/CausVid",
+        "status": "official-code",
+        "note": "CausVid / CVPR 2025 官方实现"
+      }
+    },
+    {
+      "citekey": "huang2025selfforcing",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2506.08009"
+      },
+      "github": {
+        "url": "https://github.com/guandeh17/Self-Forcing",
+        "status": "official-code",
+        "note": "NeurIPS 2025 论文官方实现"
+      }
+    },
+    {
+      "citekey": "yang2025longlive",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2509.22622"
+      },
+      "github": {
+        "url": "https://github.com/NVlabs/LongLive",
+        "status": "official-code",
+        "note": "NVIDIA Research 官方代码与长视频基础设施"
+      }
+    },
+    {
+      "citekey": "liu2025rollingforcing",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2509.25161"
+      },
+      "github": null
+    },
+    {
+      "citekey": "yu2025videossm",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2512.04519"
+      },
+      "github": null
+    },
+    {
+      "citekey": "samuel2026fastautoregressive",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2602.01801"
+      },
+      "github": null
+    },
+    {
+      "citekey": "zhu2026causalforcing",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2602.02214"
+      },
+      "github": {
+        "url": "https://github.com/thu-ml/Causal-Forcing",
+        "status": "official-code",
+        "note": "ICML 2026 论文官方实现"
+      }
+    },
+    {
+      "citekey": "xi2026quantvideogen",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2602.02958"
+      },
+      "github": null
+    },
+    {
+      "citekey": "lv2026lightforcing",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2602.04789"
+      },
+      "github": null
+    },
+    {
+      "citekey": "li2026rollingsink",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2602.07775"
+      },
+      "github": null
+    },
+    {
+      "citekey": "xu2026sparseforcing",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2604.21221"
+      },
+      "github": null
+    },
+    {
+      "citekey": "xue2026systematic",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2604.25427"
+      },
+      "github": null
+    },
+    {
+      "citekey": "ji2026forcingkv",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2605.09681"
+      },
+      "github": null
+    },
+    {
+      "citekey": "zhao2026causalforcingpp",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2605.15141"
+      },
+      "github": {
+        "url": "https://github.com/thu-ml/Causal-Forcing",
+        "status": "official-code",
+        "note": "与 Causal Forcing 共用官方仓库；README 明确覆盖 Causal Forcing++"
+      }
+    },
+    {
+      "citekey": "li2026attendlocally",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2605.16579"
+      },
+      "github": null
+    },
+    {
+      "citekey": "yesiltepe2026videomla",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2605.30351"
+      },
+      "github": null
+    },
+    {
+      "citekey": "hu2026longliverag",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2606.02553"
+      },
+      "github": null
+    },
+    {
+      "citekey": "yu2026videomirai",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2606.03971"
+      },
+      "github": null
+    },
+    {
+      "citekey": "li2026aad1",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2606.03972"
+      },
+      "github": null
+    },
+    {
+      "citekey": "lu2026fademem",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2606.10671"
+      },
+      "github": null
+    },
+    {
+      "citekey": "zheng2026causalrcm",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2606.25473"
+      },
+      "github": {
+        "url": "https://github.com/NVlabs/rcm",
+        "status": "official-code",
+        "note": "NVIDIA Research 官方 rCM / Causal-rCM 代码与配方"
+      }
+    },
+    {
+      "citekey": "fiebelman2026mvforcing",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2607.05376"
+      },
+      "github": null
+    },
+    {
+      "citekey": "zhuang2026selfgradient",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2607.20368"
+      },
+      "github": null
+    },
+    {
+      "citekey": "xiao2026joyaivideoedit",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2608.03974"
+      },
+      "github": null
+    },
+    {
+      "citekey": "ban2026stream4d",
+      "section": "K",
+      "source": {
+        "kind": "arxiv",
+        "id": "2608.19556"
       },
       "github": null
     }

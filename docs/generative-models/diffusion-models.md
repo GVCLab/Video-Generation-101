@@ -271,6 +271,8 @@ $$
 
 ### 7.2 三类加速不能合并成“少步扩散”
 
+这里先按“是否训练新参数、主要对齐轨迹还是分布”做最小分叉；若要同时判断 DDPM/score、reverse SDE、PF-ODE、FM/RF、CM/DMD 与 causal streaming 分别处在哪一层，请对照 [Flow 专章的五层机制地图](flow-consistency-models.md#five-layer-map)。核心原则是：输出参数化不等于训练 objective，确定性动力学不等于 FM，不重训的 solver 不等于少步 student，少 NFE 也不等于视频能持续发帧。
+
 ```mermaid
 flowchart TB
     accTitle: 扩散生成三类加速路线

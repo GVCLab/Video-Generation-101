@@ -1,15 +1,57 @@
 {
   "as_of": "2026-08-29",
-  "fetched_at": "2026-08-29T07:45:57Z",
+  "fetched_at": "2026-08-29T22:39:55Z",
   "repositories": {
+    "https://github.com/CompVis/maskflow": {
+      "stars": 28
+    },
     "https://github.com/GameNGen/GameNGen.github.io": {
       "stars": 91
     },
+    "https://github.com/Lightricks/LTX-2": {
+      "stars": 9294
+    },
+    "https://github.com/Lightricks/LTX-Video": {
+      "stars": 10915
+    },
     "https://github.com/NVIDIA/Cosmos": {
-      "stars": 11665
+      "stars": 11669
+    },
+    "https://github.com/NVlabs/LongLive": {
+      "stars": 2582
+    },
+    "https://github.com/NVlabs/rcm": {
+      "stars": 794
+    },
+    "https://github.com/SandAI-org/MAGI-1": {
+      "stars": 3774
+    },
+    "https://github.com/SkyworkAI/SkyReels-V2": {
+      "stars": 7471
+    },
+    "https://github.com/SkyworkAI/SkyReels-V3": {
+      "stars": 555
     },
     "https://github.com/Stability-AI/generative-models": {
-      "stars": 27273
+      "stars": 27274
+    },
+    "https://github.com/Tencent-Hunyuan/HunyuanVideo": {
+      "stars": 12490
+    },
+    "https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5": {
+      "stars": 4537
+    },
+    "https://github.com/Wan-Video/Wan2.1": {
+      "stars": 16907
+    },
+    "https://github.com/alexlee-gk/video_prediction": {
+      "stars": 304
+    },
+    "https://github.com/buoyancy99/diffusion-forcing": {
+      "stars": 1288
+    },
+    "https://github.com/character-ai/Ovi": {
+      "stars": 1750
     },
     "https://github.com/coxlab/prednet": {
       "stars": 803
@@ -24,7 +66,7 @@
       "stars": 3714
     },
     "https://github.com/dreamzero0/dreamzero": {
-      "stars": 2600
+      "stars": 2602
     },
     "https://github.com/edenton/svg": {
       "stars": 188
@@ -36,16 +78,16 @@
       "stars": 3489
     },
     "https://github.com/facebookresearch/jepa": {
-      "stars": 4111
+      "stars": 4112
     },
     "https://github.com/facebookresearch/td_jepa": {
       "stars": 61
     },
     "https://github.com/facebookresearch/vjepa2": {
-      "stars": 4540
+      "stars": 4541
     },
     "https://github.com/galilai-group/lejepa": {
-      "stars": 1323
+      "stars": 1325
     },
     "https://github.com/gaoyuezhou/dino_wm": {
       "stars": 558
@@ -56,6 +98,9 @@
     "https://github.com/google-research/planet": {
       "stars": 1260
     },
+    "https://github.com/guandeh17/Self-Forcing": {
+      "stars": 3491
+    },
     "https://github.com/guoyww/AnimateDiff": {
       "stars": 12229
     },
@@ -65,11 +110,14 @@
     "https://github.com/hojonathanho/diffusion": {
       "stars": 5304
     },
+    "https://github.com/hpcaitech/Open-Sora": {
+      "stars": 29322
+    },
     "https://github.com/junhyukoh/nips2015-action-conditional-video-prediction": {
       "stars": 114
     },
     "https://github.com/lucas-maes/le-wm": {
-      "stars": 4355
+      "stars": 4356
     },
     "https://github.com/lucidrains/video-diffusion-pytorch": {
       "stars": 1383
@@ -86,11 +134,23 @@
     "https://github.com/sergeytulyakov/mocogan": {
       "stars": 603
     },
+    "https://github.com/stepfun-ai/Step-Video-T2V": {
+      "stars": 3188
+    },
+    "https://github.com/thu-ml/Causal-Forcing": {
+      "stars": 938
+    },
+    "https://github.com/tianweiy/CausVid": {
+      "stars": 1428
+    },
     "https://github.com/werner-duvaud/muzero-general": {
       "stars": 2863
     },
     "https://github.com/wilson1yan/VideoGPT": {
       "stars": 1081
+    },
+    "https://github.com/yang-song/score_sde": {
+      "stars": 1844
     }
   }
 }

@@ -13,7 +13,7 @@ This is the working gap matrix for the long-term goal: every subfield should hav
 - **P1:** route is sound but misses mechanisms, milestones, quantitative evidence or a major recent branch.
 - **P2:** presentation, visual coverage, metadata normalization or secondary breadth.
 
-Counts are a repository snapshot after adding the causal-streaming chapter, with the mechanism, foundation, task-map, application, interpolation, inpainting, text-to-video, image-to-video, video-to-video, video-prediction, action-conditioned prediction, interactive-world, digital-human, story/multi-shot, unconditional-video, open-model, video-reasoning and JEPA rows refreshed on 2026-08-30. “Visual” counts Mermaid blocks plus embedded images; a visual can still fail the scientific-quality gate.
+Counts are a repository snapshot after adding the causal-streaming chapter, with the mechanism, foundation, task-map, application, interpolation, inpainting, text-to-video, image-to-video, video-to-video, video-prediction, action-conditioned prediction, interactive-world, digital-human, story/multi-shot, unconditional-video, open-model, video-reasoning, JEPA, diffusion/flow, physics, timeline, reading-route and bibliography rows refreshed on 2026-08-30. “Visual” counts Mermaid blocks plus embedded images; a visual can still fail the scientific-quality gate.
 
 ## A. Generation mechanisms and foundation models
 
@@ -25,8 +25,8 @@ Counts are a repository snapshot after adding the causal-streaming chapter, with
 | `adversarial-generation.md` | 358 | 32 | 3 | 4 | Rewritten across full video GANs, tokenizer/decoder critics and explicit adversarial video distillation, including negative classifications; next gate is fixed-teacher/NFE/critic reproduction | P2 |
 | `autoregressive-generation.md` | 647 | 20 | 2 | 4 | Rewritten across strict token, frame, set and chunk factorization, continuous heads, cache complexity and forcing; next gate is a matched decoder/cache implementation study | P2 |
 | `masked-generation.md` | 399 | 18 | 3 | 4 | Rewritten across absorbing-state/discrete diffusion links, confidence calibration and token/frame/tube/block schedules; next gate is controlled schedule/calibration reproduction | P2 |
-| `diffusion-models.md` | 413 | 24 | 2 | 4 | Rewritten across DDPM→score→reverse SDE→PF-ODE, parameterization, weighting, architecture and acceleration; next gate is numerical notebook reproduction | P2 |
-| `flow-consistency-models.md` | 546 | 20 | 2 | 4 | Rewritten across FM/RF/reflow, CM/sCM/rCM, Shortcut/MeanFlow/FACM/AlphaFlow and DMD/DMD2 with video evidence boundaries; next gate is matched-budget reproduction | P2 |
+| `diffusion-models.md` | 415 | 24 | 2 | 4 | Rewritten across DDPM→score→reverse SDE→PF-ODE, parameterization, weighting, architecture and acceleration, with an explicit bridge to the five-layer transport map; next gate is numerical notebook reproduction | P2 |
+| `flow-consistency-models.md` | 636 | 20 | 4 | 4 | Rewritten across FM/RF/reflow, CM/sCM/rCM, Shortcut/MeanFlow/FACM/AlphaFlow and DMD/DMD2; a verified five-layer map now separates training objectives, continuous processes, training-free solvers, learned few-step routes and the orthogonal streaming axis; next gate is matched-budget reproduction | P2 |
 | `causal-streaming-generation.md` | 374 | 25 | 2 | 3.5 | New focused review; next gate is independent reproduction/benchmark integration, not more paper names | P2 |
 | `foundation-models.md` | 352 | 42 | 3 | 4 | Rewritten as a data→captioner→tokenizer→generator→post-train→distill→decode/audio/safety/API system with release-surface evidence; next gate is clean-environment manifest reproduction | P2 |
 
@@ -64,7 +64,7 @@ Modern systems routinely choose one item from several axes. Diffusion Forcing, C
 |---|---:|---:|---:|---:|---|---|
 | `video-reasoning.md` | 809 | 58 | 3 | 4 | Added UniVR, the causal-generative gap and RuleMaze as a scoped adjacent control; normalized MME-CoF/VChain/Thinking-with-Video/VIPER venues and separated output, denoising and interaction clocks; next gate is causal-state and closed-loop reproduction | P2 |
 | `world-models.md` | 523 | 33 | 3 | 4 | Rewritten around cascaded versus joint world-action routes, receding-horizon execution, pseudo-action recovery, verifier scope, persistent memory, uncertainty and decision utility; next gate is independent closed-loop reproduction | P2 |
-| `physical-consistency.md` | 528 | 41 | 3 | 4 | Rewritten with a six-level concept taxonomy, one canonical L0–L7 evidence ladder, 2024–26 method/benchmark registries, grouped interventions, program measurements, counterfactuals and closed-loop validation; an independent primary-source audit closed four evidence-level P1s, and the next gate is independent GAUGE/robotics replication | P2 |
+| `physical-consistency.md` | 594 | 41 | 5 | 4 | Rewritten with a six-level concept taxonomy, one canonical L0–L7 evidence ladder, 2024–26 method/benchmark registries and an explicit condition→state→rollout→measurement→falsification contract; training signals are separated from sealed evaluators, and the next gate is independent GAUGE/robotics replication | P2 |
 | `evaluation.md` | 845 | 62 | 3 | 4 | Rewritten with 2025–26 generation/editing/reasoning/world-model families, evaluator stress tests, pairwise statistics, judge/arena calibration, SLO/energy, watermark and C2PA 2.4; independent audit passed after citation and standards-boundary fixes, and the next gate is evaluator/inter-validator replication | P2 |
 | `jepa.md` | 340 | 19 | 4 | 4 | Rewritten around the exact teacher–student contract, collapse, dense/semantic trade-off, action-conditioned latent MPC, V2.1 attribution, multi-future uncertainty, release surfaces and claim-specific tests; next gate is matched latent-control reproduction | P2 |
 
@@ -74,24 +74,24 @@ Modern systems routinely choose one item from several axes. Diffusion Forcing, C
 |---|---:|---:|---:|---:|---|---|
 | `taxonomy.md` | 260 | 9 | 3 | 4 | Rewritten as condition source × source-content relation × interaction-horizon axes, with task contracts, boundary cases, milestone criteria and a reproducible evidence log; next gate is coverage expansion without collapsing the axes | P2 |
 | `applications.md` | 324 | 12 | 3 | 4 | Rewritten as capability claim→workflow→acceptance→hard deployment gates→monitor/rollback, with digital-human, creative, world and Physical-AI protocols plus provenance limits; next gate is domain-specific production replication | P2 |
-| `timeline.md` | 722 | 0 local anchors | 1 Mermaid + 76 images | 3 breadth | Image-rich but relation-poor; add mechanism evolution lanes and separate recent preprints as frontier observations | P1 |
-| `reading-list.md` | 252 | 47 | 0 | 2.5 | Needs route-oriented prerequisites and current causal/streaming, post-training and native AV reading paths | P1 |
+| `timeline.md` | 816 | 0 local anchors | 2 Mermaid + 75 images | 4 | Added a four-axis evidence model and 17-item 2025–26 frontier snapshot; first disclosure, formal publication, editorial milestone, artifact and current product availability are now kept separate; next gate is periodic primary-source refresh | P2 |
+| `reading-list.md` | 365 | 46 unique primary links | 2 | 4 | Rebuilt as prerequisites→common trunk→four specialized routes→shared falsification→capstone, with minimum reproductions and explicit claim-downgrade rules; next gate is learner-run reproduction evidence | P2 |
 | `resources/datasets.md` | 795 | 38 | 2 | 4 | Rewritten as a current scoping review with release-surface taxonomy, an exact ten-stage data-engine path plus governance loop, rights/provenance, action/physics branches, manifest and fixed-compute validation; release-unit claims passed independent audit, and the next gate is acquisition/decode-yield replication | P2 |
 | `resources/open-models.md` | 449 | 35 | 4 | 4 | Rewritten as a dated release-surface audit using a nine-axis vector and R0–R4 evidence levels, current version corrections, model/task/hardware selection, smoke tests, licenses and a reproducibility card; next gate is clean-environment checkpoint reproduction | P2 |
-| `bibliography.md` / registry | 82 / registry | 58 registered core items | 0 | 2 | At least 31 arXiv IDs used by audited mechanism/foundation pages are not registered; metadata/code status inconsistencies remain | P0 infrastructure |
+| `bibliography.md` / registry | 162 / registry | 109 registered core items | 0 | 4 | Core mechanism/foundation arXiv coverage is 59/59, registry/metadata/BibTeX identity sets agree and 21 official-code relations are explicit; next gate is deliberate chapter-local expansion rather than indiscriminate ingestion | P2 |
 
 ## P0 factual and evidence corrections
 
 These should be fixed before broad stylistic expansion:
 
-1. Reclassify IFRNet as an efficient convolutional encoder–decoder/feature-refinement method, not a Transformer.
-2. Stop using general Video GAN, MoCoGAN, SVG, SVD or Video Diffusion Models as direct task-specific milestones without an explicit “technical ancestor” label.
+1. ~~Reclassify IFRNet as an efficient convolutional encoder–decoder/feature-refinement method, not a Transformer.~~ Corrected on 2026-08-30 in the interpolation chapter.
+2. ~~Stop using general Video GAN, MoCoGAN, SVG, SVD or Video Diffusion Models as direct task-specific milestones without an explicit “technical ancestor” label.~~ Corrected on 2026-08-30 across the refreshed task chapters; direct milestones and technical ancestors are now distinguished.
 3. ~~Remove or replace SVD as evidence for an LLM storyboard/multi-shot pipeline.~~ Corrected on 2026-08-30; the story chapter now separates SVD as an unrelated ancestor and audits current multi-shot routes.
 4. ~~Remove Sora and Cosmos from the representative unconditional-generation route.~~ Corrected on 2026-08-30; both are now adjacent conditional systems, not direct milestones.
-5. Standardize dates as “first preprint year / formal publication year”; FramePack, Hallo, SadTalker and ShotAdapter are now corrected, while LDF-VFI still requires the same audit.
+5. ~~Standardize dates as “first preprint year / formal publication year”; FramePack, Hallo, SadTalker, ShotAdapter and LDF-VFI require the same rule.~~ Corrected on 2026-08-30; LDF-VFI is recorded as 2026-01 first preprint → CVPR 2026 formal publication, and the timeline now applies the distinction systematically.
 6. ~~Mark the digital-human overview's `Identity 0.92` and `Temporal Consistency 0.90` as illustrative or regenerate it without fabricated-looking scores.~~ Corrected on 2026-08-30: the legacy file is retained but uncited; the chapter uses a score-free generated contract visual.
-7. Update C2PA from 2.2 to the official 2.4 specification and preserve the version date.
-8. Split model technical significance from current product availability; a discontinued product does not erase its research milestone, but should not be presented as currently available.
+7. ~~Update C2PA from 2.2 to the official 2.4 specification and preserve the version date.~~ Corrected on 2026-08-30 in the evaluation and application evidence boundaries.
+8. ~~Split model technical significance from current product availability; a discontinued product does not erase its research milestone, but should not be presented as currently available.~~ Corrected on 2026-08-30 with independent timeline evidence axes and dated availability states.
 
 ## Visual implementation queue
 
@@ -102,10 +102,10 @@ Each visual must have an explicit learning objective, editable/accessible altern
 | Done | Orthogonal mechanism cube/map | Show representation, factorization, objective, backbone and deployment as composable axes |
 | Done | Video tokenizer tensor pipeline | Show causal 3D encoding, spatial/temporal compression, latent shape, generator and decoder bottlenecks |
 | Done | Modern foundation system stack | Track governance→representation→generator→post-train→decode→deployment and separate full GAN, codec critic and adversarial distillation roles |
-| P0 | DDPM–SDE–PF-ODE–FM/RF–CM/DMD map | Prevent the most common diffusion/flow/consistency terminology errors |
+| Done | DDPM–SDE–PF-ODE–FM/RF–CM/DMD map | Prevent the most common diffusion/flow/consistency terminology errors |
 | Done | Offline bidirectional vs causal streaming | Separate full-clip denoising from chunk-causal output, bounded memory and new-condition loop |
 | Done | Data/provenance pipeline | Source→shot split→dedup→filter→caption→license/provenance→versioned split; generated figure plus accessible Mermaid alternative verified |
-| P0 | Physics evidence loop | Condition→state→generator/simulator→measurement→constraint/reward→falsification |
+| Done | Physics evidence loop | Condition→state→generator/simulator→measurement→constraint/reward→falsification |
 | Done | WAM dual route | Compare cascaded planner+generator with joint action-video model and verifier |
 | Done | Three-axis task map | Condition source, source-preservation strength and open-loop→closed-loop |
 | Done | T2V prompt-to-evidence contract | Separate pure text, source-pixel hybrid and closed-loop tasks; connect runtime conditions, optional post-training, generation and acceptance gates |
@@ -149,6 +149,23 @@ Final checks on 2026-08-30 covered the four chapters, four dated research record
 | Patch hygiene | `git diff --check` returned no error |
 
 Temporary Mermaid renderings and the contact sheet remain outside the repository. This batch does not run model checkpoints, does not constitute R1/R2 reproduction, and does not commit or push.
+
+## Batch verification — transport, physics, timeline, reading and bibliography refresh
+
+Final checks on 2026-08-30 covered the six changed documentation pages, five dated audit/research records, generated assets and bibliography infrastructure:
+
+| Check | Result |
+|---|---|
+| Markdown | markdownlint-cli2 0.23.2 / markdownlint 0.41.1: 11 files, 0 issues |
+| Reference closure | diffusion 24 / 24; flow 20 / 20; physics 41 / 41; no missing, orphan or mismatched anchor |
+| Local links and images | All relative targets in the changed Markdown set resolved; 0 missing |
+| Mermaid | 12 blocks across diffusion, flow, physics, reading list and timeline; all include `accTitle` / `accDescr`, and all 12 rendered with Mermaid CLI plus system Chrome to non-empty SVG audit artifacts |
+| Timeline media preservation | 75 existing HTML images retained; all have non-empty alt text, and the referenced image set is unchanged from `HEAD` |
+| Generated PNGs | Two 1672×941 teaching assets inspected at original size and in grayscale; SHA-256, final prompts, rejected variants and scientific boundaries are recorded in the dated visual research file |
+| Bibliography integrity | Registry, metadata and BibTeX each contain the same 109 unique identities; JSON parse, Python compile, updater `--check` and `--dry-run` all passed |
+| Patch hygiene | `git diff --check` returned no error |
+
+This batch verifies documentation structure and generated artifacts, not model checkpoints. GAUGE, few-step video and closed-loop claims remain author-reported until an independent reproduction is added.
 
 ## Definition of done for one subfield
 
