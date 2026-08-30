@@ -15,11 +15,11 @@
 
 ## 1. 六个容易混用的概念
 
-先固定符号。观测为 \(o_t\)，不可直接观测的环境状态为 \(s_t\)，动作或动作块为 \(a_t\)，目标为 \(g\)，内部记忆为 \(m_t\)。一个动作条件预测器近似：
+先固定符号。观测为 $o_t$，不可直接观测的环境状态为 $s_t$，动作或动作块为 $a_t$，目标为 $g$，内部记忆为 $m_t$。一个动作条件预测器近似：
 
-\[
+$$
 p(o_{t+1:t+H},s_{t+1:t+H}\mid o_{\leq t},a_{t:t+H-1},g,m_t).
-\]
+$$
 
 这条式子仍不足以说明系统会规划、会执行或能在现实中安全工作。
 
@@ -46,10 +46,10 @@ p(o_{t+1:t+H},s_{t+1:t+H}\mid o_{\leq t},a_{t:t+H-1},g,m_t).
 
 最简单的 latent world model 用一个确定性状态递推：
 
-\[
+$$
 h_{t+1}=f_\theta(h_t,a_t),\qquad
 \hat{o}_{t+1}=g_\theta(h_{t+1}).
-\]
+$$
 
 优点是 rollout 快、缓存简单、同一动作序列可复现；缺点是把所有不确定性压进单一路径。当门后是否有人、遮挡物如何运动或接触结果本来就有多种可能时，均方误差会产生模糊平均，离散 token 则可能过早锁定一个未来。
 
@@ -57,24 +57,24 @@ h_{t+1}=f_\theta(h_t,a_t),\qquad
 
 随机状态显式表示“一段历史之后仍不能确定”的部分：
 
-\[
+$$
 z_{t+1}\sim p_\theta(z_{t+1}\mid h_{t+1}),\qquad
 \hat{o}_{t+1}\sim p_\theta(o_{t+1}\mid h_{t+1},z_{t+1}).
-\]
+$$
 
 模型可以采样多个 future rollouts，估计任务收益分布和失败概率。但“样本不同”不必然等于“概率校准”：若训练数据没有覆盖某类动作或接触，模型可能对错误未来非常自信。
 
 ### 2.3 RSSM：记忆与随机性的组合
 
-PlaNet 的 recurrent state-space model（RSSM）把 deterministic recurrent state \(h_t\) 与 stochastic state \(z_t\) 组合 [[5]](#ref-5)：
+PlaNet 的 recurrent state-space model（RSSM）把 deterministic recurrent state $h_t$ 与 stochastic state $z_t$ 组合 [[5]](#ref-5)：
 
-\[
+$$
 \begin{aligned}
 h_t &= f_\theta(h_{t-1},z_{t-1},a_{t-1}),\\
 p_\theta(z_t\mid h_t) &\quad\text{（先验，用于想象）},\\
 q_\phi(z_t\mid h_t,o_t) &\quad\text{（后验，用于观测校正）}.
 \end{aligned}
-\]
+$$
 
 这里的 posterior 在新观测到来时校正 belief，prior 在没有新观测时按动作想象；数学上与随机未来模型共享 variational state-space 接口。ELBO、prior–posterior gap、posterior collapse、aleatoric/epistemic 分账见[变分随机视频生成](generative-models/variational-generation.md)；reward/continue、planner、return 与 model exploitation 仍由本章负责。两种验收不能互相替代。
 
@@ -102,9 +102,9 @@ _图 1：RSSM 的“先验想象—后验校正”结构。实线表示有观测
 顺序化文字替代：
 
 1. 上一时刻的确定性状态、随机状态和动作进入 recurrent transition。
-2. transition 产生新的确定性记忆 \(h_t\)。
-3. 没有新观测时，从 prior 采样 \(z_t\) 并继续想象；有新观测时，encoder 与 \(h_t\) 共同形成 posterior。
-4. \(h_t,z_t\) 用于重建观测或预测 reward/value；真实观测到达后，posterior 把 rollout 重新锚定到环境。
+2. transition 产生新的确定性记忆 $h_t$。
+3. 没有新观测时，从 prior 采样 $z_t$ 并继续想象；有新观测时，encoder 与 $h_t$ 共同形成 posterior。
+4. $h_t,z_t$ 用于重建观测或预测 reward/value；真实观测到达后，posterior 把 rollout 重新锚定到环境。
 
 ### 2.4 同是 model-based，预测目标并不相同
 
@@ -170,7 +170,7 @@ _图 2：World–Action Modeling 的两条系统路线。AI-generated scientific
 
 顺序化文字替代：
 
-1. 左侧级联系统先从当前观测与目标预测 \(K\) 个候选未来。
+1. 左侧级联系统先从当前观测与目标预测 $K$ 个候选未来。
 2. planner/reward/IDM 和 action verifier 分别检查任务价值、状态合理性与动作可达性，再选出动作块；同一预测器也可离线产生合成轨迹训练 policy。
 3. 右侧联合系统用一个共享 video–action backbone 同时产生未来状态/视频与动作块，用共同预测目标约束二者对齐。
 4. 两条路线都只执行动作块的第一部分，读取真实环境新观测，更新近期上下文、实体/空间记忆与不确定性，然后重新规划。
@@ -185,11 +185,11 @@ _图 2：World–Action Modeling 的两条系统路线。AI-generated scientific
 
 World Action Verifier（WAV）提供了一个可插入这两种级联系统的验证器 [[20]](#ref-20)。其核心不是问整段视频“像不像”，而是把转移检查拆成：
 
-\[
+$$
 \underbrace{p(s'\mid s)}_{\text{state plausibility}}
 \quad\text{与}\quad
 \underbrace{p(a\mid s,s')}_{\text{action reachability}}.
-\]
+$$
 
 论文用 action-free video 产生多样 subgoal、稀疏 inverse model 恢复动作，并通过 forward rollout cycle 检查可达性。作者在 9 个 MiniGrid、RoboMimic 与 ManiSkill 任务上报告约 2 倍 sample efficiency 和超过 22% 的下游提升。这里的正确结论是“分解 verifier 可改善指定任务的数据筛选/学习”，不是“WAV 已成为通用实时安全证书”；它的 ICLR 2026 证据来自 World Models workshop 与 Recursive Self-Improvement workshop，而不是 ICLR 主会录用。
 
@@ -236,11 +236,11 @@ World Action Verifier（WAV）提供了一个可插入这两种级联系统的�
 
 动作条件模型必须通过配对干预测试。给定同一初态与随机种子，比较 no-op、左移、右移、抓取、释放等动作：
 
-\[
+$$
 \Delta_{\text{cf}}
 =d\!\left(\hat{s}_{t+H}^{\,a},s_{t+H}^{\,a}\right)
 -d\!\left(\hat{s}_{t+H}^{\,a'},s_{t+H}^{\,a'}\right),
-\]
+$$
 
 并检查三类变量：
 
@@ -291,7 +291,7 @@ _图 3：带 verifier、不确定性和 persistent state 的 receding-horizon �
 
 顺序化文字替代：
 
-1. 系统从真实观测和 persistent state 产生 \(K\) 个候选动作及其未来。
+1. 系统从真实观测和 persistent state 产生 $K$ 个候选动作及其未来。
 2. 价值模型、不确定性估计与 action verifier 共同评分。
 3. 系统只执行第一个动作或短 action chunk，而不盲目执行完整 imagined plan。
 4. 新观测到达后，模型做 posterior correction，更新实体、空间与事件状态。
@@ -303,12 +303,12 @@ _图 3：带 verifier、不确定性和 persistent state 的 receding-horizon �
 
 长期交互需要至少三种状态：
 
-\[
+$$
 m_{t+1}=\operatorname{Update}\!\left(m_t,o_{t+1},a_t,
 \epsilon_{t+1}\right),
-\]
+$$
 
-其中 \(\epsilon_{t+1}\) 是预测与真实观测的 innovation。可操作的 memory 需要“写入、覆盖、检索、遗忘和置信度”，而不只是缓存更多帧。
+其中 $\epsilon_{t+1}$ 是预测与真实观测的 innovation。可操作的 memory 需要“写入、覆盖、检索、遗忘和置信度”，而不只是缓存更多帧。
 
 | 层 | 保存内容 | 典型实现 | 必须测试 |
 |---|---|---|---|

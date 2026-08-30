@@ -272,7 +272,7 @@ GitHub 元数据通过 gh api repos/OWNER/REPO 与 gh api repos/OWNER/REPO/conte
 - 未发现独立 Wan2.2 正式论文；Wan 论文只支持 2.1 的机制背景。
 - 未发现 MiniMax H3 完整技术报告；只从官方 repo 支持明确的架构和 release boundary。
 - 未发现 Movie Gen、Seedance 2.0 的完整官方开放权重/训练代码。
-- 不把 SkyReels-V2 “infinite-length”、Open-Sora 2.0 “commercial-level/$200k”、HunyuanVideo-1.5 “SOTA”等作者词汇写成独立事实。
+- 不把 SkyReels-V2 “infinite-length”、Open-Sora 2.0 “commercial-level/\$200k”、HunyuanVideo-1.5 “SOTA”等作者词汇写成独立事实。
 - 不把 Cosmos 的 “world foundation model” 或 MAGI 的产品命名当作动作条件、反事实和闭环控制证据。
 - 不使用官方仓库之外的 Mochi、MAGI、Ovi fork 判断发布状态。
 - 不纳入冻结日后更新；若 README 未来更改，必须以 commit/tag 或新审计日期重新冻结。

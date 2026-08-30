@@ -279,7 +279,7 @@ M0–M7 不是按年份自动升级：一个闭源产品可能先达到系统部
 
 <a id="ref-2"></a>[2] [SkyReels-V2: Infinite-length Film Generative Model](https://arxiv.org/abs/2504.13074). Guibin Chen, Dixuan Lin, Jiangping Yang, et al. arXiv preprint. 2025.
 
-<a id="ref-3"></a>[3] [Open-Sora 2.0: Training a Commercial-Level Video Generation Model in $200k](https://arxiv.org/abs/2503.09642). Zangwei Zheng, Xiangyu Peng, Yuxuan Lou, et al. arXiv preprint. 2025.
+<a id="ref-3"></a>[3] [Open-Sora 2.0: Training a Commercial-Level Video Generation Model in \$200k](https://arxiv.org/abs/2503.09642). Zangwei Zheng, Xiangyu Peng, Yuxuan Lou, et al. arXiv preprint. 2025.
 
 <a id="ref-4"></a>[4] [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575). NVIDIA et al. arXiv preprint. 2025.
 

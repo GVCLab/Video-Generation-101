@@ -285,7 +285,7 @@ VideoDPO 使用多个视觉模型构造 OmniScore，论文补充材料也承认�
 | 2026 | noisy-latent reward、BranchGRPO | terminal scalar 走向多时间点与分支 credit | 仍是近似归因，不是因果证明 [[25]](#ref-25) [[26]](#ref-26) |
 | 2026 | DPP-GRPO | scalar/sample reward 走向 set-level diversity | 直接更新的是 prompt policy [[28]](#ref-28) |
 
-最值得跟踪的三条演进是：**offline $ightarrow$ online feedback**、**terminal scalar $ightarrow$ multi-dimensional / segment / noisy-latent / branch / set-level reward**、**只改 generator 权重 $ightarrow$ inference guidance 与临时适配**。同时，偏好对齐与少步生成开始共训，但评测必须继续拆分“人更喜欢”与“更少 NFE”。
+最值得跟踪的三条演进是：**offline $\rightarrow$ online feedback**、**terminal scalar $\rightarrow$ multi-dimensional / segment / noisy-latent / branch / set-level reward**、**只改 generator 权重 $\rightarrow$ inference guidance 与临时适配**。同时，偏好对齐与少步生成开始共训，但评测必须继续拆分“人更喜欢”与“更少 NFE”。
 
 ## 12. 不在本章证据范围：视频推理 RL
 

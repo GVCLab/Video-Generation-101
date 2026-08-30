@@ -165,7 +165,7 @@ DiffVSR 用 progressive learning 拆解复杂退化、内容和时间建模负�
 
 | 证据轴 | 指标 / 检查 | 必须配套的压力测试 |
 |---|---|---|
-| 像素/结构 fidelity | PSNR、SSIM、LPIPS、DISTS；重退化一致性 $\|\mathcal D(\widehat X)-Y\|$ | 小文字、细线、脸、重复纹理、饱和和运动边界 |
+| 像素/结构 fidelity | PSNR、SSIM、LPIPS、DISTS；重退化一致性 $\Vert\mathcal D(\widehat X)-Y\Vert$ | 小文字、细线、脸、重复纹理、饱和和运动边界 |
 | Temporal stability | flow-warp error、tLPIPS、flicker spectrum、track consistency | scene cut、遮挡、快速运动、周期纹理、长片段 |
 | Perceptual detail | 盲人评、pairwise preference、no-reference VQA | 锐化 halo、塑料纹理、伪细节与 evaluator stress test |
 | Task utility | OCR、face/ID、检测/跟踪、压缩后再分析 | 原始低清基线、oracle GT、跨设备/跨域 |

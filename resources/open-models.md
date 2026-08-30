@@ -259,14 +259,14 @@ flowchart LR
 
 对一个基于上游权重、附加 control module、第三方推理框架和输入素材的系统，允许用途不是其中任何一张许可证单独决定，而是：
 
-\[
+$$
 U_{\text{allowed}}
 = U_{\text{base weights}}
 \cap U_{\text{adapter}}
 \cap U_{\text{tool}}
 \cap U_{\text{data}}
 \cap U_{\text{content policy}}.
-\]
+$$
 
 常见误读包括：
 
