@@ -2,7 +2,7 @@
 
 这不是按年份堆论文的 awesome list，而是一门可以执行、留痕和被证伪的路线式课程。目标不是“读过多少篇”，而是最终能回答四个问题：模型表示了什么、怎样沿时间生成、证据真正支持什么、下一次实验怎样推翻自己的判断。
 
-本页证据冻结于 **2026-08-30（Asia/Shanghai）**。检索式、纳入排除、正式发表状态和关键断言见[阅读路线研究日志](../sources/research_20260830_reading_routes.md)，新增三条结构性技术轴的选择依据见[缺口审计](../sources/research_20260830_missing_subfields_integration.md)。完整书目信息与仓库索引仍见[引用与代码索引](bibliography.md)；专题细节分别见[生成模型](generative-models.md)、[视频后训练与对齐](generative-models/video-post-training-alignment.md)、[因果流式生成](generative-models/causal-streaming-generation.md)、[原生音视频](tasks/native-audio-video-generation.md)、[细粒度可控生成](tasks/controllable-video-generation.md)、[评测](evaluation.md)、[World Model](world-models.md)与 [JEPA](jepa.md)。
+本页证据冻结于 **2026-08-30（Asia/Shanghai）**。检索式、纳入排除、正式发表状态和关键断言见[阅读路线研究日志](../sources/research_20260830_reading_routes.md)，新增结构性技术轴的选择依据见[缺口审计](../sources/research_20260830_missing_subfields_integration.md)、[多视角/4D 研究日志](../sources/research_20260830_multiview_4d_generation.md)与[退化修复研究日志](../sources/research_20260830_video_restoration.md)。完整书目信息与仓库索引仍见[引用与代码索引](bibliography.md)；专题细节分别见[生成模型](generative-models.md)、[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)、[视频后训练与对齐](generative-models/video-post-training-alignment.md)、[因果流式生成](generative-models/causal-streaming-generation.md)、[原生音视频](tasks/native-audio-video-generation.md)、[细粒度可控生成](tasks/controllable-video-generation.md)、[多视角/4D 生成](tasks/multiview-4d-generation.md)、[视频退化修复](tasks/video-restoration.md)、[评测](evaluation.md)、[World Model](world-models.md)与 [JEPA](jepa.md)。
 
 ## 0. 课程规则与证据标签
 
@@ -26,34 +26,40 @@
 | 先修能力 | 30 分钟自测 | 不通过时先读 |
 |---|---|---|
 | 概率与生成建模 | 能解释联合分布与自回归分解的差别，并说明“多种合理未来”为何使逐像素 MSE 变模糊 | [生成模型总览](generative-models.md) |
-| 视频表示 | 能区分 pixel、连续 latent、离散 token、结构化 state，并写出压缩率与重建误差的取舍 | [分类体系](taxonomy.md) |
+| 视频表示 | 能区分 pixel、连续 latent、离散 token、结构化 state，并分别写出 shape、dtype、时空网格、元素/token 预算；知道何时才存在可报告的 bitstream 码率 | [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md) |
 | Diffusion / flow | 能画出 data → noise → data，并区分“训练目标”“数值求解步数”“网络调用次数” | [Diffusion](generative-models/diffusion-models.md)与 [Flow / consistency](generative-models/flow-consistency-models.md) |
 | 序列与系统 | 能解释 causal mask、KV cache、首帧时间、平均 FPS、p95 帧延迟为什么不是同一个量 | [因果流式生成](generative-models/causal-streaming-generation.md) |
 | 控制 | 能区分 observation、state、action、reward、open-loop rollout 与 receding-horizon control | [World Model](world-models.md) |
 | 视觉控制坐标 | 能区分 2D 像素轨迹、3D 世界轨迹、相机内外参、pose/depth/flow，并说明它们为何不是环境 action | [任务地图](taxonomy.md) |
+| 视角—时间几何 | 能解释一条相机路径为什么只覆盖 camera–time 平面的一条对角线，并区分像素网格与可渲染状态 | [多视角与 4D](tasks/multiview-4d-generation.md) |
 | 音视频时间轴 | 能把 24 FPS 视频与 48 kHz 音频放到同一秒表上，并定义事件 onset 偏差 | [文生视频的音视频边界](tasks/text-to-video.md) |
+| 退化逆问题 | 能写出观测视频由 blur、downsample、noise 与 compression 组合而来，并区分“恢复观测证据”与“生成合理细节” | [视频退化修复](tasks/video-restoration.md) |
 
 最低入口产物是一页术语表：每个术语必须同时写“定义”“反例”和“怎样测”。如果只能写定义，说明还不能进入分支。
 
-## 2. 总路线图：一条主干，五条分支
+## 2. 总路线图：一条主干，七条分支
 
 ```mermaid
 flowchart TB
     accTitle: 视频生成论文课程的依赖路线
-    accDescr: 学习者先完成先修诊断，再通过表示、生成目标和评测组成的共同主干。之后可选择因果流式、少步与后训练、原生音视频、World Action 与 JEPA、细粒度可控生成五条分支。每条分支都进入共同验收，并以跨分支结课项目结束。
+    accDescr: 学习者先完成先修诊断，再通过 tokenizer 表示、生成目标和评测组成的共同主干。之后可选择因果流式、少步与后训练、原生音视频、World Action 与 JEPA、细粒度可控生成、视频退化修复、多视角与4D七条分支。每条分支都进入共同验收，并以跨分支结课项目结束。
 
-    P["先修诊断"] --> K["共同主干：表示 · 目标 · 评测"]
+    P["先修诊断"] --> K["共同主干：tokenizer 表示 · 目标 · 评测"]
     K --> S["分支 A：因果 · 流式 · 实时"]
     K --> D["分支 B：少步 · 后训练 · 蒸馏"]
     K --> A["分支 C：原生音视频"]
     K --> W["分支 D：World Action · JEPA"]
     K --> G["分支 E：细粒度可控生成"]
+    K --> R["分支 F：视频退化修复"]
+    K --> M["分支 G：多视角 · 4D"]
     D --> S
     S --> V["共同验收：复现 + 反证 + 边界"]
     D --> V
     A --> V
     W --> V
     G --> V
+    R --> V
+    M --> V
     V --> C["跨分支结课项目"]
 
     classDef gate fill:#f2f2f2,stroke:#222,color:#111
@@ -62,11 +68,11 @@ flowchart TB
     classDef verify fill:#dff2e5,stroke:#147a4b,color:#111
     class P,C gate
     class K trunk
-    class S,D,A,W,G branch
+    class S,D,A,W,G,R,M branch
     class V verify
 ```
 
-文字替代：先通过先修诊断，再完成共同主干。主干之后选一条主修分支；少步蒸馏又是流式生成的常见前提，因此分支 B 连接分支 A。五条分支都必须经过同一套“复现、反证、证据边界”验收，最后再做跨分支项目。颜色只辅助分组，节点标签和箭头已经给出全部语义。
+文字替代：先通过先修诊断，再完成共同主干。视频 tokenizer 是所有分支共享的表示先修，不单列为应用分支；主干之后才选一条主修分支。少步蒸馏又是流式生成的常见前提，因此分支 B 连接分支 A。七条分支都必须经过同一套“复现、反证、证据边界”验收，最后再做跨分支项目。颜色只辅助分组，节点标签和箭头已经给出全部语义。
 
 ### 怎样选主修分支
 
@@ -77,12 +83,14 @@ flowchart TB
 | 声音是否与画面共同生成，而不是事后配音？ | C 原生音视频 | B 后训练 |
 | 好看的 rollout 何时才对决策有用？ | D World Action/JEPA | A 因果/流式 |
 | 怎样精确指定相机、对象轨迹、姿态或几何，同时避免控制串扰？ | E 细粒度可控生成 | B 后训练或 A 因果/流式 |
+| 怎样从模糊、噪声、低分辨率或压缩观测恢复同一段视频，又不把生成细节冒充证据？ | F 视频退化修复 | A 因果/流式或 B 后训练 |
+| 怎样让同一动态场景在多个相机与多个时间都一致，并输出可查询状态？ | G 多视角/4D | E 细粒度控制或 A 因果/流式 |
 
 ## 3. 共同主干：表示、目标、时间与证据
 
 ### 为什么先读这条主干
 
-四个前沿分支常把不同层级的词混在一起：tokenizer 是表示，DiT 是骨干，diffusion/flow 是训练与采样路径，causal 是信息访问约束，DPO 是后训练，world model 是任务合同。主干的作用是先把这些坐标拆开，否则读新论文时很容易把“换了 objective”误写成“换了整个系统”。
+七个前沿分支常把不同层级的词混在一起：tokenizer 是表示，autoregressive/masked 是概率 factorization，diffusion/flow 是 objective 与采样路径，DiT 是骨干，causal 是信息访问约束，DPO 是后训练，restoration 是观测逆问题，4D 是相机—时间查询/状态合同，world model 是动作—状态任务合同。主干的作用是先把这些坐标拆开，否则读新论文时很容易把“换了 objective”误写成“换了整个系统”。
 
 ### 阅读顺序
 
@@ -95,6 +103,16 @@ flowchart TB
 | 5 | [Video Diffusion Models](https://proceedings.neurips.cc/paper_files/paper/2022/hash/39235c56aef13fb05a6adc95eb9d8d66-Abstract-Conference.html) | 图像扩散加上时间维后，联合生成、续写与级联分别承担什么？ | **A·正式发表** |
 | 6 | [MAGVIT](https://openaccess.thecvf.com/content/CVPR2023/html/Yu_MAGVIT_Masked_Generative_Video_Transformer_CVPR_2023_paper.html) | tokenizer、masked generation 与多任务条件怎样组合？ | **A·正式发表** |
 | 7 | [VBench](https://openaccess.thecvf.com/content/CVPR2024/html/Huang_VBench_Comprehensive_Benchmark_Suite_for_Video_Generative_Models_CVPR_2024_paper.html) | 一个总分掩盖了哪些失败？自动指标与人工判断怎样对齐？ | **A·正式发表** |
+
+### 表示加深单元：共同先修，不是第七分支
+
+主干第 2、6 篇建立离散 token 与视频 token 建模入口；下面三篇分别补齐连续兼容表示、真实 bitstream 和自适应预算。它们仍属于所有分支共享的 representation 层，不改变“六条分支”的任务结构。详细机制、更多里程碑和统一记账口径见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)。
+
+| 表示问题 | 论文 | 阅读时必须核对 | 证据 |
+|---|---|---|---|
+| 连续 video latent 怎样接入既有生成器 | [CV-VAE](https://proceedings.neurips.cc/paper_files/paper/2024/hash/1787533e171dcc8549cc2eb5a4840eec-Abstract-Conference.html) | “兼容”是训练约束与特定 checkpoint 协议，不是任意 VAE 可无损互换 | **A·正式发表，NeurIPS 2024** |
+| 离散 token 何时成为实际码流 | [Image and Video Tokenization with Binary Spherical Quantization](https://proceedings.iclr.cc/paper_files/paper/2025/hash/e25198b6a75f74277ee3a2bd4165d9ef-Abstract-Conference.html) | 只有接上先验、概率模型与算术编码后，bpp 才是 bitstream 证据 | **A·正式发表，ICLR 2025** |
+| 固定网格怎样变成内容自适应预算 | [InfoTok](https://proceedings.iclr.cc/paper_files/paper/2026/hash/432f048a844654ba981953491e6dc80e-Abstract-Conference.html) | token 节省要连同 router、变长 batching、最坏长度和下游质量报告 | **A·正式发表，ICLR 2026** |
 
 ### 主干阅读问题
 
@@ -110,8 +128,9 @@ flowchart TB
 
 1. 实现或复用 MSE predictor、离散分类/混合分布和 stochastic generator 三类最小模型；模型可以很小，但数据划分与随机种子必须固定。
 2. 同时报 pixel error、分支覆盖率、最优样本与平均样本；观察 MSE 是否用模糊平均换取更低误差。
-3. 对同一段 16 帧视频做 codec 重建，报告压缩后 token 数、重建误差和运动事件是否保存。
-4. 写一张六列模型卡：`representation / temporal factorization / objective / conditions / network calls / evidence`。
+3. 对同一段 16 帧视频做 tokenizer 重建，报告 latent/token 的 shape、dtype、时空网格、元素/token 数、重建误差和运动事件是否保存；只有实际产生可解码 bitstream 时才报告 bpp/bitrate。
+4. 固定同一个 generator、数据与训练预算替换 tokenizer，拆分“重建更好”与“下游生成更好”。
+5. 写一张六列模型卡：`representation / temporal factorization / objective / conditions / network calls / evidence`。
 
 **反证条件：** 如果你无法仅凭方法和实验部分填完六列，或把重建误差当成生成质量，就不能进入分支。主干通关产物不是排行榜，而是一张能容纳后续所有论文的比较表。
 
@@ -129,30 +148,37 @@ flowchart TB
 | 教师到学生 | [CausVid](https://openaccess.thecvf.com/content/CVPR2025/html/Yin_From_Slow_Bidirectional_to_Fast_Autoregressive_Video_Diffusion_Models_CVPR_2025_paper.html) | 双向教师、因果学生、DMD、4-step 与 KV cache 的组合 | **A·正式发表** |
 | 训练—推理对齐 | [Self Forcing](https://proceedings.neurips.cc/paper_files/paper/2025/hash/f4823f831af67a3ef15e41a85434422a-Abstract-Conference.html) | 在自生成历史上训练，直接研究 exposure bias | **A·正式发表** |
 | 因果初始化 | [Causal Forcing](https://arxiv.org/abs/2602.02214)（[ICML 2026 官方名单](https://icml.cc/Downloads/2026)） | 先训练 AR teacher，再做 causal flow-map/ODE 初始化 | **A*·正式接收** |
+| 架构解耦 | [Separable Causal Diffusion](https://openaccess.thecvf.com/content/CVPR2026/html/Bai_Causality_in_Video_Diffusers_is_Separable_from_Denoising_CVPR_2026_paper.html) | once-per-frame causal encoder 与 multi-step frame renderer 分工 | **A·正式发表；未核验开放代码/权重** |
 | 在线系统 | [StreamDiffusionV2](https://proceedings.mlsys.org/paper_files/paper/2026/hash/698cfaf72a208aef2e78bcac55b74328-Abstract-Conference.html) | 把 TTFF、deadline、jitter、调度与多 GPU pipeline 纳入问题 | **A·正式发表** |
-| 长时前沿 | [LongLive](https://arxiv.org/abs/2509.22622)与 [Rolling Forcing](https://arxiv.org/abs/2509.25161) | prompt recache、sink、rolling window 与 train-long-test-long | **B·预印本** |
+| 长时与 rolling | [LongLive](https://proceedings.iclr.cc/paper_files/paper/2026/hash/91a1610c6ed9e02d33f826b46f472b92-Abstract-Conference.html)与 [Rolling Forcing](https://openreview.net/forum?id=IAyzXjbfwo) | prompt recache、sink、rolling window 与 train-long-test-long | **A·ICLR 2026 正式发表** |
+| training-free cache | [FlowCache](https://proceedings.iclr.cc/paper_files/paper/2026/hash/85dc8f85ff978b9c606d3b2f5b0da69a-Abstract-Conference.html) | per-chunk feature reuse 与 KV 压缩；速度比不自动等于实时 | **A·ICLR 2026；代码公开** |
+| 在线运动控制 | [MotionStream](https://proceedings.iclr.cc/paper_files/paper/2026/hash/0cece806cd3d1dfad4a893f016ad3d7d-Abstract-Conference.html) | Self Forcing + 固定滑窗 + 在线轨迹/相机控制 | **A·ICLR 2026；仓库占位，代码/权重未放出** |
 | 少步前沿 | [Causal Forcing++](https://arxiv.org/abs/2605.15141)与 [Causal-rCM](https://arxiv.org/abs/2606.25473) | frame-wise 1–2 step 与 teacher-/self-forcing 组合 recipe | **B·预印本** |
 
 ### 带着这些问题读
 
-1. “causal”约束的是 attention 访问，还是作者真的做了动作反事实与物理因果测试？
-2. 模型训练时看到 ground-truth history、带噪 history，还是完整的 self-generated history？梯度跨多少块？
-3. 少步来自 consistency、DMD、flow-map 初始化还是缓存；哪一项改变画质，哪一项只改变系统吞吐？
-4. 历史是全保留、窗口、sink、压缩、检索还是递归 state？显存怎样随时长增长？
-5. “实时”是否包含文本编码、VAE decode、调度和输出；是否给 TTFF、p95/p99 与 deadline miss？
+1. causal codec、causal generator、streaming commit 与 real-time SLO 四层各自怎样证明？哪一层只靠命名继承？
+2. “causal”约束的是 attention 访问，还是作者真的做了动作反事实与物理因果测试？有限 lookahead 和块内双向是否明示？
+3. 模型训练时看到 ground-truth history、带噪 history，还是完整的 self-generated history？梯度跨多少块？
+4. 少步来自 consistency、DMD、flow-map 初始化还是缓存；sampling steps 与包含 context/CFG 的真实 NFE 是否相同？
+5. 历史是全保留、窗口、sink、压缩、检索还是递归 state？GPU resident memory、CPU/外存和查询延迟怎样随时长增长？
+6. commit 单元、hash、lookahead、revision、条件生效点、backpressure 与 cache reset 是什么？
+7. “实时”是否包含文本编码、VAE decode、调度、传输与 display；是否给 cold/warm TTFF、p95/p99、deadline miss、负载、soak 和恢复？
 
 ### 最小复现与证伪任务
 
 固定 8 个 prompt、3 个 seed、同一分辨率/帧率和同一 GPU，比较一个离线基线与一个因果 checkpoint：
 
-1. 生成训练窗口内、4 倍窗口和 12 倍窗口三档长度；逐块记录显存、首帧时间、p50/p95 帧间隔、实际播放 deadline miss。
-2. 对同一模型分别用 ground-truth history 与 self-generated history，画出误差或人工失败率随 rollout 长度的曲线。
-3. 在第 25%、50%、75% 时刻切换 prompt，测条件变化到可见响应的帧数，并记录旧身份/布局是否被错误重置。
-4. 给每个结果标第一处身份漂移、冻结、循环、几何崩坏和声音/画面停顿；不要只挑最好样例。
+1. 冻结 model/code/codec/scheduler/NFE/precision/GPU/driver/commit manifest；为每个已提交单元保存 hash。
+2. 对相同 prefix/seed 只扰动隐藏 suffix、未来 prompt 或 padding；revision window 外任何 commit hash 变化都算 future-leak/commit 失败。
+3. 生成训练窗口内、2×、6×、12× 和分钟级长度；逐块记录 GPU/CPU/外存、首帧时间、p50/p95/p99、实际 deadline miss，并画 first-failure survival curve。
+4. 对同一模型分别用 ground-truth/noised history 与 self-generated history，画出误差或人工失败率随 rollout 长度的曲线，并 hook 首块/后续块真实 NFE。
+5. 在第 25%、50%、75% 时刻切换 prompt，测条件变化到可见响应的帧数，并记录旧身份/布局是否被错误重置。
+6. 在单流与预注册并发/拥塞负载下运行至少 60 秒，记录 backpressure、降级、断流恢复；给每个结果标第一处身份漂移、冻结、循环、几何崩坏和停顿。
 
-**反证条件：** 解码后达不到目标播放 deadline、显存随时长无界增长、超出训练窗后失败率陡升，或 prompt 切换只改变纹理而不改变预期事件时，都要下调“实时”“开放时长”或“交互式”的表述。
+**反证条件：** 未来输入改变已提交 hash、解码后达不到目标播放 deadline、resident memory 随时长无界增长、超出训练窗后失败率陡升、miss 后不能恢复，或 prompt 切换只改变纹理而不改变预期事件时，都要下调“causal”“streaming”“实时”“开放时长”或“交互式”的对应表述。
 
-**通关产物：** 一张 latency breakdown、一张 drift curve、一份硬件与计时口径完整的失败日志。不能再用单个 FPS 概括系统。
+**通关产物：** 一份 commit/hash trace、一张 latency breakdown、一张 drift/survival curve、一份硬件与计时口径完整的失败日志。不能再用单个 FPS 概括系统。
 
 ## 5. 分支 B：少步生成、后训练与蒸馏
 
@@ -322,21 +348,107 @@ flowchart TB
 
 **通关产物：** 一张 `signal → coordinate → injection → effect → metric` 表、一组单变量控制干预、一个冲突矩阵和至少五个失败样例。不能用精选视频证明精确控制。
 
-## 9. 所有分支共用的验证回路
+## 9. 分支 F：视频退化修复——先守住观测证据，再谈生成细节
+
+**入口依赖：** 能把低质观测写成 $Y=\mathcal D_\phi(X)+\epsilon$，并说明 blur kernel、downsampling、noise、codec/bitstream、相机 ISP 和算子次序都属于退化协议；能区分 full-frame degradation restoration、mask inpainting、frame interpolation、semantic editing 与一般 enhancement。
+
+**为什么读：** 多帧提供亚像素位移和互补可见性，也会把错位、遮挡和压缩伪影传播到整段视频。现代生成先验能补出锐利高频，却不保证文字、人脸和对象部件来自观测。因此这条路线不能只看“更清楚”，而要把 fidelity、temporal stability、perceptual detail 与 hallucination 四栏分开。
+
+### 阅读顺序
+
+| 阶段 | 论文 | 在路线中的作用 | 证据 |
+|---|---|---|---|
+| 跨帧证据 | [Deep Video Deblurring](https://openaccess.thecvf.com/content_cvpr_2017/html/Su_Deep_Video_Deblurring_CVPR_2017_paper.html)与 [EDVR](https://openaccess.thecvf.com/content_CVPRW_2019/html/NTIRE/Wang_EDVR_Video_Restoration_With_Enhanced_Deformable_Convolutional_Networks_CVPRW_2019_paper.html) | 建立邻帧聚合、显式多尺度对齐与融合的基本问题 | **A·正式发表** |
+| 组件基线 | [BasicVSR](https://openaccess.thecvf.com/content/CVPR2021/html/Chan_BasicVSR_The_Search_for_Essential_Components_in_Video_Super-Resolution_and_CVPR_2021_paper.html) | 用 propagation、alignment、aggregation、upsampling 四组件组织 VSR | **A·正式发表** |
+| 真实退化与增强传播 | [BasicVSR++](https://openaccess.thecvf.com/content/CVPR2022/html/Chan_BasicVSR_Improving_Video_Super-Resolution_With_Enhanced_Propagation_and_Alignment_CVPR_2022_paper.html)与 [RealBasicVSR](https://openaccess.thecvf.com/content/CVPR2022/html/Chan_Investigating_Tradeoffs_in_Real-World_Video_Super-Resolution_CVPR_2022_paper.html) | 比较二阶传播、预清洗和真实低质训练的收益与债务 | **A·正式发表** |
+| Transformer 枢纽 | [RVRT](https://proceedings.neurips.cc/paper_files/paper/2022/hash/02687e7b22abc64e651be8da74ec610e-Abstract-Conference.html) | clip 内并行、clip 间递归，并在 SR、deblur、denoise 上检验通用性 | **A·正式发表** |
+| 生成先验 | [SATeCo](https://openaccess.thecvf.com/content/CVPR2024/html/Chen_Learning_Spatial_Adaptation_and_Temporal_Coherence_in_Diffusion_Models_for_CVPR_2024_paper.html)与 [Upscale-A-Video](https://openaccess.thecvf.com/content/CVPR2024/html/Zhou_Upscale-A-Video_Temporal-Consistent_Diffusion_Model_for_Real-World_Video_Super-Resolution_CVPR_2024_paper.html) | 冻结图像 diffusion prior、加入时空适配，并暴露 fidelity–generation 权衡 | **A·正式发表** |
+| 高分辨率、复杂退化与少步 | [VideoGigaGAN](https://openaccess.thecvf.com/content/CVPR2025/html/Xu_VideoGigaGAN_Towards_Detail-rich_Video_Super-Resolution_CVPR_2025_paper.html)、[DiffVSR](https://openaccess.thecvf.com/content/ICCV2025/html/Li_DiffVSR_Revealing_an_Effective_Recipe_for_Taming_Robust_Video_Super-Resolution_ICCV_2025_paper.html)与 [TurboVSR](https://openaccess.thecvf.com/content/ICCV2025/html/Wang_TurboVSR_Fantastic_Video_Upscalers_and_Where_to_Find_Them_ICCV_2025_paper.html) | 分别研究感知细节、复杂退化 curriculum 与系统效率 | **A·正式发表** |
+| 一步与 streaming 前沿 | [SeedVR2](https://proceedings.iclr.cc/paper_files/paper/2026/hash/444d69470b24ded080183c907b711bbf-Abstract-Conference.html)与 [FlashVSR](https://openaccess.thecvf.com/content/CVPR2026/html/Zhuang_FlashVSR_Towards_Real-time_Diffusion-Based_Streaming_Video_Super_Resolution_CVPR_2026_paper.html) | 区分 adversarial 一步后训练与因果稀疏注意的 streaming 系统合同 | **A·正式发表** |
+| 观测与结构守恒 | [DGAF-VSR](https://openaccess.thecvf.com/content/CVPR2026/html/Xu_Rethinking_Diffusion_Model-Based_Video_Super-Resolution_Leveraging_Dense_Guidance_from_Aligned_CVPR_2026_paper.html)、[STCDiT](https://openaccess.thecvf.com/content/CVPR2026/html/Chen_STCDiT_Spatio-Temporally_Consistent_Diffusion_Transformer_for_High-Quality_Video_Super-Resolution_CVPR_2026_paper.html)与 [DTG-Restore](https://openaccess.thecvf.com/content/CVPR2026/html/Yesiltepe_DTG-Restore_Training-Free_Diffusion_Refinement_for_Generative_Video_Super-Resolution_CVPR_2026_paper.html) | dense aligned evidence、anchor-frame structure 与生成视频伪影 refinement 的三种约束 | **A·正式发表** |
+
+### 带着这些问题读
+
+1. 训练和测试的退化算子、参数分布、组合次序、codec 与相机是否匹配；“real-world”是否只有无 GT demo？
+2. 支持帧怎样对齐，遮挡与出画区域怎样降权；错误传播在第几帧首次出现？
+3. 生成先验接收多少低质证据；相同输入换 seed 后，小字、人脸和重复纹理是否改变？
+4. 双向、整段、滑窗、recurrent 与 causal streaming 分别能看到哪些未来；显存与延迟怎样随片长增长？
+5. PSNR/SSIM、LPIPS、人评、no-reference VQA、warp/flicker 和 OCR/ID 各自证明什么，又漏掉什么？
+6. “一步”“实时”“training-free”“任意长度”分别约束 NFE、端到端服务、参数更新还是接口；是否被作者混写？
+
+### 最小复现与证伪任务
+
+冻结同一组干净视频、帧率、裁切和 seed，生成 matched synthetic、未见算子组合、codec/camera shift 与真实无 GT 四层测试：
+
+1. 至少比较逐帧、传播/对齐、Transformer/hybrid 与生成先验四类路线；同时固定输出分辨率、输入帧数和计时边界。
+2. paired 层分开报告 PSNR/SSIM、LPIPS 与时间误差；真实层加入盲人评、OCR/ID、一致性、失败率和人工复核。
+3. 对生成式方法做 re-degradation consistency 与多 seed 审计；输出新增可辨文字、面孔或部件时记录为事实性失败，而不是“更多细节”。
+4. 将平移、遮挡、scene cut、周期纹理、滚动快门和 bitstream corruption 分桶，画第一处失败位置与长时 drift。
+5. 若声称 streaming，禁止读取未来帧，报告 cold/warm TTFF、端到端 p50/p95、deadline miss、显存随时长曲线与断流恢复。
+
+**反证条件：** 只在 bicubic 上领先、换 codec/相机后排名翻转、锐利输出无法重退化回观测、多 seed 改写文字/身份、时间指标恶化，或速度数字省略 VAE/I/O 时，都要降级“真实、忠实、稳定或实时”的主张。
+
+**通关产物：** 一份版本化 degradation manifest、一张四轴指标表、一组 hallucination counterexamples、一条长视频 drift 曲线和完整 latency breakdown。详细机制、里程碑与 RestorationFork-1 协议见[视频退化修复专章](tasks/video-restoration.md)。
+
+## 10. 分支 G：多视角与 4D——把相机路径升级为可查询动态状态
+
+**入口依赖：** 能区分 camera intrinsics/extrinsics、world time、diffusion time、像素视图与场景状态；知道普通视频只覆盖 camera–time 平面的一条路径，多视角静态图只覆盖一个时间切片。
+
+**为什么读：** 一条相机控制视频可以很漂亮，却让同一时刻的另一视角完全矛盾；一个动态 Gaussian 可以实时渲染，却经过数小时 per-scene optimization；生成模型还能为不可见背面“补出”没有观测证据的内容。该分支把 reconstruction、generative completion、multi-view video diffusion、explicit 4D state 与 streaming 4D claim 分开。
+
+### 阅读顺序
+
+| 阶段 | 论文 | 在路线中的作用 | 证据 |
+|---|---|---|---|
+| 动态坐标场 | [D-NeRF](https://openaccess.thecvf.com/content/CVPR2021/html/Pumarola_D-NeRF_Neural_Radiance_Fields_for_Dynamic_Scenes_CVPR_2021_paper.html)与 [Nerfies](https://openaccess.thecvf.com/content/ICCV2021/html/Park_Nerfies_Deformable_Neural_Radiance_Fields_ICCV_2021_paper.html) | canonical state + deformation，把相机与时间变成独立查询 | **A·正式发表** |
+| Text-to-4D | [MAV3D](https://proceedings.mlr.press/v202/singer23a.html) | 用 T2V score distillation 在无配对 4D 数据时优化 dynamic NeRF | **A·ICML 2023 正式发表** |
+| 显式动态表示 | [4D Gaussian Splatting](https://openaccess.thecvf.com/content/CVPR2024/html/Wu_4D_Gaussian_Splatting_for_Real-Time_Dynamic_Scene_Rendering_CVPR_2024_paper.html) | 3D Gaussians + 4D voxels + deformation，分离构建与实时渲染 | **A·正式发表** |
+| 视角—时间条件生成 | [4DiM](https://openreview.net/forum?id=d2UrCGtntF)与 [SV4D](https://proceedings.iclr.cc/paper_files/paper/2025/hash/5297e56ac65ba2bfa70ee9fc4818c042-Abstract-Conference.html) | metric camera/time query 与 multi-frame/multi-view diffusion | **A·ICLR 2025 正式发表** |
+| 网格到状态 | [CAT4D](https://openaccess.thecvf.com/content/CVPR2025/html/Wu_CAT4D_Create_Anything_in_4D_with_Multi-View_Video_Diffusion_Models_CVPR_2025_paper.html) | 单目视频 → camera-time 网格 → deformable 3D Gaussian | **A·正式发表** |
+| 泛化与大运动 | [4Real-Video](https://openaccess.thecvf.com/content/CVPR2025/html/Wang_4Real-Video_Learning_Generalizable_Photo-Realistic_4D_Video_Diffusion_CVPR_2025_paper.html)与 [SV4D 2.0](https://openaccess.thecvf.com/content/ICCV2025/html/Yao_SV4D_2.0_Enhancing_Spatio-Temporal_Consistency_in_Multi-View_Video_Diffusion_for_ICCV_2025_paper.html) | 从逐场景优化走向可泛化 view-time generation，并处理遮挡与大运动 | **A·正式发表** |
+| 稀疏、无 pose 与长时 | [4C4D](https://openaccess.thecvf.com/content/CVPR2026/html/Zhou_4C4D_4_Camera_4D_Gaussian_Splatting_CVPR_2026_paper.html)、[DGGT](https://openaccess.thecvf.com/content/CVPR2026/html/Chen_DGGT_Feedforward_4D_Reconstruction_of_Dynamic_Driving_Scenes_using_Unposed_CVPR_2026_paper.html)、[MoRel](https://openaccess.thecvf.com/content/CVPR2026/html/Kwak_MoRel_Long-Range_Flicker-Free_4D_Motion_Modeling_via_Anchor_Relay-based_Bidirectioanl_CVPR_2026_paper.html) | 极稀疏相机、pose-as-output、长时 anchor relay 与内存边界 | **A·CVPR 2026 正式发表** |
+| 长多视角与在线前沿 | [MV-Forcing](https://arxiv.org/abs/2607.05376)、[Stream4D](https://arxiv.org/abs/2608.19556)、[4DStreamCtrl](https://arxiv.org/abs/2608.25479) | 3D bridge/self-forcing、动态 4D reward、在线 3D point-track control | **B·2026 预印本；作者结果** |
+
+### 带着这些问题读
+
+1. 输入是同步多相机、带 pose 单目视频、无 pose 图像、单图还是文字；目标区域有多少直接观测支持？
+2. 输出是独立像素 query、联合 $V\times T$ 网格、dynamic NeRF/Gaussian/surface，还是只是一条 camera path？
+3. 相机与对象运动怎样分解；坐标、尺度、时间同步和 rolling shutter 是否公开？
+4. 未见背面、遮挡后区域与未来状态由几何重投影还是生成先验产生；是否分 mask 报告？
+5. 同一 $(v,t)$ 重复查询、冻结世界时间移动相机、冻结相机推进时间和相机闭环时，结果是否一致？
+6. scene build、生成、4D optimization、renderer FPS 与端到端 streaming SLO 是否被分别计时？
+
+### 最小复现与证伪任务
+
+冻结一个开放 checkpoint、12 个 scene-held-out 动态场景、至少 4 个同步相机与 32 个时间点：
+
+1. 比较独立视图生成、同刻 joint-view、完整 view-time block 与“网格后优化 4D state”四种方案。
+2. 按 `seen / reprojected / hallucinated` 三类区域分开报保真、重投影、depth/pose、3D track、LPIPS 与人评。
+3. 做 freeze-time、freeze-camera、novel-view/novel-time、离开后回到旧视点和对象出画再入画五类压力测试。
+4. 用独立 depth/track/pose evaluator；训练 reward 与终评模型不得相同。
+5. 同时报 scene build time、首个可见结果、query latency、renderer FPS、VRAM 与资产大小。
+
+**反证条件：** 相机路径准确但同刻视图冲突、显式状态只提高训练视图 PSNR、静态 3D reward 通过冻结运动变高、不可见背面换 seed 完全改写却不报告不确定性，或“实时”只指优化后的 renderer 时，都要降低 4D、一致、重建或实时主张。
+
+**通关产物：** 一张 camera × time coverage 图、一份 query manifest、六门证据表、三类区域 mask、相机 loop-closure 视频和构建/查询成本分解。完整机制与 `GridFork-1` 见[多视角与 4D 专章](tasks/multiview-4d-generation.md)。
+
+## 11. 所有分支共用的验证回路
 
 ```mermaid
 flowchart LR
     accTitle: 从论文声明到保留或降级结论的验证回路
-    accDescr: 先把论文声明改写成可测量命题，再按声明类型选择质量、延迟、音视频同步、显式视觉控制或闭环控制协议。固定版本、条件和预算后运行最小复现，再加入最可能推翻结论的干预。证据通过则保留带边界的结论，否则降级并记录失败。
+    accDescr: 先把论文声明改写成可测量命题，再按声明类型选择质量、退化恢复、延迟、音视频同步、显式视觉控制或闭环控制协议。固定版本、条件和预算后运行最小复现，再加入最可能推翻结论的干预。证据通过则保留带边界的结论，否则降级并记录失败。
 
     C["提取一条声明"] --> M["改写成可测命题"]
     M --> T{"声明类型"}
     T --> Q["画质 / 时间一致"]
+    T --> E["退化恢复 / 事实保真"]
     T --> L["延迟 / 流式"]
     T --> A["音视频同步"]
     T --> V["相机 / 轨迹 / 姿态控制"]
     T --> W["动作 / 闭环"]
     Q --> F["冻结版本 · 条件 · 预算"]
+    E --> F
     L --> F
     A --> F
     V --> F
@@ -353,13 +465,13 @@ flowchart LR
     classDef test fill:#fff0cc,stroke:#a65f00,color:#111
     classDef outcome fill:#dff2e5,stroke:#147a4b,color:#111
     class C,M,T claim
-    class Q,L,A,V,W,F,R,X,J test
+    class Q,E,L,A,V,W,F,R,X,J test
     class K,G,N outcome
 ```
 
-文字替代：先从论文中只取一条声明，把它改写为可测命题；根据声明属于画质、延迟、音视频同步、相机/轨迹/姿态控制还是动作闭环，选择相应协议。冻结模型版本、输入条件、预算和硬件后做最小复现，再加入最可能推翻结论的干预。证据仍成立时保留带适用边界的结论；不成立时降级结论并保存失败，两者都进入下一条声明。
+文字替代：先从论文中只取一条声明，把它改写为可测命题；根据声明属于画质、退化恢复、延迟、音视频同步、相机/轨迹/姿态控制还是动作闭环，选择相应协议。冻结模型版本、输入条件、预算和硬件后做最小复现，再加入最可能推翻结论的干预。证据仍成立时保留带适用边界的结论；不成立时降级结论并保存失败，两者都进入下一条声明。
 
-## 10. 跨分支结课项目
+## 12. 跨分支结课项目
 
 至少选择两个分支，不训练大模型也可以完成。交付一个可复核目录，包含 `claim-card.md`、配置、原始结果、失败样例、环境信息和结论。
 
@@ -372,10 +484,14 @@ flowchart LR
 | B 后训练 + E 细粒度控制 | 用轨迹/相机 adherence reward 后训练同一 controller，比较控制误差与非目标保持 | reward 改善 tracker 分数，却造成身份、背景、多样性或遮挡恢复退化 |
 | A 因果 + E 细粒度控制 | 在流式生成中途反转相机或对象轨迹，测条件响应、deadline 与旧状态保持 | 系统预读整条轨迹，或快速响应只是重置场景而不是连续控制 |
 | D World Action + E 细粒度控制 | 对同一初态比较“摄影机轨迹”和“环境动作”两种条件的反事实 | 视觉控制精确，却无法预测 action 对状态的因果后果 |
+| E 细粒度控制 + G 多视角/4D | 对同一 camera path 同时生成额外同步视角，再优化可渲染状态 | 原路径准确，但额外视图重投影、遮挡或 loop closure 失败 |
+| A 因果 + G 多视角/4D | 在长时多视角生成中比较独立 view cache 与 3D bridge | 平均画质不变，却跨视角漂移、motion collapse 或显存无界增长 |
+| B 后训练 + F 退化修复 | 比较同一 restoration teacher 蒸馏/对抗后训练前后的一致性、速度与幻觉 | 一步输出更锐利，却更改文字、身份或重退化一致性 |
+| A 因果 + F 退化修复 | 将同一离线 restoration 改为只读历史的 streaming 协议 | 平均 FPS 达标，但未来帧泄漏、p95 卡顿或长时 drift 失控 |
 
 最终结论只能落在以下四种之一：`复现`、`部分复现`、`未复现`、`证据不足`。`看起来不错`不是第五种。
 
-## 11. 一页论文笔记模板
+## 13. 一页论文笔记模板
 
 ```markdown
 # Paper title
@@ -390,7 +506,7 @@ A / A* / B / C / D；正式入口、作者稿、代码与 checkpoint 分开列�
 读懂本论文必须先知道的表示、objective、时间机制与控制概念。
 
 ## Model contract
-- Representation:
+- Representation: pixel / continuous latent / discrete token / structured state；shape、dtype、量化、时空网格、元素/token 预算；是否存在可解码 bitstream
 - Temporal factorization:
 - Objective:
 - Conditions:

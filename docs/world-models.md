@@ -78,6 +78,9 @@ q_\phi(z_t\mid h_t,o_t) &\quad\text{（后验，用于观测校正）}.
 
 ~~~mermaid
 flowchart LR
+    accTitle: RSSM 的先验想象与后验观测校正
+    accDescr: 上一确定性状态、随机状态和已执行动作进入 recurrent transition，形成当前记忆。没有新观测时从 prior 继续 rollout；真实观测到达时由 encoder 与 posterior 校正随机状态，再用于解码观测、奖励或价值。
+
     O["真实观测 o_t"] --> E["Encoder"]
     H0["上一确定性状态 h_(t-1)"] --> R["Recurrent transition"]
     Z0["上一随机状态 z_(t-1)"] --> R
@@ -262,6 +265,9 @@ World Action Verifier（WAV）提供了一个可插入这两种级联系统的�
 
 ~~~mermaid
 flowchart LR
+    accTitle: 带验证器和不确定性的滚动时域闭环
+    accDescr: 系统从真实观测与持久状态产生多个动作和未来候选，由任务价值、不确定性与动作验证器共同评分，只执行首个动作或短动作块。新观测用于后验校正与记忆更新；预测现实偏差过大时转入减速、重新感知或安全策略。
+
     S["真实观测 + persistent state"] --> C["生成 K 个动作/未来候选"]
     C --> V["预测任务价值"]
     C --> U["估计不确定性"]
@@ -331,11 +337,21 @@ WorldPack 当前 arXiv v3 的标题是 _Dynamic Frame Compression for Long-conte
 
 报告首次不可恢复错误的时间、loop-closure error、entity identity switches 和 event-state accuracy，比只报最长样片更有诊断力。
 
-## 8. 一套从运行规格到现实效用的分层协议
+## 8. 一套从运行规格到现实效用的 WM 报告栈
 
-单个总分会掩盖“画面好但动作错”或“短时准但规划会利用漏洞”。建议按层报告，上一层通过不代表下一层通过。
+单个总分会掩盖“画面好但动作错”或“短时准但规划会利用漏洞”。建议按层报告，上一层通过不代表下一层通过。这里使用 **WM0–WM6** 作为本章的局部报告栈，避免与[评测指南](evaluation.md)中面向能力主张的全局 **L0–L7 证据阶梯**混淆：WM0–WM1 是发布与系统前提，不是能力等级；WM2–WM6 才逐步对应全局证据。
 
-### L0：发布面与证据来源
+| 本章 WM 报告栈 | 对应的全局 L0–L7 | 解释 |
+|---|---|---|
+| WM0 发布面 | 不对应能力等级 | 只说明结论来自哪里、artifact 是否可得 |
+| WM1 系统规格 | 不对应能力等级 | 只说明速度、延迟、动作频率与内存边界 |
+| WM2 open-loop 感知 | L0–L2 | 从渲染质量到时间、语义与物理诊断 |
+| WM3 状态与动作 | L3 | 给定动作后的状态转移是否正确 |
+| WM4 反事实与不确定性 | L4 | 换动作时是否产生正确且校准的分支 |
+| WM5 规划与决策 | L5–L6 | 先验证闭环 rollout，再验证策略排序与决策收益 |
+| WM6 现实迁移 | L7 | 是否在独立真实系统中改善成功率、安全或数据效率 |
+
+### WM0：发布面与证据来源
 
 对每一个结论记录：
 
@@ -344,7 +360,7 @@ WorldPack 当前 arXiv v3 的标题是 _Dynamic Frame Compression for Long-conte
 - 论文 checkpoint 是否等同公开 checkpoint，公开小模型是否等同在线大 demo；
 - 数字来自 peer-reviewed paper、arXiv、作者项目、代码 README 还是厂商发布。
 
-### L1：系统与运行规格
+### WM1：系统与运行规格
 
 | 字段 | 统一报告方式 | 常见误读 |
 |---|---|---|
@@ -355,25 +371,25 @@ WorldPack 当前 arXiv v3 的标题是 _Dynamic Frame Compression for Long-conte
 | Memory | context frames/tokens、KV 大小、landmark/entity store、增长率 | “支持长视频”等于有 persistent state |
 | Latency | p50/p95 sense-to-act、first-frame、replan latency | 用平均 FPS 掩盖长尾卡顿 |
 
-### L2：open-loop perceptual quality
+### WM2：open-loop perceptual quality
 
 在 teacher-forced 或固定动作序列下报告 FVD/LPIPS/SSIM、human preference、temporal artifacts，并把 camera motion、对象运动、接触和遮挡分层。此层只回答“未来看起来怎样”，不能回答“动作是否正确”。
 
-### L3：state 与 action fidelity
+### WM3：state 与 action fidelity
 
 - 从生成视频提取对象 pose、速度、接触、关节状态和任务事件，与真值轨迹比较；
 - 计算 action-conditioned transition error、action recognizability、inverse-dynamics consistency；
 - 对 no-op、相反动作、无效动作和边界动作分别报告；
 - 检查 visual action、proprioception 与真实控制命令是否时序对齐。
 
-### L4：counterfactual 与不确定性
+### WM4：counterfactual 与不确定性
 
 - 同初态、多动作、多随机种子成对比较；
 - 测 causal effect error、branch coverage、calibration error、negative log-likelihood 或 risk–coverage curve；
 - 设计 OOD 动作组合、未见对象关系和接触条件；
 - 对“高价值但高 uncertainty”的候选，验证 conservative scoring 是否降低灾难失败。
 
-### L5：planning / decision utility
+### WM5：planning / decision utility
 
 世界模型必须在独立真值环境中接受考试：
 
@@ -385,9 +401,9 @@ WorldPack 当前 arXiv v3 的标题是 _Dynamic Frame Compression for Long-conte
 
 WorldGym 把 action-conditioned video model 当作 policy evaluation environment，用 Monte Carlo rollouts 与视觉语言模型 reward 评估 VLA policy；作者报告模型内成功率与真机成功率高度相关，并能保留不同版本、规模和 checkpoint 的相对排序 [[28]](#ref-28)。论文同时明确指出真实物体交互仍难生成，因此“ranking 可用”与“绝对转移可信”仍是两个问题。
 
-### L6：real-world transfer
+### WM6：real-world transfer
 
-最后报告冻结/微调设置、真实机器人与相机、任务数、重复次数、成功率置信区间、干预次数、故障类别和 sim-to-real gap。若只在生成器自身 rollout 中评估 planner，仍停留在 L5 之前。
+最后报告冻结/微调设置、真实机器人与相机、任务数、重复次数、成功率置信区间、干预次数、故障类别和 sim-to-real gap。若只在生成器自身 rollout 中评估 planner，不应记为通过 WM5，更不能据此支持全局 L7 的现实效用主张。
 
 ### 8.1 新评测集各自补哪块证据
 
@@ -402,12 +418,12 @@ WorldGym 把 action-conditioned video model 当作 policy evaluation environment
 
 | 层级 | 指标 | 短 horizon | 长 horizon | In-distribution | OOD |
 |---|---|---:|---:|---:|---:|
-| L1 系统 | FPS、action Hz、p95 latency、memory | ✓ | ✓ | ✓ | ✓ |
-| L2 感知 | perceptual/temporal quality | ✓ | ✓ | ✓ | ✓ |
-| L3 状态动作 | pose/contact/event/action fidelity | ✓ | ✓ | ✓ | ✓ |
-| L4 反事实 | paired intervention、calibration | ✓ | ✓ | ✓ | ✓ |
-| L5 决策 | ranking、regret、exploitation gap | ✓ | ✓ | ✓ | ✓ |
-| L6 现实 | success、safety、transfer gap | ✓ | ✓ | ✓ | ✓ |
+| WM1 系统 | FPS、action Hz、p95 latency、memory | ✓ | ✓ | ✓ | ✓ |
+| WM2 感知 | perceptual/temporal quality | ✓ | ✓ | ✓ | ✓ |
+| WM3 状态动作 | pose/contact/event/action fidelity | ✓ | ✓ | ✓ | ✓ |
+| WM4 反事实 | paired intervention、calibration | ✓ | ✓ | ✓ | ✓ |
+| WM5 决策 | ranking、regret、exploitation gap | ✓ | ✓ | ✓ | ✓ |
+| WM6 现实 | success、safety、transfer gap | ✓ | ✓ | ✓ | ✓ |
 
 ## 9. 2025–2026 重点工作的证据地图
 
@@ -441,7 +457,7 @@ WorldGym 把 action-conditioned video model 当作 policy evaluation environment
 
 一个可接受的能力表述模板是：
 
-> 在【指定数据、任务、动作空间和硬件】下，该系统以【级联/联合】方式把未来预测用于【数据生成/规划/动作输出】，通过【L2–L6 中的具体证据】支持【有限结论】；其【长期状态、反事实、OOD、不确定性或现实迁移】仍未被相应实验验证。
+> 在【指定数据、任务、动作空间和硬件】下，该系统以【级联/联合】方式把未来预测用于【数据生成/规划/动作输出】，通过【WM2–WM6 中的具体证据】支持【有限结论】；其【长期状态、反事实、OOD、不确定性或现实迁移】仍未被相应实验验证。能力结论另按全局 L0–L7 标注。
 
 ## 11. 推荐阅读路径
 
@@ -450,7 +466,7 @@ WorldGym 把 action-conditioned video model 当作 policy evaluation environment
 3. 从 Genie、GameNGen、DIAMOND、Oasis 理解 latent action、实时交互与 model exploitation。
 4. 从 DreamGen、WAV、ViPRA、DreamZero 比较级联和联合 WAM。
 5. 从 WorldPack、Infinite-World、两篇 ReWorld 理解 compression、persistent state 与 reward/verifier 的不同职责。
-6. 最后用 L0–L6 协议审查每个新发布，而不是把产品 demo、paper 和 checkpoint 混为一种证据。
+6. 最后用 WM0–WM6 报告栈审查每个新发布，再映射到全局 L0–L7；不要把产品 demo、paper 和 checkpoint 混为一种证据。
 
 相邻章节：[动作条件预测](tasks/action-conditioned-prediction.md)、[交互式世界生成](tasks/interactive-world-generation.md)、[循环预测](generative-models/recurrent-prediction.md)、[JEPA](jepa.md)、[物理一致性](physical-consistency.md)与[评测指南](evaluation.md)。
 

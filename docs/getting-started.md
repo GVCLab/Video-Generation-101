@@ -43,6 +43,8 @@
 
 可以把它理解成：模型不逐像素背诵整段视频，而是先写成一份紧凑的内部速记，保留人物、场景、运动和变化所需的信息。
 
+这是**表示层**的选择，并没有说明后面的生成器采用自回归、掩码预测、扩散还是流匹配。更小的 tensor 也不自动等于可传输的“码率”：只有进一步定义量化、概率模型、熵编码和可解码 bitstream，才可报告 bpp 或 bitrate。表示预算与生成式压缩的完整边界见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)。
+
 ### 第 4 步：反复练习恢复视频
 
 现代视频生成模型常用的训练方法，是故意把视频的内部表示打乱、遮住或加入噪声，再让模型尝试恢复它。模型做错后，训练程序会告诉它误差有多大，并调整内部参数。
@@ -210,6 +212,10 @@
 
 不一定。普通视频模型主要生成看起来合理的画面；面向决策的 world model 还要接受动作，保持环境状态，并能预测不同动作的不同后果。具体边界见 [从视频生成到 World Model](world-models.md)。
 
+### “相机能绕着物体移动，就证明模型有完整 3D/4D 世界吗？”
+
+不一定。一段相机控制视频在每个时刻只展示一个视角；模型可能让这条路径看起来连贯，却无法在同一时刻生成彼此一致的其他视角。更强的多视角/4D 主张还要检查相机 × 时间网格、遮挡、重投影、回到旧视点时是否仍是同一场景，以及能否形成可重复查询的动态状态。直观坐标图见[多视角与 4D 生成](tasks/multiview-4d-generation.md)。
+
 ## 六、现在应该怎样阅读这个仓库
 
 不建议按文件顺序从头读到尾。先建立全流程，再根据自己的问题选择路线。
@@ -229,8 +235,8 @@
 
 ### 路线 B：我是内容创作者或产品使用者
 
-1. [任务地图](taxonomy.md)：先确定自己需要文生视频、图生视频、视频编辑、数字人、原生音视频还是显式相机/轨迹控制。
-2. 对应任务专章：例如 [文生视频](tasks/text-to-video.md)、[图生视频](tasks/image-to-video.md)、[视频到视频](tasks/video-to-video.md)、[数字人](tasks/digital-human.md)、[原生音视频](tasks/native-audio-video-generation.md)或[细粒度可控生成](tasks/controllable-video-generation.md)。
+1. [任务地图](taxonomy.md)：先确定自己需要文生视频、图生视频、视频编辑、视频退化修复、缺失区域补全、数字人、原生音视频、显式相机/轨迹控制，还是多视角/4D 动态资产。
+2. 对应任务专章：例如 [文生视频](tasks/text-to-video.md)、[图生视频](tasks/image-to-video.md)、[视频到视频](tasks/video-to-video.md)、[视频退化修复](tasks/video-restoration.md)、[视频补全](tasks/video-inpainting.md)、[数字人](tasks/digital-human.md)、[原生音视频](tasks/native-audio-video-generation.md)、[细粒度可控生成](tasks/controllable-video-generation.md)或[多视角与 4D](tasks/multiview-4d-generation.md)。
 3. [相关应用](applications.md)：了解工作流怎样落到真实场景。
 4. [评测指南](evaluation.md)：建立自己的测试提示、失败标签和多次生成协议。
 
@@ -238,12 +244,13 @@
 
 ### 路线 C：我是工程师，想知道模型内部怎样实现
 
-1. [生成模型路线](generative-models.md)：理解 VAE、GAN、Diffusion 和 Flow 的关系。
-2. [大模型路线](foundation-models.md)：理解视频压缩、token、Transformer 和基础模型。
-3. [视频后训练与对齐](generative-models/video-post-training-alignment.md)：区分 SFT、reward、DPO/RL、推理 guidance 与少步蒸馏。
-4. [开放模型与代码](../resources/open-models.md)：选择可以实际运行的模型。
-5. [数据集索引](../resources/datasets.md)：了解训练与评测数据。
-6. [评测指南](evaluation.md)：设计可重复的比较实验。
+1. [生成模型路线](generative-models.md)：先分清 representation、factorization、objective、backbone 与 deployment 五个正交层，不把 VAE、Transformer、Diffusion 和 Flow 当成互斥整机标签。
+2. [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)：理解连续 latent、离散 token、量化、时空预算与真实 bitstream 的边界。
+3. [大模型路线](foundation-models.md)：理解 tokenizer、generator、Transformer、后训练与基础模型系统怎样组合。
+4. [视频后训练与对齐](generative-models/video-post-training-alignment.md)：区分 SFT、reward、DPO/RL、推理 guidance 与少步蒸馏。
+5. [开放模型与代码](../resources/open-models.md)：选择可以实际运行的模型。
+6. [数据集索引](../resources/datasets.md)：了解训练与评测数据。
+7. [评测指南](evaluation.md)：设计可重复的比较实验。
 
 建议先理解每种方法解决了什么问题，再进入公式和代码。
 
@@ -251,8 +258,8 @@
 
 1. [技术时间线](timeline.md)：理解这个领域为什么从运动预测走向 Diffusion 和 world model。
 2. [精选阅读列表](reading-list.md)：从最小阅读集开始，不要一开始追求读完所有论文。
-3. 选择一个具体轴：长时一致性、控制、物理、效率、评测或交互。
-4. 阅读对应专题，例如 [视频预测](tasks/video-prediction.md)、[视频后训练与对齐](generative-models/video-post-training-alignment.md)、[细粒度可控生成](tasks/controllable-video-generation.md)、[原生音视频](tasks/native-audio-video-generation.md)、[物理一致性](physical-consistency.md)或 [World Model](world-models.md)。
+3. 选择一个具体轴：视频表示/tokenizer、长时一致性、退化逆问题、控制、多视角/4D、物理、效率、评测或交互。
+4. 阅读对应专题，例如 [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)、[视频预测](tasks/video-prediction.md)、[视频退化修复](tasks/video-restoration.md)、[视频后训练与对齐](generative-models/video-post-training-alignment.md)、[细粒度可控生成](tasks/controllable-video-generation.md)、[多视角与 4D](tasks/multiview-4d-generation.md)、[原生音视频](tasks/native-audio-video-generation.md)、[物理一致性](physical-consistency.md)或 [World Model](world-models.md)。
 5. 用 [引用与代码索引](bibliography.md) 找论文、官方代码和可复现 baseline。
 
 研究时不要只收集“最新模型”。更重要的是明确任务、比较对象、失败条件和验证证据。

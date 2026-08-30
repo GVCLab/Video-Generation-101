@@ -41,7 +41,7 @@ $$
 | 轴 | 选项 | 必须固定的合同 |
 |---|---|---|
 | 编辑范围 | local / masked；global | 局部任务报告 mask 外泄漏；全局任务列出仍需保留的身份、布局、运动或镜头 |
-| 编辑内容 | appearance；object；motion；camera / geometry；restoration | “换材质”和“改轨迹”不能共用一个模糊的文本相似度验收 |
+| 编辑内容 | appearance；object；motion；camera / geometry | “换材质”和“改轨迹”不能共用一个模糊的文本相似度验收；restoration 是邻接合同而非编辑内容标签 |
 | 条件接口 | instruction；mask / box；reference；track / pose / depth / camera；组合条件 | 说明哪个条件具有冲突时优先级，以及条件是否逐帧对齐 |
 | 会话形态 | one-shot；multi-turn；streaming | 多轮需保存状态与撤销点；流式需声明可见未来、缓冲区和端到端延迟 |
 
@@ -54,7 +54,8 @@ $$
 | 源 RGB 视频 + 指令 / 参考 / 控制 → 同一场景的反事实视频 | 是 | 源视频不可被移除；需同时验收 edit success 与 preservation |
 | 局部对象替换、删除、重着色或动作修改 | 是 | 编辑区与保留区可写明；删除若目标是恢复遮挡背景，也与 inpainting 相交 |
 | 全局风格、天气或域翻译 | 是，但属于 global edit | 不能用“全画面都变”免除结构、身份和运动守恒 |
-| 缺失像素补全、去污点、超分、去模糊 | 邻接任务 | 目标是恢复同一语义内容；详见[视频修复与补全](video-inpainting.md) |
+| 超分、去模糊、去噪、去压缩或复合低质恢复 | 邻接任务 | 全帧通常仍有退化观测；详见[视频退化修复](video-restoration.md) |
+| 缺失像素补全、对象移除后背景生成、outpainting | 邻接任务 | 未知支持由 mask 指定或估计；详见[视频补全](video-inpainting.md) |
 | 单图 / 首帧 + 文本 → 视频 | 否 | 图像是时间锚点而非待编辑视频；详见[图像到视频](image-to-video.md) |
 | 语义图 / pose / depth 视频 → RGB 视频 | 视合同而定 | 若源 RGB 不参与或可丢弃，是 conditional synthesis / translation；vid2vid 属于历史上的 video translation [[3]](#ref-3) |
 | 相机轨迹 + 文本 → 新场景 | 否 | 是 camera-conditioned generation |
@@ -65,14 +66,16 @@ $$
 ```mermaid
 flowchart TD
     accTitle: 严格视频到视频编辑的边界判定
-    accDescr: 先判断是否有完整源视频，再判断源视频是否定义待修改时间轴，最后按恢复、局部反事实、全局反事实、相机重定位或未来预测分流。
+    accDescr: 先判断是否有完整源视频，再判断源视频是否定义待修改时间轴；若目标是恢复原内容，继续区分全帧退化观测与由 mask 指定的缺失支持，其余再按局部反事实、全局反事实、运动或相机重定位分流。
 
     q0["一个视频条件任务"] --> q1{"有完整源视频 X 吗？"}
     q1 -- "否" --> gen["I2V / T2V / conditional synthesis\n不是严格 V2V"]
     q1 -- "是" --> q2{"输出要修改 X 的既有时间轴吗？"}
     q2 -- "否，仅用作驱动或历史" --> other["animation / continuation\n不是严格 V2V"]
     q2 -- "是" --> q3{"目标只是恢复原内容吗？"}
-    q3 -- "是" --> restore["restoration / inpainting\n邻接任务"]
+    q3 -- "是" --> q_restore{"全帧退化还是缺失支持？"}
+    q_restore -- "blur / noise / SR / compression" --> restore["degradation restoration\n邻接任务"]
+    q_restore -- "mask / missing support" --> inpaint["video inpainting\n邻接任务"]
     q3 -- "否" --> q4{"改变的是什么？"}
     q4 -- "局部内容" --> local["local V2V\n硬或软编辑区"]
     q4 -- "全局外观或语义" --> global["global V2V\n仍需守恒结构"]
@@ -80,18 +83,18 @@ flowchart TD
     q4 -- "相机 / 视角" --> view["novel-view editing\n同一动态场景"]
 ```
 
-**顺序化文字替代：** 先确认存在完整源视频；再确认输出修改的是这条既有时间轴，而非把它当驱动或历史。若目标只是恢复原内容，归入 restoration / inpainting。其余按局部、全局、运动或相机 / 视角编辑分流，每一支都同时写出编辑目标和守恒目标。
+**顺序化文字替代：** 先确认存在完整源视频；再确认输出修改的是这条既有时间轴，而非把它当驱动或历史。若目标只是恢复原内容，再判断是全帧退化观测的 restoration，还是由 mask 指定缺失支持的 inpainting。其余按局部、全局、运动或相机 / 视角编辑分流，每一支都同时写出编辑目标和守恒目标。
 
 ## 2. 方法选择器：控制越强，证据合同越具体
 
-![视频到视频任务合同选择器：从同一源视频与可选 instruction、mask、domain、reference、audio 或 pose 条件出发，按恢复、外观翻译、语义编辑和重定时四种输出关系分流，并分别检查编辑成功、源保真、局部性、时间一致和身份/运动守恒。](../../assets/diagrams/video-to-video-method-selector.png)
+![视频到视频任务合同选择器：从同一源视频与可选 instruction、mask、domain、reference、audio 或 pose 条件出发，先把图中的广义 restoration 或 completion 入口继续拆成全帧退化修复与缺失支持补全，再与外观翻译、语义编辑和重定时分流，并分别检查编辑成功、源保真、局部性、时间一致和身份或运动守恒。](../../assets/diagrams/video-to-video-method-selector.png)
 
-**图注：** 四条路线先写“允许改变什么”和“必须保留什么”，再交付输出视频与 edit ledger。A 路 restoration / completion 是严格语义 V2V 的邻接任务，保留在选择器中是为了防止误路由；B–D 分别扩大到外观、语义与时间/运动结构。右侧五个验收轴彼此独立，不能用 edit success 掩盖整帧重绘。未来预测与首帧动画不修改完整源时间轴，属于不同合同。
+**图注：** 四条路线先写“允许改变什么”和“必须保留什么”，再交付输出视频与 edit ledger。A 路是邻接任务入口，图中的 `restoration / completion` 必须继续拆成[全帧退化逆问题](video-restoration.md)与[mask 缺失支持补全](video-inpainting.md)，不能共用一份验收；B–D 分别扩大到外观、语义与时间/运动结构。右侧五个验收轴彼此独立，不能用 edit success 掩盖整帧重绘。未来预测与首帧动画不修改完整源时间轴，属于不同合同。
 
 **图的顺序化文字替代：**
 
 1. 输入先固定完整源视频；instruction、mask/track、target domain、reference、audio/pose 只是可选控制。
-2. 若目标是恢复缺失或损坏内容，进入 restoration / completion，并冻结身份、时序和未遮挡区域。
+2. 若目标是逆转 blur、noise、downsample 或 compression，进入 degradation restoration；若目标是补 mask 缺失支持，进入 completion / inpainting。两者都冻结身份与时序，但只有后者具有 mask 外像素硬保护。
 3. 若只改变风格或域，进入 appearance translation，并保留身份、运动、几何和时间。
 4. 若增删、替换或重照明指定内容，进入 semantic edit，并把改动限制在请求区域或属性及其必要环境效应。
 5. 若改变速度、运动路径或镜头结构，进入 retime / restructure，并显式冻结身份和因果连续性。
@@ -164,6 +167,8 @@ Movie Gen 把视频生成与精确编辑纳入同一媒体基础模型族 [[14]]
 MotionFollower 用 pose / appearance controllers 和 score guidance 改变主体运动并保留外观与背景 [[22]](#ref-22)；MotionV2V 构造 motion counterfactual，以稀疏轨迹改变对象运动同时保留外观 [[23]](#ref-23)；3D Point Tracks 方法进一步把深度、遮挡与源 / 目标三维点轨迹写入运动合同 [[24]](#ref-24)。TrajectoryCrafter [[25]](#ref-25) 与 ReCamMaster [[26]](#ref-26) 面向新轨迹 / 新相机视角，只有当它们保持同一动态场景状态时才属于 V2V 的 novel-view edit。
 
 V-RGBX 先把视频分解为反照率、法线、材质和照明，再做 intrinsic-aware 编辑 [[27]](#ref-27)；V2Edit 同时面向视频和三维场景 [[28]](#ref-28)。这一路线更适合检验遮挡、光照和几何，却要求可靠深度、相机或内禀估计。所谓“4D-aware”若没有跨视角 / 时间的几何证据，仍可能只是更强的视频先验。
+
+编辑主张一旦扩展到“所有视角、所有时刻保持同一变化”，就要从像素保持合同升级为 camera-time grid、重投影、遮挡、loop closure 与可渲染状态合同；完整测试见[多视角与 4D 生成](multiview-4d-generation.md)。
 
 ### 3.8 记忆、多轮与流式：状态管理成为模型合同的一部分
 
@@ -335,7 +340,7 @@ $$
 
 ## 11. 建议阅读路径
 
-- **理解任务边界：** 先读本页第 1 节，再读[图像到视频](image-to-video.md)、[视频修复与补全](video-inpainting.md)和[任务分类](../taxonomy.md)。
+- **理解任务边界：** 先读本页第 1 节，再读[图像到视频](image-to-video.md)、[视频退化修复](video-restoration.md)、[视频补全](video-inpainting.md)和[任务分类](../taxonomy.md)。
 - **理解测试时编辑：** Dreamix → FateZero → Pix2Video → TokenFlow → AnyV2V。
 - **理解原生编辑模型：** VACE → EditVerse / UNIC → EasyV2V / Ditto → EditCtrl / VIVA / CoT-Edit。
 - **理解运动与几何：** MotionFollower → MotionV2V → 3D Point Tracks → ReCamMaster → V-RGBX。

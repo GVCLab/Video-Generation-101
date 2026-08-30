@@ -4,7 +4,7 @@
 
 视频基础模型不是“一个更大的 T2V 网络”，而是一条可复用、可后训练、可部署且可审计的链：数据治理产生训练语料，captioner 把视觉事实和创作语言对齐，tokenizer 决定学习空间，generator 学习条件分布，后训练与蒸馏改变行为和成本，超分、插帧、音频、安全及 API 再把 checkpoint 变成服务。Foundation model 的判据是广泛预训练后可跨任务适配，而非固定参数门槛 [[1]](#ref-1)。
 
-本章回答“一个视频基础模型系统怎样成立、证据应归因给哪一层”。表示、factorization、objective、backbone 与 deployment 的正交机制见[生成模型路线](generative-models.md)，SFT/reward/DPO/RL 的细分见[视频后训练与对齐](generative-models/video-post-training-alignment.md)，相机/轨迹/姿态/几何条件见[细粒度可控生成](tasks/controllable-video-generation.md)，联合声画合同见[原生音视频生成](tasks/native-audio-video-generation.md)，逐年节点见[技术时间线](timeline.md)，动作条件、状态与规划证据见[World Model 专章](world-models.md)。
+本章回答“一个视频基础模型系统怎样成立、证据应归因给哪一层”。表示、factorization、objective、backbone 与 deployment 的正交机制见[生成模型路线](generative-models.md)，其中连续 latent、离散 token、量化与生成式压缩的表示合同见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)，causal codec→generator→commit→SLO 的部署合同见[因果、流式与实时](generative-models/causal-streaming-generation.md)；SFT/reward/DPO/RL 的细分见[视频后训练与对齐](generative-models/video-post-training-alignment.md)，相机/轨迹/姿态/几何条件见[细粒度可控生成](tasks/controllable-video-generation.md)，相机 × 世界时间、多视角网格与可渲染动态状态见[多视角与 4D](tasks/multiview-4d-generation.md)，联合声画合同见[原生音视频生成](tasks/native-audio-video-generation.md)，逐年节点见[技术时间线](timeline.md)，动作条件、状态与规划证据见[World Model 专章](world-models.md)。
 
 ## 1. 先固定研究对象与证据单位
 
@@ -56,7 +56,7 @@ flowchart LR
 
 1. 先冻结素材权利、来源和版本，再做切镜、质量/安全过滤与近重复去除。
 2. captioner 和元数据管线把镜头、主体、动作、摄影与音频条件结构化，随后按任务、时长和质量分层采样。
-3. tokenizer 压缩视频/音频，generator 在该表示空间预训练；SFT、偏好优化或 RL 再改变条件遵循和输出分布。
+3. tokenizer 把视频/音频编码为紧凑表示，generator 在该表示空间预训练；只有含量化、概率模型、熵编码与可解码 bitstream 的 codec 才能把这种紧凑性报告为实际码率。SFT、偏好优化或 RL 再改变条件遵循和输出分布。
 4. 蒸馏、量化和任务适配产生可部署 checkpoint；编排器还可能调用超分、插帧、修复和独立音频模块。
 5. 输入/输出安全、来源声明和版本化 API 形成服务面；离线评测、在线 SLO 与事故样本回流到数据和后训练。
 
@@ -100,15 +100,15 @@ captioner 不是中性标注工具，而是第二个学习系统。SkyReels-V2 �
 
 | 层 | 主要选择 | 对系统的影响 | 不能只看什么 |
 |---|---|---|---|
-| 视频 tokenizer | 离散 code 或连续 latent；因果/双向；时空压缩率 | 序列长度、重建细节、流式可用性、generator 成本 | 单张重建图或平均 PSNR |
+| 视频 tokenizer | 离散 code 或连续 latent；因果/双向；时空网格、dtype 与元素/token 预算；有真实 bitstream 时才含码率 | 序列长度、重建细节、流式可用性、generator 成本 | 单张重建图、平均 PSNR，或把 tensor shape 当作 bpp/bitrate |
 | 音频 tokenizer | codec token 或连续 VAE latent；采样率与帧率 | 口型同步、音乐节拍、跨模态 attention 成本 | 音频是否“听起来有声” |
 | 条件编码 | 文本编码器、视觉参考、mask、轨迹、相机与音频 | 可控范围、条件冲突、显存与缓存 | UI 能上传某种素材 |
 | generator | AR/masked/diffusion/flow；全双向、因果或层级 factorization | 质量—延迟、可缓存性、长时漂移 | “Transformer”或“flow”标签 |
 | decoder | 单阶段或分层 VAE、tile decode、细节模块 | 实际分辨率、边界伪影、峰值显存 | base latent 的名义尺寸 |
 
-tokenizer 的验收必须同时覆盖：静态纹理、快速运动、镜头切换、细线与文字、人脸、循环重编码、长片漂移和音画对齐。2026 年的 V-RAE 与 VideoRAE 预印本进一步主张 latent 应同时服务语义可学习性与生成，而非只追求像素重建 [[9]](#ref-9) [[10]](#ref-10)；这是值得验证的前沿假设，不是已经形成的正式共识。
+tokenizer 的验收必须同时覆盖：静态纹理、快速运动、镜头切换、细线与文字、人脸、循环重编码、长片漂移和音画对齐；还应把 tokenizer 重建与下游 generator 质量拆开归因。没有量化、概率模型、熵编码与可解码 bitstream 时，只报告 latent/token 的精确 shape、dtype、时空网格及元素/token 数，不报告 bpp 或 bitrate。完整定义、预算口径与对照实验见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)。2026 年的 V-RAE 与 VideoRAE 预印本进一步主张 latent 应同时服务语义可学习性与生成，而非只追求像素重建 [[9]](#ref-9) [[10]](#ref-10)；这是值得验证的前沿假设，不是已经形成的正式共识。
 
-架构命名也不能替代机制分解。例如 Wan2.2-A14B 的 MoE 专家按去噪时间阶段路由，而 TI2V-5B 使用更高压缩 VAE；两者属于同一产品家族，但不是同一 checkpoint 的两个开关 [[11]](#ref-11)。详细五轴分类与公式见[生成模型路线](generative-models.md)。
+架构命名也不能替代机制分解。例如 Wan2.2-A14B 的 MoE 专家按去噪时间阶段路由，而 TI2V-5B 使用更紧凑的 VAE 表示；两者属于同一产品家族，但不是同一 checkpoint 的两个开关 [[11]](#ref-11)。详细五轴分类与公式见[生成模型路线](generative-models.md)，表示层的量化与 codec 边界见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)。
 
 ## 5. 预训练之后：行为、成本与最终画面来自不同阶段
 
@@ -124,7 +124,7 @@ tokenizer 的验收必须同时覆盖：静态纹理、快速运动、镜头切�
 
 “蒸馏版”可能改变步数、CFG、模型大小、因果方向或输出分布，不能与 base checkpoint 混报。CausVid 把双向 teacher 蒸馏成少步因果 student，展示了质量、时间 factorization 和部署优化的耦合 [[14]](#ref-14)；LTX、HunyuanVideo-1.5、Wan 与 MAGI 又各自发布了不同粒度的蒸馏或任务资产。
 
-每个部署变体至少单列：teacher、student、目标函数、NFE、guidance、精度、量化、分辨率/帧数、峰值显存、首帧延迟、稳态吞吐和质量损失。只报“实时”而没有硬件、batch、预热、编解码和后处理口径，不构成系统结论。
+每个部署变体至少单列：teacher、student、目标函数、sampling steps 与 hook 得到的真实 NFE、guidance、精度、量化、分辨率/帧数、峰值显存、首帧延迟、稳态吞吐和质量损失。若声称 streaming，还要冻结 commit 单元/hash、lookahead、revision、条件生效点、backpressure 与 cache reset；只报“实时”而没有硬件、batch、预热、编解码、负载、尾延迟和恢复口径，不构成系统结论。
 
 ### 5.3 SR、插帧与 refinement
 
@@ -219,7 +219,7 @@ API 验收还应冻结 endpoint、模型版本、seed 语义、上传/保留政�
 | 从“重建好”到“可生成的 latent” | V-RAE、VideoRAE 尝试让 representation 同时保留感知与语义结构 [[9]](#ref-9) [[10]](#ref-10) | 同 generator、同数据、同训练预算的 tokenizer 替换实验 |
 | 原生音视频成为主路径 | LTX-2、Ovi、Seedance 2.0、H3 分别展示单流、双 backbone 或产品级联合 A/V | 事件同步、说话人一致、跨镜头声音状态和单模态干预 |
 | 后训练从单一 SFT 变为行为闭环 | 运动 reward、DPO/RL、难例回流与系统化 post-train 增多 [[2]](#ref-2) [[13]](#ref-13) | reward 数据、标注者、on/off-policy、模式收缩与安全副作用 |
-| 因果块与少步 student 服务长视频 | Diffusion Forcing、CausVid、MAGI、SkyReels 将时间 factorization 与蒸馏组合 [[14]](#ref-14) [[35]](#ref-35) | 随 horizon 的漂移曲线、首帧延迟、稳态 FPS、缓存增长和恢复策略 |
+| 因果块与少步 student 服务长视频 | Diffusion Forcing、CausVid、SCD、FlowCache 与 streaming serving 分别改动 noise、训练历史、架构、cache 和系统层 [[14]](#ref-14) [[35]](#ref-35) | codec/generator/commit/SLO 四层 future-leak、hash、horizon、尾延迟、缓存/外存和恢复证据 |
 | 模型发布转向可编排包 | DFR、任务权重、LoRA、upscaler、API-compatible serving 被一起交付 | 锁定 manifest 后的端到端复现；模块消融和许可证传递 |
 
 这些方向多数仍以预印本、技术报告或官方 release 为主。2026 的“前沿”表示证据新、系统影响大，不表示已经通过多年同行检验。
@@ -229,11 +229,11 @@ API 验收还应冻结 endpoint、模型版本、seed 语义、上传/保留政�
 | 里程碑 | 通过判据 | 仍未解决 |
 |---|---|---|
 | M0 可审计数据引擎 | 来源/权利、过滤、去重、caption、切分和版本可追踪；污染抽检可复跑 | 大规模权利证明、删除后模型影响、文化/地域偏差 |
-| M1 可用时空表示 | 在固定码率/压缩率下通过纹理、快速运动、文字、人脸、长时和循环重建测试 | 高压缩与微运动/几何细节冲突；语义 latent 的通用判据 |
+| M1 可用时空表示 | 在固定且精确的 shape、dtype、时空网格与元素/token 预算下通过纹理、快速运动、文字、人脸、长时和循环重建测试；仅真实 bitstream codec 可改用固定 bpp/bitrate | 紧凑表示与微运动/几何细节冲突；语义 latent 的通用判据 |
 | M2 开放域 base generator | 固定权重在未见概念、组合动作、多时长/宽高比上稳定；训练/采样配置完整 | 长尾事实、复杂交互、物理错误和高计算成本 |
 | M3 可适配 foundation model | 同一底座经轻量或明确后训练覆盖至少两类任务，并有 frozen-backbone 对照 | “共享”究竟来自 backbone、数据还是编排；能力干扰 |
 | M4 可控后训练系统 | SFT/preference/RL 数据与 reward 可审计，收益跨类别且不过度收缩 | reward hacking、人类偏好偏差、安全与创作自由冲突 |
-| M5 可部署模型家族 | base/distill/quant/task/SR 资产有 manifest；质量—延迟—显存 Pareto 可复跑 | 不同硬件 kernel、长时缓存、版本兼容和许可证组合 |
+| M5 可部署模型家族 | base/distill/quant/task/SR 资产有 manifest；质量—延迟—显存 Pareto 可复跑；流式变体另有 commit、负载、尾延迟与恢复 trace | 不同硬件 kernel、长时缓存、版本兼容和许可证组合 |
 | M6 原生音视频系统 | 固定版本通过语义、事件同步、身份、长时连续与单模态干预测试 | 高采样率音频成本、对白/音乐版权与多说话人控制 |
 | M7 可治理服务 | API/SLO/成本/保留政策、安全、provenance、撤回与事故响应可审计 | 托管漂移、越狱、来源真实性误读、跨地域合规 |
 | WM 动作条件分支 | 动作改变未来、状态持久、反事实一致、闭环规划收益均有独立环境证据 | 逼真视频不能替代动力学；详见[World Model 专章](world-models.md) |
@@ -246,14 +246,16 @@ M0–M7 不是按年份自动升级：一个闭源产品可能先达到系统部
 |---|---|---|---|
 | 数据 | snapshot、来源、权利、过滤器、去重域、split | 分层抽检；跨 split 近重复；来源删除回放 | 只给总规模；不能定位来源或污染 |
 | caption | checkpoint、prompt、解码参数、语言 | 物体/动作/时序/镜头/声音的事实与幻觉率 | caption 版本未知或以生成 caption 当真值 |
-| tokenizer | 权重、压缩率、码率、因果性、decode path | 快动、文字、人脸、切镜、循环与长时误差 | 只报平均重建指标或精选画面 |
+| tokenizer | 权重、shape、dtype、量化方式、时空网格、元素/token 预算、因果性与 decode path；若有 bitstream，再冻结概率模型、熵编码器与 bpp/bitrate | 快动、文字、人脸、切镜、循环与长时误差；固定 generator 的 tokenizer 替换 | 只报平均重建指标或精选画面；无 bitstream 却声称码率 |
 | base generator | checkpoint hash、条件编码器、scheduler、NFE、seed | 同提示多 seed；组合语义、时序、运动、长尾 | 把 LoRA/SR/重写器结果记为 base 输出 |
 | 后训练 | base、数据对、reward、算法、更新范围 | 分类别收益、diversity、安全与 reward hacking | 只报汇总 win-rate；base 同时变化 |
 | 蒸馏/量化 | teacher/student、步数、CFG、precision、kernel | 质量—延迟—显存 Pareto；冷/热启动 | “实时”无硬件、batch、编解码口径 |
 | 长视频 | chunk、overlap、cache、续写策略、最大 horizon | 随时间的身份/状态/事件/画质漂移曲线 | 只展示可继续采样；无固定长度统计 |
+| 因果/流式服务 | codec 与 generator future access、commit unit/hash、lookahead/revision、condition index、playback clock、load/backpressure/reset | future perturbation、1×/2×/6×/12× survival、cold/warm p95/p99、deadline miss、soak 与恢复 | causal codec 代替 generator 证据；平均 FPS 代替 commit/SLO |
 | SR/插帧 | 输入 base、模块权重、scale/FPS、tile | base/最终双报；文字、人脸、边界和运动消融 | 把后处理分辨率或 FPS 当作 base 原生能力 |
 | 音频 | joint/V2A 类型、codec/VAE、模态帧率 | 事件同步、说话人、跨镜头、静音与条件干预 | “有音频”被写成联合生成；只听主观样例 |
 | 多条件/编辑 | 每种条件、优先级、mask/参考编码、轮次 | 加入/删除/冲突条件消融；未编辑区域保持 | UI 接受文件但模型忽略条件 |
+| 多视角/4D | camera/time convention、同步、seen/reprojected/hallucinated mask、输出是像素网格还是状态 | freeze-time、freeze-camera、novel-view/time、重投影、遮挡、loop closure、build/query cost | 一条相机路径代替同刻多视角；renderer FPS 代替场景构建 |
 | 安全与 provenance | policy、classifier、阈值、watermark/C2PA、日志版本 | 分人群 red-team、误杀/漏检、去水印与申诉 | 用签名替代真实性判断；过滤器不可版本化 |
 | API/产品 | endpoint、模型版本、区域、SLO、价格、保留政策 | 超时/重试/idempotency、并发、版本回归 | 无法 pin 版本；产品能力反推开放权重 |
 | 开放性 | code、weights、recipe、data、license 五列 | 从干净环境按 manifest 复跑；逐依赖许可 | 仅仓库公开就称“完整开源/可商用” |
@@ -265,7 +267,7 @@ M0–M7 不是按年份自动升级：一个闭源产品可能先达到系统部
 1. 先读第 1、2 节，建立“checkpoint ≠ family ≠ product ≠ API”的证据单位。
 2. 再读第 3–6 节，沿数据→caption→tokenizer→generator→post-train→部署→治理追踪因果链。
 3. 用第 7 节定位官方 artifact，再到[开放模型索引](../resources/open-models.md)核对权重与许可证。
-4. 用第 9、10 节设计验收；生成机制细节转到[生成模型路线](generative-models.md)，行为优化转到[视频后训练与对齐](generative-models/video-post-training-alignment.md)，创作控制转到[细粒度可控生成](tasks/controllable-video-generation.md)，动作与规划声明转到[World Model 专章](world-models.md)。
+4. 用第 9、10 节设计验收；表示与 codec 转到[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)，生成机制细节转到[生成模型路线](generative-models.md)，commit/backpressure/open horizon 转到[因果、流式与实时](generative-models/causal-streaming-generation.md)，行为优化转到[视频后训练与对齐](generative-models/video-post-training-alignment.md)，创作控制转到[细粒度可控生成](tasks/controllable-video-generation.md)，相机—时间网格与可渲染状态转到[多视角与 4D](tasks/multiview-4d-generation.md)，动作与规划声明转到[World Model 专章](world-models.md)。
 
 本章的检索、筛选、证据分级和 release-surface 逐项记录见[研究日志](../sources/research_20260830_video_foundation_models.md)。
 

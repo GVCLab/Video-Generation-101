@@ -84,7 +84,7 @@ flowchart LR
 
 ### 2.4 开放世界没有单一参考视频
 
-PSNR、SSIM、VMAF 等 full-reference 指标原本适合比较同一内容的原始视频与压缩、传输或重建版本。文本生成视频则没有逐像素配准的“标准答案”。把压缩质量指标直接用于开放式生成，会把创意差异误判为失真。它们仍适合插帧、超分、视频恢复、可控编辑和确定性较强的短期预测，但不是开放式 T2V 的总分。
+PSNR、SSIM、VMAF 等 full-reference 指标原本适合比较同一内容的原始视频与压缩、传输或重建版本。文本生成视频则没有逐像素配准的“标准答案”。把压缩质量指标直接用于开放式生成，会把创意差异误判为失真。它们仍适合插帧、[视频退化修复](tasks/video-restoration.md)、可控编辑和确定性较强的短期预测，但不是开放式 T2V 的总分。
 
 ### 2.5 评测器本身也可能不懂视频
 
@@ -287,7 +287,7 @@ Benchmark 名称不足以复现结果。仓库或论文附录应为每次运行�
 ```yaml
 benchmark:
   name:
-  task_family: [generation, editing, reasoning, world_model]
+  task_family: [generation, editing, multiview_4d, reasoning, world_model]
   version_or_commit:
   release_date:
   accessed_at:
@@ -315,6 +315,18 @@ evidence:
 
 同名 benchmark 的论文版、项目页版和 leaderboard 当前版可能不同；API 模型和 judge 也会静默更新。版本、访问日期和 prompt hash 是结果的一部分，而不是补充信息。
 
+### 5.10 多视角 / 4D 要把 camera 与 world time 拆成测试网格
+
+相机控制视频只沿 camera–time 平面的一条路径采样，不能证明同一时刻的其他视角一致。多视角/4D 报告至少要分成：
+
+1. `seen-view / seen-time` 的输入证据保真；
+2. `novel-view / seen-time` 的重投影、epipolar 与 loop closure；
+3. `seen-view / novel-time` 的轨迹、显隐与运动；
+4. `novel-view / novel-time` 的联合外推和未见区域不确定性；
+5. 生成网格与可渲染状态的构建、查询、显存和资产大小。
+
+PSNR/LPIPS/FVD 只能覆盖其中一部分。深度、pose、3D track、surface/Chamfer、遮挡顺序和重复 query 稳定性必须按主张选用；不可见背面还要与有观测支持的区域分 mask。完整的六门证据链和 `GridFork-1` 见[多视角与 4D 生成](tasks/multiview-4d-generation.md)。
+
 ## 6. 自动指标到底测什么
 
 为了避免“指标名很多但证据重复”，可以把自动评价分成六类。
@@ -331,7 +343,9 @@ evidence:
 
 ### 6.1 有参考的保真指标
 
-PSNR、SSIM、LPIPS、VMAF、关键点误差、轨迹误差属于这一类。它们回答“输出与指定参考有多接近”。适合重建、超分、编辑保持、插帧和受控动作预测，不适合开放式创作的总体质量。对于 stochastic future，应报告 expected score、best-of-N 和样本覆盖，并明确三者含义不同。
+PSNR、SSIM、LPIPS、VMAF、关键点误差、轨迹误差属于这一类。它们回答“输出与指定参考有多接近”。适合重建、[视频退化修复](tasks/video-restoration.md)、编辑保持、插帧和受控动作预测，不适合开放式创作的总体质量。对于 stochastic future，应报告 expected score、best-of-N 和样本覆盖，并明确三者含义不同。
+
+对 restoration，full-reference 也只覆盖已配准、已知 ground truth 的设置。真实盲退化还要同时报告：退化器/codec/camera 是否未见、把输出重新退化后能否回到输入、flow/track 对齐后的闪烁、OCR/身份/物体计数是否被生成先验改写，以及多 seed 的高频不确定性。PSNR 高可能过平滑，无参考感知分高也可能来自合理但错误的纹理；至少应把 fidelity、temporal stability、perceptual detail 和 hallucination failure 分开。
 
 ### 6.2 无参考的单视频质量指标
 
@@ -487,9 +501,11 @@ WorldModelBench 在 2025 年开始专门用指令遵循、物理违规和大规�
 | 时间质量 | 闪烁、平滑、运动幅度 | motion/flow/track 指标 + 人评 | 合成时间破坏的 sensitivity 验证 |
 | 分布 | fidelity、coverage、多样性 | 同协议 FVD + precision/recall | 多 backbone、bootstrap CI、分层结果 |
 | 条件 | 文本/图像/姿态/轨迹遵循 | 原子事实与约束核验 | 检测、跟踪、VQA、人评交叉验证 |
+| 退化修复 | fidelity、时间稳定、感知细节、幻觉 | paired 指标 + 未见退化 + OCR/身份/闪烁 | 真实设备/codec shift、重退化一致性、多 seed 与高风险人工审计 |
 | 编辑 | edit success、源保留、局部性 | source/instruction 双条件 + mask/track 可选 | 真实长序列上的对象级与时间级副作用审计 |
 | 推理 | 问题、答案、合法中间状态、预算 | deterministic scorer + process violation | OOD 状态、长链、预算受控的 pass@k |
 | 长时结构 | 身份、状态、叙事、镜头 | horizon 切片与失败分类 | 回环、遮挡恢复、跨镜头实体测试 |
+| 因果/流式正确性 | future access、commit、revision、condition index | 相同 prefix/seed 下扰动隐藏未来；逐 commit hash 与边界检查 | codec/generator/commit/SLO 四层独立 probe、backpressure/reset 恢复 |
 | 物理 | 接触、重力、材料、守恒 | 专项 prompt + 物理人评 | 可控状态变量和仿真 ground truth |
 | 世界模型 | 动作、反事实、闭环 | paired intervention + rollout | 策略排序、实际任务 optimization lift |
 | 行为安全 | 有害输出、误拒、肖像/版权 | 红队 prompt + refusal/output taxonomy | 持续攻击、人工复核、部署监测 |
@@ -535,7 +551,7 @@ WorldModelBench 在 2025 年开始专门用指令遵循、物理违规和大规�
 | 使用方式 | 必须报告 | 常见遗漏 |
 |---|---|---|
 | 离线批量 | 冷/热启动、videos/hour、生成帧率、`RTF = 计算秒 / 输出视频秒`、峰值 device allocated/reserved、host RAM、offload、墙上能耗 | 只报最快一批；忽略编解码、加载与失败重试 |
-| 交互/streaming | time-to-first-frame/chunk、控制到可见响应、inter-frame p50/p95/p99、jitter、deadline miss、可持续 horizon、缓存/显存增长、miss 后恢复 | 只报平均延迟；短 demo 掩盖内存增长和尾延迟 |
+| 交互/streaming | causal codec/generator 边界、commit unit/hash、lookahead/revision、condition effective index、time-to-first-frame/chunk、控制到可见响应、inter-frame p50/p95/p99、jitter、deadline miss、可持续 horizon、GPU/CPU/外存增长、backpressure/reset 与 miss 后恢复 | 只报平均延迟；因果 mask 代替 commit 证据；短 demo 掩盖内存增长和尾延迟 |
 | 商业 API | 上传、排队、推理、编码、下载的端到端分解；I2V/编辑还要计源视频上传 | 只使用服务端宣称的 inference time；不计拒绝、超时和网络 |
 
 功耗应与 workload window 同步；优先用墙上功率，同时报告 gross energy 与扣除 idle baseline 后的 net energy。若只有 GPU telemetry，必须标为部分系统能耗。MLPerf Power 提供了同步负载窗口的工程参考 [[58]](#ref-58)；商业 API 可借鉴行业测量按 p05/p25/median/p75/p95 报端到端时间，但应标明其不是同行评审标准 [[59]](#ref-59)。
@@ -549,6 +565,14 @@ $$
 $$
 
 其中分母必须只计满足预设质量和安全门槛的输出，分子则包含拒绝、失败、超时和重试成本。SLO 可写成 `p95 latency ≤ T`，或等价地写“至少 95% 的合格请求在 $T$ 秒内完成”，避免混用比例与分位数，也避免把不可用视频算作吞吐。
+
+对 causal/streaming 声明，还要做三项不依赖感知评分的正确性测试：
+
+1. **future perturbation：**固定 prefix、seed 和当前条件，只改变隐藏 suffix、未来 prompt 或 padding；已提交前缀在声明 revision window 外必须逐元素或逐 hash 一致；
+2. **commit trace：**逐单元记录 speculative、decoded、committed、displayed 时间与内容 hash，明确 overlap/crop、lookahead、新条件生效索引和任何有界修订；
+3. **load/recovery：**在预注册单流与并发到达过程下运行至少 60 秒，记录 queue、降级、回压、drop/reject、cache reset、断流到恢复以及此后的质量。
+
+这三项分别检查信息不泄漏、输出不静默回改和系统在期限压力下仍遵守协议。causal codec 通过第一层测试，不意味着 generator、commit 或播放 SLO 也自动通过；详细四层合同与 `StreamFork-1` 见[因果、流式与实时专章](generative-models/causal-streaming-generation.md)。
 
 ### 10.8 行为安全、水印和 C2PA 2.4 的完整协议
 

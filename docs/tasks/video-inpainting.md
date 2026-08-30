@@ -1,6 +1,6 @@
-# 视频修复与补全：从可见像素传播到世界效应消除
+# 视频补全与对象移除：从可见像素传播到世界效应消除
 
-> 本章资料与 venue / artifact 状态核验截至 **2026-08-30**。这里的 video inpainting 指：给定源视频、逐帧缺失区域及可选语义条件，在保护已知区域的同时补全未知区域。对象移除、扩画幅、V2V 编辑和产品中的 generative fill 与它相邻，但验收合同并不相同。
+> 本章资料与 venue / artifact 状态核验截至 **2026-08-30**。这里的 video inpainting 指：给定源视频、逐帧缺失区域及可选语义条件，在保护已知区域的同时补全未知区域。对象移除、扩画幅、V2V 编辑和产品中的 generative fill 与它相邻，但验收合同并不相同。若全帧仍有观测、目标是逆转 blur、downsample、noise 或 compression，则属于[视频退化修复](video-restoration.md)，不使用本章的 mask 外硬保护合同。
 
 检索式、纳入/排除、证据等级、图像生成记录和冻结日验证见[配套研究记录](../../sources/research_20260830_video_inpainting.md)。
 
@@ -43,6 +43,7 @@ $$
 | **Video outpainting** | 原画布外区域未知、原画布内已知 | 扩大视野并保持原画布 | 对原画面做全局重绘 |
 | **Masked V2V editing** | 视频 + mask + 编辑条件 | 在局部执行替换、增添或重绘 | 必然恢复原始内容 |
 | **Generative fill** | 产品级区域选择 + prompt / reference | 产生一个用户可接受的候选 | 可复现实验协议或唯一模型能力 |
+| **Degradation restoration（邻接但不属于本章）** | 全帧 blur / noise / low-resolution / compression 观测 | 恢复同一场景的未退化信号 | 用 mask 内生成协议替代 fidelity、时序与幻觉审计 |
 
 对象 mask $m_{\text{obj}}$ 常常小于真正需要修改的支持集：
 
@@ -59,7 +60,7 @@ $$
 
 ```mermaid
 flowchart TD
-    accTitle: 视频修复、对象移除、扩画幅、局部编辑与生成填充的任务边界
+    accTitle: 视频补全、对象移除、扩画幅、局部编辑与生成填充的任务边界
     accDescr: 根据未知区域位于原画布内外、目标是否恢复原内容、是否需要删除对象效应以及是否允许修改已知区，把输入分到六种不同验收合同。
 
     start["源视频 + 时空 mask + 可选条件"] --> inside{"未知区在原画布内?"}
@@ -82,7 +83,7 @@ flowchart TD
 
 ## 🖼️ 3. 一张图读懂现代证据管线
 
-![视频修复证据管线：输入视频和红色斜线缺失区先经过带置信度与遮挡判断的蓝色有效像素传播，只有紫色残余洞进入 Transformer 或 Video DiT；重叠窗口、记忆与 scene-cut 重置负责全局时间检查，最终用绿色锁保护已知像素，并分别评测 mask 内质量、mask 外误差、warp error、时间和内存。](../../assets/diagrams/video-inpainting-evidence-pipeline.png)
+![视频补全证据管线：输入视频和红色斜线缺失区先经过带置信度与遮挡判断的蓝色有效像素传播，只有紫色残余洞进入 Transformer 或 Video DiT；重叠窗口、记忆与 scene-cut 重置负责全局时间检查，最终用绿色锁保护已知像素，并分别评测 mask 内质量、mask 外误差、warp error、时间和内存。](../../assets/diagrams/video-inpainting-evidence-pipeline.png)
 
 **图注：** 现代 video inpainting 的安全默认顺序是“可见则复制、不可见才生成、已知区最终锁定”。图中的 `MASK QUALITY` 是对输入 mask 覆盖、边界和时间连续性的诊断，不是输出保护证据；`OUTSIDE-MASK ERROR` 才直接检验已知区是否被改动。颜色之外还使用了斜线、箭头、闪光和锁作为冗余编码。该图由 AI 生成，prompt、文件哈希、尺寸与原图视觉检查见[研究记录](../../sources/research_20260830_video_inpainting.md)。
 
@@ -197,7 +198,7 @@ E²FGVI 把 flow completion、feature propagation 与 content hallucination 三�
 
 ```mermaid
 flowchart LR
-    accTitle: 视频修复中的误差传播与四道证据闸门
+    accTitle: 视频补全中的误差传播与四道证据闸门
     accDescr: flow、可见性、传播、生成、窗口记忆和最终合成依次通过独立检查；任何上游误差都可能污染后续锚点，因此同时保存置信度、残余洞和外部区审计。
 
     input["视频 x 与 hole mask m"] --> flow["估计并补全双向 flow"]

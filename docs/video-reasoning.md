@@ -386,10 +386,12 @@ The Seriality Gap in Video Diffusion Models 用可控的多球依赖链指出：
 
 **图注：** 三条横轴不是同一条时间线的不同名字。输出帧能让过程可读；去噪状态可能在整段视频成形前决定计划；只有交互时钟中的新观测与 verifier 才能改变下一次动作。右侧阶梯表示主张强度：结果正确、过程有效、因果干预和闭环效用需要逐级新增实验，不能互相替代。
 
+本节把这四级局部机制证据记作 **R1–R4**。它们只回答“视频推理结论由什么实验支持”，不等同于[评测指南](evaluation.md)中世界模型能力的全局 L0–L7；例如 R4 闭环回报仍可能只发生在模拟器里，不能自动上升为全局 L7 现实效用。
+
 ```mermaid
 flowchart TB
     accTitle: 视频推理的三个时间轴与四级证据
-    accDescr: 输出时间沿帧序列展开可见轨迹，去噪时间从早期计划进入约束绑定和后期渲染，交互时间执行动作、短片段生成、验证与重规划。最终答案、过程有效、因果干预和闭环回报构成逐级增强的证据。
+    accDescr: 输出时间沿帧序列展开可见轨迹，去噪时间从早期计划进入约束绑定和后期渲染，交互时间执行动作、短片段生成、验证与重规划。R1 最终答案、R2 过程有效、R3 因果干预和 R4 闭环回报构成逐级增强的局部机制证据。
 
     subgraph output_clock["1. Output time"]
         direction LR
@@ -407,7 +409,7 @@ flowchart TB
         next_action --> action
     end
 
-    final_answer["L1 final answer"] --> process_validity["L2 process validity"] --> causal_intervention["L3 causal intervention"] --> closed_loop_return["L4 closed-loop return"]
+    final_answer["R1 final answer"] --> process_validity["R2 process validity"] --> causal_intervention["R3 causal intervention"] --> closed_loop_return["R4 closed-loop return"]
     x_t -. "observable result" .-> final_answer
     z_0 -. "probe plus intervention required" .-> process_validity
     verify -. "counterfactual tests" .-> causal_intervention
@@ -419,7 +421,7 @@ flowchart TB
 1. 输出时间从 $x_1$ 走到 $x_T$，提供可观察轨迹和最终答案，但不单独证明内部因果计算。
 2. 去噪时间从 $z_K$ 走到 $z_0$，可依次形成早期计划、绑定约束和完成渲染；必须配合 probe 与干预才构成机制证据。
 3. 交互时间依次执行动作、短 rollout、验证和重规划，再把下一动作送回环境；新反馈可以真正改变后续决策。
-4. 证据从最终答案、过程有效、因果干预逐级上升到闭环回报，每一级都需要新增对照。
+4. 局部机制证据从 R1 最终答案、R2 过程有效、R3 因果干预逐级上升到 R4 闭环回报，每一级都需要新增对照。
 
 回到研究问题，三个时钟分别测量：
 

@@ -59,7 +59,7 @@ $m^{\mathrm{pred}}$ 只是可回滚、带 provenance 的 speculative memory，$q
 | **动作条件视频预测** | 历史 + 预先给定动作序列 → 未来视频 | 动作条件与未来预测 | 中途分支、实时 deadline、环境 API |
 | **Learned game engine** | 玩家输入 → 画面，常带奖励/终止 | 可玩的低延迟闭环 | 显式权威状态、规则完整性、跨游戏泛化 |
 | **一般 world model** | 历史/动作 → latent 或观测预测 | 学到环境转移或任务相关动力学 | 像素渲染、开放世界、实时交互 |
-| **4D / scene simulation** | 已捕获场景 + 视角/时间 → novel view | 时空几何或可渲染表示 | 未见动作的因果后果、对象状态干预 |
+| **[4D / scene simulation](multiview-4d-generation.md)** | 已捕获/生成场景 + 视角/时间 → novel view 或动态状态 | 时空几何或可渲染表示 | 未见动作的因果后果、对象状态干预 |
 | **WAM / policy** | 观测/目标 → 动作，可能联合未来视频 | 提议或输出可执行动作 | 充当环境；动作正确也不证明预测世界正确 |
 
 World Models 与 Dreamer 代表“学动力学供想象和控制”的主线 [[1]](#ref-1), [[2]](#ref-2)；它们不需要生成开放域高清视频。Sora 类视频生成器具有很强视觉先验，但官方“world simulator”表述本身不构成在线动作闭环证据 [[5]](#ref-5)。反过来，learned game engine 即便画面较窄，只要能按动作持续更新，也比离线高保真视频更接近交互合同。

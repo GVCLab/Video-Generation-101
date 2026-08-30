@@ -8,14 +8,15 @@
 
 > **阅读说明**
 >
-> - 年份采用论文首次公开或机构首次官方发布的时间，而不是后续会议、期刊或产品开放年份；因此年份标签不代表该工作已经正式发表。
+> - 年份采用论文首次公开或机构首次官方发布的时间，而不是后续会议、期刊或产品开放年份；因此年份标签不代表该工作已经正式发表。涉及论文的新增节点同时写“首次公开 / 正式状态”，没有 proceedings 的保留 `preprint` 标签。
 > - 这是一组经过筛选的技术谱系，不是所有模型的产品年表。
 > - Video editing 是贯穿多条泳道的横向能力；从 Video Rewrite、时空补全、vid2vid 到 Diffusion / DiT、instruction editing 与 memory 的专门节点，见[视频编辑 milestones](tasks/video-to-video.md)。
+> - 视频退化修复是与生成/编辑相邻的观测逆问题：目标是从 blur、downsample、noise、compression 等低质观测恢复同一内容，不是重新创作或只在 mask 内补全；其横向谱系见本页专题表与[退化修复专章](tasks/video-restoration.md)。
 > - 每个节点均链接到论文、作者项目页或机构官方发布等一手来源。
 > - 每个节点的“资源”栏统一标记 Paper/Report、Project、Code、Weights 与 Demo；Code 只认作者或机构官方实现，`未公开` 表示截至核查日未找到官方公开资源，第三方复现不会冒充官方实现；`—` 表示没有独立入口或不适用，失效、归档、下线与访问受限会直接标注状态。
 > - 企业节点中的分辨率、速度、时长与性能，如无独立复现，均按“官方或作者报告”理解。
 > - 2025–2026 节点默认是 **frontier observation**：它们记录截止日可见的前沿方向，不把预印本、机构自评或宣传演示升格为已经独立验证的能力事实。
-> - 本轮新增的联合音视频、后训练和显式控制节点，其结构性纳入依据与一手来源交叉核验见[缺口审计](../sources/research_20260830_missing_subfields_integration.md)。
+> - 本轮新增的联合音视频、后训练和显式控制节点，其结构性纳入依据与一手来源交叉核验见[缺口审计](../sources/research_20260830_missing_subfields_integration.md)；多视角/4D 的 camera-time 合同、里程碑和预印本边界见[4D 研究日志](../sources/research_20260830_multiview_4d_generation.md)；退化修复的检索、纳排和证据边界见[独立研究日志](../sources/research_20260830_video_restoration.md)；视频表示节点的正式 venue、位流边界与开放实现见[tokenizer 研究日志](../sources/research_20260830_video_representation_tokenizers.md)。
 > - 下列图片均由 imagegen 根据论文机制生成，属于**概念示意图，不是论文原图，也不代表模型真实输出**。
 
 ## 并行泳道索引
@@ -35,10 +36,12 @@ flowchart TB
         direction LR
         text_video["T2V 与视频 Token<br/>技术前驱"] --> foundation_backbone["规模化预训练与<br/>可迁移 Backbone"]
         foundation_backbone --> multi_condition["多条件与<br/>多参考接口"]
+        multi_condition --> view_time_4d["相机 × 世界时间<br/>多视角 / 4D"]
         foundation_backbone --> source_editing["源视频约束与<br/>可寻址编辑"]
         foundation_backbone --> timeline_authoring["多段 Prompt / 分镜<br/>与跨镜头连续"]
         foundation_backbone --> native_av["原生联合<br/>音视频"]
         multi_condition --> unified_creation["不同层级的统一<br/>接口 / Backbone / Checkpoint"]
+        view_time_4d --> unified_creation
         source_editing --> unified_creation
         timeline_authoring --> unified_creation
         native_av --> unified_creation
@@ -66,6 +69,7 @@ flowchart TB
     scalable_generation -.->|"生成式视觉先验"| action_rollout
     foundation_backbone -.->|"视觉先验可复用；仍需动作数据"| action_rollout
     multi_condition --> workflows
+    view_time_4d --> workflows
     source_editing --> workflows
     timeline_authoring --> workflows
     native_av --> workflows
@@ -83,7 +87,7 @@ flowchart TB
     classDef outcome fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
 
     class motion_prediction,probabilistic_generation,scalable_generation foundation
-    class text_video,foundation_backbone,multi_condition,source_editing,timeline_authoring,native_av,unified_creation creative
+    class text_video,foundation_backbone,multi_condition,view_time_4d,source_editing,timeline_authoring,native_av,unified_creation creative
     class state_space,latent_planning,action_rollout,world_model_evidence,closed_loop_control world
     class evidence foundation
     class workflows outcome
@@ -91,10 +95,10 @@ flowchart TB
 
 | 泳道 | 核心问题 | 阅读方法 | 对应专题 |
 |---|---|---|---|
-| **生成机制基础** | 视频如何表示、压缩、预测和采样？ | 显式运动与统计动态 → 深度视频预测 → 随机预测与 GAN → 视频 Token → Diffusion、DiT 与 Flow | [生成模型路线](generative-models.md) |
-| **视频基础模型与创作能力** | 模型如何从技术前驱扩展为规模化、可迁移的多模态系统？ | 先读 T2V、视频 Token 与规模化预训练，再分别看开放生成、多条件/多参考、源视频约束与编辑、多段 prompt/分镜、跨镜头连续和原生联合音视频；遇到“统一”时继续追问统一发生在哪一层 | [视频基础模型路线](foundation-models.md) · [视频编辑 milestones](tasks/video-to-video.md) · [任务地图](taxonomy.md) |
+| **生成机制基础** | 视频如何表示、压缩、预测和采样？ | 显式运动与统计动态 → 深度视频预测 → 随机预测与 GAN → 视频 Token → Diffusion、DiT 与 Flow | [生成模型路线](generative-models.md) · [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md) |
+| **视频基础模型与创作能力** | 模型如何从技术前驱扩展为规模化、可迁移的多模态系统？ | 先读 T2V、视频 Token 与规模化预训练，再分别看开放生成、多条件/多参考、相机 × 世界时间的多视角/4D、源视频约束与编辑、多段 prompt/分镜、跨镜头连续和原生联合音视频；遇到“统一”时继续追问统一发生在哪一层 | [视频基础模型路线](foundation-models.md) · [多视角/4D](tasks/multiview-4d-generation.md) · [视频编辑 milestones](tasks/video-to-video.md) · [任务地图](taxonomy.md) |
 | **World Model 与行动闭环** | 模型能否维护状态、响应动作，并进一步支持反事实、规划或持续交互？ | 分别追踪决策型 latent dynamics 与动作条件视觉 rollout；先检查动作条件转移、状态持久和干预证据，若声称支持决策或控制，再要求“动作 → 环境响应 → 新观测 → 再决策”的闭环验证 | [World Model 专章](world-models.md) · [JEPA 路线](jepa.md) |
-| **应用层** | 技术在哪里产生价值，又提出哪些新约束？ | 内容与编辑工作流、数字人、游戏与交互、数据合成、自动驾驶、机器人和科学可视化 | [相关应用](applications.md) · [任务地图](taxonomy.md) |
+| **应用层** | 技术在哪里产生价值，又提出哪些新约束？ | 内容、编辑与退化修复工作流、数字人、游戏与交互、数据合成、自动驾驶、机器人和科学可视化 | [相关应用](applications.md) · [退化修复](tasks/video-restoration.md) · [任务地图](taxonomy.md) |
 | **验证框架** | 应以什么证据证明能力有效？ | 分开检查生成质量、条件遵循、长程状态、物理与反事实、延迟、规划或控制闭环，以及安全治理 | [评测指南](evaluation.md) · [物理一致性](physical-consistency.md) |
 
 > **术语与归属原则：**同一模型可能横跨多条泳道。本页按其主要技术贡献和验证证据归类，而不是因为使用了 Diffusion、Transformer 或“World Model”名称就重复收录。这里的“多段 prompt”特指按时间或镜头组织的 prompt/storyboard，不等同于多参考输入；“统一模型”必须注明统一的是接口、流水线、共享 backbone、模型家族还是单一 checkpoint；动作条件 rollout 或实时交互可以提供 World Model 证据，但只有反复执行“动作 → 环境响应 → 新观测 → 再决策”才构成闭环验证，平台或模型家族也不能整体继承某个策略分支的闭环能力。
@@ -191,6 +195,21 @@ flowchart LR
 | LAMP / FlashMotion / BulletTime | CVPR 2026 正式 proceedings | 语言到运动程序、少步轨迹控制与时间—视角解耦的 frontier observation | 各论文与补充材料入口可访问；工件范围逐项核验，三者不是一个统一控制系统 |
 | NAVA / Ripple | 2026-05-28、2026-07-29 arXiv v1；均为预印本 | 原生 AV 对齐与带跨模态记忆的流式联合生成 frontier observation | NAVA 项目样例与两篇预印本可访问；未把作者同步/速度结果写成开放权重或独立性能 |
 | 4DStreamCtrl | 2026-08-26 arXiv v1，2026-08-27 v2；预印本 | 相机、对象、深度与因果流式统一的最新 frontier observation | arXiv PDF/源码可访问；未在一手记录中确认官方代码或权重，20 FPS/长序列为作者协议结果 |
+| SeedVR2 / FlashVSR / DGAF-VSR / STCDiT / DTG-Restore | SeedVR2 为 ICLR 2026 正式 proceedings；其余四项为 CVPR 2026 正式 proceedings | 一步对抗后训练、streaming、aligned evidence、结构锚定与 training-free refinement 的视频退化修复分叉 | 论文入口可访问；本页不把不同数据、退化、硬件和感知协议下的作者结果合并成统一排名 |
+
+---
+
+## 横向任务谱系｜2017–2026：视频退化修复从对齐传播到生成先验
+
+这条谱系不等同于视频编辑：输入 $Y$ 是同一真实视频 $X$ 经未知或已知退化算子后的观测，目标是恢复 $X$，不是按指令改变事件。它也不等同于 inpainting：全帧通常仍有低质证据，并不存在一张天然的 mask 外硬保护区。下表只保留改变任务合同或系统边界的节点；逐篇 paper review、公式、指标和 RestorationFork-1 见[专章](tasks/video-restoration.md)。
+
+| 阶段 | 代表节点 | 合同变化 | 仍未解决 |
+|---|---|---|---|
+| 2017–2020：利用跨帧证据 | [Deep Video Deblurring](https://openaccess.thecvf.com/content_cvpr_2017/html/Su_Deep_Video_Deblurring_CVPR_2017_paper.html)、[EDVR](https://openaccess.thecvf.com/content_CVPRW_2019/html/NTIRE/Wang_EDVR_Video_Restoration_With_Enhanced_Deformable_Convolutional_Networks_CVPRW_2019_paper.html)、[FastDVDnet](https://openaccess.thecvf.com/content_CVPR_2020/html/Tassano_FastDVDnet_Towards_Real-Time_Deep_Video_Denoising_Without_Flow_Estimation_CVPR_2020_paper.html) | 邻帧不再独立处理；对齐、遮挡权重与时空融合成为一等组件 | 合成 blur/noise 与真实 shutter、codec、ISP 的距离仍大 |
+| 2021–2022：传播、盲退化与 Transformer | [BasicVSR](https://openaccess.thecvf.com/content/CVPR2021/html/Chan_BasicVSR_The_Search_for_Essential_Components_in_Video_Super-Resolution_and_CVPR_2021_paper.html)、[RealBasicVSR](https://openaccess.thecvf.com/content/CVPR2022/html/Chan_Investigating_Tradeoffs_in_Real-World_Video_Super-Resolution_CVPR_2022_paper.html)、[RVRT](https://proceedings.neurips.cc/paper_files/paper/2022/hash/02687e7b22abc64e651be8da74ec610e-Abstract-Conference.html) | 建立传播/对齐/聚合/上采样组件表，把真实退化和 clip 内并行、clip 间递归纳入统一诊断 | 双向方法依赖未来帧；长视频仍有传播漂移与显存债务 |
+| 2023–2024：图像生成先验获得时间能力 | [SATeCo](https://openaccess.thecvf.com/content/CVPR2024/html/Chen_Learning_Spatial_Adaptation_and_Temporal_Coherence_in_Diffusion_Models_for_CVPR_2024_paper.html)、[Upscale-A-Video](https://openaccess.thecvf.com/content/CVPR2024/html/Zhou_Upscale-A-Video_Temporal-Consistent_Diffusion_Model_for_Real-World_Video_Super-Resolution_CVPR_2024_paper.html)、[MGLD-VSR](https://eccv.ecva.net/virtual/2024/poster/2534) | 冻结或适配图像 diffusion prior，以 latent/pixel、local/global 与 flow guidance 补足视频时间约束 | 感知细节可能没有观测支持；锐利不能替代 re-degradation、OCR/ID 与多 seed 审计 |
+| 2024–2025：高倍率、高分辨率、复杂退化与少步 | [VideoGigaGAN](https://openaccess.thecvf.com/content/CVPR2025/html/Xu_VideoGigaGAN_Towards_Detail-rich_Video_Super-Resolution_CVPR_2025_paper.html)、[PatchVSR](https://openaccess.thecvf.com/content/CVPR2025/html/Du_PatchVSR_Breaking_Video_Diffusion_Resolution_Limits_with_Patch-wise_Video_Super-Resolution_CVPR_2025_paper.html)、[DiffVSR](https://openaccess.thecvf.com/content/ICCV2025/html/Li_DiffVSR_Revealing_an_Effective_Recipe_for_Taming_Robust_Video_Super-Resolution_ICCV_2025_paper.html)、[TurboVSR](https://openaccess.thecvf.com/content/ICCV2025/html/Wang_TurboVSR_Fantastic_Video_Upscalers_and_Where_to_Find_Them_ICCV_2025_paper.html) | 分别把生成细节、patch 条件、复杂退化 curriculum 与压缩/少步效率推到系统层 | 结果绑定各自数据、倍率、硬件与计时边界，不能直接拼成“最佳模型” |
+| 2026：一步、streaming 与证据守恒分叉 | [SeedVR2](https://proceedings.iclr.cc/paper_files/paper/2026/hash/444d69470b24ded080183c907b711bbf-Abstract-Conference.html)、[FlashVSR](https://openaccess.thecvf.com/content/CVPR2026/html/Zhuang_FlashVSR_Towards_Real-time_Diffusion-Based_Streaming_Video_Super_Resolution_CVPR_2026_paper.html)、[DGAF-VSR](https://openaccess.thecvf.com/content/CVPR2026/html/Xu_Rethinking_Diffusion_Model-Based_Video_Super-Resolution_Leveraging_Dense_Guidance_from_Aligned_CVPR_2026_paper.html)、[STCDiT](https://openaccess.thecvf.com/content/CVPR2026/html/Chen_STCDiT_Spatio-Temporally_Consistent_Diffusion_Transformer_for_High-Quality_Video_Super-Resolution_CVPR_2026_paper.html)、[DTG-Restore](https://openaccess.thecvf.com/content/CVPR2026/html/Yesiltepe_DTG-Restore_Training-Free_Diffusion_Refinement_for_Generative_Video_Super-Resolution_CVPR_2026_paper.html) | 将 adversarial 一步、只读历史的 streaming、dense aligned evidence、anchor-frame structure 与无训练 refinement 分成不同系统合同 | “一步”“实时”“training-free”和“忠实”仍是四个独立主张，需分别验证 |
 
 ---
 
@@ -360,9 +379,9 @@ flowchart LR
 
 ---
 
-## 生成机制 → 视频基础模型｜2017–2023：视觉 Token 与视频语言模型
+## 生成机制 → 视频基础模型｜2017–2026：视觉 Token 与视频语言模型
 
-这条路线先把视频压缩成离散符号，再使用语言模型式自回归或 masked prediction。需要特别注意：MAGVIT 的离散 code 与 Sora/DiT 的连续 latent patch 并不是同一种“token”。
+早期节点主要把视频编码为离散符号，再使用语言模型式自回归或 masked prediction；2024 年后又出现连续兼容 latent、自适应预算和结构化表示。需要特别注意：连续/离散/结构化属于 **representation**，autoregressive/masked 属于 **factorization**，diffusion/flow/重建损失属于 **objective 或 decoder 路径**；MAGVIT 的离散 code 与 Sora/DiT 的连续 latent patch 并不是同一种“token”。完整术语和记账合同见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)。
 
 <table>
 <tr>
@@ -409,20 +428,67 @@ flowchart LR
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2023-magvit-v2.jpg" alt="MAGVIT-v2 lookup-free quantization 概念图"></td>
-<td><strong>2023 — <a href="https://arxiv.org/abs/2310.05737">MAGVIT-v2</a></strong> <code>视觉 tokenizer</code><br><strong>表示/机制：</strong>使用 causal 3D CNN 与 lookup-free quantization，构造图像/视频共享的大型离散词表。<br><strong>控制/任务：</strong>服务生成、压缩和识别，并增强与语言模型式生成器的兼容。<br><strong>意义/边界：</strong>论文“LM beats diffusion”的结论来自相同数据、相近规模与预算的受控实验，不能泛化成所有语言模型都胜过 diffusion。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2310.05737">Paper</a> · <a href="https://magvit.cs.cmu.edu/v2/">Project</a> · Code：未公开 · <a href="https://github.com/google-research/magvit">Related Code（MAGVIT v1）</a> · Weights：未公开 · Demo：—</td>
+<td><strong>2023 首次公开 / ICLR 2024 — <a href="https://arxiv.org/abs/2310.05737">MAGVIT-v2</a></strong> <code>视觉 tokenizer</code><br><strong>表示/机制：</strong>使用 causal 3D CNN 与 lookup-free quantization，构造图像/视频共享的大型离散词表。<br><strong>控制/任务：</strong>服务生成、紧凑表示和识别，并增强与语言模型式生成器的兼容；entropy regularizer 不是 entropy coder。<br><strong>意义/边界：</strong>论文“LM beats diffusion”的结论来自相同数据、相近规模与预算的受控实验，不能泛化成所有语言模型都胜过 diffusion。<br><strong>资源：</strong><a href="https://proceedings.iclr.cc/paper_files/paper/2024/hash/036912a83bdbb1fd792baf6532f102d8-Abstract-Conference.html">Paper（正式）</a> · <a href="https://magvit.cs.cmu.edu/v2/">Project</a> · Code：未公开 · <a href="https://github.com/google-research/magvit">Related Code（MAGVIT v1）</a> · Weights：未公开 · Demo：—</td>
 </tr>
 </table>
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2023-videopoet.jpg" alt="VideoPoet 多模态 token 语言模型概念图"></td>
-<td><strong>2023 — <a href="https://arxiv.org/abs/2312.14125">VideoPoet</a></strong> <code>多模态生成语言模型</code><br><strong>表示/机制：</strong>decoder-only Transformer 统一处理文本、图像、视频与音频 token，以混合生成目标预训练后再适配任务。<br><strong>控制/任务：</strong>文本/图像到视频、视频编辑、延展与视频到音频。<br><strong>意义/边界：</strong>清楚展示“视频生成语言模型化”；离散 token 的序列长度、串行解码和 tokenizer 误差仍是代价。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2312.14125">Paper</a> · <a href="https://sites.research.google/videopoet/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+<td><strong>2023 首次公开 / ICML 2024 — <a href="https://arxiv.org/abs/2312.14125">VideoPoet</a></strong> <code>多模态生成语言模型</code><br><strong>表示/机制：</strong>decoder-only Transformer 统一处理文本、图像、视频与音频 token，以混合生成目标预训练后再适配任务。<br><strong>控制/任务：</strong>文本/图像到视频、视频编辑、延展与视频到音频。<br><strong>意义/边界：</strong>清楚展示“视频生成语言模型化”；离散 token 的序列长度、串行解码和 tokenizer 误差仍是代价。<br><strong>资源：</strong><a href="https://proceedings.mlr.press/v235/kondratyuk24a.html">Paper（正式）</a> · <a href="https://sites.research.google/videopoet/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
 </tr>
 </table>
+
+### 2024–2026 视频表示前沿：首次公开与正式状态分列
+
+下表只补表示层的结构性转折，不把 tokenizer 当成新的生成 factorization。`bitstream` 一列中的“是”要求概率模型、熵编码器和可解码码流；仅有更小 tensor、token 数或 nominal bits 时仍为“否”。
+
+| 首次公开 | 正式状态（截至 2026-08-30） | 代表节点 | 改变的表示轴 | 实际 bitstream 证据 |
+|---|---|---|---|---|
+| 2023 | ICLR 2024 | [MAGVIT-v2](https://proceedings.iclr.cc/paper_files/paper/2024/hash/036912a83bdbb1fd792baf6532f102d8-Abstract-Conference.html) | lookup-free 离散量化与大隐式词表 | 否；entropy penalty 只是训练正则 |
+| 2024 | NeurIPS 2024 | [CV-VAE](https://proceedings.neurips.cc/paper_files/paper/2024/hash/1787533e171dcc8549cc2eb5a4840eec-Abstract-Conference.html)；[OmniTokenizer](https://proceedings.neurips.cc/paper_files/paper/2024/hash/31994923f58ae5b2d661b300bd439107-Abstract-Conference.html) | 连续 latent 兼容；图像—视频联合 tokenizer | 否；报告 shape/dtype/grid/元素或 token 预算 |
+| 2024-12 | **预印本；未发现正式 venue** | [VidTok](https://arxiv.org/abs/2412.13061) | 分开的 continuous-KL / discrete-FSQ 型号、causal / noncausal 与多种固定压缩配置 | 否；多型号不是 hybrid 或按样本 adaptive，VCR 也不是 bpp |
+| 2024 | ICLR 2025 | [Causal VAE](https://proceedings.iclr.cc/paper_files/paper/2025/hash/03df5246cc78af497940338dd3eacbaa-Abstract-Conference.html)；[BSQ-ViT](https://proceedings.iclr.cc/paper_files/paper/2025/hash/e25198b6a75f74277ee3a2bd4165d9ef-Abstract-Conference.html)；[ElasticTok](https://proceedings.iclr.cc/paper_files/paper/2025/hash/5e6cec2a9520708381fe520246018e8b-Abstract-Conference.html)；[LARP](https://proceedings.iclr.cc/paper_files/paper/2025/hash/97c903fbf21a7d863af2015d8803ca8f-Abstract-Conference.html) | 因果联合编码、球面二值量化、可截断预算、generator-aware prior | **仅 BSQ-ViT 有实验性算术编码码流** |
+| 2024 | CVPR 2025 | [CoordTok](https://openaccess.thecvf.com/content/CVPR2025/html/Jang_Efficient_Long_Video_Tokenization_via_Coordinate-based_Patch_Reconstruction_CVPR_2025_paper.html)；[VidTwin](https://openaccess.thecvf.com/content/CVPR2025/html/Wang_VidTwin_Video_VAE_with_Decoupled_Structure_and_Dynamics_CVPR_2025_paper.html)；[Divot](https://openaccess.thecvf.com/content/CVPR2025/html/Ge_Divot_Diffusion_Powers_Video_Tokenizer_for_Comprehension_and_Generation_CVPR_2025_paper.html) | triplane、结构/动态双分支、语义连续表示与生成式 de-tokenizer | 否；结构命名和 diffusion decoder 都不构成码流 |
+| 2025 | ICLR 2026 | [InfoTok](https://proceedings.iclr.cc/paper_files/paper/2026/hash/432f048a844654ba981953491e6dc80e-Abstract-Conference.html)；[NeRV-Diffusion](https://proceedings.iclr.cc/paper_files/paper/2026/hash/1a17a06de88cf77f25cda0da91615a54-Abstract-Conference.html) | 内容自适应 token 预算；整段视频 INR-weight latent | 否；nominal BPP 与 latent weights 都不是码流 |
+| 2025 | CVPR 2026 | [AdapTok](https://openaccess.thecvf.com/content/CVPR2026/html/Li_AdapTok_Learning_Adaptive_and_Temporally_Causal_Video_Tokenization_in_a_CVPR_2026_paper.html) | block-causal 1D adaptive latent | 否；还需计入 scorer、分配器与 ragged batching |
+| 2026-07/08 | **预印本；未发现正式 venue** | [VideoRAE](https://arxiv.org/abs/2607.14088)；[V-RAE](https://arxiv.org/abs/2608.13556) | frozen video/visual foundation features、representation alignment 与固定预算的生成可学性 | 否；continuous/discrete 变体不是 hybrid，causal 性按 encoder variant 判断 |
+| 2026-08 | **预印本；未发现正式 venue** | [KVAE](https://arxiv.org/abs/2608.05798) | 更高空间缩减的 causal continuous video VAE 家族 | 否；保持 preprint 与作者结果边界 |
 
 ### 视频 Token 与序列建模的核心矛盾
 
 自回归模型具有统一概率形式，但串行采样昂贵；masked generation 提高并行度，却仍需多轮迭代。两者都受视频 token 数量、tokenizer 重建损失和长程状态一致性制约。
+
+### 2024–2026 因果、流式与实时：四层合同怎样汇合
+
+这条谱系横跨 factorization、训练历史、architecture、cache 与 serving，不是新的单一 objective。causal codec、causal generator、streaming commit 与 real-time SLO 也不能相互继承；详细的逐位置噪声、commit/backpressure、开放时长、作者速度口径和 `StreamFork-1` 见[因果流式专章](generative-models/causal-streaming-generation.md)。
+
+| 首次公开 → 正式状态 | 节点 | 改变的层 | 证据边界 |
+|---|---|---|---|
+| 2024-07 → NeurIPS 2024 | [Diffusion Forcing](https://proceedings.neurips.cc/paper_files/paper/2024/hash/2aee1c4159e48407d68fe16ae8e6e49e-Abstract-Conference.html) | per-token noise 将 next-unit 与 full-sequence diffusion 接到同一训练接口 | 不内生 self-history、few-step、commit 或实时 SLO |
+| 2024-12 → CVPR 2025 | [CausVid](https://openaccess.thecvf.com/content/CVPR2025/html/Yin_From_Slow_Bidirectional_to_Fast_Autoregressive_Video_Diffusion_Models_CVPR_2025_paper.html) | 双向 teacher → 4-step causal student 与 KV cache | GT/noised-GT 历史不等于 on-policy matching |
+| 2025-06 → NeurIPS 2025 | [Self Forcing](https://proceedings.neurips.cc/paper_files/paper/2025/hash/f4823f831af67a3ef15e41a85434422a-Abstract-Conference.html) | 训练进入 self-generated rollout 分布 | detached history 仍留下 context-gradient 缺口 |
+| 2025-09 → ICLR 2026 | [Rolling Forcing](https://openreview.net/forum?id=IAyzXjbfwo)；[LongLive](https://proceedings.iclr.cc/paper_files/paper/2026/hash/91a1610c6ed9e02d33f826b46f472b92-Abstract-Conference.html) | 联合 rolling noise、sink、长训、prompt recache 与固定滑窗 | 窗口内不一定严格逐帧；长 demo 不等于 survival 保证 |
+| 2025-10/11 → MLSys 2026 | [StreamDiffusionV2](https://proceedings.mlsys.org/paper_files/paper/2026/hash/698cfaf72a208aef2e78bcac55b74328-Abstract-Conference.html) | TTFF、deadline、jitter、scheduler 与多卡 pipeline | 4×H100 aggregate FPS 不能替代单流延迟 |
+| 2026-02 → CVPR/ICLR 2026 | [SCD](https://openaccess.thecvf.com/content/CVPR2026/html/Bai_Causality_in_Video_Diffusers_is_Separable_from_Denoising_CVPR_2026_paper.html)；[FlowCache](https://proceedings.iclr.cc/paper_files/paper/2026/hash/85dc8f85ff978b9c606d3b2f5b0da69a-Abstract-Conference.html) | 分离跨帧因果推理/帧内渲染；training-free per-chunk cache/KV 压缩 | architecture 加速与 serving 加速都不自动改变 history exposure |
+| 2025-11 → ICLR 2026 | [MotionStream](https://proceedings.iclr.cc/paper_files/paper/2026/hash/0cece806cd3d1dfad4a893f016ad3d7d-Abstract-Conference.html) | 在线轨迹/相机输入、Self Forcing 与固定窗口汇合 | 官方仓库仍未提供可运行代码/权重；控制遵循不是 world-model 闭环 |
+| 2026-02/05/06 | [Causal Forcing](https://arxiv.org/abs/2602.02214)（ICML 2026 accepted）、[Causal Forcing++](https://arxiv.org/abs/2605.15141)、[Causal-rCM](https://arxiv.org/abs/2606.25473) | flow-map 初始化、相邻时间 consistency 与 TF→SF recipe | step 不总等于 NFE；++ 首 latent frame 仍为 4 steps |
+
+### 2021–2026 多视角与 4D：从动态重建到 camera × time 生成
+
+这条谱系有两条不能混写的起点：动态场景重建从已捕获观测恢复可渲染状态，4D generation 则要为未见视角、时间或整段动态生成内容。普通 camera-controlled video 只覆盖 camera–time 平面的一条路径；同刻多视角、完整 query grid 和显式状态需要额外几何证据。详细任务合同、五条技术路线和 `GridFork-1` 见[多视角与 4D 专章](tasks/multiview-4d-generation.md)。
+
+| 首次公开 → 正式状态 | 节点 | 合同转折 | 未解决与证据边界 |
+|---|---|---|---|
+| 2020 → CVPR/ICCV 2021 | [D-NeRF](https://openaccess.thecvf.com/content/CVPR2021/html/Pumarola_D-NeRF_Neural_Radiance_Fields_for_Dynamic_Scenes_CVPR_2021_paper.html)；[Nerfies](https://openaccess.thecvf.com/content/ICCV2021/html/Park_Nerfies_Deformable_Neural_Radiance_Fields_ICCV_2021_paper.html) | canonical state + deformation 支持 novel view/time | per-scene optimization、pose 与 topology |
+| 2023 → ICML 2023 | [MAV3D](https://proceedings.mlr.press/v202/singer23a.html) | T2V score distillation 首次把文字提升为 dynamic 3D state | SDS 成本、教师偏置与工件边界 |
+| 2023 → ICLR/CVPR 2024 | [Consistent4D](https://openreview.net/forum?id=sPUrdFGepF)；[4D-GS](https://openaccess.thecvf.com/content/CVPR2024/html/Wu_4D_Gaussian_Splatting_for_Real-Time_Dynamic_Scene_Rendering_CVPR_2024_paper.html)；[Align Your Gaussians](https://openaccess.thecvf.com/content/CVPR2024/html/Ling_Align_Your_Gaussians_Text-to-4D_with_Dynamic_3D_Gaussians_and_Composed_CVPR_2024_paper.html) | video-to-4D consistency 与显式 dynamic Gaussian 汇合 | 实时渲染不等于实时构建；对象/场景范围有限 |
+| 2024 → NeurIPS 2024 | [4Real](https://proceedings.neurips.cc/paper_files/paper/2024/hash/50358459632f7fc1c7e9f9f0ad0cc026-Abstract-Conference.html) | 真实视频 prior 推动 scene-level photorealistic text-to-4D | staged、per-scene pipeline |
+| 2024 → ICLR 2025 | [4DiM](https://openreview.net/forum?id=d2UrCGtntF)；[SV4D](https://proceedings.iclr.cc/paper_files/paper/2025/hash/5297e56ac65ba2bfa70ee9fc4818c042-Abstract-Conference.html)；[GenXD](https://proceedings.iclr.cc/paper_files/paper/2025/hash/ee2841db84cd09a5f6e3e313ce3d79d9-Abstract-Conference.html) | camera/time 条件、multi-frame/multi-view diffusion 与可变条件视图进入统一模型 | 固定窗口、数据稀缺与 query 顺序一致性 |
+| 2024 → CVPR 2025 | [CAT4D](https://openaccess.thecvf.com/content/CVPR2025/html/Wu_CAT4D_Create_Anything_in_4D_with_Multi-View_Video_Diffusion_Models_CVPR_2025_paper.html)；[4Real-Video](https://openaccess.thecvf.com/content/CVPR2025/html/Wang_4Real-Video_Learning_Generalizable_Photo-Realistic_4D_Video_Diffusion_CVPR_2025_paper.html) | camera-time grid→deformable state；可泛化 4D video diffusion | 生成网格偏差可能被状态优化固化 |
+| 2025 → ICCV 2025 | [SV4D 2.0](https://openaccess.thecvf.com/content/ICCV2025/html/Yao_SV4D_2.0_Enhancing_Spatio-Temporal_Consistency_in_Multi-View_Video_Diffusion_for_ICCV_2025_paper.html)；[Free4D](https://openaccess.thecvf.com/content/ICCV2025/html/Liu_Free4D_Tuning-free_4D_Scene_Generation_with_Spatial-Temporal_Consistency_ICCV_2025_paper.html) | 大运动/遮挡、渐进 3D→4D 与免微调单图场景 | 未见区域不确定性和跨域几何 |
+| 2026 → CVPR 2026 | [4C4D](https://openaccess.thecvf.com/content/CVPR2026/html/Zhou_4C4D_4_Camera_4D_Gaussian_Splatting_CVPR_2026_paper.html)；[DGGT](https://openaccess.thecvf.com/content/CVPR2026/html/Chen_DGGT_Feedforward_4D_Reconstruction_of_Dynamic_Driving_Scenes_using_Unposed_CVPR_2026_paper.html)；[MoRel](https://openaccess.thecvf.com/content/CVPR2026/html/Kwak_MoRel_Long-Range_Flicker-Free_4D_Motion_Modeling_via_Anchor_Relay-based_Bidirectioanl_CVPR_2026_paper.html)；[4DSurf](https://openaccess.thecvf.com/content/CVPR2026/html/Wu_4DSurf_High-Fidelity_Dynamic_Scene_Surface_Reconstruction_CVPR_2026_paper.html) | 极稀疏相机、pose-as-output、长时 anchor 与 surface consistency | 域特定、构建/更新/渲染仍需分账 |
+| 2026-05/07/08 → 预印本 | [Full-4D](https://arxiv.org/abs/2605.25500)；[MV-Forcing](https://arxiv.org/abs/2607.05376)；[Stream4D](https://arxiv.org/abs/2608.19556)；[4DStreamCtrl](https://arxiv.org/abs/2608.25479) | full-scope grid、长时多视角 self-forcing、动态 4D reward 与在线 3D 控制 | 正式发表、开放工件与 SLO 均需逐项复核 |
 
 ---
 
@@ -818,4 +884,4 @@ Sora 在生成路线中提出“视频生成可能通向世界模拟器”的研
 - 开环 demo 稳定 ⇒ 闭环控制可靠；
 - 官方 benchmark 领先 ⇒ 已被独立复现。
 
-JEPA 从图像表征、视频预测到动作条件规划的独立演化，见 [JEPA 参考阅读](jepa.md)。具体任务与模型则见 [任务与方法分类](taxonomy.md)、[评测指南](evaluation.md) 和 [开放模型与代码](../resources/open-models.md)。
+JEPA 从图像表征、视频预测到动作条件规划的独立演化，见 [JEPA 参考阅读](jepa.md)。视频表示的完整定义、预算与 codec 验收见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)；具体任务与模型则见 [任务与方法分类](taxonomy.md)、[评测指南](evaluation.md) 和 [开放模型与代码](../resources/open-models.md)。

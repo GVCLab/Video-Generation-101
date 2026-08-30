@@ -1,4 +1,4 @@
-# 视频修复与补全：截至 2026-08-30 的检索、证据与图像审计
+# 视频补全与对象移除：截至 2026-08-30 的检索、证据与图像审计
 
 > 冻结时间：2026-08-30（Asia/Shanghai）
 > 对应正文：[`docs/tasks/video-inpainting.md`](../docs/tasks/video-inpainting.md)

@@ -37,7 +37,7 @@ The following were not promoted to separate chapters in this batch:
 
 - **long video**, because continuous single-shot generation and cross-shot narrative already have separate causal-streaming and story/multi-shot routes;
 - **video-to-audio**, because it is used as the staged counterfactual inside the native AV chapter rather than mislabeled as joint generation;
-- **multi-view and 4D generation**, because the current addition treats them as geometry-heavy branches of explicit controllability; a future audit may split them if their task and evaluation contracts diverge further;
+- ~~**multi-view and 4D generation** were initially deferred because this batch treated them as geometry-heavy branches of explicit controllability.~~ A follow-up audit on 2026-08-30 promoted them to [their own chapter](../docs/tasks/multiview-4d-generation.md): camera-controlled diagonals, same-time multi-view grids, renderable dynamic states, unseen-region generation and 2026 long/streaming 4D work now require a distinct task and evaluation contract. The follow-up evidence is recorded in [the dedicated research log](research_20260830_multiview_4d_generation.md).
 - **generic safety and provenance**, because they already have explicit sections in evaluation, applications, datasets and foundation-model release-surface audits.
 
 ## 4. Independent primary-source frontier check

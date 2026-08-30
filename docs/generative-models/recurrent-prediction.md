@@ -117,7 +117,7 @@ z_t\sim p_\theta(z_t\mid x_{<t}),
 x_t\sim p_\theta(x_t\mid x_{<t},z_{\le t}).
 $$
 
-训练后验 $q_\phi(z_t\mid x_{\le t})$ 可以看见待解释的真实未来；部署时只能从历史先验 $p_\theta$ 采样。把训练后验样本误当成测试能力，会泄漏未来信息。变分下界、codec 与随机未来两种 latent 角色的完整推导见[变分生成](variational-generation.md)。
+训练后验 $q_\phi(z_t\mid x_{\le t})$ 可以看见待解释的真实未来；部署时只能从历史先验 $p_\theta$ 采样。把训练后验样本误当成测试能力，会泄漏未来信息。随机未来 latent、learned prior 与 ELBO 的完整推导见[变分生成](variational-generation.md)；仅负责压缩/重建接口的 latent、离散 token 与 codec 边界见[视频 Tokenizer 与生成式压缩](video-tokenizers.md)。
 
 | 路线 | 随机性放在哪里 | 主要改进 | 必须保留的证据边界 |
 |---|---|---|---|

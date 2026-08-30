@@ -205,7 +205,7 @@ Token-Critic 另训判别器识别真实与采样 token，并用它接受、拒�
 | 随机 token | 在时空 token 中独立抽点 | 通用补全、全序列初始化 | 容易利用近邻冗余；与推理的置信度偏置 mask 不同 |
 | temporal tube | 同一空间位置跨多帧一起遮挡 | 迫使使用运动与对象持续性线索 | VideoMAE 只证明表征预训练有效 [[4]](#ref-4)；Lumos-1 的 tube policy 才是生成训练证据 [[17]](#ref-17) |
 | 整帧 | 一帧内所有空间 token 共用 mask 状态或比例 | 插帧、未来帧、chunk rollout | 帧级难度差异会造成 loss imbalance；一步内仍有大量空间 token |
-| 时空 block | 连续时间与空间区域一起缺失 | 视频修复、局部编辑、对象区域控制 | 训练 block 尺寸与测试编辑区域不匹配时易退化 |
+| 时空 block | 连续时间与空间区域一起缺失 | 视频补全、局部编辑、对象区域控制 | 训练 block 尺寸与测试编辑区域不匹配时易退化 |
 | 因果 prefix / chunk | 过去帧可见，未来帧或下一 chunk 隐藏 | 在线预测、长视频 rollout | 错误跨 chunk 累积，速度取决于 chunk 数与每 chunk 轮数 |
 | mixed task mask | 首帧、内部区域、尾帧等条件组合 | 一个模型统一生成、预测、插值与补全 | 必须阻断 tokenizer 或 condition embedding 泄漏；任务采样比例影响能力 |
 

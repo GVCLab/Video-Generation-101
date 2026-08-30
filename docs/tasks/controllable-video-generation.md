@@ -132,6 +132,8 @@ CameraCtrl 将相机轨迹参数化并通过 plug-and-play pose module 注入冻
 
 2026 年后的关键变化是不再把相机当成单一轴：UCPE 分解相对运动与初始绝对方位，通过轻量 spatial-attention adapter 注入 DiT [[28]](#ref-28)；BulletTime 把连续 world-time 与 camera pose 分开，分别使用 4D positional encoding 和 adaptive normalization，因而能一边冻结/慢放动态，一边移动视点 [[27]](#ref-27)。WorldStereo 则增加全局几何记忆与 spatial-stereo memory，目标不只是 pose adherence，还包括多视角空间一致和后续重建 [[29]](#ref-29)。
 
+这一步开始越过普通 camera control 的边界：一条相机路径只覆盖“每个时间选择一个视角”，而多视角视频要求同一时间的多个视图彼此一致，可渲染 4D 状态还要支持重复的任意 $(v,t)$ 查询。相机 × 世界时间坐标图、动态表示和几何证据详见[多视角与 4D 专章](multiview-4d-generation.md)。
+
 ### 4.2 Object trajectory / drag / box / mask / keypoint
 
 用户画的一条线至少需要展开为
@@ -321,6 +323,8 @@ FlashMotion 的正式 CVPR 2026 证据支持“few-step trajectory control 需�
 ### 8.4 Offline fixed clip→online 4D stream：仍是待独立复现的预印本前沿
 
 4DStreamCtrl 将 camera motion、object trajectories 和 depth 统一成 3D point-track representation，用可时间分离的 Geometric Motion Head 接入预训 VDM，并蒸馏为四步因果流式 student [[35]](#ref-35)。作者报告 480p、20 FPS、单高端 GPU 和数百帧一致；这些数字属于**预印本作者协议下的自报结果**，冻结日项目页仍未公开论文与代码下载，因而不能当作已独立复现的实时世界模型 [[45]](#ref-45)。
+
+这里的“4D”既涉及在线 3D 控制，也涉及跨视角/时间一致性；后者必须额外测试 freeze-time 多视角、重投影、遮挡与 loop closure，不能由轨迹误差或 FPS 代替。对应的 `GridFork-1` 协议见[多视角与 4D 专章](multiview-4d-generation.md)。
 
 ## ⚖️ 9. 四方权衡：control–fidelity–motion–diversity
 

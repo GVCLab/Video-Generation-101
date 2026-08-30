@@ -212,19 +212,13 @@ $$
 
 再在低维连续表示 $Z_\tau$ 上执行扩散。Latent Diffusion Models 将这一思路系统化，Video LDM 则把预训练图像 LDM 加入时间层并用于高分辨率视频 [[8]](#ref-8) [[12]](#ref-12)。压缩降低了 denoiser 的时空成本，却把最终误差拆成两部分：生成器能否拟合 latent 分布，以及 decoder 能否把 latent 恢复成连续视频。
 
-所谓“tokenizer 上限”应精确理解为**忠实可恢复信息的上限**。所有输出都落在 decoder 可表达的范围内；若 $E$ 已经丢掉小文字、细物体、快速运动或高频纹理，latent denoiser 无法从同一个编码中可靠恢复这些被丢弃的信息。它不是主观美学分数的数学上界，因为 decoder 仍可能生成看似锐利的新纹理；它约束的是输入信息能否被保真保留。因此，在比较 latent generator 之前，应先在目标分辨率、帧率和时长上报告 $D(E(X))$ 的重建质量与时间一致性。
+所谓“tokenizer 上限”应精确理解为**忠实可恢复信息的上限**。所有输出都落在 decoder 可表达的范围内；若 $E$ 已经丢掉小文字、细物体、快速运动或高频纹理，latent denoiser 无法从同一个编码中可靠恢复这些被丢弃的信息。它不是主观美学分数的数学上界，因为 decoder 仍可能生成看似锐利的新纹理；它约束的是输入信息能否被保真保留。因此，在比较 latent generator 之前，应先在目标分辨率、帧率和时长上报告 $D(E(X))$ 的重建质量与时间一致性，并冻结 latent 的 shape、dtype、时空网格及元素/token 预算。没有概率模型、熵编码器和可解码 bitstream 时，不报告 bpp 或 bitrate。
 
-### 5.3 连续 latent、离散 token 与 spacetime patch 不同
+### 5.3 Representation 不等于 objective、factorization 或 backbone
 
-“Tokenizer”在视频论文中至少有三种含义：
+连续 VAE/AE latent、VQ 离散 token 与 spacetime patch 是不同的 **representation** 接口；diffusion/score/flow 是 **objective 与采样路径**，autoregressive/masked/joint 是 **factorization**，DiT 则是 **backbone**。同一种连续 latent 可交给 diffusion 或 flow，同一种离散 token 可交给 AR、masked prediction 或 discrete diffusion。把连续 latent 切成 spacetime patches 只是给 Transformer 组织输入，并不会自动把它变成 VQ 离散 token。
 
-| 表示 | 是否量化 | 常见生成目标 | 关键瓶颈 |
-|---|---:|---|---|
-| 连续 VAE/AE latent | 否 | Gaussian diffusion、score、flow、DMD | 压缩率与重建保真 |
-| VQ 离散 token | 是 | categorical AR、masked prediction、discrete diffusion | codebook 容量、量化误差与利用率 |
-| Spacetime patch | 不一定 | DiT 上的 diffusion/flow/其他目标 | patch 大小、token 数与注意力成本 |
-
-把连续 latent 切成 spacetime patches 只是给 Transformer 组织输入，并不会自动把它变成 VQ 离散 token。Stable Video Diffusion 是连续 latent video diffusion 的公开技术报告实例 [[14]](#ref-14)；Sora 的机构技术报告则明确披露了视频压缩、spacetime patch 与 Transformer diffusion 的组合，但没有公开足以复现训练数据、完整注意力结构、参数量、sampler 和成本的细节 [[16]](#ref-16)。
+本章只负责这些表示如何接入 diffusion。连续/离散/结构化类型、量化、预算口径、真实 codec 与 tokenizer 替换实验统一见[视频 Tokenizer 与生成式压缩](video-tokenizers.md)。Stable Video Diffusion 是连续 latent video diffusion 的公开技术报告实例 [[14]](#ref-14)；Sora 的机构技术报告则明确披露了视频压缩、spacetime patch 与 Transformer diffusion 的组合，但没有公开足以复现训练数据、完整注意力结构、参数量、sampler 和成本的细节 [[16]](#ref-16)。
 
 ## 6. 视频时空架构与条件控制
 
@@ -353,7 +347,7 @@ CausVid 把 DMD 扩展到视频，用双向 diffusion teacher 监督 4-step caus
 |---|---|---|
 | 任务与条件 | T2V、I2V、V2V、预测或动作条件；完整 prompt/参考/控制 | 把编辑或预测结果当开放生成结果 |
 | 视频范围 | 分辨率、帧数、FPS、时长、是否分段拼接 | 把短 clip 质量外推到长视频 |
-| 表示 | Pixel/continuous latent/VQ；codec 压缩率与 $D(E(X))$ 重建 | 把 decoder 伪影归因于 denoiser |
+| 表示 | Pixel/continuous latent/VQ；shape、dtype、时空网格、元素/token 预算与 $D(E(X))$ 重建；仅有 bitstream 时报告 bpp/bitrate | 把 decoder 伪影归因于 denoiser，或把 tensor shape 当作码率 |
 | 训练 | $\alpha/\sigma$ schedule、$p(\tau)$、target、weight、数据阶段 | 只写“使用 diffusion loss” |
 | 采样 | sampler、节点、NFE、随机性、CFG scale、seed 数 | 把名义 step 当真实网络调用 |
 | 系统 | GPU 型号与数量、精度、batch、编译/量化、是否含 VAE 解码 | 把多卡吞吐当单样本延迟 |

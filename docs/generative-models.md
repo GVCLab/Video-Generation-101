@@ -18,7 +18,7 @@ $$
 
 例如，NOVA 是**连续 latent 表示**、**帧间与帧内集合式自回归分解**、**逐 token diffusion loss**和 Transformer 的组合；Pyramidal Flow 把**连续 latent**、**时间金字塔自回归**、**flow matching**与 DiT 组合；CausVid 则把双向视频 diffusion teacher 蒸馏成**时间因果**、**少步** student [[21]](#ref-21) [[20]](#ref-20) [[23]](#ref-23)。这些系统不能被放进一列互斥“模型家族”而不丢失关键信息。
 
-本章建立全局地图。DDPM、score、SDE/PF-ODE 的完整推导见[扩散模型专章](generative-models/diffusion-models.md)；FM、RF、Consistency、Shortcut 与 DMD 的差异见[Flow 与 Consistency 专章](generative-models/flow-consistency-models.md)；SFT、reward model、DPO/RWR、policy-gradient RL、推理期 guidance 与蒸馏的边界见[视频后训练与对齐专章](generative-models/video-post-training-alignment.md)；在线生成的暴露偏移、缓存和 SLO 见[因果、流式与实时专章](generative-models/causal-streaming-generation.md)。
+本章建立全局地图。连续/离散表示、压缩账本、因果 codec 与实际 bitstream 的边界见[视频 Tokenizer 与生成式压缩专章](generative-models/video-tokenizers.md)，ELBO、learned prior 与随机未来见[变分生成专章](generative-models/variational-generation.md)；DDPM、score、SDE/PF-ODE 的完整推导见[扩散模型专章](generative-models/diffusion-models.md)；FM、RF、Consistency、Shortcut 与 DMD 的差异见[Flow 与 Consistency 专章](generative-models/flow-consistency-models.md)；SFT、reward model、DPO/RWR、policy-gradient RL、推理期 guidance 与蒸馏的边界见[视频后训练与对齐专章](generative-models/video-post-training-alignment.md)；在线生成的暴露偏移、缓存和 SLO 见[因果、流式与实时专章](generative-models/causal-streaming-generation.md)。
 
 ## 1. 一张图看懂五个交叉分类轴
 
@@ -33,7 +33,7 @@ flowchart LR
 
     R["R · Representation<br/>pixel / continuous latent / discrete token"]
     F["F · Factorization<br/>joint / AR / masked / hierarchy / causal chunk"]
-    O["O · Objective<br/>ELBO-score / FM-RF / CM-shortcut / DMD / GAN-RL"]
+    O["O · Objective<br/>ELBO / adversarial / score / FM-RF / CM-DMD / preference-RL"]
     B["B · Backbone<br/>U-Net / DiT / decoder Transformer / recurrent-SSM"]
     D["D · Deployment<br/>offline / few-step / streaming / interactive"]
 
@@ -53,7 +53,7 @@ flowchart LR
     X4["StreamDiffusionV2<br/>cache + scheduler + pipeline + SLO"] -.-> E
 ~~~
 
-顺序化文字替代：先确定生成变量是像素、连续 latent 还是离散 token；再确定联合分布按全片、逐帧、逐 token、mask 块、尺度或因果 chunk 怎样分解；再选择 ELBO/score、flow、consistency、DMD、GAN 或偏好目标；由 U-Net、DiT、decoder-only Transformer 或 recurrent/SSM 实现；最后才讨论离线、少步、流式或交互部署。系统声称什么，就必须提供对应的质量、NFE、TTFF、deadline、长期漂移或闭环控制证据。
+顺序化文字替代：先确定生成变量是像素、连续 latent 还是离散 token；再确定联合分布按全片、逐帧、逐 token、mask 块、尺度或因果 chunk 怎样分解；再选择 ELBO、adversarial、denoising/score、flow、consistency/DMD 或偏好目标；由 U-Net、DiT、decoder-only Transformer 或 recurrent/SSM 实现；最后才讨论离线、少步、流式或交互部署。系统声称什么，就必须提供对应的质量、NFE、TTFF、deadline、长期漂移或闭环控制证据。
 
 ## 2. 为什么旧式“路线列表”会误导
 
@@ -67,7 +67,7 @@ flowchart LR
 | Backbone | 用什么网络实现条件映射、score 或速度场？ | 2D/3D U-Net、DiT、decoder Transformer、RNN/recurrent-state/SSM、cascade/MoE | “DiT”不是与 diffusion/flow 并列的概率家族 |
 | Deployment | 输出何时可见，系统受什么运行约束？ | offline multistep、few-step、preview、streaming、interactive、quantized/cached/pipelined | causal mask、低 NFE 或平均 FPS 不能自动证明 SLO |
 
-VAE 还容易同时指两件事：一是用 ELBO 学整个生成分布的潜变量模型；二是现代视频系统中只负责压缩与解码的 codec。后者的上层 generator 完全可以使用 diffusion、flow、AR 或 DMD。因此，“用了 VAE”往往只回答表示轴的一部分，而不是整个系统属于哪一派 [[1]](#ref-1)。
+VAE 还容易同时指两件事：一是用 ELBO 学整个生成分布的潜变量模型；二是现代视频系统中只负责紧凑编码与解码的 tokenizer。后者的上层 generator 完全可以使用 diffusion、flow、AR 或 DMD；若没有量化、概率模型、熵编码器与 bitstream，也不能仅凭 latent shape 声称实际码率压缩。因此，“用了 VAE”往往只回答表示轴的一部分，而不是整个系统属于哪一派 [[1]](#ref-1)。两种角色分别见[变分生成](generative-models/variational-generation.md)与[视频 Tokenizer](generative-models/video-tokenizers.md)。
 
 ### 2.1 三条常见兼容配置怎样串起来
 
@@ -102,7 +102,7 @@ z=E(x)\in
 \hat{x}=D(z).
 $$
 
-压缩率应分别报告时间、空间和通道：
+表示预算应分别报告时间、空间和通道：
 
 $$
 r_t=\frac{T}{T'},\qquad
@@ -110,7 +110,7 @@ r_s=\frac{HW}{H'W'},\qquad
 r_{\mathrm{elem}}=\frac{THWC}{T'H'W'C_z}.
 $$
 
-只写“$8\times$ VAE”可能把空间压缩、总元素压缩和 bitrate 混为一谈。codec 验收至少要包含文字、小物体、快速运动、闪烁、首尾 causal 边界和长段落漂移。生成器分数再高，也不能恢复 codec 已系统性删除的信息。
+只写“$8\times$ VAE”可能把空间网格比、总元素比和 bitrate 混为一谈。没有量化、熵模型和实际 bitstream 时，只能报告 shape、dtype、网格或元素预算，不能报告 bpp/bitrate。tokenizer 验收至少要包含文字、小物体、快速运动、闪烁、首尾 causal 边界和长段落漂移；完整四本账与生成式 decoder 的幻觉边界见[视频 Tokenizer 专章](generative-models/video-tokenizers.md)。生成器分数再高，也不能可靠恢复 tokenizer 已系统性删除的信息。
 
 ### 3.3 Discrete token
 
@@ -122,7 +122,7 @@ VQ 类 tokenizer 将 encoder 输出映射到有限 codebook，生成器可使用
 
 Sora 报告在压缩 latent 上切 spacetime patches，再由 Transformer diffusion 建模 [[18]](#ref-18)。Patchification 是把连续张量组织成 Transformer 输入单元；除非前置 tokenizer 真的量化到有限 codebook，否则不能写成“离散视觉 token”。
 
-同理，**causal VAE**只表示 codec 在时间上不偷看未来，便于在线编码或解码；它不证明上层生成器 causal，更不证明端到端 streaming。
+同理，**causal VAE**只表示 tokenizer 在时间上不偷看未来，便于在线编码或解码；它不证明上层生成器 causal，更不证明端到端 streaming。首帧、padding、chunk 与 cache 的详细合同见[视频 Tokenizer 专章](generative-models/video-tokenizers.md)。
 
 ## 4. 第二轴：Factorization——联合分布怎样被拆开
 
@@ -168,9 +168,11 @@ $$
 
 ### 4.5 Causal chunk / rolling
 
-每个新帧或 chunk 只能看过去；chunk 内部仍可双向联合生成。它是 **data-time information constraint**，不是 noise-time sampler，也不是结构因果模型。
+每个新帧或 chunk 只能看过去；chunk 内部仍可双向联合生成。有限 lookahead 也可以形成流式系统，但必须把可读未来范围、revision window 和最终 commit frontier 写清，不能把它标成严格 causal。这里讨论的是 **data-time information constraint**，不是 noise-time sampler，也不是结构因果模型。
 
 CausVid、Self Forcing 与 Separable Causal Diffusion 分别从蒸馏、自生成历史和“时间推理与迭代去噪解耦”推进这一分支 [[23]](#ref-23) [[24]](#ref-24) [[26]](#ref-26)。这些论文中的 causal 首先表示不访问未来帧，不能自动升级为干预正确或物理因果理解。
+
+实现时还要把四层合同拆开：causal codec → causal generator → streaming commit → real-time SLO；任一层成立都不自动推出下一层。首帧与 chunk codec 细节见[视频 Tokenizer](generative-models/video-tokenizers.md)，commit、backpressure、open-horizon 与反证实验见[因果流式专章](generative-models/causal-streaming-generation.md)。
 
 ## 5. 第三轴：Objective——模型用什么统计信号学习
 
@@ -250,12 +252,14 @@ DMD 的核心是 distribution matching：用 target score 与 fake/student score
 | 声明 | 最低操作定义 | 必须报告 | 不能偷换成 |
 |---|---|---|---|
 | Few-step | 单个输出所需 NFE 明显减少 | NFE、solver、guidance、时长、分辨率、质量/覆盖曲线 | streaming 或长期稳定 |
-| Causal | 新输出不读取未来数据 token | receptive field、commit 粒度、训练/推理历史 | 结构因果理解 |
-| Streaming | 完整序列结束前持续提交输出并增量维护状态；输出通常不可撤回，或只允许协议明确规定的有界修订 | TTFF、inter-frame latency、缓存、峰值显存、漂移、修订窗口 | “能生成长视频” |
+| Causal | 新输出不读取声明范围外的未来数据 token；若有 finite lookahead 必须单列 | receptive field、块内访问、codec/generator 边界、训练/推理历史、未来扰动测试 | 结构因果理解或 streaming commit |
+| Streaming | 完整序列结束前持续提交输出并增量维护状态；输出通常不可撤回，或只允许协议明确规定的有界修订 | commit 单元/hash、lookahead、revision、overlap/crop、条件生效点、backpressure、cache reset | “能生成长视频”或 real-time |
 | Interactive | 生成期间可接收新 prompt/action 并在声明预算内生效 | 输入到可见响应延迟、状态保持、反事实控制 | 预先给定整条轨迹 |
-| Real-time | 在指定硬件、精度和负载下持续满足 deadline | p50/p95/p99、deadline miss、jitter、steady-state FPS、批量和并发 | 单次平均 FPS |
+| Real-time | 在指定硬件、精度、到达负载和播放时钟下持续满足端到端 deadline | cold/warm TTFF、condition-to-display、p50/p95/p99、miss、jitter、steady-state FPS、并发、soak 与恢复 | 单次平均 FPS |
 
 StreamDiffusionV2 把 TTFF、逐帧 deadline、jitter、SLO-aware batching 和多 GPU pipeline 纳入正式系统评测；论文在 4×H100 的特定设置中报告首帧不超过约 0.5 秒等结果，这些数字不能脱离硬件、模型、分辨率、NFE 和精度外推 [[27]](#ref-27)。
+
+开放时长也必须拆成固定长片、测试长度外推、启动时未知终点和恒定资源架构四层。程序能继续调用 sampler，只证明没有主动停止；只有 quality–time/survival curve、resident/外存斜率、EOS/reset 语义和失败样本，才能判断内容与系统是否真的支持 open horizon。
 
 ## 8. 两个时间轴不能混用
 
@@ -282,12 +286,12 @@ flowchart TB
 
 顺序化文字替代：factorization 先决定当前要生成第 $k$ 帧、一个 token、一个 chunk 或一个 mask 块；若条件分布采用 diffusion/flow，内部再沿 $\tau$ 从 base noise 走到样本；样本被 commit 后才进入下一个数据时间。因而“autoregressive diffusion”通常是 data-time AR 与 noise-time denoising 的组合，不是一个神秘的第三时钟。
 
-## 9. 2024–2026 的关键里程碑应该怎样读
+## 9. 2023–2026 的关键里程碑应该怎样读
 
 | 时间 / 工作 | 五轴配置摘要 | 真正推进 | 证据边界 |
 |---|---|---|---|
-| 2024 MAGVIT-v2 [[6]](#ref-6) | discrete video token × masked/LM factorization × Transformer | tokenizer 成为语言模型式视觉生成的关键变量 | tokenizer/图像比较不能替代开放视频生成评测 |
-| 2024 VideoPoet [[7]](#ref-7) | discrete multimodal token × decoder-only AR | 一个 AR 模型统一多种视频输入输出 | 序列长度、tokenizer 和串行成本仍在 |
+| 2023 首次公开 → ICLR 2024 MAGVIT-v2 [[6]](#ref-6) | discrete video token × masked/LM factorization × Transformer | tokenizer 成为语言模型式视觉生成的关键变量 | tokenizer/图像比较不能替代开放视频生成评测 |
+| 2023 首次公开 → ICML 2024 VideoPoet [[7]](#ref-7) | discrete multimodal token × decoder-only AR | 一个 AR 模型统一多种视频输入输出 | 序列长度、tokenizer 和串行成本仍在 |
 | 2024 MAR [[8]](#ref-8) | continuous token × next-set AR × diffusion loss | 证明 AR 不要求 VQ 与 CE | 主要是图像证据，不能直接外推视频运动 |
 | 2024 Sora report [[18]](#ref-18) | compressed latent × spacetime patch × Transformer diffusion | 统一时长、分辨率和宽高比的 patch 表示 | 技术报告未公开全部架构、参数、sampler 和成本 |
 | 2024 Diffusion Forcing [[19]](#ref-19) | sequence factorization × per-token noise | 将 diffusion 与 causal sequence learning 连接 | 不等于商品级视频生成或实时部署 |
@@ -375,14 +379,15 @@ evidence:
 | 本总览 | 五轴 taxonomy、跨轴组合、历史与选型 | 每个 SDE/ODE 的完整推导 |
 | [递归预测](generative-models/recurrent-prediction.md) | 逐步状态、teacher forcing、rollout | 把所有递归模型归成 objective |
 | [变分生成](generative-models/variational-generation.md) | stochastic latent、ELBO、多未来 | 把现代 codec 等同完整 VAE generator |
+| [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md) | 表示接口、连续/离散/混合 latent、压缩账本、causal codec、重建与下游生成 | 把 latent shape 当实际码率；替代上层 factorization/objective 章节 |
 | [对抗生成](generative-models/adversarial-generation.md) | 时空判别器、mode collapse、现代辅助角色 | 把 GAN 与 content/motion representation 混写 |
 | [自回归生成](generative-models/autoregressive-generation.md) | strict frame/token/chunk factorization、continuous head | 把 AR 限定为 VQ+CE |
 | [掩码生成](generative-models/masked-generation.md) | mask schedule、block commit、双向上下文 | 假定 masked 只能离散 |
 | [扩散模型](generative-models/diffusion-models.md) | DDPM→score→SDE/PF-ODE、参数化、sampler | 重复完整 streaming 系统 |
 | [Flow 与 Consistency](generative-models/flow-consistency-models.md) | FM/RF/CM/Shortcut/DMD 与 few-step 证据 | 把 causal/streaming 当 objective |
-| [因果、流式与实时](generative-models/causal-streaming-generation.md) | 自生成历史、bounded memory、KV/cache、SLO | 把低 NFE 自动写成实时 |
+| [因果、流式与实时](generative-models/causal-streaming-generation.md) | codec→generator→commit→SLO 合同、自生成历史、bounded memory、KV/cache、lookahead、backpressure、open horizon | 把低 NFE、因果 mask 或长 demo 自动写成实时 |
 
-推荐先读本章与 Diffusion、Flow/Consistency 两章，建立 objective 的数学桥；再根据模型的 factorization 去读 AR、masked 或 causal streaming；最后回到[大模型系统路线](foundation-models.md)、[评测指南](evaluation.md)和[World Models](world-models.md)，检查能力 claim 是否真的由对应证据支持。
+推荐先读本章，再按 representation 进入[视频 Tokenizer](generative-models/video-tokenizers.md)，按 objective 进入变分、Diffusion 或 Flow/Consistency；随后根据 factorization 去读 AR、masked 或 causal streaming。最后回到[大模型系统路线](foundation-models.md)、[评测指南](evaluation.md)和[World Models](world-models.md)，检查能力 claim 是否真的由对应证据支持。
 
 ## 参考文献
 
