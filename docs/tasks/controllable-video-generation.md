@@ -29,6 +29,7 @@ $$
 | 相邻任务 | 输入时间轴 | 主要保真对象 | 本章与它的交集 | 不能混写的证据 |
 |---|---|---|---|---|
 | [I2V](image-to-video.md) | 一张/多张图像是输出中已知时刻 | 锚点帧、身份、可见内容 | I2V + 相机/轨迹/姿态控制是可控生成子集 | 首帧相似不证明轨迹生效 |
+| [开放集视频个性化](personalized-video-generation.md) | 主体参考通常不占输出时间轴 | 开放集主体身份与关键属性 | identity / appearance 可作为一类控制条件 | identity score 不证明 prompt/运动、多主体绑定或无泄漏 |
 | [V2V editing](video-to-video.md) | 完整源视频已给定 | 未编辑区域、原运动/时序 | 可用轨迹或相机信号改动源视频 | 只有首帧时不能宣称守住了源运动 |
 | [story/multishot](story-multishot.md) | 多镜头状态与切镜计划 | 角色、道具、关系和叙事状态 | 每个镜头可有相机/对象控制 | 单镜头轨迹成功不证明跨镜头连续 |
 | [action-conditioned prediction](action-conditioned-prediction.md) | 历史观测 + 环境可执行 action | 状态转移、动作后果 | 动作可编码为视觉控制，但还需环境语义 | 拖动一个点不等于执行机器人 action |
@@ -183,6 +184,8 @@ $$
 其中 $a_j$ 表示身份/服饰/材质/局部属性，$r_j$ 声明它是时间锚点、纯外观参考，还是驱动帧。Animate Anyone 使用 ReferenceNet 保留外观细节，Pose Guider 给姿态，temporal layers 处理时序；这正是将 identity 与 pose 拆开的代表 [[11]](#ref-11)。
 
 参考条件过强会把源姿势、光照甚至背景一起复制；过弱则在大姿态、遮挡和转身时丢失身份。因此身份评测必须按姿态幅度、可见面、遮挡和时间分层；“全帧 CLIP 相似度高”无法排除静帧复制。FaceCam 进一步说明人像相机控制有特殊尺度歧义；其 scale-aware camera representation 专门处理单目人像的几何变形和身份/运动保留 [[31]](#ref-31)。
+
+本节只拥有 identity signal 的坐标、时钟、注入和与其他控制信号的冲突合同；逐主体适配、开放集拆分、多主体绑定与参考泄漏由[开放集视频个性化](personalized-video-generation.md)验收。
 
 ### 4.5 Multi-control composition：同时接收不等于同时遵循
 

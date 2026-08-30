@@ -26,6 +26,7 @@
 | Video-to-video | 源视频与编辑条件 | 与源视频时间轴强对应的改写视频 | 源运动、结构或布局，依任务而定 | 从剧本自主规划多个镜头 |
 | Story visualization | 多句故事，可加人物参考 | 多张静态故事图 | 跨图人物与剧情一致 | 已生成镜头内运动；StoryGAN 即把任务定义为故事到图像序列 [[1]](#ref-1) |
 | Storyboard | 剧本/镜头描述 | 每镜头关键帧或首尾帧对 | 构图、人物、镜头意图 | 已把关键帧可靠动画化 |
+| [开放集视频个性化](personalized-video-generation.md) | 主体参考 + prompt，可附控制 | 新时间轴的单片段或候选镜头 | 新情境中的主体身份、属性与绑定 | 自动证明跨镜头事实、道具状态或回滚 |
 | Multi-shot video | 故事、镜头表或逐镜头 prompt，可加参考 | 至少两个镜头，含硬切/转场及镜头内运动 | 镜头内动态 + 镜头间叙事状态 + 边界语法 | 自动证明长程因果或电影质量 |
 
 StoryDALL-E 与 Make-A-Story 都属于静态 story visualization/continuation：前者从源图与故事生成后续图像，后者用视觉记忆维持多图一致性 [[2]](#ref-2) [[3]](#ref-3)。Phenaki 能按连续文本生成可变长度视频，但其核心证据是长时间 token 建模，不是显式切镜合同 [[4]](#ref-4)。SEINE 处理首尾条件下的转场/补间，适合连接两个片段，却也不自动成为多镜头叙事器 [[6]](#ref-6)。
@@ -90,6 +91,8 @@ $$
 若方法同时生成音频，还必须另写 $A_i\in\mathbb R^{B\times C_a\times L_i^a}$、采样率与音画对齐规则；不能把“后配音”与联合音视频生成混成同一个输出合同。UnityShots 把 opening-shot 长期记忆与前一镜头 tail 短期记忆用于多镜头音视频生成，但截至冻结日其训练代码、权重和 agent 系统仍标为待发布 [[26]](#ref-26)。
 
 ### 2.1 可审计状态不是“一张参考图”
+
+单个镜头内如何从参考抽取、适配并绑定主体，属于[开放集视频个性化](personalized-video-generation.md)；本章拥有的是镜头间状态的接受、更新、失效、召回与回滚。
 
 一个实用的已接受状态可以写成
 
@@ -232,7 +235,7 @@ flowchart TB
 | 2026 评测 | MuSS、MSVBench、EntityBench、PersonaShot [[27]](#ref-27) [[28]](#ref-28) [[29]](#ref-29) [[30]](#ref-30) | 电影数据、层级诊断、长间隔实体与人物叙事评测 | 多数仍为预印本，指标需人类校准 |
 | 2026-08 | LogiShot、SEAM [[31]](#ref-31) [[32]](#ref-32) | 上下文视频逻辑条件、prompt 层记忆图/回写 | 最新预印本；后者主要是 storyboarding/prompt 系统 |
 
-2025–2026 的 frontier 不是单一排行榜，而是三条互相牵制的轴：一次生成能否全局协调、逐镜头系统能否维护可更新状态、流式系统能否在低延迟下避免 exposure drift。PoCo 还把多参考与多镜头放到同一位置条件接口，提示“参考属于谁、在何时生效”本身就是核心建模问题 [[33]](#ref-33)。
+2025–2026 的 frontier 不是单一排行榜，而是三条互相牵制的轴：一次生成能否全局协调、逐镜头系统能否维护可更新状态、流式系统能否在低延迟下避免 exposure drift。PoCo 还把多参考与多镜头放到同一位置条件接口，提示“参考属于谁、在何时生效”本身就是核心建模问题 [[33]](#ref-33)；参考槽、绑定与身份泄漏验收见[开放集视频个性化](personalized-video-generation.md)，本章仍以跨镜头状态为最终合同。
 
 ## 6. 数据、评测与最常见的证据错位
 
@@ -386,6 +389,6 @@ flowchart TB
 
 <a id="ref-32"></a>[32] [SEAM: Structured Episodic Agent Memory for Long-Horizon Storyboarding](https://arxiv.org/abs/2608.22725); [SEAM-Bench](https://huggingface.co/datasets/Jackyqq/SEAM-Bench). arXiv. 2026.
 
-<a id="ref-33"></a>[33] [PoCo: Position-Aware Multi-Reference Conditioning for Controllable Multi-Shot Video Generation](https://arxiv.org/abs/2604.03738). arXiv. 2026.
+<a id="ref-33"></a>[33] [Rethinking Position Embedding as a Context Controller for Multi-Reference and Multi-Shot Video Generation](https://openaccess.thecvf.com/content/CVPR2026/html/Huang_Rethinking_Position_Embedding_as_a_Context_Controller_for_Multi-Reference_and_CVPR_2026_paper.html). CVPR, 2026.
 
 <a id="ref-34"></a>[34] [EM-Vid: Entity-Centric Memory for Multi-Shot Video Generation](https://arxiv.org/abs/2605.23610). arXiv. 2026.

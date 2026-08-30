@@ -30,7 +30,7 @@ p_\theta(X_{0:F-1}\mid I_{\mathrm{ref}},c_{\mathrm{text}},
 c_{\mathrm{motion}},c_{\mathrm{cam}},c_{\mathrm{audio}}),
 $$
 
-其中 $X\in[0,1]^{B\times F\times3\times H\times W}$，并且合同声明 $I_{\mathrm{ref}}$ 对应某个已知时间索引，最常见是 $X_0$。若输入图只提供人物外观、画风或产品身份，却不要求成为视频中的实际帧，则更准确的名字是 **reference-to-video**，而不是严格首帧 I2V。
+其中 $X\in[0,1]^{B\times F\times3\times H\times W}$，并且合同声明 $I_{\mathrm{ref}}$ 对应某个已知时间索引，最常见是 $X_0$。若输入图只提供人物外观、画风或产品身份，却不要求成为视频中的实际帧，则更准确的名字是 **reference-to-video**，而不是严格首帧 I2V；当参考用于定义测试时未见主体、输出使用新场景与新时间轴时，进入[开放集视频个性化](personalized-video-generation.md)的身份—运动合同。
 
 ### 1.1 三种“锚定”强度不能混写
 
@@ -46,7 +46,7 @@ $$
 |---|---|---:|---|---|
 | **严格 I2V / TI2V** | 一张或多张已知时刻图像，可加文本 | 是，常为首帧 | 未来运动、新显露区域、镜头 | 锚点 + 身份 + 运动 + 条件遵循 |
 | **first–last / keyframe transition** | 首尾帧或稀疏关键帧 | 是，多个锚点 | 锚点间路径可能多解 | 每个锚点、顺序、转场合理性 |
-| **reference-to-video** | 外观/身份/风格参考图 | 不一定 | 场景、构图与时间位置可改变 | 跨姿态身份与属性保持 |
+| [**开放集视频个性化 / reference-to-video**](personalized-video-generation.md) | 外观/身份/风格参考图 | 否 | 场景、构图与时间位置可改变 | 跨姿态身份、属性、绑定与无参考泄漏 |
 | **角色/肖像 animation** | 人物图 + pose/audio/driving video | 常是外观参考，不必是首帧 | 受驱动动作、口型或姿态 | 身份、驱动同步、领域外泛化 |
 | **image-conditioned video editing** | 源视频 + 编辑图/文字/掩码 | 源视频定义时间轴 | 局部内容变化 | 未编辑区域守恒 + 编辑遵循 |
 | **video-prefix continuation / prediction** | 已发生的视频前缀，可加文本/动作 | 前缀占据输出时间轴，未来尚未知 | 前缀后的未来分布 | 前缀守恒、无未来泄漏、多步漂移/校准 |
@@ -255,6 +255,8 @@ I2V-Adapter 把已有 T2I/T2V diffusion 通过轻量适配器扩展为图像条�
 ## 🪞 7. 技术路线四：身份保持、关键帧与长视频
 
 ### 7.1 身份保持不是只比首帧相似度
+
+本节只拥有“参考是已知时刻锚点”时的保真问题；纯主体参考的适配、多主体绑定、参考姿态/背景泄漏与身份—运动 Pareto 见[开放集视频个性化](personalized-video-generation.md)。
 
 ConsistI2V 用 first-frame spatiotemporal attention 传播参考信息，并从参考图低频成分初始化噪声，以保持布局和风格 [[13]](#ref-13)。它揭示两个尺度：低频结构负责全局布局，局部 token/feature 负责身份细节。只比较第一帧与输出平均 CLIP 相似度，会漏掉手指、文字、纹理和遮挡后重现等局部漂移。
 

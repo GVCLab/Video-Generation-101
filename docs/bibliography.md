@@ -2,7 +2,7 @@
 
 # 论文引用、代码仓库与 GitHub Stars
 
-本索引收录 **117 篇**在 `bibliography/registry.json` 中登记的核心论文与技术报告，用于提供标准 BibTeX 和官方代码状态。仓库正文引用的文献总数多于此，完整清单以各章文末的参考文献为准。论文元数据来自 Crossref、arXiv 或机构原始页面；GitHub Stars 是 **2026-08-30** 的快照，不代表代码质量。
+本索引收录 **132 篇**在 `bibliography/registry.json` 中登记的核心论文与技术报告，用于提供标准 BibTeX 和官方代码状态。仓库正文引用的文献总数多于此，完整清单以各章文末的参考文献为准。论文元数据来自 Crossref、arXiv 或机构原始页面；GitHub Stars 是 **2026-08-30** 的快照，不代表代码质量。
 
 - [完整 BibTeX](../bibliography/references.bib)
 - [引用与仓库登记表](../bibliography/registry.json)
@@ -38,6 +38,8 @@
 - **J**：现代视频基础模型与系统报告
 - **K**：因果、自回归流式生成与加速
 - **L**：Video DiT 骨干、注意力与扩展
+- **M**：变分随机视频与时序潜变量
+- **N**：开放集与单/多主体视频个性化
 
 这里的“代码仓库”表示可公开访问的 GitHub 实现；是否属于 OSI 定义的开源软件、权重是否开放，以及可否商用，仍需逐项查看仓库许可证。
 
@@ -55,7 +57,6 @@
 | B | `shi2015convolutional` | [Convolutional LSTM Network: A Machine Learning Approach for Precipitation Nowcasting](https://arxiv.org/abs/1506.04214) | 2015 | **未发现官方 GitHub 仓库** | — |
 | B | `srivastava2015unsupervised` | [Unsupervised Learning of Video Representations using LSTMs](https://arxiv.org/abs/1502.04681) | 2015 | **未发现官方 GitHub 仓库** | — |
 | C | `clark2019adversarial` | [Adversarial Video Generation on Complex Datasets](https://arxiv.org/abs/1907.06571) | 2019 | **未发现官方 GitHub 仓库** | — |
-| C | `denton2018stochastic` | [Stochastic Video Generation with a Learned Prior](https://arxiv.org/abs/1802.07687) | 2018 | [edenton/svg](https://github.com/edenton/svg) · **官方代码**；作者实现 | 188 |
 | C | `tulyakov2017mocogan` | [MoCoGAN: Decomposing Motion and Content for Video Generation](https://arxiv.org/abs/1707.04993) | 2017 | [sergeytulyakov/mocogan](https://github.com/sergeytulyakov/mocogan) · **官方代码**；作者实现 | 603 |
 | C | `vondrick2016generating` | [Generating Videos with Scene Dynamics](https://arxiv.org/abs/1609.02612) | 2016 | [cvondrick/videogan](https://github.com/cvondrick/videogan) · **官方代码**；论文项目页链接的作者实现 | 706 |
 | D | `oord2017neural` | [Neural Discrete Representation Learning](https://arxiv.org/abs/1711.00937) | 2017 | **未发现官方 GitHub 仓库** | — |
@@ -65,7 +66,7 @@
 | D | `yu2023language` | [Language Model Beats Diffusion -- Tokenizer is Key to Visual Generation](https://arxiv.org/abs/2310.05737) | 2023 | [google-research/magvit](https://github.com/google-research/magvit) · **官方相关代码（非本论文实现）**；作者团队的 MAGVIT v1 仓库；README 未声明包含 MAGVIT-v2 实现；仓库已归档 | 1,001 |
 | E | `bartal2024lumiere` | [Lumiere: A Space-Time Diffusion Model for Video Generation](https://arxiv.org/abs/2401.12945) | 2024 | **未发现官方 GitHub 仓库** | — |
 | E | `blattmann2023align` | [Align your Latents: High-Resolution Video Synthesis with Latent Diffusion Models](https://arxiv.org/abs/2304.08818) | 2023 | **未发现官方 GitHub 仓库** | — |
-| E | `blattmann2023stable` | [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127) | 2023 | [Stability-AI/generative-models](https://github.com/Stability-AI/generative-models) · **官方代码**；Stability AI 官方模型仓库 | 27,274 |
+| E | `blattmann2023stable` | [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127) | 2023 | [Stability-AI/generative-models](https://github.com/Stability-AI/generative-models) · **官方代码**；Stability AI 官方模型仓库 | 27,276 |
 | E | `guo2023animatediff` | [AnimateDiff: Animate Your Personalized Text-to-Image Diffusion Models without Specific Tuning](https://arxiv.org/abs/2307.04725) | 2023 | [guoyww/AnimateDiff](https://github.com/guoyww/AnimateDiff) · **官方代码**；作者实现 | 12,229 |
 | E | `ho2020denoising` | [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239) | 2020 | [hojonathanho/diffusion](https://github.com/hojonathanho/diffusion) · **官方代码**；作者实现 | 5,304 |
 | E | `ho2022imagen` | [Imagen Video: High Definition Video Generation with Diffusion Models](https://arxiv.org/abs/2210.02303) | 2022 | **未发现官方 GitHub 仓库** | — |
@@ -83,7 +84,7 @@
 | F | `ha2018worldmodels` | [World Models](https://arxiv.org/abs/1803.10122) | 2018 | [hardmaru/WorldModelsExperiments](https://github.com/hardmaru/WorldModelsExperiments) · **官方研究产物**；作者发布的实验代码与笔记 | 734 |
 | G | `bruce2024genie` | [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391) | 2024 | **未发现官方 GitHub 仓库** | — |
 | G | `nvidia2025cosmos` | [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575) | 2025 | [nvidia-cosmos/cosmos-predict1](https://github.com/nvidia-cosmos/cosmos-predict1) · **官方代码**；NVIDIA Cosmos Predict1 官方实现 | 468 |
-| G | `nvidia2026cosmos3` | [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800) | 2026 | [NVIDIA/Cosmos](https://github.com/NVIDIA/Cosmos) · **官方代码**；NVIDIA 官方统一 Cosmos 仓库 | 11,670 |
+| G | `nvidia2026cosmos3` | [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800) | 2026 | [NVIDIA/Cosmos](https://github.com/NVIDIA/Cosmos) · **官方代码**；NVIDIA 官方统一 Cosmos 仓库 | 11,671 |
 | G | `valevski2024diffusion` | [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837) | 2024 | [GameNGen/GameNGen.github.io](https://github.com/GameNGen/GameNGen.github.io) · **官方项目页（非模型代码）**；官方项目页源码，不含模型训练或推理实现 | 91 |
 | G | `yang2023interactive` | [Learning Interactive Real-World Simulators](https://arxiv.org/abs/2310.06114) | 2023 | **未发现官方 GitHub 仓库** | — |
 | G | `ye2026worldaction` | [World Action Models are Zero-shot Policies](https://arxiv.org/abs/2602.15922) | 2026 | [dreamzero0/dreamzero](https://github.com/dreamzero0/dreamzero) · **官方代码**；DreamZero / World Action Model 作者实现 | 2,603 |
@@ -105,7 +106,6 @@
 | H | `lecun2022path` | [A Path Towards Autonomous Machine Intelligence](https://openreview.net/forum?id=BZ5a1r-kVsf) | 2022 | **未发现官方 GitHub 仓库** | — |
 | I | `kingma2013autoencoding` | [Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114) | 2013 | **未发现官方 GitHub 仓库** | — |
 | I | `huszar2015how` | [How (not) to Train your Generative Model: Scheduled Sampling, Likelihood, Adversary?](https://arxiv.org/abs/1511.05101) | 2015 | **未发现官方 GitHub 仓库** | — |
-| I | `lee2018stochastic` | [Stochastic Adversarial Video Prediction](https://arxiv.org/abs/1804.01523) | 2018 | [alexlee-gk/video_prediction](https://github.com/alexlee-gk/video_prediction) · **官方代码**；作者发布的 SAVP 官方实现 | 304 |
 | I | `unterthiner2018towards` | [Towards Accurate Generative Models of Video: A New Metric &amp; Challenges](https://arxiv.org/abs/1812.01717) | 2018 | **未发现官方 GitHub 仓库** | — |
 | I | `song2020scorebased` | [Score-Based Generative Modeling through Stochastic Differential Equations](https://arxiv.org/abs/2011.13456) | 2020 | [yang-song/score_sde](https://github.com/yang-song/score_sde) · **官方代码**；论文作者发布的 ICLR 2021 官方实现 | 1,844 |
 | I | `ho2022classifierfree` | [Classifier-Free Diffusion Guidance](https://arxiv.org/abs/2207.12598) | 2022 | **未发现官方 GitHub 仓库** | — |
@@ -162,6 +162,23 @@
 | L | `huang2025linvideo` | [LinVideo: A Post-Training Framework towards O(n) Attention in Efficient Video Generation](https://arxiv.org/abs/2510.08318) | 2025 | **未发现官方 GitHub 仓库** | — |
 | L | `mao2025timeripples` | [Timeripple: Accelerating vDiTs by Understanding the Spatio-Temporal Correlations in Latent Space](https://arxiv.org/abs/2511.12035) | 2025 | **未发现官方 GitHub 仓库** | — |
 | L | `chen2026sanavideo2` | [SANA-Video 2.0: Hybrid Linear Attention with Attention Residuals for Efficient Video Generation](https://arxiv.org/abs/2607.21553) | 2026 | [NVlabs/Sana](https://github.com/NVlabs/Sana) · **官方代码**；官方统一仓库；具体已发布 checkpoint 仍须按模型文档核对 | 8,890 |
+| M | `chung2015recurrent` | [A Recurrent Latent Variable Model for Sequential Data](https://arxiv.org/abs/1506.02216) | 2015 | [jych/nips2015_vrnn](https://github.com/jych/nips2015_vrnn) · **官方代码**；作者发布的旧版 Theano 实现 | 291 |
+| M | `babaeizadeh2017stochastic` | [Stochastic Variational Video Prediction](https://arxiv.org/abs/1710.11252) | 2017 | [tensorflow/tensor2tensor](https://github.com/tensorflow/tensor2tensor) · **官方代码**；SV2P 位于该官方仓库；仓库已归档且标记为弃用 | 17,464 |
+| M | `denton2018stochastic` | [Stochastic Video Generation with a Learned Prior](https://arxiv.org/abs/1802.07687) | 2018 | [edenton/svg](https://github.com/edenton/svg) · **官方代码**；作者实现 | 188 |
+| M | `lee2018stochastic` | [Stochastic Adversarial Video Prediction](https://arxiv.org/abs/1804.01523) | 2018 | [alexlee-gk/video_prediction](https://github.com/alexlee-gk/video_prediction) · **官方代码**；作者发布的 SAVP 官方实现 | 304 |
+| M | `castrejon2019improved` | [Improved Conditional VRNNs for Video Prediction](https://arxiv.org/abs/1904.12165) | 2019 | [facebookresearch/improved_vrnn](https://github.com/facebookresearch/improved_vrnn) · **官方代码**；作者配套实现；仓库已归档 | 39 |
+| M | `franceschi2020stochastic` | [Stochastic Latent Residual Video Prediction](https://arxiv.org/abs/2002.09219) | 2020 | [edouardelasalles/srvp](https://github.com/edouardelasalles/srvp) · **官方代码**；作者实现，并提供预训练模型入口 | 74 |
+| M | `wu2021greedy` | [Greedy Hierarchical Variational Autoencoders for Large-Scale Video Prediction](https://arxiv.org/abs/2103.04174) | 2021 | **未发现官方 GitHub 仓库** | — |
+| M | `saxena2021clockwork` | [Clockwork Variational Autoencoders](https://arxiv.org/abs/2102.09532) | 2021 | [vaibhavsaxena11/cwvae](https://github.com/vaibhavsaxena11/cwvae) · **官方代码**；第一作者发布的训练与评测实现 | 50 |
+| M | `daniel2026latent` | [Latent Particle World Models: Self-supervised Object-centric Stochastic Dynamics Modeling](https://arxiv.org/abs/2603.04553) | 2026 | [taldatech/lpwm](https://github.com/taldatech/lpwm) · **官方代码**；ICLR 2026 Oral 官方代码、数据与 checkpoints | 133 |
+| N | `wang2024customvideo` | [CustomVideo: Customizing Text-to-Video Generation with Multiple Subjects](https://arxiv.org/abs/2401.09962) | 2024 | **未发现官方 GitHub 仓库** | — |
+| N | `ma2024magicme` | [Magic-Me: Identity-Specific Video Customized Diffusion](https://arxiv.org/abs/2402.09368) | 2024 | [Zhen-Dong/Magic-Me](https://github.com/Zhen-Dong/Magic-Me) · **官方代码**；作者官方 VCD 训练与推理实现；依赖第三方 SD/AnimateDiff 权重，并提供若干身份嵌入；未发布训练数据集 | 458 |
+| N | `li2024personalvideo` | [PersonalVideo: High ID-Fidelity Video Customization without Dynamic and Semantic Degradation](https://arxiv.org/abs/2411.17048) | 2024 | [EchoPluto/PersonalVideo](https://github.com/EchoPluto/PersonalVideo) · **官方项目页（非模型代码）**；作者占位仓；README 的 Code 仍为 Coming Soon，未发布实现、权重或数据 | 9 |
+| N | `chen2025videoalchemist` | [Multi-subject Open-set Personalization in Video Generation](https://arxiv.org/abs/2501.06187) | 2025 | [snap-research/MSRVTT-Personalization](https://github.com/snap-research/MSRVTT-Personalization) · **官方研究产物**；官方 MSRVTT-Personalization 测试集与评测协议；不含 Video Alchemist 模型实现或权重 | 53 |
+| N | `liang2025movie` | [Movie Weaver: Tuning-Free Multi-Concept Video Personalization with Anchored Prompts](https://arxiv.org/abs/2502.07802) | 2025 | **未发现官方 GitHub 仓库** | — |
+| N | `deng2025magref` | [MAGREF: Masked Guidance for Any-Reference Video Generation with Subject Disentanglement](https://arxiv.org/abs/2505.23742) | 2025 | [MAGREF-Video/MAGREF](https://github.com/MAGREF-Video/MAGREF) · **官方代码**；官方推理代码与 MAGREF checkpoint；480P/14B Pro checkpoint 和训练代码仍在 TODO，训练数据未发布 | 299 |
+| N | `girish2025alchemint` | [AlcheMinT: Fine-grained Temporal Control for Multi-Reference Consistent Video Generation](https://arxiv.org/abs/2512.10943) | 2025 | [snap-research/Video-AlcheMinT](https://github.com/snap-research/Video-AlcheMinT) · **官方项目页（非模型代码）**；官方 README/项目占位仓；未发布方法代码、权重或 benchmark 数据 | 0 |
+| N | `huang2026rethinking` | [Rethinking Position Embedding as a Context Controller for Multi-Reference and Multi-Shot Video Generation](https://arxiv.org/abs/2604.03738) | 2026 | [byhuang123/PoCo](https://github.com/byhuang123/PoCo) · **官方项目页（非模型代码）**；官方占位与演示仓；Release Plan 中 Core model code 尚未发布，无权重或数据 | 20 |
 
 ## 维护约定
 

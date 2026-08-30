@@ -22,24 +22,26 @@
 
 ## 1. 一张图看懂：先分任务，再选择证据
 
-![视频生成评测证据链：能力声明进入任务分流，分别进入开放生成、视频编辑、Video Reasoning 或 World Model；自动指标先接受压力测试，再用冻结人类 Gold Set 校准 Judge，并完成盲测人评；最后检查 SLO、安全、水印和 C2PA，只报告分项结果、失败分类与 Pareto。World Model 还需从视觉诊断升级到动作干预和闭环决策。](../assets/diagrams/video-evaluation-evidence-chain.png)
+![视频生成评测证据链：能力声明先按任务分流，再做自动指标压力测试、冻结人类 Gold Set 校准、盲测人评和 SLO/安全/来源验收，最后只报告分项结果、失败分类与 Pareto；World Model 还需从视觉诊断升级到动作干预和闭环决策。](../assets/diagrams/video-evaluation-evidence-chain.png)
 
-**图 1：评测不是把所有视频送进同一个总分。** 先把能力声明写成可证伪的 claim card，再按任务选择成功条件；自动指标只有通过受控破坏和人类 gold set 校准，才有资格参与最终报告。World Model 分支额外要求动作干预和闭环决策证据。
+**图 1：评测不是把所有视频送进同一个总分。** 先把能力声明写成可证伪的 claim card，再按任务选择成功条件；开放集个性化须从宏观“开放生成”中另拆身份、运动、绑定与泄漏。自动指标只有通过受控破坏和人类 gold set 校准，才有资格参与最终报告。World Model 分支额外要求动作干预和闭环决策证据。
 
 下面是同一逻辑的可编辑、可搜索版本：
 
 ```mermaid
 flowchart TD
     accTitle: 视频生成评测证据链
-    accDescr: 能力声明先按开放生成、视频编辑、视频推理或世界模型分流，再依次通过自动指标压力测试、冻结人类样本校准、盲测人评和部署门槛，最后只报告分项结果、失败分类与 Pareto；世界模型还需动作干预与闭环证据。
+    accDescr: 能力声明先按开放生成、开放集个性化、视频编辑、视频推理或世界模型分流，再依次通过自动指标压力测试、冻结人类样本校准、盲测人评和部署门槛，最后只报告分项结果、失败分类与 Pareto；世界模型还需动作干预与闭环证据。
     A["能力声明<br/>任务、条件、用途、失败代价"] --> B{"任务分流"}
     B -->|开放生成| G["质量 + 覆盖 + 条件 + 时间"]
+    B -->|开放集个性化| PERS["身份 + 运动 + 绑定 + 泄漏"]
     B -->|视频编辑| E["编辑成功 + 源保留 + 局部性 + 时间"]
     B -->|Video Reasoning| R["问题保持 + 结果 + 过程 + 预算"]
     B -->|World Model| W{"是否动作条件化？"}
     W -->|否| W0["只支持 L0–L2<br/>视觉与物理诊断"]
     W -->|是| W1["动作干预 → rollout<br/>策略排序与现实效用"]
     G --> M["自动指标 + 受控破坏压力测试"]
+    PERS --> M
     E --> M
     R --> M
     W0 --> M
@@ -51,7 +53,7 @@ flowchart TD
     J -.->|校准失败则修订指标| M
 ```
 
-顺序化文字替代：声明任务和失败代价；按开放生成、编辑、推理或 World Model 分流；先压力测试自动指标，再用冻结人类样本校准；完成人工盲测与部署门槛；最后发布分项结果、置信区间、失败类型和质量—速度—成本 Pareto。
+顺序化文字替代：声明任务和失败代价；按开放生成、开放集个性化、编辑、推理或 World Model 分流；先压力测试自动指标，再用冻结人类样本校准；完成人工盲测与部署门槛；最后发布分项结果、置信区间、失败类型和质量—速度—成本 Pareto。
 
 ### 1.1 历史范式为什么不断扩大
 
@@ -236,17 +238,19 @@ VideoScore/VideoFeedback 使用来自多个生成模型的 3.76 万条视频多�
 | 评测器元评测 | SLVMEval [[39]](#ref-39) | 最长 10,486 秒、10 类受控退化 | 直接检验 evaluator 是否识别长视频错误 | 某个 judge 在新域必然可靠 |
 | 人体运动 | HuM-Eval / HuM-Bench [[40]](#ref-40) | 1,000 prompts；VLM 粗评 + 2D pose + 3D motion 细评 | 人体运动不再被整体 VQA 掩盖 | 姿态正确等于接触和动力学正确 |
 | 视频编辑 | VE-Bench、FiVE-Bench、IVEBench [[41]](#ref-41) [[42]](#ref-42) [[43]](#ref-43) | 从整体编辑质量推进到对象 mask、长序列和多类指令 | 同时检查“改对”和“未要求部分保住” | 开放式 T2V 覆盖能力 |
+| 开放集个性化 | [主体到视频 benchmark 与身份指标谱系](tasks/personalized-video-generation.md) | identity-disjoint 主体拆分、参考集、适配预算与多主体协议 | 身份、运动/prompt、绑定与参考泄漏被分开 | 单帧人脸/全帧相似度足够 |
 | 物理与 World Model | VideoPhy、PhyGenBench、VideoPhy-2、Physics-IQ、WorldModelBench、WorldMark [[23]](#ref-23) [[24]](#ref-24) [[25]](#ref-25) [[44]](#ref-44) [[32]](#ref-32) [[45]](#ref-45) | 常识/规律 → 视觉违规 → 动作响应 | 物理和动作响应形成独立证据链 | 视觉 plausibility 自动等于决策效用 |
 | Video Reasoning | MME-CoF、TiViBench、Gen-ViRe、V-ReasonBench、VBVR、World Reasoning Arena、VBVR-Pro [[46]](#ref-46) [[47]](#ref-47) [[48]](#ref-48) [[49]](#ref-49) [[50]](#ref-50) [[51]](#ref-51) [[52]](#ref-52) | 结果、过程、预算与可验证状态 | 生成过程可作为推理轨迹被检查 | 漂亮中间帧就是合法推理 |
 | 安全与来源 | T2VSafetyBench、VideoMarkBench、SIGMark、C2PA 2.4 [[26]](#ref-26) [[54]](#ref-54) [[55]](#ref-55) [[56]](#ref-56) | 行为风险、水印攻击和来源凭证分层 | 部署风险进入可复现协议 | 有水印/C2PA 就代表内容真实 |
 
 这条谱系的主线是：**单一总分 → 多维诊断 → 任务专项 benchmark → 对 evaluator 本身做压力测试 → 将生成质量与决策、部署证据分开。**
 
-### 5.7 四类任务必须使用不同的成功定义
+### 5.7 五类任务必须使用不同的成功定义
 
 | 任务 | 基本评测单位 | 必须回答 | 典型指标 | 不能由此推出 |
 |---|---|---|---|---|
 | 开放生成 | `prompt × seed` | 好看吗、动了吗、条件正确吗、覆盖困难 prompt 吗 | 分项质量、组合事实、时间/物理、拒绝率、人评 | 动作因果或规划价值 |
+| 开放集个性化 | `subject × reference set × prompt/control × seed × adaptation budget` | 新情境中还是同一主体吗、动了吗、绑定对了吗、复制参考了吗 | 身份/关键属性、prompt/运动、时间漂移、多主体绑定、泄漏与成本 | I2V 锚点保真或跨镜头状态管理 |
 | 视频编辑 | `source × instruction × seed`，mask 可选 | 改对了吗、原视频保住了吗、影响是否越界、时间上稳定吗 | edit success、source fidelity、locality、identity/motion preservation | 开放生成的多样性和覆盖 |
 | Video Reasoning | `question/initial state × seed × budget` | 问题约束保留了吗、答案对吗、中间状态合法吗 | exact/program score、process violation、pass@1/pass@k、预算 | 存在可用于控制的 World Model |
 | World Model | `initial state × action branch × horizon × policy` | 动作后果、反事实、长 rollout 和策略排序可靠吗 | action alignment、regret、return gap、optimization lift | 跨域通用世界理解 |
@@ -260,6 +264,10 @@ VideoScore/VideoFeedback 使用来自多个生成模型的 3.76 万条视频多�
 3. **Locality and temporal stability：** 改动是否局限在目标区域/时间段，是否产生闪烁和跨帧泄漏。
 
 VE-Bench 同时建模文本—编辑结果、源—编辑结果和感知质量；FiVE-Bench 引入对象级指令与 mask；IVEBench 再扩展到 600 个源视频、32–1,024 帧、8 大类/35 子类 [[41]](#ref-41) [[42]](#ref-42) [[43]](#ref-43)。`VE-Bench`（编辑输出质量）不要与 2026 年评估 MLLM 视频编辑知识的 `VEBench` 混写 [[62]](#ref-62)。
+
+#### 开放集个性化要把“像”与“可动、可绑定”分开
+
+个性化的参考不占输出时间轴，因此高相似度可能来自静帧复制、参考姿态/背景泄漏或只对检测成功帧计分。最小协议必须分开身份/属性、prompt/运动、时间稳定、多主体绑定和参考泄漏，并把缺失主体计为失败；适配数据、步数、额外参数/状态和推理成本同时进入 Pareto。完整的五道门、开放集拆分与交换/遮挡反证见[开放集视频个性化](tasks/personalized-video-generation.md)。
 
 #### Video Reasoning 要把“答案”和“过程”分开
 
@@ -289,7 +297,7 @@ Benchmark 名称不足以复现结果。仓库或论文附录应为每次运行�
 ```yaml
 benchmark:
   name:
-  task_family: [generation, editing, multiview_4d, reasoning, world_model]
+  task_family: [generation, personalization, editing, multiview_4d, reasoning, world_model]
   version_or_commit:
   release_date:
   accessed_at:
@@ -504,6 +512,7 @@ WorldModelBench 在 2025 年开始专门用指令遵循、物理违规和大规�
 | 分布 | fidelity、coverage、多样性 | 同协议 FVD + precision/recall | 多个评价特征编码器、bootstrap CI、分层结果 |
 | 随机未来 | deployment-valid sampling、mode 频率、校准 | 固定 $N$ 的 single/average/best + event Brier/NLL/ECE + 非法 mode；变分模型另列 prior-only 与 posterior oracle（若定义） | 多未来 ground truth/simulator、latent intervention、prior–posterior gap、horizon 曲线与 paired CI |
 | 条件 | 文本/图像/姿态/轨迹遵循 | 原子事实与约束核验 | 检测、跟踪、VQA、人评交叉验证 |
+| 开放集个性化 | 身份/属性、运动/prompt、时间、绑定、泄漏 | identity-disjoint 拆分 + 全部帧/主体计分 + 参考交换与遮挡反证 | 多姿态/多背景/多主体压力测试 + 适配质量—成本 Pareto |
 | 退化修复 | fidelity、时间稳定、感知细节、幻觉 | paired 指标 + 未见退化 + OCR/身份/闪烁 | 真实设备/codec shift、重退化一致性、多 seed 与高风险人工审计 |
 | 编辑 | edit success、源保留、局部性 | source/instruction 双条件 + mask/track 可选 | 真实长序列上的对象级与时间级副作用审计 |
 | 推理 | 问题、答案、合法中间状态、预算 | deterministic scorer + process violation | OOD 状态、长链、预算受控的 pass@k |
@@ -522,7 +531,7 @@ WorldModelBench 在 2025 年开始专门用指令遵循、物理违规和大规�
 
 ### 10.1 先写 model claim card
 
-在运行指标前，先写清模型声明：是开放域 T2V、I2V、可控编辑、长视频、联合音频、交互环境，还是用于规划的 action-conditioned world model。每个声明对应成功判据和证据等级。没有这一步，团队很容易选择对模型最有利但与用途无关的指标。
+在运行指标前，先写清模型声明：是开放域 T2V、I2V、开放集个性化、可控编辑、长视频、联合音频、交互环境，还是用于规划的 action-conditioned world model。每个声明对应成功判据和证据等级。没有这一步，团队很容易选择对模型最有利但与用途无关的指标。
 
 ### 10.2 建立分层 prompt 与场景集
 
@@ -638,6 +647,11 @@ editing:
   - requested_edit_failed
   - source_identity_or_motion_lost
   - spatial_or_temporal_edit_leakage
+personalization:
+  - subject_identity_drift_or_drop
+  - multi_subject_blending_or_binding_swap
+  - reference_pose_background_or_crop_leakage
+  - static_copy_or_motion_collapse
 reasoning:
   - question_or_constraint_drift
   - wrong_final_state
@@ -730,6 +744,7 @@ safety:
 - judge gold set, calibration, frame sweep and abstention:
 
 ## 6. Task-specific tests
+- personalization: identity / prompt and motion / temporal drift / binding / leakage / adaptation budget:
 - editing: edit success / source preservation / locality:
 - reasoning: answer / legal process / pass@1, pass@k / budget:
 

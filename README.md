@@ -2,7 +2,7 @@
 
 #### Created by Codex and <a href='https://vinthony.github.io/'>Xiaodong Cun (Corresponding Author)</a>, from <a href='https://gvclab.github.io'>GVC Lab, Great Bay University</a>
 
-一份面向初学者、研究者、工程师和创作者的 **视频生成技术知识地图**：从“一句话如何变成一段视频”开始，逐步进入传统运动建模、深度视频预测、diffusion、flow matching、偏好后训练、细粒度控制、多视角/4D、视频退化修复、原生音视频和可交互 world model。
+一份面向初学者、研究者、工程师和创作者的 **视频生成技术知识地图**：从“一句话如何变成一段视频”开始，逐步进入传统运动建模、深度视频预测、diffusion、flow matching、偏好后训练、开放集视频个性化、细粒度控制、多视角/4D、视频退化修复、原生音视频和可交互 world model。
 
 资料更新时间：**2026-08**
 
@@ -82,13 +82,13 @@ flowchart LR
 | 结构 | 核心问题 | 主要演进与代表工作 | 学习入口 |
 |---|---|---|---|
 | **1. 技术基础：视频表示、时序建模与生成机制** | 模型怎样表达时间、运动和多种可能未来？ | 从 Video Textures [[1]](#ref-1)、Dynamic Textures [[2]](#ref-2)、ConvLSTM [[3]](#ref-3)、CDNA [[4]](#ref-4)，到 MoCoGAN [[5]](#ref-5)、DVD-GAN [[6]](#ref-6) 和 Video Diffusion [[10]](#ref-10)；表示从 pixel 扩展到连续 latent 与离散 token，时间分解采用 recurrent、autoregressive 或 masked 路线，训练目标再选择 ELBO、adversarial、diffusion/score 或 flow，骨干再选择 U-Net、full/factorized/sparse/linear/hybrid Video DiT，并可叠加少步蒸馏、偏好后训练、长期记忆和 SLO | [生成模型路线](docs/generative-models.md) · [视频 Tokenizer 与生成式压缩边界](docs/generative-models/video-tokenizers.md) · [Video DiT 与骨干扩展](docs/generative-models/video-dit-backbones.md) · [视频后训练与对齐](docs/generative-models/video-post-training-alignment.md) · [因果流式专章](docs/generative-models/causal-streaming-generation.md) |
-| **2. 视频基础模型与创作系统** | 模型怎样从单任务生成器扩展为可迁移、多条件、多模态系统？ | VideoGPT [[7]](#ref-7)、Phenaki [[8]](#ref-8)、MAGVIT [[9]](#ref-9)、Make-A-Video [[11]](#ref-11)、Imagen Video [[12]](#ref-12)、Lumiere [[13]](#ref-13) 与 Sora [[14]](#ref-14) 串起技术前驱与规模化模型。发展应从六个正交维度观察：开放式文本到视频；相机、轨迹、姿态与几何控制；相机 × 世界时间的多视角/4D 查询与状态；源视频保持与可寻址编辑；多段 prompt/storyboard 与跨镜头连续；原生联合音视频。所谓“统一”还必须说明是统一接口、流水线、backbone、模型家族还是单一 checkpoint | [视频基础模型路线](docs/foundation-models.md) · [细粒度可控生成](docs/tasks/controllable-video-generation.md) · [多视角/4D 生成](docs/tasks/multiview-4d-generation.md) · [原生音视频](docs/tasks/native-audio-video-generation.md) · [视频编辑](docs/tasks/video-to-video.md) |
+| **2. 视频基础模型与创作系统** | 模型怎样从单任务生成器扩展为可迁移、多条件、多模态系统？ | VideoGPT [[7]](#ref-7)、Phenaki [[8]](#ref-8)、MAGVIT [[9]](#ref-9)、Make-A-Video [[11]](#ref-11)、Imagen Video [[12]](#ref-12)、Lumiere [[13]](#ref-13) 与 Sora [[14]](#ref-14) 串起技术前驱与规模化模型。发展应从七个正交维度观察：开放式文本到视频；开放集主体参考与身份—运动绑定；相机、轨迹、姿态与几何控制；相机 × 世界时间的多视角/4D 查询与状态；源视频保持与可寻址编辑；多段 prompt/storyboard 与跨镜头连续；原生联合音视频。所谓“统一”还必须说明是统一接口、流水线、backbone、模型家族还是单一 checkpoint | [视频基础模型路线](docs/foundation-models.md) · [开放集视频个性化](docs/tasks/personalized-video-generation.md) · [细粒度可控生成](docs/tasks/controllable-video-generation.md) · [多视角/4D 生成](docs/tasks/multiview-4d-generation.md) · [原生音视频](docs/tasks/native-audio-video-generation.md) · [视频编辑](docs/tasks/video-to-video.md) |
 | **3. Video Reasoning：把视觉生成作为计算介质** | 模型能否用连续视觉状态执行搜索、规则、物理推演与规划；结果和过程怎样验证？ | 以 *Video models are zero-shot learners and reasoners* 为叙事原点：先还原其零样本证据、Chain-of-Frames 假说与黑盒边界，再向前追溯视觉化思维，向后展开 benchmark、VBVR 百万规模监督、Chain-of-Steps、early commitment、verifiable reward、test-time adaptation、层级去噪和 planner—generator—verifier 闭环；不把正确终态等同于忠实推理 | [Video Reasoning 专章](docs/video-reasoning.md) |
 | **4. World Model：从未来预测到行动闭环** | 模型能否根据状态和动作预测后果，并进一步支持交互、规划或决策？ | 决策型 latent dynamics 与生成式视觉模型形成两条并行历史，并在 Genie [[15]](#ref-15)、GameNGen [[16]](#ref-16)、Genie 3 [[17]](#ref-17)、GWM-1 [[18]](#ref-18) 和 Cosmos [[19]](#ref-19) 等交互环境与 Physical AI 系统中逐渐汇合；是否达到闭环仍须逐个系统核验 | [从视频生成到 World Model](docs/world-models.md) · [物理一致性的视频生成](docs/physical-consistency.md) |
 | **5. 应用层** | 上述能力能解决哪些实际问题？ | 内容创作、视频编辑、视频退化修复、数字人、游戏、数据合成、自动驾驶、机器人和科学可视化；编辑改变指定内容，退化修复则从仍可观测的 blur、noise、低分辨率或压缩视频恢复同一时间轴，不能与 mask 缺失补全共用验收 | [相关应用](docs/applications.md) · [视频编辑](docs/tasks/video-to-video.md) · [视频退化修复](docs/tasks/video-restoration.md) · [任务地图](docs/taxonomy.md) |
 | **6. 验证框架** | 应以什么证据证明能力有效？ | 分开检查画质与条件遵循、长程状态、推理结果与过程、物理与反事实、交互延迟、规划或控制闭环，以及安全和治理；“看起来真实”不是理解世界的充分证据 | [评测指南](docs/evaluation.md) · [物理一致性](docs/physical-consistency.md) |
 
-按输入与输出查任务，请使用 [任务地图](docs/taxonomy.md)；理解生成、编辑与当前基础模型的关系，可直接阅读[视频编辑与 milestones](docs/tasks/video-to-video.md)；需要同时区分相机视角、世界时间、像素网格与可渲染动态状态时进入[多视角/4D 生成](docs/tasks/multiview-4d-generation.md)；处理超分、去模糊、去噪或去压缩时进入[视频退化修复](docs/tasks/video-restoration.md)，缺失区域或对象移除则进入[视频补全](docs/tasks/video-inpainting.md)；按年份查完整论文谱系，请进入 [并行技术时间线](docs/timeline.md)。
+按输入与输出查任务，请使用 [任务地图](docs/taxonomy.md)；参考图只定义开放集主体、不占输出时间轴时进入[开放集视频个性化](docs/tasks/personalized-video-generation.md)；理解生成、编辑与当前基础模型的关系，可直接阅读[视频编辑与 milestones](docs/tasks/video-to-video.md)；需要同时区分相机视角、世界时间、像素网格与可渲染动态状态时进入[多视角/4D 生成](docs/tasks/multiview-4d-generation.md)；处理超分、去模糊、去噪或去压缩时进入[视频退化修复](docs/tasks/video-restoration.md)，缺失区域或对象移除则进入[视频补全](docs/tasks/video-inpainting.md)；按年份查完整论文谱系，请进入 [并行技术时间线](docs/timeline.md)。
 
 ## 一张图看懂详细技术演化
 
@@ -116,7 +116,7 @@ flowchart LR
 3. 阅读 [Video DiT 与骨干扩展](docs/generative-models/video-dit-backbones.md)，从 latent token 预算出发，分清 attention topology、条件融合、MoE、并行与 cache，并学会做 matched-backbone / fixed-checkpoint 比较。
 4. 用 [因果、流式与实时视频生成](docs/generative-models/causal-streaming-generation.md) 理解少步生成、训练—推理分布、长期记忆和在线系统怎样汇合，并能分别写出 codec、generator、commit 与 SLO 四层合同。
 5. 阅读 [视频基础模型路线](docs/foundation-models.md)，理解 tokenizer、Transformer、多模态条件，以及“统一”发生在接口、backbone、模型家族还是 checkpoint 层。
-6. 按研究问题进入 [细粒度可控生成](docs/tasks/controllable-video-generation.md)、[多视角/4D 生成](docs/tasks/multiview-4d-generation.md)、[视频退化修复](docs/tasks/video-restoration.md)、[原生音视频](docs/tasks/native-audio-video-generation.md)或[视频后训练与对齐](docs/generative-models/video-post-training-alignment.md)，练习区分任务条件、观测证据、相机/时间查询、优化目标与采样成本。
+6. 按研究问题进入 [开放集视频个性化](docs/tasks/personalized-video-generation.md)、[细粒度可控生成](docs/tasks/controllable-video-generation.md)、[多视角/4D 生成](docs/tasks/multiview-4d-generation.md)、[视频退化修复](docs/tasks/video-restoration.md)、[原生音视频](docs/tasks/native-audio-video-generation.md)或[视频后训练与对齐](docs/generative-models/video-post-training-alignment.md)，练习区分任务条件、观测证据、相机/时间查询、优化目标与采样成本。
 7. 阅读 [Video Reasoning 专章](docs/video-reasoning.md)，区分输出帧、去噪过程和交互闭环三种推理时间，并掌握可验证证据阶梯。
 8. 阅读 [World Model 专章](docs/world-models.md)，区分生成质量、环境预测和决策能力。
 9. 补充 [物理一致性的视频生成](docs/physical-consistency.md)，理解视觉 plausibility 与真实规律的差别。
@@ -141,6 +141,7 @@ flowchart LR
 │   ├── tasks/
 │   │   ├── text-to-video.md
 │   │   ├── image-to-video.md
+│   │   ├── personalized-video-generation.md
 │   │   ├── controllable-video-generation.md
 │   │   ├── multiview-4d-generation.md
 │   │   ├── native-audio-video-generation.md

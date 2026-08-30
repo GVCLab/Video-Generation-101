@@ -100,6 +100,26 @@ def validate_registry(registry: dict[str, Any]) -> None:
         if source["kind"] == "arxiv" and not re.fullmatch(r"\d{4}\.\d{4,5}", source["id"]):
             raise ValueError(f"{key}: invalid or versioned arXiv identifier")
 
+        metadata_override = source.get("metadata_override")
+        if metadata_override is not None:
+            if not isinstance(metadata_override, dict) or not metadata_override:
+                raise ValueError(f"{key}: metadata_override must be a non-empty object")
+            unsupported = set(metadata_override) - {
+                "entry_type",
+                "title",
+                "authors",
+                "year",
+                "journal",
+                "booktitle",
+                "volume",
+                "number",
+                "pages",
+                "publisher",
+                "howpublished",
+            }
+            if unsupported:
+                raise ValueError(f"{key}: unsupported metadata_override fields {sorted(unsupported)}")
+
         if source["kind"] == "manual":
             metadata = source["metadata"]
             missing = {field for field in ("title", "authors", "year", "url") if not metadata.get(field)}
@@ -239,6 +259,7 @@ def refresh_metadata(registry: dict[str, Any]) -> dict[str, Any]:
             metadata = dict(arxiv_results[source["id"]])
         if source.get("author_override"):
             metadata["authors"] = source["author_override"]
+        metadata.update(source.get("metadata_override", {}))
         metadata["source_kind"] = source["kind"]
         metadata["source_id"] = source.get("id", metadata.get("url", ""))
         output[entry["citekey"]] = metadata

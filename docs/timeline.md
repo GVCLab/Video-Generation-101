@@ -656,6 +656,18 @@ flowchart LR
 </tr>
 </table>
 
+### 开放集视频个性化支线｜2022–2026：从每主体适配到多参考绑定
+
+这条支线的参考图**不占输出时间轴**：目标是让测试时未见主体在新场景、动作和组合中保持身份，而不是复制首帧或修改既有视频。下表只标合同转折；完整论文、正式年份、开放工件与反证协议见[开放集视频个性化](tasks/personalized-video-generation.md)。
+
+| 时间 | 代表节点 | 合同转折 | 仍需保留的边界 |
+|---|---|---|---|
+| 2022–2023 | Textual Inversion、DreamBooth → AnimateDiff | 先学新图像概念/主体，再用通用 motion module 把个性化图像先验视频化 | 图像身份证据不等于时序、动作或绑定证据 |
+| 2023–2024 | VideoDreamer、VideoBooth、DreamVideo、CustomVideo、DisenStudio、Magic-Me | 进入直接视频定制，并分化为逐主体优化、identity/motion adapter 和 feed-forward 图像提示 | 免调优不自动意味 open-set；多主体样例不等于 binding 定量 |
+| 2024–2025 | ConsisID、Video Alchemist、Movie Weaver、VideoMage、PersonalVideo、MagicID / Phantom / DualReal | 从单主体适配推进到摊销式 open-set、多主体绑定和身份—运动 Pareto | 需说清是否每主体优化、适配预算及底座数据污染 |
+| 2025 | MSRVTT-Personalization → OpenS2V-Nexus | 从演示转向 identity-disjoint 拆分、主体缺失计零、身份/运动分轴与规模化数据基础设施 | 人脸/图像代理指标仍不证明长时绑定、无泄漏或通用物体能力 |
+| 2026 | AlcheMinT、ID-Crafter、Gloria、PoCo、ID-Sim / Vera | 多参考出现时窗、VLM-grounded RL、长时 anchor、位置控制与专用身份指标成为新前沿 | 正式论文、作者报告、占位仓库和可复现 checkpoint 必须分栏 |
+
 ### 同期闭源产品如何放入时间线
 
 Veo、Kling 与 Runway Gen-3 Alpha 等 2024 产品推动了真实用户访问和创作工作流，但公开材料不足以确认完整训练目标与架构，因此这里把它们视为产业背景，不用产品展示替代可核验的技术节点。

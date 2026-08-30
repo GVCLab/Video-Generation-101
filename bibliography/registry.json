@@ -25,7 +25,9 @@
     "I": "跨路线生成基础、测量与 tokenizer",
     "J": "现代视频基础模型与系统报告",
     "K": "因果、自回归流式生成与加速",
-    "L": "Video DiT 骨干、注意力与扩展"
+    "L": "Video DiT 骨干、注意力与扩展",
+    "M": "变分随机视频与时序潜变量",
+    "N": "开放集与单/多主体视频个性化"
   },
   "entries": [
     {
@@ -129,19 +131,6 @@
         "id": "1907.06571"
       },
       "github": null
-    },
-    {
-      "citekey": "denton2018stochastic",
-      "section": "C",
-      "source": {
-        "kind": "arxiv",
-        "id": "1802.07687"
-      },
-      "github": {
-        "url": "https://github.com/edenton/svg",
-        "status": "official-code",
-        "note": "作者实现"
-      }
     },
     {
       "citekey": "tulyakov2017mocogan",
@@ -764,19 +753,6 @@
       "github": null
     },
     {
-      "citekey": "lee2018stochastic",
-      "section": "I",
-      "source": {
-        "kind": "arxiv",
-        "id": "1804.01523"
-      },
-      "github": {
-        "url": "https://github.com/alexlee-gk/video_prediction",
-        "status": "official-code",
-        "note": "作者发布的 SAVP 官方实现"
-      }
-    },
-    {
       "citekey": "unterthiner2018towards",
       "section": "I",
       "source": {
@@ -1315,7 +1291,10 @@
       "section": "L",
       "source": {
         "kind": "arxiv",
-        "id": "2401.03048"
+        "id": "2401.03048",
+        "metadata_override": {
+          "journal": "Transactions on Machine Learning Research"
+        }
       },
       "github": {
         "url": "https://github.com/Vchitect/Latte",
@@ -1378,6 +1357,215 @@
         "url": "https://github.com/NVlabs/Sana",
         "status": "official-code",
         "note": "官方统一仓库；具体已发布 checkpoint 仍须按模型文档核对"
+      }
+    },
+    {
+      "citekey": "chung2015recurrent",
+      "section": "M",
+      "source": {
+        "kind": "arxiv",
+        "id": "1506.02216"
+      },
+      "github": {
+        "url": "https://github.com/jych/nips2015_vrnn",
+        "status": "official-code",
+        "note": "作者发布的旧版 Theano 实现"
+      }
+    },
+    {
+      "citekey": "babaeizadeh2017stochastic",
+      "section": "M",
+      "source": {
+        "kind": "arxiv",
+        "id": "1710.11252"
+      },
+      "github": {
+        "url": "https://github.com/tensorflow/tensor2tensor",
+        "status": "official-code",
+        "note": "SV2P 位于该官方仓库；仓库已归档且标记为弃用"
+      }
+    },
+    {
+      "citekey": "denton2018stochastic",
+      "section": "M",
+      "source": {
+        "kind": "arxiv",
+        "id": "1802.07687"
+      },
+      "github": {
+        "url": "https://github.com/edenton/svg",
+        "status": "official-code",
+        "note": "作者实现"
+      }
+    },
+    {
+      "citekey": "lee2018stochastic",
+      "section": "M",
+      "source": {
+        "kind": "arxiv",
+        "id": "1804.01523"
+      },
+      "github": {
+        "url": "https://github.com/alexlee-gk/video_prediction",
+        "status": "official-code",
+        "note": "作者发布的 SAVP 官方实现"
+      }
+    },
+    {
+      "citekey": "castrejon2019improved",
+      "section": "M",
+      "source": {
+        "kind": "arxiv",
+        "id": "1904.12165"
+      },
+      "github": {
+        "url": "https://github.com/facebookresearch/improved_vrnn",
+        "status": "official-code",
+        "note": "作者配套实现；仓库已归档"
+      }
+    },
+    {
+      "citekey": "franceschi2020stochastic",
+      "section": "M",
+      "source": {
+        "kind": "arxiv",
+        "id": "2002.09219"
+      },
+      "github": {
+        "url": "https://github.com/edouardelasalles/srvp",
+        "status": "official-code",
+        "note": "作者实现，并提供预训练模型入口"
+      }
+    },
+    {
+      "citekey": "wu2021greedy",
+      "section": "M",
+      "source": {
+        "kind": "arxiv",
+        "id": "2103.04174"
+      },
+      "github": null
+    },
+    {
+      "citekey": "saxena2021clockwork",
+      "section": "M",
+      "source": {
+        "kind": "arxiv",
+        "id": "2102.09532"
+      },
+      "github": {
+        "url": "https://github.com/vaibhavsaxena11/cwvae",
+        "status": "official-code",
+        "note": "第一作者发布的训练与评测实现"
+      }
+    },
+    {
+      "citekey": "daniel2026latent",
+      "section": "M",
+      "source": {
+        "kind": "arxiv",
+        "id": "2603.04553"
+      },
+      "github": {
+        "url": "https://github.com/taldatech/lpwm",
+        "status": "official-code",
+        "note": "ICLR 2026 Oral 官方代码、数据与 checkpoints"
+      }
+    },
+    {
+      "citekey": "wang2024customvideo",
+      "section": "N",
+      "source": {
+        "kind": "arxiv",
+        "id": "2401.09962"
+      },
+      "github": null
+    },
+    {
+      "citekey": "ma2024magicme",
+      "section": "N",
+      "source": {
+        "kind": "arxiv",
+        "id": "2402.09368"
+      },
+      "github": {
+        "url": "https://github.com/Zhen-Dong/Magic-Me",
+        "status": "official-code",
+        "note": "作者官方 VCD 训练与推理实现；依赖第三方 SD/AnimateDiff 权重，并提供若干身份嵌入；未发布训练数据集"
+      }
+    },
+    {
+      "citekey": "li2024personalvideo",
+      "section": "N",
+      "source": {
+        "kind": "arxiv",
+        "id": "2411.17048"
+      },
+      "github": {
+        "url": "https://github.com/EchoPluto/PersonalVideo",
+        "status": "official-project-page",
+        "note": "作者占位仓；README 的 Code 仍为 Coming Soon，未发布实现、权重或数据"
+      }
+    },
+    {
+      "citekey": "chen2025videoalchemist",
+      "section": "N",
+      "source": {
+        "kind": "arxiv",
+        "id": "2501.06187"
+      },
+      "github": {
+        "url": "https://github.com/snap-research/MSRVTT-Personalization",
+        "status": "official-research-artifact",
+        "note": "官方 MSRVTT-Personalization 测试集与评测协议；不含 Video Alchemist 模型实现或权重"
+      }
+    },
+    {
+      "citekey": "liang2025movie",
+      "section": "N",
+      "source": {
+        "kind": "arxiv",
+        "id": "2502.07802"
+      },
+      "github": null
+    },
+    {
+      "citekey": "deng2025magref",
+      "section": "N",
+      "source": {
+        "kind": "arxiv",
+        "id": "2505.23742"
+      },
+      "github": {
+        "url": "https://github.com/MAGREF-Video/MAGREF",
+        "status": "official-code",
+        "note": "官方推理代码与 MAGREF checkpoint；480P/14B Pro checkpoint 和训练代码仍在 TODO，训练数据未发布"
+      }
+    },
+    {
+      "citekey": "girish2025alchemint",
+      "section": "N",
+      "source": {
+        "kind": "arxiv",
+        "id": "2512.10943"
+      },
+      "github": {
+        "url": "https://github.com/snap-research/Video-AlcheMinT",
+        "status": "official-project-page",
+        "note": "官方 README/项目占位仓；未发布方法代码、权重或 benchmark 数据"
+      }
+    },
+    {
+      "citekey": "huang2026rethinking",
+      "section": "N",
+      "source": {
+        "kind": "arxiv",
+        "id": "2604.03738"
+      },
+      "github": {
+        "url": "https://github.com/byhuang123/PoCo",
+        "status": "official-project-page",
+        "note": "官方占位与演示仓；Release Plan 中 Core model code 尚未发布，无权重或数据"
       }
     }
   ]

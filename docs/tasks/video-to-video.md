@@ -62,6 +62,7 @@ $$
 | 源视频 + 新相机轨迹 → 同一动态场景的新视图 | 是，属于 camera / geometry edit | 必须保持同一对象状态并检验显露区和三维几何；ReCamMaster 是这一交叉点 [[26]](#ref-26) |
 | 视频前缀 → 未知未来 | 否 | 是 prediction / continuation，源帧是历史而非被修改对象 |
 | driving video + 人像参考 → 新人物动画 | 通常否 | driving video 提供动作控制；若还要编辑 driving video 本身才进入 V2V |
+| 主体参考集 + prompt → 新时间轴视频 | 否 | 没有完整源视频可守恒；属于[开放集视频个性化](personalized-video-generation.md) |
 
 ```mermaid
 flowchart TD
@@ -128,7 +129,7 @@ flowchart LR
 
 **顺序化文字替代：** 先由 mask 外是否需要像素级锁定决定是否使用 mask-aware 路线。没有专用训练数据时优先考虑 inversion 与测试时注入；大幅语义变化优先原生编辑模型；首帧或关键帧驱动的小改动可走对应传播。运动、相机和材质分解需要更具体的 2D / 3D / RGBX 控制。最后按离线、多轮长视频或因果流式选择状态管理。上方 PNG 用于快速识别输出关系；本 Mermaid 保留“任务合同 → 控制自由度 → 时序形态”的可编辑精确分支。
 
-## 3. 七条机制路线及各自的守恒假设
+## 3. 八条机制路线及各自的守恒假设
 
 ### 3.1 传播与 warp：把少量可靠编辑扩散到时间轴
 
@@ -153,6 +154,8 @@ FateZero 在反演轨迹中融合注意力，保留布局和运动 [[7]](#ref-7)
 ### 3.5 Diffusion inversion 与测试时适配：先找回源视频，再沿条件方向移动
 
 Dreamix 通过加噪、混合微调与视频扩散实现视频到视频、图像到视频和主体驱动编辑 [[6]](#ref-6)。StableV2V 强调编辑前后形状稳定 [[11]](#ref-11)，AnyV2V 则把 inversion、图像编辑和时间传播模块化 [[10]](#ref-10)。路线的主要误差来自：反演重建误差、编辑方向和源运动纠缠、每视频优化成本，以及不同随机种子导致的不可归因差异。
+
+Dreamix 的逐视频反演/微调仍围绕已有源时间轴验收；若优化对象是开放集主体表示，并在全新时间轴中生成，则归入[开放集视频个性化](personalized-video-generation.md)。
 
 实验必须先报告 **reconstruction-only**：在不施加编辑时，反演—解码能否重建 $X$。否则后续变化无法区分是编辑成功还是反演损失。
 
@@ -340,7 +343,7 @@ $$
 
 ## 11. 建议阅读路径
 
-- **理解任务边界：** 先读本页第 1 节，再读[图像到视频](image-to-video.md)、[视频退化修复](video-restoration.md)、[视频补全](video-inpainting.md)和[任务分类](../taxonomy.md)。
+- **理解任务边界：** 先读本页第 1 节，再读[图像到视频](image-to-video.md)、[开放集视频个性化](personalized-video-generation.md)、[视频退化修复](video-restoration.md)、[视频补全](video-inpainting.md)和[任务分类](../taxonomy.md)。
 - **理解测试时编辑：** Dreamix → FateZero → Pix2Video → TokenFlow → AnyV2V。
 - **理解原生编辑模型：** VACE → EditVerse / UNIC → EasyV2V / Ditto → EditCtrl / VIVA / CoT-Edit。
 - **理解运动与几何：** MotionFollower → MotionV2V → 3D Point Tracks → ReCamMaster → V-RGBX。

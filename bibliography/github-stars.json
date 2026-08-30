@@ -1,9 +1,12 @@
 {
   "as_of": "2026-08-30",
-  "fetched_at": "2026-08-30T02:58:58Z",
+  "fetched_at": "2026-08-30T05:08:37Z",
   "repositories": {
     "https://github.com/CompVis/maskflow": {
       "stars": 28
+    },
+    "https://github.com/EchoPluto/PersonalVideo": {
+      "stars": 9
     },
     "https://github.com/GameNGen/GameNGen.github.io": {
       "stars": 91
@@ -14,8 +17,11 @@
     "https://github.com/Lightricks/LTX-Video": {
       "stars": 10916
     },
+    "https://github.com/MAGREF-Video/MAGREF": {
+      "stars": 299
+    },
     "https://github.com/NVIDIA/Cosmos": {
-      "stars": 11670
+      "stars": 11671
     },
     "https://github.com/NVlabs/LongLive": {
       "stars": 2582
@@ -36,7 +42,7 @@
       "stars": 555
     },
     "https://github.com/Stability-AI/generative-models": {
-      "stars": 27274
+      "stars": 27276
     },
     "https://github.com/Tencent-Hunyuan/HunyuanVideo": {
       "stars": 12490
@@ -50,11 +56,17 @@
     "https://github.com/Wan-Video/Wan2.1": {
       "stars": 16908
     },
+    "https://github.com/Zhen-Dong/Magic-Me": {
+      "stars": 458
+    },
     "https://github.com/alexlee-gk/video_prediction": {
       "stars": 304
     },
     "https://github.com/buoyancy99/diffusion-forcing": {
       "stars": 1288
+    },
+    "https://github.com/byhuang123/PoCo": {
+      "stars": 20
     },
     "https://github.com/character-ai/Ovi": {
       "stars": 1750
@@ -77,6 +89,9 @@
     "https://github.com/edenton/svg": {
       "stars": 188
     },
+    "https://github.com/edouardelasalles/srvp": {
+      "stars": 74
+    },
     "https://github.com/facebookresearch/DiT": {
       "stars": 8689
     },
@@ -85,6 +100,9 @@
     },
     "https://github.com/facebookresearch/ijepa": {
       "stars": 3489
+    },
+    "https://github.com/facebookresearch/improved_vrnn": {
+      "stars": 39
     },
     "https://github.com/facebookresearch/jepa": {
       "stars": 4112
@@ -125,6 +143,9 @@
     "https://github.com/junhyukoh/nips2015-action-conditional-video-prediction": {
       "stars": 114
     },
+    "https://github.com/jych/nips2015_vrnn": {
+      "stars": 291
+    },
     "https://github.com/lucas-maes/le-wm": {
       "stars": 4357
     },
@@ -143,14 +164,29 @@
     "https://github.com/sergeytulyakov/mocogan": {
       "stars": 603
     },
+    "https://github.com/snap-research/MSRVTT-Personalization": {
+      "stars": 53
+    },
+    "https://github.com/snap-research/Video-AlcheMinT": {
+      "stars": 0
+    },
     "https://github.com/stepfun-ai/Step-Video-T2V": {
       "stars": 3188
+    },
+    "https://github.com/taldatech/lpwm": {
+      "stars": 133
+    },
+    "https://github.com/tensorflow/tensor2tensor": {
+      "stars": 17464
     },
     "https://github.com/thu-ml/Causal-Forcing": {
       "stars": 938
     },
     "https://github.com/tianweiy/CausVid": {
       "stars": 1428
+    },
+    "https://github.com/vaibhavsaxena11/cwvae": {
+      "stars": 50
     },
     "https://github.com/werner-duvaud/muzero-general": {
       "stars": 2863
