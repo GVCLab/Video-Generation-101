@@ -85,35 +85,7 @@ N=
 
 ## 3. Video DiT block 到底做什么
 
-~~~mermaid
-flowchart LR
-    accTitle: Video DiT 的接口、位置与条件融合
-    accDescr: 视频 codec 先产生带噪 latent 网格，patch embedding 与时空位置编码把它变成视频 token；噪声时间、文本及其他条件经调制、交叉注意力或联合 token 路径进入重复的 mixer 和前馈 block，最后由 objective 指定的输出头还原到 latent 网格。Tokenizer、backbone 和 objective 的责任边界被分别标出。
-
-    subgraph REP["Tokenizer / representation 章"]
-        X["pixel video"] --> E["video codec"] --> Z["latent grid<br/>B × Cz × T' × H' × W'"]
-    end
-
-    subgraph BB["Backbone 章"]
-        Z --> P["patch embed<br/>N video tokens"]
-        POS["position<br/>t · h · w · fps · modality"] --> P
-        TAU["noise / transport time τ"] --> MOD["AdaLN / FiLM modulation"]
-        TXT["text / image / audio / control"] --> FUS["cross-attention<br/>or joint/dual stream"]
-        P --> MIX["spatiotemporal mixer<br/>full / factorized / window / sparse / linear / hybrid"]
-        MOD --> MIX
-        FUS --> MIX
-        MIX --> FFN["FFN or routed experts"]
-        FFN --> RES["residual stack × L"]
-        RES --> MIX
-        RES --> UNP["output projection + unpatchify"]
-    end
-
-    subgraph OBJ["Objective / sampler 章"]
-        UNP --> Y["ε / x0 / score / v / flow target"]
-        Y --> STEP["solver / sampler / NFE"]
-    end
-~~~
-
+![图 031：Video DiT 的接口、位置与条件融合](assets/imagegen-diagrams/031/diagram.png)
 **图 2：同一个 block 可以承载不同 objective。** 顺序化文字替代：pixel video 先由 codec 变成 latent grid；patch embedding 加入时空、FPS 和 modality 位置后成为 $N$ 个视频 token。噪声时间可以经 AdaLN/FiLM 调制 block，文本、图像、音频或控制可经 cross-attention 或 joint/dual stream 融合。时空 mixer 与 FFN/experts 重复 $L$ 层，输出再 unpatchify；最终预测 $\epsilon$、$x_0$、score、$v$ 还是 flow velocity 由 objective 决定，solver/NFE 属于采样层。
 
 ### 3.1 Mixer、FFN 与 residual 是三笔不同计算
@@ -433,30 +405,7 @@ cost:
 |---|---|---|---|
 | codec/latent、patch、数据及顺序、文本 encoder、条件 dropout、objective/loss weighting、sampler/NFE/CFG、输出、训练 tokens、精度与硬件 | U-Net、full、factorized、window/sparse、linear/recurrent；position 和 fusion 另做单变量 fork | parameter-matched；training-FLOP-matched | 按 $\tau$ 分桶 target error；质量/覆盖；长程/绑定/网格 probe；forward FLOPs、VRAM、tokens/s、端到端成本 |
 
-~~~mermaid
-flowchart LR
-    accTitle: BackboneFork-1 的冻结、分叉与反证路径
-    accDescr: 实验先冻结 tokenizer、数据、目标、采样和输出合同，再分别做等参数与等训练计算的骨干分叉；所有模型接受质量覆盖、长程绑定、网格外推和系统成本探针，只有同时满足预注册质量非劣界和资源斜率改善的声明才保留。
-
-    F["Freeze<br/>codec · data · objective · sampler · output"] --> A["Architecture fork<br/>full · factorized · window/sparse · linear/recurrent"]
-    A --> P1["Parameter-matched"]
-    A --> P2["Training-FLOP-matched"]
-    P1 --> Q["Quality + coverage"]
-    P2 --> Q
-    P1 --> L["Long-range + binding"]
-    P2 --> L
-    P1 --> G["Grid/FPS extrapolation"]
-    P2 --> G
-    P1 --> C["FLOPs · VRAM · latency slope"]
-    P2 --> C
-    Q --> D{"pre-registered<br/>non-inferiority<br/>and claimed gain?"}
-    L --> D
-    G --> D
-    C --> D
-    D -->|yes| KEEP["retain bounded claim"]
-    D -->|no| REJECT["reject or narrow claim"]
-~~~
-
+![图 032：BackboneFork-1 的冻结、分叉与反证路径](assets/imagegen-diagrams/032/diagram.png)
 顺序化文字替代：先冻结 codec、数据、objective、sampler 和输出；再分叉 full、factorized、window/sparse 与 linear/recurrent 骨干；每个分叉都做等参数和等训练 FLOPs 两套比较；随后同时运行质量/覆盖、长程/绑定、网格外推和资源斜率探针。只有达到预注册质量非劣界并出现所声称收益时保留有限结论，否则驳回或收窄。
 
 预注册反证：

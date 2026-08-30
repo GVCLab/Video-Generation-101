@@ -1,0 +1,839 @@
+[
+  {
+    "id": "001",
+    "path": "README.md",
+    "file_index": 1,
+    "title": "Video Generation 101 知识全景",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：Video Generation 101 知识全景。图中表达的关键模块包括：生成基础 表示、时间与生成机制、基础模型 规模、条件与多模态、可控能力 编辑、个性化与多视角、世界理解 推理、物理与动作后果、应用落地 创作、修复、数字人与试衣、证据体系 评测、复现与闭环验证。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/001",
+    "source": "~~~mermaid\nflowchart LR\n    accTitle: Video Generation 101 知识全景\n    accDescr: 知识体系从生成基础出发，经过基础模型与可控能力，延伸到视频推理和世界模型，最终服务真实应用；证据体系贯穿各层并约束能力结论。\n\n    generation[\"生成基础<br/>表示、时间与生成机制\"] --> foundation[\"基础模型<br/>规模、条件与多模态\"]\n    foundation --> capabilities[\"可控能力<br/>编辑、个性化与多视角\"]\n    foundation --> world[\"世界理解<br/>推理、物理与动作后果\"]\n    capabilities --> applications[\"应用落地<br/>创作、修复、数字人与试衣\"]\n    world --> applications\n    evidence[\"证据体系<br/>评测、复现与闭环验证\"] -.-> generation\n    evidence -.-> foundation\n    evidence -.-> capabilities\n    evidence -.-> world\n    evidence -.-> applications\n\n    classDef foundation_style fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f\n    classDef capability_style fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#3b0764\n    classDef outcome_style fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d\n    classDef evidence_style fill:#f3f4f6,stroke:#6b7280,stroke-width:2px,color:#1f2937\n\n    class generation,foundation foundation_style\n    class capabilities,world capability_style\n    class applications outcome_style\n    class evidence evidence_style\n~~~\n"
+  },
+  {
+    "id": "002",
+    "path": "docs/applications.md",
+    "file_index": 1,
+    "title": "从使用合同到部署与回滚",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：从使用合同到部署与回滚。图中表达的关键模块包括：1 使用合同 用户 · 决策 · 伤害、2 输入与控制 text · image · video · audio · action、3 模型与工具工作流 生成 · 编辑 · 动画 · 模拟、4 Human-in-the-loop 选择 · 修订 · 版本、5 验收协议 多 seed · 指标 · 压力测试、6 部署与监测 SLO · 成本 · 隐私 · 来源、STOP 记录失败并修正、回滚模型、配置或素材。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/002",
+    "source": "~~~mermaid\nflowchart LR\n    accTitle: 从使用合同到部署与回滚\n    accDescr: 真实应用先定义用户、决策和潜在伤害，再确定输入控制与模型工作流，经过人工修订和版本管理后执行多随机种子、指标与压力测试；只有全部硬门槛通过才部署，部署后持续监测并在异常时回滚。\n\n    U[\"1 使用合同<br/>用户 · 决策 · 伤害\"] --> I[\"2 输入与控制<br/>text · image · video · audio · action\"]\n    I --> W[\"3 模型与工具工作流<br/>生成 · 编辑 · 动画 · 模拟\"]\n    W --> H[\"4 Human-in-the-loop<br/>选择 · 修订 · 版本\"]\n    H --> A[\"5 验收协议<br/>多 seed · 指标 · 压力测试\"]\n    A --> G{\"硬门槛全通过？\"}\n    G -- 是 --> D[\"6 部署与监测<br/>SLO · 成本 · 隐私 · 来源\"]\n    G -- 否 --> S[\"STOP<br/>记录失败并修正\"]\n    D --> M{\"漂移 / 事故 / 权利变化？\"}\n    M -- 否 --> D\n    M -- 是 --> R[\"回滚模型、配置或素材\"]\n    R --> U\n~~~\n"
+  },
+  {
+    "id": "003",
+    "path": "docs/applications.md",
+    "file_index": 2,
+    "title": "创意视频的可回滚制作循环",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：创意视频的可回滚制作循环。图中表达的关键模块包括：剧本 / brief 角色与素材权利、分镜与 shot contract 主体 · 动作 · 相机 · 时长、生成候选 多 seed / 多配置、自动检查 条件 · 身份 · 时间 · 文字、人工审片 采用 / 局部修订 / 拒绝、V2V / mask / reference 只改一个变量、锁定版本 模型 · prompt · seed · asset hash、发布 + provenance、反馈 / 撤回 / 回滚。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/003",
+    "source": "~~~mermaid\nflowchart LR\n    accTitle: 创意视频的可回滚制作循环\n    accDescr: 剧本和资产权利经过分镜与参考配置进入生成，自动检查和人工审片将失败定位到提示、参考、模型或后处理，局部修改形成新版本；批准版本连同来源记录发布，未批准版本可回滚。\n\n    A[\"剧本 / brief<br/>角色与素材权利\"] --> B[\"分镜与 shot contract<br/>主体 · 动作 · 相机 · 时长\"]\n    B --> C[\"生成候选<br/>多 seed / 多配置\"]\n    C --> D[\"自动检查<br/>条件 · 身份 · 时间 · 文字\"]\n    D --> E[\"人工审片<br/>采用 / 局部修订 / 拒绝\"]\n    E -- 修订 --> F[\"V2V / mask / reference<br/>只改一个变量\"]\n    F --> D\n    E -- 批准 --> G[\"锁定版本<br/>模型 · prompt · seed · asset hash\"]\n    G --> H[\"发布 + provenance\"]\n    H --> I[\"反馈 / 撤回 / 回滚\"]\n~~~\n"
+  },
+  {
+    "id": "004",
+    "path": "docs/evaluation.md",
+    "file_index": 1,
+    "title": "视频生成评测证据链",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频生成评测证据链。图中表达的关键模块包括：能力声明 任务、条件、用途、失败代价、质量 + 覆盖 + 条件 + 时间、身份 + 运动 + 绑定 + 泄漏、编辑成功 + 源保留 + 局部性 + 时间、问题保持 + 结果 + 过程 + 预算、只支持 L0–L2 视觉与物理诊断、动作干预 → rollout 策略排序与现实效用、自动指标 + 受控破坏压力测试、冻结人类 Gold Set Judge 校准与拒答测试、盲测成对人评 BT / Thurstone + prompt-cluster CI。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/004",
+    "source": "```mermaid\nflowchart TD\n    accTitle: 视频生成评测证据链\n    accDescr: 能力声明先按开放生成、开放集个性化、视频编辑、视频推理或世界模型分流，再依次通过自动指标压力测试、冻结人类样本校准、盲测人评和部署门槛，最后只报告分项结果、失败分类与 Pareto；世界模型还需动作干预与闭环证据。\n    A[\"能力声明<br/>任务、条件、用途、失败代价\"] --> B{\"任务分流\"}\n    B -->|开放生成| G[\"质量 + 覆盖 + 条件 + 时间\"]\n    B -->|开放集个性化| PERS[\"身份 + 运动 + 绑定 + 泄漏\"]\n    B -->|视频编辑| E[\"编辑成功 + 源保留 + 局部性 + 时间\"]\n    B -->|Video Reasoning| R[\"问题保持 + 结果 + 过程 + 预算\"]\n    B -->|World Model| W{\"是否动作条件化？\"}\n    W -->|否| W0[\"只支持 L0–L2<br/>视觉与物理诊断\"]\n    W -->|是| W1[\"动作干预 → rollout<br/>策略排序与现实效用\"]\n    G --> M[\"自动指标 + 受控破坏压力测试\"]\n    PERS --> M\n    E --> M\n    R --> M\n    W0 --> M\n    W1 --> M\n    M --> J[\"冻结人类 Gold Set<br/>Judge 校准与拒答测试\"]\n    J --> H[\"盲测成对人评<br/>BT / Thurstone + prompt-cluster CI\"]\n    H --> S[\"部署门槛<br/>SLO + 安全 + 水印 + C2PA\"]\n    S --> P[\"分项结果 + 失败分类 + Pareto<br/>不强制合成总分\"]\n    J -.->|校准失败则修订指标| M\n```\n"
+  },
+  {
+    "id": "005",
+    "path": "docs/evaluation.md",
+    "file_index": 2,
+    "title": "视频生成评测范式演化",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频生成评测范式演化。图中表达的关键模块包括：传统视频质量 编码、传输、重建、早期视频预测 像素与感知保真、GAN / 随机生成 真实性与多样性、FVD 时代 时空特征分布、大模型时代 多维能力与人类偏好、World Model 时代 干预、闭环与规划效用。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/005",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 视频生成评测范式演化\n    accDescr: 评测从传统视频质量与逐帧保真，扩展到随机生成的真实性和多样性、FVD 时空分布、多维能力与人类偏好，最终进入动作干预、闭环和规划效用。\n    A[\"传统视频质量<br/>编码、传输、重建\"] --> B[\"早期视频预测<br/>像素与感知保真\"]\n    B --> C[\"GAN / 随机生成<br/>真实性与多样性\"]\n    C --> D[\"FVD 时代<br/>时空特征分布\"]\n    D --> E[\"大模型时代<br/>多维能力与人类偏好\"]\n    E --> F[\"World Model 时代<br/>干预、闭环与规划效用\"]\n```\n"
+  },
+  {
+    "id": "006",
+    "path": "docs/foundation-models.md",
+    "file_index": 1,
+    "title": "视频基础模型从数据治理到服务审计的端到端闭环",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频基础模型从数据治理到服务审计的端到端闭环。图中表达的关键模块包括：训练与发布、权利、来源、版本清单、切镜、过滤、去重、caption / 元数据 / 条件、配比、课程、数据切分、视频 / 音频 tokenizer、generator 预训练、SFT / preference / RL、蒸馏 / 量化 / 任务 checkpoint、产品与服务。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/006",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 视频基础模型从数据治理到服务审计的端到端闭环\n    accDescr: 训练侧从权利与来源清单、切镜去重过滤、结构化 caption、混合采样进入 tokenizer 和 generator，再经后训练与蒸馏；部署侧由编排器组合基础权重、适配器、超分插帧和音频，经过输入输出安全与来源声明后由 API 提供服务，评测和事故样本回流到数据与后训练。\n\n    subgraph TR[\"训练与发布\"]\n        R[\"权利、来源、版本清单\"] --> F[\"切镜、过滤、去重\"] --> C[\"caption / 元数据 / 条件\"] --> M[\"配比、课程、数据切分\"]\n        M --> T[\"视频 / 音频 tokenizer\"] --> G[\"generator 预训练\"] --> P[\"SFT / preference / RL\"]\n        P --> D[\"蒸馏 / 量化 / 任务 checkpoint\"]\n    end\n\n    subgraph SV[\"产品与服务\"]\n        D --> O[\"版本化编排器\"]\n        O --> U[\"SR / 插帧 / 修复\"]\n        O --> A[\"联合音频或 V2A\"]\n        U --> S[\"输入输出安全 / provenance\"]\n        A --> S\n        S --> API[\"API / UI / 本地 pipeline\"]\n    end\n\n    E[\"离线评测 + 在线 SLO + 人工审计\"] -->|失败样本| F\n    E -->|偏好与风险样本| P\n    API --> E\n```\n"
+  },
+  {
+    "id": "007",
+    "path": "docs/foundation-models.md",
+    "file_index": 2,
+    "title": "产品能力到可下载权重的归因边界",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：产品能力到可下载权重的归因边界。图中表达的关键模块包括：产品能力声明、版本化 API / UI、路由、重写、缓存、重试、编排、基础 checkpoint、任务 checkpoint / LoRA / 控制器、SR / 插帧 / 修复 / 音频、moderation / watermark / provenance、固定依赖 + 消融：可归因能力、系统级能力、release surface 审计。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/007",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 产品能力到可下载权重的归因边界\n    accDescr: 产品声明首先落到版本化 API 和编排器，编排器可能组合基础 checkpoint、任务适配器、超分插帧、音频模块与安全模块；只有在固定这些依赖并做消融后，能力才能归因到单 checkpoint，开放性则需分别检查代码、权重、训练配方、数据和许可证。\n\n    PC[\"产品能力声明\"] --> API[\"版本化 API / UI\"]\n    API --> ORC[\"路由、重写、缓存、重试、编排\"]\n    ORC --> CK[\"基础 checkpoint\"]\n    ORC --> AD[\"任务 checkpoint / LoRA / 控制器\"]\n    ORC --> PP[\"SR / 插帧 / 修复 / 音频\"]\n    ORC --> SAFE[\"moderation / watermark / provenance\"]\n\n    CK --> CA[\"固定依赖 + 消融：可归因能力\"]\n    AD --> CA\n    PP --> SY[\"系统级能力\"]\n    SAFE --> SY\n\n    CK --> RS[\"release surface 审计\"]\n    RS --> RC[\"代码\"]\n    RS --> RW[\"权重\"]\n    RS --> RT[\"训练配方\"]\n    RS --> RD[\"数据\"]\n    RS --> RL[\"许可证\"]\n```\n"
+  },
+  {
+    "id": "008",
+    "path": "docs/generative-models.md",
+    "file_index": 1,
+    "title": "视频生成系统的五个交叉分类轴",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频生成系统的五个交叉分类轴。图中表达的关键模块包括：R · Representation pixel / continuous latent / discrete token、F · Factorization joint / AR / masked / hierarchy / causal chunk、O · Objective ELBO / adversarial / score / FM-RF / CM-DMD / preference-RL、B · Backbone U-Net / DiT / decoder Transformer / recurrent-SSM、D · Deployment offline / few-step / streaming / interactive、Configured video generator (R, F, O, B, D)、Claim-specific evidence quality · NFE · TTFF · deadline · drift · control、NOVA latent + frame/set AR + diffusion loss、Pyramidal Flow temporal pyramid + FM + DiT、CausVid causal + DMD + few-step。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/008",
+    "source": "~~~mermaid\nflowchart LR\n    accTitle: 视频生成系统的五个交叉分类轴\n    accDescr: 表示空间、数据分解、训练目标、网络骨干和部署方式五个分析维度在兼容约束下汇入一个配置后的生成器，系统主张再连接到画质、计算、延迟、漂移和控制等对应证据；NOVA、Pyramidal Flow、CausVid 与 StreamDiffusionV2 只是组合实例，不构成排名。\n\n    R[\"R · Representation<br/>pixel / continuous latent / discrete token\"]\n    F[\"F · Factorization<br/>joint / AR / masked / hierarchy / causal chunk\"]\n    O[\"O · Objective<br/>ELBO / adversarial / score / FM-RF / CM-DMD / preference-RL\"]\n    B[\"B · Backbone<br/>U-Net / DiT / decoder Transformer / recurrent-SSM\"]\n    D[\"D · Deployment<br/>offline / few-step / streaming / interactive\"]\n\n    M[\"Configured video generator<br/>(R, F, O, B, D)\"]\n    E[\"Claim-specific evidence<br/>quality · NFE · TTFF · deadline · drift · control\"]\n\n    R --> M\n    F --> M\n    O --> M\n    B --> M\n    D --> M\n    M --> E\n\n    X1[\"NOVA<br/>latent + frame/set AR + diffusion loss\"] -.-> M\n    X2[\"Pyramidal Flow<br/>temporal pyramid + FM + DiT\"] -.-> M\n    X3[\"CausVid<br/>causal + DMD + few-step\"] -.-> M\n    X4[\"StreamDiffusionV2<br/>cache + scheduler + pipeline + SLO\"] -.-> E\n~~~\n"
+  },
+  {
+    "id": "009",
+    "path": "docs/generative-models.md",
+    "file_index": 2,
+    "title": "视频时间与噪声时间的双时钟",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频时间与噪声时间的双时钟。图中表达的关键模块包括：已提交上下文 x<sub>&lt;k</sub>、当前变量 x<sub>k</sub>、当前集合 X<sub>j</sub>、τ=1 noise / base、τ<sub>2</sub> intermediate、τ<sub>1</sub> intermediate、τ=0 sample、commit frame / token / chunk、成为 k+1 的上下文 或结束 joint block。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/009",
+    "source": "~~~mermaid\nflowchart TB\n    accTitle: 视频时间与噪声时间的双时钟\n    accDescr: 数据时间 k 决定帧或 chunk 怎样依赖过去，噪声或运输时间 tau 决定一个待生成变量怎样从噪声迭代到样本；自回归或因果分解与 diffusion、flow 或 consistency 目标可以交叉组合。\n\n    C[\"已提交上下文<br/>x<sub>&lt;k</sub>\"] --> F{\"data-time factorization\"}\n    F -->|strict AR / causal chunk| K[\"当前变量 x<sub>k</sub>\"]\n    F -->|joint / masked block| J[\"当前集合 X<sub>j</sub>\"]\n\n    N3[\"τ=1<br/>noise / base\"] --> N2[\"τ<sub>2</sub><br/>intermediate\"]\n    N2 --> N1[\"τ<sub>1</sub><br/>intermediate\"]\n    N1 --> N0[\"τ=0<br/>sample\"]\n\n    K -. \"若采用 diffusion / flow 条件头\" .-> N3\n    J -. \"若采用 diffusion / flow 条件头\" .-> N3\n    N0 --> O[\"commit frame / token / chunk\"]\n    O --> C2[\"成为 k+1 的上下文<br/>或结束 joint block\"]\n~~~\n"
+  },
+  {
+    "id": "010",
+    "path": "docs/generative-models/adversarial-generation.md",
+    "file_index": 1,
+    "title": "对抗学习在视频生成中的三种角色",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：对抗学习在视频生成中的三种角色。图中表达的关键模块包括：(真实视频 x)、噪声 z 与条件 c、完整 GAN G(z,c)、帧/时空/多尺度/条件 D、编码器 E、解码器 D_dec、重建判别器 D_rec、latent 先验 AR / masked / diffusion / flow、diffusion / flow 教师、少步学生 G_s。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/010",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 对抗学习在视频生成中的三种角色\n    accDescr: 完整 GAN 从噪声直接生成视频，重建判别器只训练 tokenizer 的 decoder，对抗蒸馏则在 diffusion 或 flow 教师之后训练少步学生。\n\n    data[(真实视频 x)]\n    noise[噪声 z 与条件 c]\n    full_g[\"完整 GAN<br/>G(z,c)\"]\n    full_d[\"帧/时空/多尺度/条件 D\"]\n    encoder[\"编码器 E\"]\n    decoder[\"解码器 D_dec\"]\n    recon_d[\"重建判别器 D_rec\"]\n    prior[\"latent 先验<br/>AR / masked / diffusion / flow\"]\n    teacher[\"diffusion / flow 教师\"]\n    student[\"少步学生 G_s\"]\n    distill_d[\"对抗 critic<br/>只在显式使用时\"]\n\n    noise --> full_g --> full_d\n    data --> full_d\n    data --> encoder --> decoder --> recon_d\n    data --> recon_d\n    encoder --> prior --> decoder\n    teacher --> student\n    noise --> student --> distill_d\n    data --> distill_d\n\n    classDef role fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#172554\n    classDef critic fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#450a0a\n    classDef source fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d\n    class full_g,encoder,decoder,prior,teacher,student role\n    class full_d,recon_d,distill_d critic\n    class data,noise source\n```\n"
+  },
+  {
+    "id": "011",
+    "path": "docs/generative-models/adversarial-generation.md",
+    "file_index": 2,
+    "title": "四类视频判别视野与它们的盲区",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：四类视频判别视野与它们的盲区。图中表达的关键模块包括：候选视频 x̂ T × H × W、抽取单帧/少量帧、连续或带时间戳的 clip、高清短视野 低清长视野、条件 c 文本/首帧/类别/动作、帧/空间 D 纹理与形状、时空 D 运动与闪烁、多尺度 D 局部细节与全局节奏、条件 D 真实性 + 匹配性、共同盲区 超出训练窗口的身份、因果和状态。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/011",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 四类视频判别视野与它们的盲区\n    accDescr: 帧判别器保护纹理，时空判别器检查运动，多尺度设计交换分辨率和时长，条件判别器再检查文本、首帧或动作是否匹配；任一视野都不能单独保证长期一致。\n\n    video[\"候选视频 x̂<br/>T × H × W\"]\n    frame_sample[\"抽取单帧/少量帧\"]\n    clip_sample[\"连续或带时间戳的 clip\"]\n    scale_split[\"高清短视野<br/>低清长视野\"]\n    condition[\"条件 c<br/>文本/首帧/类别/动作\"]\n    frame_d[\"帧/空间 D<br/>纹理与形状\"]\n    temporal_d[\"时空 D<br/>运动与闪烁\"]\n    multi_d[\"多尺度 D<br/>局部细节与全局节奏\"]\n    cond_d[\"条件 D<br/>真实性 + 匹配性\"]\n    blind[\"共同盲区<br/>超出训练窗口的身份、因果和状态\"]\n\n    video --> frame_sample --> frame_d --> blind\n    video --> clip_sample --> temporal_d --> blind\n    video --> scale_split --> multi_d --> blind\n    video --> cond_d --> blind\n    condition --> cond_d\n\n    classDef view fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0c4a6e\n    classDef disc fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#450a0a\n    classDef warn fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f\n    class video,frame_sample,clip_sample,scale_split,condition view\n    class frame_d,temporal_d,multi_d,cond_d disc\n    class blind warn\n```\n"
+  },
+  {
+    "id": "012",
+    "path": "docs/generative-models/autoregressive-generation.md",
+    "file_index": 1,
+    "title": "自回归视频生成的三层选择",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：自回归视频生成的三层选择。图中表达的关键模块包括：表示层、原始像素、离散视觉码、连续 latent、外层提交粒度、pixel / token、token set、pyramid scale、frame、temporal chunk。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/012",
+    "source": "~~~mermaid\nflowchart LR\n    accTitle: 自回归视频生成的三层选择\n    accDescr: 先选择像素、离散码或连续 latent 表示，再选择 token、集合、尺度、帧或时间块作为外层提交单位，最后选择 categorical、逐 token diffusion 或 flow、以及单元内 masked 或 discrete-diffusion refinement；不同组合形成 VideoGPT、InfinityStar、NOVA、Lumos-1 和 CausVid 等系统。\n\n    subgraph representation_layer[\"表示层\"]\n        raw_pixels[\"原始像素\"]\n        discrete_codes[\"离散视觉码\"]\n        continuous_latents[\"连续 latent\"]\n    end\n\n    subgraph commit_layer[\"外层提交粒度\"]\n        pixel_token_commit[\"pixel / token\"]\n        set_commit[\"token set\"]\n        scale_commit[\"pyramid scale\"]\n        frame_commit[\"frame\"]\n        chunk_commit[\"temporal chunk\"]\n    end\n\n    subgraph conditional_layer[\"单个条件分布的实现\"]\n        categorical_head[\"categorical head\"]\n        diffusion_flow_head[\"逐 token diffusion / flow head\"]\n        masked_refinement[\"单元内 masked / discrete diffusion\"]\n        full_backbone_denoising[\"单元内 full-backbone denoising\"]\n    end\n\n    raw_pixels --> pixel_token_commit\n    discrete_codes --> pixel_token_commit\n    discrete_codes --> scale_commit\n    discrete_codes --> frame_commit\n    continuous_latents --> set_commit\n    continuous_latents --> frame_commit\n    continuous_latents --> chunk_commit\n\n    pixel_token_commit --> categorical_head\n    scale_commit --> categorical_head\n    set_commit --> diffusion_flow_head\n    frame_commit --> masked_refinement\n    frame_commit --> full_backbone_denoising\n    chunk_commit --> full_backbone_denoising\n\n    categorical_head --> discrete_ar_route[\"VideoGPT / VideoPoet / InfinityStar\"]\n    diffusion_flow_head --> nova_route[\"MAR / NOVA\"]\n    masked_refinement --> lumos_route[\"Lumos-1\"]\n    full_backbone_denoising --> causvid_route[\"CausVid / Self Forcing\"]\n~~~\n"
+  },
+  {
+    "id": "013",
+    "path": "docs/generative-models/autoregressive-generation.md",
+    "file_index": 2,
+    "title": "Teacher forcing 与 self forcing 的历史来源",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：Teacher forcing 与 self forcing 的历史来源。图中表达的关键模块包括：核心模块与关系。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/013",
+    "source": "~~~mermaid\nsequenceDiagram\n    accTitle: Teacher forcing 与 self forcing 的历史来源\n    accDescr: Teacher forcing 在每一步向生成器提供真实历史并逐位置计算损失；self forcing 则让生成器采样当前单元、将其提交到 rollout 状态和 KV cache，再用自生成历史生成下一单元，最后施加视频级监督。\n\n    participant dataset as 真实视频样本\n    participant generator as 因果生成器\n    participant rollout_state as rollout 状态与 KV\n    participant objective as 训练目标\n\n    Note over dataset,objective: Teacher forcing\n    loop 每个外层位置 k\n        dataset->>generator: 提供真实前缀 x_<k\n        generator->>objective: 预测 x_k 并计算位置损失\n    end\n\n    Note over dataset,objective: Self forcing\n    dataset->>generator: 提供初始条件\n    loop 每个外层位置 k\n        rollout_state->>generator: 提供自生成前缀与缓存\n        generator->>rollout_state: 采样并提交当前单元\n    end\n    rollout_state->>objective: 形成完整自生成视频\n    objective->>generator: 视频级监督与截断梯度\n~~~\n"
+  },
+  {
+    "id": "014",
+    "path": "docs/generative-models/causal-streaming-generation.md",
+    "file_index": 1,
+    "title": "因果流式视频生成的五层技术栈",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：因果流式视频生成的五层技术栈。图中表达的关键模块包括：条件层 文本 / 图像 / 动作 / 源视频、因果生成骨干 frame-wise 或 chunk-wise DiT、少步蒸馏 DMD / consistency / flow map、on-policy 训练 self-generated history、有界长期记忆 window / sink / compression / retrieval / state、流式系统 VAE 解码 / batching / pipeline / deadline、持续发帧 并接收下一次条件、四类评测 质量 · 时长 · 交互 · 系统。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/014",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 因果流式视频生成的五层技术栈\n    accDescr: 条件进入因果视频生成器。少步蒸馏降低每块网络调用，on-policy 训练降低自身历史导致的分布偏移，记忆策略控制长期状态和显存，流式系统负责解码调度与期限。评测分别检查质量、长时稳定、交互响应和系统延迟。\n\n    C[\"条件层<br/>文本 / 图像 / 动作 / 源视频\"] --> B[\"因果生成骨干<br/>frame-wise 或 chunk-wise DiT\"]\n    D[\"少步蒸馏<br/>DMD / consistency / flow map\"] --> B\n    O[\"on-policy 训练<br/>self-generated history\"] --> B\n    B <--> M[\"有界长期记忆<br/>window / sink / compression / retrieval / state\"]\n    B --> S[\"流式系统<br/>VAE 解码 / batching / pipeline / deadline\"]\n    S --> F[\"持续发帧<br/>并接收下一次条件\"]\n    F -.->|\"新条件进入下一块\"| C\n    F --> E[\"四类评测<br/>质量 · 时长 · 交互 · 系统\"]\n\n    classDef input fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e\n    classDef model fill:#ccfbf1,stroke:#0f766e,color:#134e4a\n    classDef system fill:#fef3c7,stroke:#b45309,color:#78350f\n    classDef eval fill:#f3e8ff,stroke:#7e22ce,color:#581c87\n    class C input\n    class B,D,O,M model\n    class S,F system\n    class E eval\n```\n"
+  },
+  {
+    "id": "015",
+    "path": "docs/generative-models/causal-streaming-generation.md",
+    "file_index": 2,
+    "title": "逐位置噪声与滚动提交",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：逐位置噪声与滚动提交。图中表达的关键模块包括：A · next-unit 极限、已提交历史 τ=0、一个噪声目标 τ∈(0,1、目标到 τ=0、提交下一单元、尚不存在的 future、B · full-sequence diffusion、全片位置共享 τ_i=τ、全局去噪一步、整段继续迭代。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/015",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 逐位置噪声与滚动提交\n    accDescr: 三个面板对比干净历史加单一目标、全序列共享噪声以及逐位置不同噪声的滚动窗口；滚动采样只在最早活动单元完成去噪后提交并右移窗口，且噪声日程本身不推出因果访问、自生成历史、少步或实时服务。\n\n    subgraph A[\"A · next-unit 极限\"]\n        direction LR\n        A0[\"已提交历史<br/>τ=0\"] --> A1[\"一个噪声目标<br/>τ∈(0,1]\"]\n        A1 -->|\"τ↓；多次网络调用\"| A2[\"目标到 τ=0\"]\n        A2 --> A3[\"提交下一单元\"]\n        A1 -.->|\"更远未来不创建\"| A4[\"尚不存在的 future\"]\n    end\n\n    subgraph B[\"B · full-sequence diffusion\"]\n        direction LR\n        B0[\"全片位置共享<br/>τ_i=τ\"] --> B1[\"全局去噪一步\"]\n        B1 -->|\"所有位置一起 τ↓\"| B2[\"整段继续迭代\"]\n        B2 --> B3[\"全片完成后提交\"]\n    end\n\n    subgraph C[\"C · rolling per-token noise\"]\n        direction LR\n        C0[\"不可变 prefix<br/>τ=0\"] --> C1[\"活动窗口示例<br/>τ=[.25,.5,.75,1]\"]\n        C1 -->|\"窗口内联合 τ↓\"| C2[\"最左活动单元<br/>到 τ=0\"]\n        C2 --> C3[\"只提交该 frame/chunk\"]\n        C3 --> C4[\"窗口右移\"]\n        C4 --> C5[\"追加新位置<br/>τ=1\"]\n        C5 --> C1\n    end\n\n    A3 -.->|\"对照；不是执行先后\"| B0\n    B3 -.->|\"对照；不是执行先后\"| C0\n    C4 -.-> G[\"rolling schedule 不推出<br/>① causal access<br/>② GT 或 self history<br/>③ 每次 commit 的真实 NFE<br/>④ TTFF / p99 / deadline\"]\n\n    classDef clean fill:#dcfce7,stroke:#15803d,color:#14532d\n    classDef active fill:#dbeafe,stroke:#2563eb,color:#1e3a5f\n    classDef commit fill:#fef3c7,stroke:#b45309,color:#78350f\n    classDef gate fill:#f3e8ff,stroke:#7e22ce,color:#581c87\n    class A0,C0 clean\n    class A1,A2,B0,B1,B2,C1,C2,C5 active\n    class A3,B3,C3,C4 commit\n    class G,A4 gate\n```\n"
+  },
+  {
+    "id": "016",
+    "path": "docs/generative-models/causal-streaming-generation.md",
+    "file_index": 3,
+    "title": "长时生成的有界记忆合同",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：长时生成的有界记忆合同。图中表达的关键模块包括：已提交块 b_k、近期窗口 W、有界 working-set reader、retention policy 路线可组合、固定 sink / anchor、选择持久 salient blocks、量化 / 低秩 / 剪枝 / 分层合并 有损变换、更新递归 / SSM 状态 h_k=U(h_{k-1},b_k)、写入可检索外存 M_ext(k) 可增长、evict / drop。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/016",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 长时生成的有界记忆合同\n    accDescr: 每个已提交视频块先进入近期窗口，过期内容可被固定为锚点、选择为持久块、压缩或分层合并、汇总为递归状态、写入可检索外存或丢弃；下一块只读取受 GPU 工作集约束的内容，因此固定显存不等于无损长期记忆，外存和检索成本也须另计。\n\n    K[\"已提交块 b_k\"] --> W[\"近期窗口 W\"]\n    W --> R[\"有界 working-set reader\"]\n    W -->|\"ages out\"| P[\"retention policy<br/>路线可组合\"]\n    P -.-> A[\"固定 sink / anchor\"]\n    P -.-> S[\"选择持久 salient blocks\"]\n    P -.-> C[\"量化 / 低秩 / 剪枝 / 分层合并<br/>有损变换\"]\n    P -.-> H[\"更新递归 / SSM 状态<br/>h_k=U(h_{k-1},b_k)\"]\n    P -.-> X[\"写入可检索外存<br/>M_ext(k) 可增长\"]\n    P -.-> D[\"evict / drop\"]\n\n    A --> R\n    S --> R\n    C --> R\n    H --> R\n    Q[\"当前 query / state\"] --> X\n    X -->|\"top-r retrieved blocks\"| R\n    R --> N[\"生成下一块 b_{k+1}\"]\n    N --> J[\"commit\"]\n    J --> W\n\n    F0[\"baseline：保留全部 raw KV<br/>M_full(k)=O(k)\"] --> R0[\"GPU memory 随时长增长\"]\n    T1[\"对象离场后返回\"] -.->|\"测 eviction / retrieval\"| P\n    T2[\"场景切换或新 prompt\"] -.->|\"测 anchor lock-in\"| A\n    T3[\"小而快的物体\"] -.->|\"测压缩损失\"| C\n    T4[\"错误块已 commit\"] -.->|\"测 cache poisoning\"| R\n    R --> E[\"验收<br/>quality-time · survival curve<br/>peak GPU · external latency\"]\n\n    classDef live fill:#dbeafe,stroke:#2563eb,color:#1e3a5f\n    classDef route fill:#fef3c7,stroke:#b45309,color:#78350f\n    classDef risk fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d\n    classDef eval fill:#f3e8ff,stroke:#7e22ce,color:#581c87\n    class K,W,R,N,J live\n    class P,A,S,C,H,X route\n    class D,F0,R0,T1,T2,T3,T4 risk\n    class E eval\n```\n"
+  },
+  {
+    "id": "017",
+    "path": "docs/generative-models/causal-streaming-generation.md",
+    "file_index": 4,
+    "title": "流式提交、回压与恢复状态机",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：流式提交、回压与恢复状态机。图中表达的关键模块包括：条件到达 记录 arrival timestamp、admission 绑定到未提交索引、生成 speculative frame/chunk、decode + overlap/crop、commit 写 hash 与不可变前缀、更新 generator memory、mux / transport / display、推进 playback clock、声明的降级策略 降 NFE / 分辨率 / 跳过未提交单元、backpressure / reject 不得静默改写已提交帧。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/017",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 流式提交、回压与恢复状态机\n    accDescr: 条件先被接纳到尚未提交的未来，生成器产生 speculative chunk，经解码、边界裁切、质量和期限 gate 后才写入不可变前缀并播放；失败只可重做未提交内容，拥塞时必须执行预先声明的降级或回压，错误缓存则重置或重新锚定。\n\n    I[\"条件到达<br/>记录 arrival timestamp\"] --> A[\"admission<br/>绑定到未提交索引\"]\n    A --> G[\"生成 speculative frame/chunk\"]\n    G --> D[\"decode + overlap/crop\"]\n    D --> Q{\"质量与 deadline gate\"}\n    Q -->|\"通过\"| C[\"commit<br/>写 hash 与不可变前缀\"]\n    C --> M[\"更新 generator memory\"]\n    C --> P[\"mux / transport / display\"]\n    P --> N[\"推进 playback clock\"]\n    N --> G\n\n    Q -->|\"质量失败且尚有预算\"| G\n    Q -->|\"deadline 风险\"| B[\"声明的降级策略<br/>降 NFE / 分辨率 / 跳过未提交单元\"]\n    B --> Q\n    B -->|\"预算仍不足\"| R[\"backpressure / reject<br/>不得静默改写已提交帧\"]\n    M -->|\"重复错误或 scene reset\"| X[\"清 cache / re-anchor\"]\n    X --> G\n    U[\"新 prompt / 动作\"] -.->|\"只影响未提交未来\"| A\n    F[\"future-leak probe\"] -.->|\"比较 commit hashes\"| C\n\n    classDef process fill:#dbeafe,stroke:#2563eb,color:#1e3a5f\n    classDef commit fill:#dcfce7,stroke:#15803d,color:#14532d\n    classDef risk fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d\n    classDef audit fill:#f3e8ff,stroke:#7e22ce,color:#581c87\n    class I,A,G,D,Q,M,P,N process\n    class C commit\n    class B,R,X risk\n    class U,F audit\n```\n"
+  },
+  {
+    "id": "018",
+    "path": "docs/generative-models/diffusion-models.md",
+    "file_index": 1,
+    "title": "视频与噪声双时间轴",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频与噪声双时间轴。图中表达的关键模块包括：第 1 帧 xτ^(1)、第 k 帧 xτ^(k)、第 K 帧 xτ^(K)、干净视频 X0 τ = 0、扰动视频 Xτ k 不前进、高斯先验 XT τ = T、Reverse SDE 随机路径、PF-ODE 确定路径、生成样本 X̂0、生成样本 X̂0。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/018",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 视频与噪声双时间轴\n    accDescr: 视频时间 k 在同一噪声层内排列各帧，噪声时间 tau 把整段干净视频推向高斯先验；生成时同一 score 可驱动随机 reverse SDE 或确定性 PF-ODE 返回数据端。\n\n    first_frame[\"第 1 帧<br/>xτ^(1)\"] -->|视频推进| middle_frame[\"第 k 帧<br/>xτ^(k)\"] -->|视频推进| last_frame[\"第 K 帧<br/>xτ^(K)\"]\n    clean_video[\"干净视频 X0<br/>τ = 0\"] -->|前向加噪| noisy_video[\"扰动视频 Xτ<br/>k 不前进\"] -->|继续加噪| gaussian_prior[\"高斯先验 XT<br/>τ = T\"]\n    last_frame -.->|同一噪声层| noisy_video\n    gaussian_prior -->|τ 下降| reverse_sde[\"Reverse SDE<br/>随机路径\"]\n    gaussian_prior -->|τ 下降| pf_ode[\"PF-ODE<br/>确定路径\"]\n    reverse_sde --> generated_sde([\"生成样本 X̂0\"])\n    pf_ode --> generated_ode([\"生成样本 X̂0\"])\n\n    classDef data fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f\n    classDef noise fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#3b0764\n    classDef stochastic fill:#fef9c3,stroke:#ca8a04,stroke-width:2px,color:#713f12\n    classDef output fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d\n    class first_frame,middle_frame,last_frame data\n    class clean_video,noisy_video,gaussian_prior,pf_ode noise\n    class reverse_sde stochastic\n    class generated_sde,generated_ode output\n```\n"
+  },
+  {
+    "id": "019",
+    "path": "docs/generative-models/diffusion-models.md",
+    "file_index": 2,
+    "title": "扩散生成三类加速路线",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：扩散生成三类加速路线。图中表达的关键模块包括：已训练 diffusion 或 score 场、Training-free solver DDIM / DPM-Solver、Consistency trajectory 一步或多步 refinement、DMD / DMD2 score 差 + 可选 GAN、较少 NFE 的输出、统一验收 质量 · 覆盖 · 延迟 · 硬件。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/019",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 扩散生成三类加速路线\n    accDescr: 从已训练的扩散或 score 模型出发，若不重训则选择 training-free sampler 或 solver；若训练新模型，则按对齐同一生成轨迹还是对齐目标分布，分别进入 consistency 路线或 DMD 与对抗蒸馏路线。\n\n    teacher_field([\"已训练 diffusion<br/>或 score 场\"]) --> retrain_choice{\"允许训练新模型？\"}\n    retrain_choice -->|否| solver_route[\"Training-free solver<br/>DDIM / DPM-Solver\"]\n    retrain_choice -->|是| alignment_choice{\"主要对齐对象？\"}\n    alignment_choice -->|同一轨迹端点| consistency_route[\"Consistency trajectory<br/>一步或多步 refinement\"]\n    alignment_choice -->|目标生成分布| dmd_route[\"DMD / DMD2<br/>score 差 + 可选 GAN\"]\n    solver_route --> generated_output([\"较少 NFE 的输出\"])\n    consistency_route --> generated_output\n    dmd_route --> generated_output\n    generated_output --> deployment_check[\"统一验收<br/>质量 · 覆盖 · 延迟 · 硬件\"]\n\n    classDef source fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#3b0764\n    classDef decision fill:#fef9c3,stroke:#ca8a04,stroke-width:2px,color:#713f12\n    classDef method fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f\n    classDef result fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d\n    class teacher_field source\n    class retrain_choice,alignment_choice decision\n    class solver_route,consistency_route,dmd_route method\n    class generated_output,deployment_check result\n```\n"
+  },
+  {
+    "id": "020",
+    "path": "docs/generative-models/flow-consistency-models.md",
+    "file_index": 1,
+    "title": "Diffusion 到连续运输的桥梁",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：Diffusion 到连续运输的桥梁。图中表达的关键模块包括：Diffusion / score 路线、数据分布 p_data、前向 SDE / 离散加噪、噪声边缘族 p_tau、学习 score s_tau、反向时间 SDE、PF-ODE、Flow Matching 路线、端点 / 条件 Z、条件概率路径 p_s(x | Z)。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/020",
+    "source": "~~~mermaid\nflowchart TB\n    accTitle: Diffusion 到连续运输的桥梁\n    accDescr: 左侧展示数据经加噪得到边缘分布并学习 score，随后分为反向 SDE 和概率流 ODE；右侧展示 Flow Matching 从条件路径、条件速度、边缘速度场到学习 ODE 轨迹的三层关系。\n\n    subgraph diffusion_bridge[\"Diffusion / score 路线\"]\n        data_distribution[\"数据分布 p_data\"]\n        forward_noising[\"前向 SDE / 离散加噪\"]\n        noisy_marginals[\"噪声边缘族 p_tau\"]\n        learned_score[\"学习 score s_tau\"]\n        reverse_sde[\"反向时间 SDE\"]\n        probability_flow_ode[\"PF-ODE\"]\n\n        data_distribution --> forward_noising\n        forward_noising --> noisy_marginals\n        noisy_marginals --> learned_score\n        learned_score --> reverse_sde\n        learned_score --> probability_flow_ode\n    end\n\n    subgraph flow_matching_bridge[\"Flow Matching 路线\"]\n        endpoint_condition[\"端点 / 条件 Z\"]\n        conditional_path[\"条件概率路径 p_s(x | Z)\"]\n        conditional_velocity[\"条件速度 u_s(x | Z)\"]\n        marginal_field[\"边缘速度场 u_s(x)\"]\n        learned_field[\"学习速度场 v_theta\"]\n        learned_trajectory[\"数值积分得到 ODE 轨迹\"]\n\n        endpoint_condition --> conditional_path\n        conditional_path --> conditional_velocity\n        conditional_velocity -->|条件期望| marginal_field\n        marginal_field -->|回归| learned_field\n        learned_field --> learned_trajectory\n    end\n\n    probability_flow_ode -.->|同为 ODE，但构造与监督不同| learned_trajectory\n    probability_flow_ode --> consistency_reference[\"CM 可沿参考 PF-ODE 学流映射\"]\n~~~\n"
+  },
+  {
+    "id": "021",
+    "path": "docs/generative-models/flow-consistency-models.md",
+    "file_index": 2,
+    "title": "DDPM、SDE、PF-ODE、Flow Matching、Rectified Flow、Consistency 与 DMD 的五层关系",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：DDPM、SDE、PF-ODE、Flow Matching、Rectified Flow、Consistency 与 DMD 的五层关系。图中表达的关键模块包括：1 · 训练统计量 / objective、DDPM / score ε、x0、v 或 score 回归、Flow Matching 条件速度回归、Rectified Flow / reflow 直线条件桥与重耦合、2 · 连续过程 / dynamics、Reverse SDE 随机样本路径、PF-ODE 确定样本路径、Learned ODE 积分边缘速度场、3 · 只改推理 / no retraining、DDIM / DPM-Solver / 时间网格 复用已有 denoiser 或 score。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/021",
+    "source": "~~~mermaid\nflowchart TB\n    accTitle: DDPM、SDE、PF-ODE、Flow Matching、Rectified Flow、Consistency 与 DMD 的五层关系\n    accDescr: 训练层分为 diffusion 或 score 与 Flow Matching 或 Rectified Flow；连续过程层分为 reverse SDE、PF-ODE 与学习 ODE；不重训层只更换 DDIM 或 DPM-Solver；另训练的少步层按轨迹或 flow map、分布、区间运输分开；因果、分块、KV cache 与持续发帧属于正交部署轴。\n\n    subgraph train[\"1 · 训练统计量 / objective\"]\n        direction LR\n        diff[\"DDPM / score<br/>ε、x0、v 或 score 回归\"]\n        fm[\"Flow Matching<br/>条件速度回归\"]\n        rf[\"Rectified Flow / reflow<br/>直线条件桥与重耦合\"]\n        fm -->|一种路径与耦合选择| rf\n    end\n\n    subgraph dynamics[\"2 · 连续过程 / dynamics\"]\n        direction LR\n        rsde[\"Reverse SDE<br/>随机样本路径\"]\n        pfode[\"PF-ODE<br/>确定样本路径\"]\n        learnedode[\"Learned ODE<br/>积分边缘速度场\"]\n    end\n\n    diff -->|同一 score，不同动力学| rsde\n    diff -->|同一 score，不同动力学| pfode\n    fm -->|学习边缘速度| learnedode\n    rf -->|学习更易积分的速度场| learnedode\n\n    subgraph solver[\"3 · 只改推理 / no retraining\"]\n        direction LR\n        fastsolver[\"DDIM / DPM-Solver / 时间网格<br/>复用已有 denoiser 或 score\"]\n    end\n\n    diff -->|不训练新 student| fastsolver\n\n    subgraph student[\"4 · 另训练少步模型 / new parameters\"]\n        direction LR\n        trajectory[\"PD / CD / CM<br/>教师轨迹或终点 flow map\"]\n        standalone[\"Standalone CT<br/>可不依赖外部教师\"]\n        distribution[\"DMD / DMD2<br/>目标 score − fake score；分布对齐\"]\n        interval[\"Shortcut / MeanFlow / α-Flow<br/>步长条件或区间平均运输\"]\n        standalone -.->|CM 的另一训练路线| trajectory\n    end\n\n    pfode -->|常见参考轨迹；PD 也可用确定性 sampler| trajectory\n    diff -->|预训练教师 score| distribution\n    fm -->|trajectory FM 与 bootstrap| interval\n    rf -.->|可提供重耦合轨迹| interval\n\n    subgraph deployment[\"5 · 视频部署轴 / orthogonal axis\"]\n        direction LR\n        serving[\"causal attention · chunking · KV cache<br/>首帧延迟 · 稳态吞吐 · 持续发帧\"]\n    end\n\n    fastsolver -.->|仍需另选视频 factorization| serving\n    trajectory -.->|仍需另选视频 factorization| serving\n    distribution -.->|仍需另选视频 factorization| serving\n    interval -.->|仍需另选视频 factorization| serving\n\n    classDef diffusion fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f\n    classDef flow fill:#ffedd5,stroke:#ea580c,stroke-width:2px,color:#7c2d12\n    classDef few fill:#f3e8ff,stroke:#7e22ce,stroke-width:2px,color:#581c87\n    classDef deploy fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d\n    class diff,rsde,pfode,fastsolver diffusion\n    class fm,rf,learnedode flow\n    class trajectory,standalone,distribution,interval few\n    class serving deploy\n~~~\n"
+  },
+  {
+    "id": "022",
+    "path": "docs/generative-models/flow-consistency-models.md",
+    "file_index": 3,
+    "title": "Few-Step 与流式生成的正交关系",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：Few-Step 与流式生成的正交关系。图中表达的关键模块包括：轴一：噪声 / 运输时间目标、场：FM / RF、映射：CM / Shortcut / MeanFlow、分布：DMD / DMD2、轴二：视频数据时间分解、整段双向联合、空间时间金字塔、按帧 / chunk 因果、轴三：部署执行、离线整段生成。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/022",
+    "source": "~~~mermaid\nflowchart LR\n    accTitle: Few-Step 与流式生成的正交关系\n    accDescr: 图中三列分别表示少步学习目标、视频数据时间分解和部署执行方式。任一生成系统都要从三列分别作选择，少步并不会自动推出因果、流式或实时。\n\n    subgraph objective_axis[\"轴一：噪声 / 运输时间目标\"]\n        field_objective[\"场：FM / RF\"]\n        map_objective[\"映射：CM / Shortcut / MeanFlow\"]\n        distribution_objective[\"分布：DMD / DMD2\"]\n    end\n\n    subgraph factorization_axis[\"轴二：视频数据时间分解\"]\n        joint_factorization[\"整段双向联合\"]\n        pyramid_factorization[\"空间时间金字塔\"]\n        causal_factorization[\"按帧 / chunk 因果\"]\n    end\n\n    subgraph deployment_axis[\"轴三：部署执行\"]\n        offline_batch[\"离线整段生成\"]\n        streaming_state[\"状态化流式生成\"]\n        realtime_slo[\"实时 SLO：TTFF / deadline / jitter\"]\n    end\n\n    field_objective --> configured_generator[\"具体生成系统\"]\n    map_objective --> configured_generator\n    distribution_objective --> configured_generator\n    joint_factorization --> configured_generator\n    pyramid_factorization --> configured_generator\n    causal_factorization --> configured_generator\n    offline_batch --> configured_generator\n    streaming_state --> configured_generator\n    realtime_slo --> configured_generator\n\n    configured_generator -.-> pyramidal_example[\"Pyramidal Flow：FM + 金字塔\"]\n    configured_generator -.-> rcm_example[\"rCM：少步 map + 离线短视频\"]\n    configured_generator -.-> causvid_example[\"CausVid：DMD2 + 因果学生\"]\n    configured_generator -.-> streamv2_example[\"StreamDiffusionV2：训练无关的流式服务管线\"]\n~~~\n"
+  },
+  {
+    "id": "023",
+    "path": "docs/generative-models/masked-generation.md",
+    "file_index": 1,
+    "title": "掩码生成的四层关系",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：掩码生成的四层关系。图中表达的关键模块包括：训练腐败与目标、随机缺失条件预测 masked modeling、吸收态前向过程 clean → MASK、推理采样策略、置信度排序 + schedule MaskGIT 式迭代提交、时间或速率定义的 概率化反向过程、联合分布或集合顺序、有序集合 S1, S2, … next-set AR、样本依赖的动态顺序 需把选择策略计入、视频时间结构。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/023",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 掩码生成的四层关系\n    accDescr: 图从训练腐败与目标、反向或启发式采样、集合顺序、视频时间因果四层区分 masked modeling、吸收态离散扩散、MaskGIT、next-set AR 和帧间因果混合模型。\n\n    subgraph training_layer[\"训练腐败与目标\"]\n        masked_objective[\"随机缺失条件预测<br/>masked modeling\"]\n        absorbing_process[\"吸收态前向过程<br/>clean → MASK\"]\n    end\n\n    subgraph sampling_layer[\"推理采样策略\"]\n        maskgit_sampler[\"置信度排序 + schedule<br/>MaskGIT 式迭代提交\"]\n        reverse_sampler[\"时间或速率定义的<br/>概率化反向过程\"]\n    end\n\n    subgraph order_layer[\"联合分布或集合顺序\"]\n        next_set_ar[\"有序集合 S1, S2, …<br/>next-set AR\"]\n        adaptive_order[\"样本依赖的动态顺序<br/>需把选择策略计入\"]\n    end\n\n    subgraph video_layer[\"视频时间结构\"]\n        full_bidirectional[\"整段双向补全\"]\n        frame_causal[\"帧间因果<br/>帧内双向\"]\n    end\n\n    masked_objective --> maskgit_sampler\n    absorbing_process --> reverse_sampler\n    absorbing_process -.->|\"特定参数化下是<br/>加权交叉熵积分\"| masked_objective\n    maskgit_sampler -.->|\"若提交集合构成分区\"| adaptive_order\n    next_set_ar --> adaptive_order\n    maskgit_sampler --> full_bidirectional\n    maskgit_sampler --> frame_causal\n    reverse_sampler --> full_bidirectional\n    reverse_sampler --> frame_causal\n\n    classDef objective fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f\n    classDef sampler fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#3b0764\n    classDef order fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#713f12\n    classDef video fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d\n    class masked_objective,absorbing_process objective\n    class maskgit_sampler,reverse_sampler sampler\n    class next_set_ar,adaptive_order order\n    class full_bidirectional,frame_causal video\n```\n"
+  },
+  {
+    "id": "024",
+    "path": "docs/generative-models/masked-generation.md",
+    "file_index": 2,
+    "title": "MaskGIT 式一轮解码的状态变化",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：MaskGIT 式一轮解码的状态变化。图中表达的关键模块包括：当前状态 已提交 token + mask、并行预测 所有当前 mask 位置、从分类分布采样 候选 token、计算候选置信度 可叠加退火随机量、schedule γ(j/J) 给出下一轮 mask 数、跨位置排序、提交高分候选、低分候选重新 mask、原版中已提交位置 设高置信并冻结、下一轮状态。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/024",
+    "source": "```mermaid\nflowchart LR\n    accTitle: MaskGIT 式一轮解码的状态变化\n    accDescr: 图展示从当前 mask 集合开始，并行预测和采样候选，按置信度与 schedule 提交高分候选、重掩低分候选；原版已提交位置被冻结，可选 Token-Critic 才提供另一种接受拒绝机制。\n\n    current_state[\"当前状态<br/>已提交 token + mask\"] --> parallel_predict[\"并行预测<br/>所有当前 mask 位置\"]\n    parallel_predict --> sample_candidates[\"从分类分布采样<br/>候选 token\"]\n    sample_candidates --> score_candidates[\"计算候选置信度<br/>可叠加退火随机量\"]\n    schedule_count[\"schedule γ(j/J)<br/>给出下一轮 mask 数\"] --> rank_candidates[\"跨位置排序\"]\n    score_candidates --> rank_candidates\n    rank_candidates --> commit_high[\"提交高分候选\"]\n    rank_candidates --> remask_low[\"低分候选重新 mask\"]\n    commit_high --> frozen_context[\"原版中已提交位置<br/>设高置信并冻结\"]\n    frozen_context --> next_state[\"下一轮状态\"]\n    remask_low --> next_state\n    next_state --> finished{\"mask 是否清零？\"}\n    finished -->|\"否\"| parallel_predict\n    finished -->|\"是\"| decoded_tokens([\"完整 token → 视频解码\"])\n    token_critic[\"可选 Token-Critic<br/>学习接受 / 拒绝\"] -.-> score_candidates\n\n    classDef state fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f\n    classDef operation fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#3b0764\n    classDef decision fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#713f12\n    classDef output fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d\n    class current_state,next_state,schedule_count state\n    class parallel_predict,sample_candidates,score_candidates,rank_candidates,commit_high,remask_low,frozen_context,token_critic operation\n    class finished decision\n    class decoded_tokens output\n```\n"
+  },
+  {
+    "id": "025",
+    "path": "docs/generative-models/masked-generation.md",
+    "file_index": 3,
+    "title": "帧间因果与帧内掩码的双层串行深度",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：帧间因果与帧内掩码的双层串行深度。图中表达的关键模块包括：完整历史帧 1 … k-1、当前第 k 帧 空间 token 全部或部分 mask、帧内 J 轮 双向预测、提交、重掩、完成第 k 帧、写入因果历史 / KV cache、第 k+1 帧 重新开始帧内迭代、训练端关键选择、完整真值历史帧 Complete Teacher Forcing、被 mask 的历史帧 Masked Teacher Forcing。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/025",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 帧间因果与帧内掩码的双层串行深度\n    accDescr: 图展示完整历史帧作为因果上下文，当前帧内部用多轮双向掩码生成，完成后写入历史缓存再生成下一帧；总串行深度约为帧数乘帧内轮数。\n\n    past_frames[\"完整历史帧<br/>1 … k-1\"] --> current_mask[\"当前第 k 帧<br/>空间 token 全部或部分 mask\"]\n    current_mask --> intra_rounds[\"帧内 J 轮<br/>双向预测、提交、重掩\"]\n    intra_rounds --> complete_frame[\"完成第 k 帧\"]\n    complete_frame --> history_cache[\"写入因果历史 / KV cache\"]\n    history_cache --> next_frame[\"第 k+1 帧<br/>重新开始帧内迭代\"]\n    next_frame -.-> intra_rounds\n\n    training_context[\"训练端关键选择\"] --> complete_teacher[\"完整真值历史帧<br/>Complete Teacher Forcing\"]\n    training_context --> masked_teacher[\"被 mask 的历史帧<br/>Masked Teacher Forcing\"]\n    complete_teacher -.-> past_frames\n    masked_teacher -.-> past_frames\n\n    classDef context fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f\n    classDef generation fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#3b0764\n    classDef complete fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d\n    classDef caution fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#713f12\n    class past_frames,history_cache context\n    class current_mask,intra_rounds,next_frame generation\n    class complete_frame,complete_teacher complete\n    class training_context,masked_teacher caution\n```\n"
+  },
+  {
+    "id": "026",
+    "path": "docs/generative-models/recurrent-prediction.md",
+    "file_index": 1,
+    "title": "递归视频预测的共同 rollout 外壳与四类条件头",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：递归视频预测的共同 rollout 外壳与四类条件头。图中表达的关键模块包括：已观测帧或 latent、状态更新 U、动作与其他条件、递归状态 h、直接像素 / 运动变换、随机 latent、条件 normalizing flow、帧 / 块 diffusion、提交帧或 chunk、播放或环境执行。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/026",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 递归视频预测的共同 rollout 外壳与四类条件头\n    accDescr: 已观测帧和动作进入状态更新器，状态分别驱动直接像素或变换、随机潜变量、可逆流和扩散条件头，产出按帧或块提交；提交结果反馈到下一步，真实环境观测也可重新锚定状态。\n\n    observed_history[\"已观测帧或 latent\"] --> state_update[\"状态更新 U\"]\n    action_condition[\"动作与其他条件\"] --> state_update\n    recurrent_state[\"递归状态 h\"] --> state_update\n    state_update --> recurrent_state\n    recurrent_state --> deterministic_head[\"直接像素 / 运动变换\"]\n    recurrent_state --> latent_head[\"随机 latent\"]\n    recurrent_state --> flow_head[\"条件 normalizing flow\"]\n    recurrent_state --> diffusion_head[\"帧 / 块 diffusion\"]\n    deterministic_head --> committed_unit[\"提交帧或 chunk\"]\n    latent_head --> committed_unit\n    flow_head --> committed_unit\n    diffusion_head --> committed_unit\n    committed_unit -. \"open-loop 反馈\" .-> observed_history\n    committed_unit --> environment[\"播放或环境执行\"]\n    environment -. \"新观测闭环校正\" .-> observed_history\n```\n"
+  },
+  {
+    "id": "027",
+    "path": "docs/generative-models/recurrent-prediction.md",
+    "file_index": 2,
+    "title": "动作干预与闭环规划的最小证据循环",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：动作干预与闭环规划的最小证据循环。图中表达的关键模块包括：核心模块与关系。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/027",
+    "source": "```mermaid\nsequenceDiagram\n    accTitle: 动作干预与闭环规划的最小证据循环\n    accDescr: 从同一初始状态复制多个动作干预，预测器在固定随机种子下生成反事实结果，评测器核对动作效应；规划器随后在预测模型中比较候选序列，只执行第一步，环境返回真实观测并更新状态，循环记录任务成功、失效与期限。\n\n    participant environment as 真实环境或保真模拟器\n    participant predictor as 动作条件预测器\n    participant evaluator as 干预评测器\n    participant planner as 规划器\n\n    environment->>predictor: 相同初始观测与状态\n    loop 成对动作 a / a' / no-op\n        predictor->>predictor: 固定 seed，替换且仅替换动作\n        predictor->>evaluator: 反事实 rollout\n        environment->>evaluator: 对应真实执行或 simulator truth\n        evaluator->>evaluator: 核对方向、时序、幅度与失败\n    end\n    loop 每个 closed-loop 决策时刻\n        planner->>predictor: 候选动作序列\n        predictor->>planner: 预测 reward、风险与不确定性\n        planner->>environment: 只执行第一步动作\n        environment->>predictor: 返回新观测并更新 belief\n        environment->>evaluator: 任务结果与端到端延迟\n    end\n```\n"
+  },
+  {
+    "id": "028",
+    "path": "docs/generative-models/variational-generation.md",
+    "file_index": 1,
+    "title": "latent 系统的严格分类门",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：latent 系统的严格分类门。图中表达的关键模块包括：看到 latent / VAE 字样、不是严格变分未来模型、latent action / tokenizer / oracle、GAN / AR / deterministic latent、posterior 泄漏未来、严格 stochastic future 主线、表示压缩、diffusion / flow、确定性层级。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/028",
+    "source": "```mermaid\nflowchart LR\n    accTitle: latent 系统的严格分类门\n    accDescr: 只有训练时未来可见后验、不看未来的部署生成先验和变分对齐同时成立，才进入随机未来主线；表示压缩、扩散噪声、确定性层级和无生成先验的潜动作分别分流。\n\n    name[\"看到 latent / VAE 字样\"] --> posterior{\"有 future-aware<br/>posterior 吗？\"}\n    posterior -->|\"否\"| near_miss[\"不是严格变分未来模型\"]\n    posterior -->|\"是\"| prior{\"部署有不看未来的<br/>generative prior 吗？\"}\n    prior -->|\"否\"| action_or_codec[\"latent action / tokenizer / oracle\"]\n    prior -->|\"是\"| align{\"有 KL / ELBO<br/>对齐吗？\"}\n    align -->|\"否\"| other[\"GAN / AR / deterministic latent\"]\n    align -->|\"是\"| deploy{\"测试只从 prior<br/>采样吗？\"}\n    deploy -->|\"否\"| leakage[\"posterior 泄漏未来\"]\n    deploy -->|\"是\"| strict[\"严格 stochastic future 主线\"]\n\n    near_miss --> codec[\"表示压缩\"]\n    near_miss --> diffusion[\"diffusion / flow\"]\n    near_miss --> deterministic[\"确定性层级\"]\n```\n"
+  },
+  {
+    "id": "029",
+    "path": "docs/generative-models/variational-generation.md",
+    "file_index": 2,
+    "title": "变分随机视频生成的机制演化",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：变分随机视频生成的机制演化。图中表达的关键模块包括：2015 VRNN per-step stochastic state、2017/18 SV2P fixed prior + future posterior、2018 SVG-LP learned per-step prior、2019 capacity / hierarchy Improved VRNN + Large RNN、2020 fully latent dynamics SRVP、2021 deep hierarchy GHVAE、2021/22 temporal abstraction CW-VAE + VPR、2020/22 object & modules G-SWM + VIM、2023/24 DDLP particle posterior + dynamics prior、2026 LPWM particles + latent action + ELBO。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/029",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 变分随机视频生成的机制演化\n    accDescr: 主线从固定先验和全局潜变量，发展到历史条件逐步先验、深层和时间层级、全潜空间动力学以及对象粒子世界模型；RSSM分支进入控制，而开放域高保真生成更多转向表示VAE加扩散或流。\n\n    vrnn[\"2015 VRNN<br/>per-step stochastic state\"] --> sv2p[\"2017/18 SV2P<br/>fixed prior + future posterior\"]\n    sv2p --> svg[\"2018 SVG-LP<br/>learned per-step prior\"]\n    svg --> capacity[\"2019 capacity / hierarchy<br/>Improved VRNN + Large RNN\"]\n    svg --> latent_dyn[\"2020 fully latent dynamics<br/>SRVP\"]\n    capacity --> deep[\"2021 deep hierarchy<br/>GHVAE\"]\n    latent_dyn --> clocks[\"2021/22 temporal abstraction<br/>CW-VAE + VPR\"]\n    latent_dyn --> objects[\"2020/22 object & modules<br/>G-SWM + VIM\"]\n    objects --> ddlp[\"2023/24 DDLP<br/>particle posterior + dynamics prior\"]\n    ddlp --> lpwm[\"2026 LPWM<br/>particles + latent action + ELBO\"]\n\n    svg --> rssm[\"2018–25 RSSM<br/>PlaNet → DreamerV3\"]\n    rssm --> control[\"action / reward / return<br/>world-model branch\"]\n\n    capacity -.\"open-domain frontier shift\".-> modern[\"2023+ representation VAE/VQ<br/>+ diffusion / flow / AR\"]\n    modern --> tokenizer[\"different contract:<br/>encode known video\"]\n```\n"
+  },
+  {
+    "id": "030",
+    "path": "docs/generative-models/variational-generation.md",
+    "file_index": 3,
+    "title": "posterior collapse 的因果诊断与修复闭环",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：posterior collapse 的因果诊断与修复闭环。图中表达的关键模块包括：历史 h、prior p(z|h)、真实未来 y train only、posterior q(z|h,y)、部署采样 z_prior ~ p、训练 / oracle 采样 z_post ~ q、shared decoder / dynamics、KL / free-energy 对齐、training objective / gradient、未来 rollout。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/030",
+    "source": "```mermaid\nflowchart TB\n    accTitle: posterior collapse 的因果诊断与修复闭环\n    accDescr: 历史既进入随机先验和后验，也可能沿强确定性旁路直接到解码器；只有KL变小、潜变量干预无效和先验样本退化等证据联合出现，才诊断collapse，再按成因选择调度、推断、结构或多步对齐并复测。\n\n    history[\"历史 h\"] --> prior[\"prior p(z|h)\"]\n    target[\"真实未来 y<br/>train only\"] --> posterior[\"posterior q(z|h,y)\"]\n    history --> posterior\n    prior --> zprior[\"部署采样 z_prior ~ p\"]\n    posterior --> zpost[\"训练 / oracle 采样 z_post ~ q\"]\n    zprior --> decoder[\"shared decoder / dynamics\"]\n    zpost --> decoder\n    prior -.-> kl[\"KL / free-energy 对齐\"]\n    posterior -.-> kl\n    kl --> objective[\"training objective / gradient\"]\n    history ==>|\"强 AR / deterministic bypass\"| decoder\n    decoder --> future[\"未来 rollout\"]\n\n    future --> evidence{\"联合证据\"}\n    evidence --> klsmall[\"per-level KL / active units\"]\n    evidence --> intervene[\"zero / shuffle / resample z\"]\n    evidence --> gap[\"posterior oracle vs prior rollout\"]\n    evidence --> horizon[\"mode + condition vs horizon\"]\n\n    klsmall --> cause{\"优先成因\"}\n    intervene --> cause\n    gap --> cause\n    horizon --> cause\n    cause --> schedule[\"warm-up / free bits / KL balance\"]\n    cause --> inference[\"更强 q / 更新频率 / dense connections\"]\n    cause --> structure[\"限制 bypass / structured prior\"]\n    cause --> multistep[\"overshooting / open-loop objective\"]\n    schedule --> rerun[\"相同协议复测\"]\n    inference --> rerun\n    structure --> rerun\n    multistep --> rerun\n```\n"
+  },
+  {
+    "id": "031",
+    "path": "docs/generative-models/video-dit-backbones.md",
+    "file_index": 1,
+    "title": "Video DiT 的接口、位置与条件融合",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：Video DiT 的接口、位置与条件融合。图中表达的关键模块包括：Tokenizer / representation 章、pixel video、video codec、Backbone 章、patch embed N video tokens、position t · h · w · fps · modality、noise / transport time τ、AdaLN / FiLM modulation、text / image / audio / control、cross-attention or joint/dual stream。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/031",
+    "source": "~~~mermaid\nflowchart LR\n    accTitle: Video DiT 的接口、位置与条件融合\n    accDescr: 视频 codec 先产生带噪 latent 网格，patch embedding 与时空位置编码把它变成视频 token；噪声时间、文本及其他条件经调制、交叉注意力或联合 token 路径进入重复的 mixer 和前馈 block，最后由 objective 指定的输出头还原到 latent 网格。Tokenizer、backbone 和 objective 的责任边界被分别标出。\n\n    subgraph REP[\"Tokenizer / representation 章\"]\n        X[\"pixel video\"] --> E[\"video codec\"] --> Z[\"latent grid<br/>B × Cz × T' × H' × W'\"]\n    end\n\n    subgraph BB[\"Backbone 章\"]\n        Z --> P[\"patch embed<br/>N video tokens\"]\n        POS[\"position<br/>t · h · w · fps · modality\"] --> P\n        TAU[\"noise / transport time τ\"] --> MOD[\"AdaLN / FiLM modulation\"]\n        TXT[\"text / image / audio / control\"] --> FUS[\"cross-attention<br/>or joint/dual stream\"]\n        P --> MIX[\"spatiotemporal mixer<br/>full / factorized / window / sparse / linear / hybrid\"]\n        MOD --> MIX\n        FUS --> MIX\n        MIX --> FFN[\"FFN or routed experts\"]\n        FFN --> RES[\"residual stack × L\"]\n        RES --> MIX\n        RES --> UNP[\"output projection + unpatchify\"]\n    end\n\n    subgraph OBJ[\"Objective / sampler 章\"]\n        UNP --> Y[\"ε / x0 / score / v / flow target\"]\n        Y --> STEP[\"solver / sampler / NFE\"]\n    end\n~~~\n"
+  },
+  {
+    "id": "032",
+    "path": "docs/generative-models/video-dit-backbones.md",
+    "file_index": 2,
+    "title": "BackboneFork-1 的冻结、分叉与反证路径",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：BackboneFork-1 的冻结、分叉与反证路径。图中表达的关键模块包括：Freeze codec · data · objective · sampler · output、Architecture fork full · factorized · window/sparse · linear/recurrent、Parameter-matched、Training-FLOP-matched、Quality + coverage、Long-range + binding、Grid/FPS extrapolation、FLOPs · VRAM · latency slope、retain bounded claim、reject or narrow claim。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/032",
+    "source": "~~~mermaid\nflowchart LR\n    accTitle: BackboneFork-1 的冻结、分叉与反证路径\n    accDescr: 实验先冻结 tokenizer、数据、目标、采样和输出合同，再分别做等参数与等训练计算的骨干分叉；所有模型接受质量覆盖、长程绑定、网格外推和系统成本探针，只有同时满足预注册质量非劣界和资源斜率改善的声明才保留。\n\n    F[\"Freeze<br/>codec · data · objective · sampler · output\"] --> A[\"Architecture fork<br/>full · factorized · window/sparse · linear/recurrent\"]\n    A --> P1[\"Parameter-matched\"]\n    A --> P2[\"Training-FLOP-matched\"]\n    P1 --> Q[\"Quality + coverage\"]\n    P2 --> Q\n    P1 --> L[\"Long-range + binding\"]\n    P2 --> L\n    P1 --> G[\"Grid/FPS extrapolation\"]\n    P2 --> G\n    P1 --> C[\"FLOPs · VRAM · latency slope\"]\n    P2 --> C\n    Q --> D{\"pre-registered<br/>non-inferiority<br/>and claimed gain?\"}\n    L --> D\n    G --> D\n    C --> D\n    D -->|yes| KEEP[\"retain bounded claim\"]\n    D -->|no| REJECT[\"reject or narrow claim\"]\n~~~\n"
+  },
+  {
+    "id": "033",
+    "path": "docs/generative-models/video-post-training-alignment.md",
+    "file_index": 1,
+    "title": "视频生成后训练的五条并行决策路线",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频生成后训练的五条并行决策路线。图中表达的关键模块包括：预训练视频生成器、并行选择，不是必经流水线、1 · DATA / SFT 精选视频与条件数据、能力或接口 ↑ 基础步数不变、2 · PAIRWISE chosen / rejected、偏好目标 ↑ 基础步数不变、3 · REWARD / RL rollout、评分、反馈、偏好目标 ↑ 训练成本 ↑、4 · TEST-TIME 搜索、引导、临时参数、当次偏好 ↑ 推理成本 ↑。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/033",
+    "source": "~~~mermaid\nflowchart LR\n    accTitle: 视频生成后训练的五条并行决策路线\n    accDescr: 一个预训练视频生成器分别连接到数据和监督微调、成对偏好优化、奖励和强化学习、测试时搜索或引导、以及教师蒸馏；每条路线独立标注它主要改变能力、偏好、训练成本、推理成本或采样步数。\n\n    base[\"预训练视频生成器\"]\n\n    subgraph routes[\"并行选择，不是必经流水线\"]\n        direction TB\n        sft[\"1 · DATA / SFT<br/>精选视频与条件数据\"] --> sft_effect[\"能力或接口 ↑<br/>基础步数不变\"]\n        pair[\"2 · PAIRWISE<br/>chosen / rejected\"] --> pair_effect[\"偏好目标 ↑<br/>基础步数不变\"]\n        rl[\"3 · REWARD / RL<br/>rollout、评分、反馈\"] --> rl_effect[\"偏好目标 ↑<br/>训练成本 ↑\"]\n        test[\"4 · TEST-TIME<br/>搜索、引导、临时参数\"] --> test_effect[\"当次偏好 ↑<br/>推理成本 ↑\"]\n        distill[\"5 · DISTILL<br/>教师压缩到少步 student\"] --> distill_effect[\"NFE ↓<br/>教师依赖\"]\n    end\n\n    base --> sft\n    base --> pair\n    base --> rl\n    base --> test\n    base --> distill\n\n    warning[\"只有加入 reward / preference<br/>蒸馏才同时改偏好\"]\n    distill_effect -.-> warning\n\n    classDef baseStyle fill:#ffffff,stroke:#111827,stroke-width:3px,color:#111827\n    classDef dataStyle fill:#56b4e9,stroke:#075985,stroke-width:2px,color:#082f49\n    classDef pairStyle fill:#e69f00,stroke:#92400e,stroke-width:2px,color:#451a03\n    classDef rlStyle fill:#009e73,stroke:#065f46,stroke-width:2px,color:#052e16\n    classDef testStyle fill:#cc79a7,stroke:#831843,stroke-width:2px,color:#500724\n    classDef distillStyle fill:#f0e442,stroke:#854d0e,stroke-width:2px,color:#422006\n    class base baseStyle\n    class sft,sft_effect dataStyle\n    class pair,pair_effect pairStyle\n    class rl,rl_effect rlStyle\n    class test,test_effect testStyle\n    class distill,distill_effect,warning distillStyle\n~~~\n"
+  },
+  {
+    "id": "034",
+    "path": "docs/generative-models/video-tokenizers.md",
+    "file_index": 1,
+    "title": "视频 tokenizer 的张量与码率四本账",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频 tokenizer 的张量与码率四本账。图中表达的关键模块包括：输入 x: [B,C,T,H,W、encoder / downsample、账 1：grid rt, rhw, rgrid、账 2：elements / storage relem 不等于 bitrate、账 3：nominal capacity log2(Kc) bits/token、概率模型、entropy / arithmetic coder、header + chunk + index + side info、账 4：actual bitstream bpp=bits/(T·H·W) bitrate=bits/duration、短片实例 [1,3,9,512,512。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/034",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 视频 tokenizer 的张量与码率四本账\n    accDescr: 输入视频经连续或离散表示后，依次区分网格和元素压缩、名义 token 容量及带概率模型和熵编码的真实位流，并用九帧例子说明名义时间四倍在有限片段中实际只有三倍。\n\n    input[\"输入 x: [B,C,T,H,W]\"] --> encoder[\"encoder / downsample\"]\n    encoder --> continuous[\"连续 z: [B,Cz,T',H',W']<br/>必须写 dtype\"]\n    encoder --> discrete[\"离散 i: [B,T',H',W']<br/>状态 1…Kc\"]\n\n    input -.\"T,H,W\".-> grid[\"账 1：grid<br/>rt, rhw, rgrid\"]\n    continuous -.\"Cz + dtype\".-> elements[\"账 2：elements / storage<br/>relem 不等于 bitrate\"]\n    discrete -.\"Ntoken + Kc\".-> nominal[\"账 3：nominal capacity<br/>log2(Kc) bits/token\"]\n    nominal --> probability[\"概率模型\"]\n    probability --> coder[\"entropy / arithmetic coder\"]\n    coder --> overhead[\"header + chunk + index + side info\"]\n    overhead --> actual[\"账 4：actual bitstream<br/>bpp=bits/(T·H·W)<br/>bitrate=bits/duration\"]\n\n    example[\"短片实例<br/>[1,3,9,512,512]\"] --> cexample[\"continuous [1,16,3,64,64]\"]\n    example --> dexample[\"discrete [1,3,64,64]\"]\n    cexample --> exact[\"exact: rt=3, rhw=64<br/>rgrid=192, relem=36\"]\n    dexample --> exact\n    exact --> nominal_cfg[\"名义 t4·s8·s8：渐近<br/>rgrid=256, relem=48\"]\n    nominal_cfg --> warning[\"配置名 ≠ 短片实际比<br/>未编码 ≠ 码率\"]\n```\n"
+  },
+  {
+    "id": "035",
+    "path": "docs/generative-models/video-tokenizers.md",
+    "file_index": 2,
+    "title": "因果视频 tokenizer 的首帧与分块边界",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：因果视频 tokenizer 的首帧与分块边界。图中表达的关键模块包括：输入 x1 … x9、codec past-only access receptive fields 可重叠、z0 first temporal token anchors x1、z1 只读当前与过去、z2 只读当前与过去、chunk 状态与提交、chunk k−1 状态、cache carried、cold start / reset、chunk k。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/035",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 因果视频 tokenizer 的首帧与分块边界\n    accDescr: 九帧输入经只读当前和过去的编码形成三个时间潜位置，首位置锚定第一帧；分块推理可携带或重置缓存并可能需要预热重叠和裁剪，必须检验提交帧接缝，而且 codec 因果不推出生成器因果、流式或实时。\n\n    frames[\"输入 x1 … x9\"] --> rule[\"codec past-only access<br/>receptive fields 可重叠\"]\n    rule --> z0[\"z0<br/>first temporal token<br/>anchors x1\"]\n    rule --> z1[\"z1<br/>只读当前与过去\"]\n    rule --> z2[\"z2<br/>只读当前与过去\"]\n    z0 --> shape[\"常见 T'=ceil(T/ft)<br/>但 actual API shape wins\"]\n    z1 --> shape\n    z2 --> shape\n\n    subgraph chunks[\"chunk 状态与提交\"]\n        previous[\"chunk k−1 状态\"] --> carry[\"cache carried\"]\n        reset[\"cold start / reset\"] --> current[\"chunk k\"]\n        carry --> current\n        current --> warm[\"optional warm-up / overlap / crop\"]\n        warm --> commit[\"committed frames\"]\n        commit --> seam[\"cache carry/reset seam test\"]\n    end\n\n    shape --> current\n\n    causal_codec[\"causal codec\"] -.\"不推出\".-> causal_generator[\"causal upper generator\"]\n    causal_generator -.\"不推出\".-> streaming[\"streaming commit\"]\n    streaming -.\"不推出\".-> realtime[\"real-time SLO\"]\n    realtime --> measure[\"测 TTFF + steady FPS/deadline<br/>peak memory + quality drift\"]\n```\n"
+  },
+  {
+    "id": "036",
+    "path": "docs/jepa.md",
+    "file_index": 1,
+    "title": "典型 teacher student JEPA 的信息流与梯度边界",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：典型 teacher student JEPA 的信息流与梯度边界。图中表达的关键模块包括：完整图像或视频 x、采样 context C 与 target T、仅可见 token x_C、context encoder f_theta、目标位置 query q_T、predictor g_phi、EMA target encoder f_bar_theta、stop-gradient 后取 target token、预测表征 z_hat_T、目标表征 z_T。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/036",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 典型 teacher student JEPA 的信息流与梯度边界\n    accDescr: 完整样本经过掩码后只有可见 token 进入 context encoder；完整样本进入 EMA target encoder，目标输出由 stop gradient 截断。predictor 使用 context 表征和目标位置预测被遮挡表征，损失只更新 context encoder 与 predictor，再由指数滑动平均更新 target encoder。\n    x_full[\"完整图像或视频 x\"] --> mask[\"采样 context C 与 target T\"]\n    mask --> x_context[\"仅可见 token x_C\"]\n    x_context --> context[\"context encoder f_theta\"]\n    mask --> query[\"目标位置 query q_T\"]\n    context --> predictor[\"predictor g_phi\"]\n    query --> predictor\n    x_full --> target[\"EMA target encoder f_bar_theta\"]\n    target --> stopgrad[\"stop-gradient 后取 target token\"]\n    predictor --> predicted[\"预测表征 z_hat_T\"]\n    stopgrad --> target_z[\"目标表征 z_T\"]\n    predicted --> loss[\"target-only latent loss\"]\n    target_z --> loss\n    loss -->|\"梯度\"| context\n    loss -->|\"梯度\"| predictor\n    context -.->|\"EMA 参数更新\"| target\n```\n"
+  },
+  {
+    "id": "037",
+    "path": "docs/jepa.md",
+    "file_index": 2,
+    "title": "JEPA 路线按可检验能力而不是模型年份分层",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：JEPA 路线按可检验能力而不是模型年份分层。图中表达的关键模块包括：图像 masked embedding I-JEPA、视频时空表征 V-JEPA、大规模 action-free encoder V-JEPA 2、动作条件 latent rollout V-JEPA 2-AC、goal energy + CEM、真实观测重规划 MPC 闭环、dense / multi-level feature V-JEPA 2.1、显式防坍塌 LeJEPA、端到端动作 world model LeWorldModel、策略条件长期动力学 TD-JEPA。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/037",
+    "source": "```mermaid\nflowchart LR\n    accTitle: JEPA 路线按可检验能力而不是模型年份分层\n    accDescr: 静态图像 masked embedding prediction 先扩展到视频时空表征，再由 action free 大规模视频 encoder 提供视觉先验。加入动作条件 rollout 后才可进行反事实预测，连接目标能量、搜索和真实观测重规划后才形成闭环控制。dense、自监督稳定性、长期策略动力学和多未来表达是横向分支，不能自动升级到更高控制层。\n    image[\"图像 masked embedding<br>I-JEPA\"] --> video[\"视频时空表征<br>V-JEPA\"]\n    video --> foundation[\"大规模 action-free encoder<br>V-JEPA 2\"]\n    foundation --> action[\"动作条件 latent rollout<br>V-JEPA 2-AC\"]\n    action --> planning[\"goal energy + CEM\"]\n    planning --> closed[\"真实观测重规划<br>MPC 闭环\"]\n    dense[\"dense / multi-level feature<br>V-JEPA 2.1\"] -.-> foundation\n    stable[\"显式防坍塌<br>LeJEPA\"] -.-> image\n    stable --> end2end[\"端到端动作 world model<br>LeWorldModel\"]\n    longterm[\"策略条件长期动力学<br>TD-JEPA\"] -.-> action\n    branches[\"分支或变分未来<br>Branch-JEPA / Var-JEPA\"] -.-> action\n```\n"
+  },
+  {
+    "id": "038",
+    "path": "docs/jepa.md",
+    "file_index": 3,
+    "title": "动作条件 latent 训练与闭环 MPC 是两个独立验收环",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：动作条件 latent 训练与闭环 MPC 是两个独立验收环。图中表达的关键模块包括：当前观测 o_t、冻结视觉 encoder、当前 latent z_t、proprioception s_t、动作 predictor、数据中的动作 a_t:t+H、真实未来观测、future target latent、预测 future latent、多步 latent loss。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/038",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 动作条件 latent 训练与闭环 MPC 是两个独立验收环\n    accDescr: 训练环把当前视觉、机器人状态和真实动作序列输入动作 predictor，并以未来 target encoder 表征监督。部署环从同一当前状态采样候选动作序列，滚动预测终点 latent，以目标 latent 能量排序并用 CEM 更新分布，只执行首个动作；环境返回真实观测后重新编码和规划。\n    current[\"当前观测 o_t\"] --> frozen[\"冻结视觉 encoder\"]\n    frozen --> z_now[\"当前 latent z_t\"]\n    state[\"proprioception s_t\"] --> train_predictor[\"动作 predictor\"]\n    action_data[\"数据中的动作 a_t:t+H\"] --> train_predictor\n    z_now --> train_predictor\n    future[\"真实未来观测\"] --> target_future[\"future target latent\"]\n    train_predictor --> predicted_future[\"预测 future latent\"]\n    predicted_future --> train_loss[\"多步 latent loss\"]\n    target_future --> train_loss\n    z_now --> rollout[\"候选动作序列 rollout\"]\n    state --> rollout\n    sampler[\"CEM 候选分布\"] --> rollout\n    rollout --> terminal[\"预测终点 latent\"]\n    goal[\"视觉目标 latent z_g\"] --> energy[\"目标 energy\"]\n    terminal --> energy\n    energy --> sampler\n    energy --> first[\"选择序列并只执行第一步\"]\n    first --> environment[\"真实机器人或环境\"]\n    environment --> current\n```\n"
+  },
+  {
+    "id": "039",
+    "path": "docs/physical-consistency.md",
+    "file_index": 1,
+    "title": "物理一致性证据阶梯",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：物理一致性证据阶梯。图中表达的关键模块包括：L0 · 视觉真实感 单帧外观与参考相似、L1 · 时间连贯性 身份、几何、无闪烁、L2 · 物理合理性 人类或 VLM：可能发生吗、L3 · 测量型物理忠实度 已知 s0、u、θ、b；轨迹/接触/参数 ± 不确定性、L4 · 反事实忠实度 成对干预、参数扫描、分支局部性、L5 · 闭环可执行性 动作恢复、rollout、失败恢复、L6 · 决策忠实度 策略排序、regret、风险与优化增益、L7 · 真实世界效用 真实机器人/驾驶成功与标定风险、禁止把不同证据层 压成不透明总分。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/039",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 物理一致性证据阶梯\n    accDescr: 从视觉真实感到真实世界效用共八级；每一级都需要额外的测量、反事实或闭环证据，能力声明不能高于实际通过的等级。\n    L0[\"L0 · 视觉真实感<br/>单帧外观与参考相似\"] --> L1[\"L1 · 时间连贯性<br/>身份、几何、无闪烁\"]\n    L1 --> L2[\"L2 · 物理合理性<br/>人类或 VLM：可能发生吗\"]\n    L2 --> L3[\"L3 · 测量型物理忠实度<br/>已知 s0、u、θ、b；轨迹/接触/参数 ± 不确定性\"]\n    L3 --> L4[\"L4 · 反事实忠实度<br/>成对干预、参数扫描、分支局部性\"]\n    L4 --> L5[\"L5 · 闭环可执行性<br/>动作恢复、rollout、失败恢复\"]\n    L5 --> L6[\"L6 · 决策忠实度<br/>策略排序、regret、风险与优化增益\"]\n    L6 --> L7[\"L7 · 真实世界效用<br/>真实机器人/驾驶成功与标定风险\"]\n    L2 -.-> J[\"禁止把不同证据层<br/>压成不透明总分\"]\n    L3 -.-> J\n    L5 -.-> J\n```\n"
+  },
+  {
+    "id": "040",
+    "path": "docs/physical-consistency.md",
+    "file_index": 2,
+    "title": "物理一致性的可证伪证据闭环",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：物理一致性的可证伪证据闭环。图中表达的关键模块包括：A · 冻结生成合同、条件合同 s0 · action u · 参数 θ · 边界 b · seeds、状态接口 track · depth · 3D/4D · field · latent、Generator / simulator 固定 checkpoint 与推理配置、rollout 保留失败和测量缺失样本、B · 独立测量与证伪、测量 + 不确定性 轨迹 · 接触 · 守恒账 · 反事实差分、constraint / reward / diagnostic 每项单独报告、封存参照 / 独立环境 真实标定 · 未见干预 · task return、只报告已通过的 L0–L7 附适用域与失败覆盖。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/040",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 物理一致性的可证伪证据闭环\n    accDescr: 预先冻结初态、动作、物性、边界和随机种子，经状态表示进入生成器或模拟器；rollout 用程序测量和不确定性形成约束或奖励；封存参照或独立环境只进入测量与证伪门；通过才按 L0 到 L7 报告，失败则定位数据、模型、测量器或声明并重新运行。\n\n    subgraph setup[\"A · 冻结生成合同\"]\n        direction LR\n        contract[\"条件合同<br/>s0 · action u · 参数 θ · 边界 b · seeds\"] --> state[\"状态接口<br/>track · depth · 3D/4D · field · latent\"]\n        state --> model[\"Generator / simulator<br/>固定 checkpoint 与推理配置\"]\n        model --> rollout[\"rollout<br/>保留失败和测量缺失样本\"]\n    end\n\n    subgraph audit[\"B · 独立测量与证伪\"]\n        direction LR\n        measure[\"测量 + 不确定性<br/>轨迹 · 接触 · 守恒账 · 反事实差分\"] --> signal[\"constraint / reward / diagnostic<br/>每项单独报告\"]\n        signal --> gate{\"预注册证伪 gate<br/>阈值 · coverage · seeds · OOD\"}\n        sealed[\"封存参照 / 独立环境<br/>真实标定 · 未见干预 · task return\"] -.->|只供终评| measure\n        sealed -.->|防止 evaluator 投机| gate\n    end\n\n    rollout --> measure\n    gate -->|全部必要 gate 通过| claim[\"只报告已通过的 L0–L7<br/>附适用域与失败覆盖\"]\n    gate -->|任一必要 gate 失败| diagnose[\"定位失败来源<br/>condition · state · model · extractor · evaluator\"]\n    diagnose -->|版本化修改并重跑| contract\n\n    classDef input fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f\n    classDef process fill:#ffedd5,stroke:#ea580c,stroke-width:2px,color:#7c2d12\n    classDef evidence fill:#f3e8ff,stroke:#7e22ce,stroke-width:2px,color:#581c87\n    classDef gateStyle fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#7f1d1d\n    classDef pass fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d\n    class contract,state,sealed input\n    class model,rollout process\n    class measure,signal evidence\n    class gate,diagnose gateStyle\n    class claim pass\n```\n"
+  },
+  {
+    "id": "041",
+    "path": "docs/physical-consistency.md",
+    "file_index": 3,
+    "title": "物理一致性训练与验证闭环",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：物理一致性训练与验证闭环。图中表达的关键模块包括：成组数据 真实标定 + 模拟干预 + action logs、状态/表示 track · depth · 3D/4D · field · latent、训练时 SFT · property control · constraint loss、训练后 DPO/RL · verifiable reward、推理时 simulator loop · search · verifier、生成或 rollout、开放域 Judge 语义与显眼违规、程序测量 轨迹、接触、参数、不确定性、成组干预 单调性、局部性、OOD、闭环环境 执行、regret、任务成功、安全。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/041",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 物理一致性训练与验证闭环\n    accDescr: 成组数据先转换为状态表示，再分别在训练、后训练或推理阶段注入物理约束，最后以开放域裁判、程序测量、成组干预和闭环环境四路证据独立验收。\n    A[\"成组数据<br/>真实标定 + 模拟干预 + action logs\"] --> B[\"状态/表示<br/>track · depth · 3D/4D · field · latent\"]\n    B --> C{\"物理注入位置\"}\n    C --> C1[\"训练时<br/>SFT · property control · constraint loss\"]\n    C --> C2[\"训练后<br/>DPO/RL · verifiable reward\"]\n    C --> C3[\"推理时<br/>simulator loop · search · verifier\"]\n    C1 --> D[\"生成或 rollout\"]\n    C2 --> D\n    C3 --> D\n    D --> E1[\"开放域 Judge<br/>语义与显眼违规\"]\n    D --> E2[\"程序测量<br/>轨迹、接触、参数、不确定性\"]\n    D --> E3[\"成组干预<br/>单调性、局部性、OOD\"]\n    D --> E4[\"闭环环境<br/>执行、regret、任务成功、安全\"]\n    E1 --> F[\"按证据层分别报告\"]\n    E2 --> F\n    E3 --> F\n    E4 --> F\n```\n"
+  },
+  {
+    "id": "042",
+    "path": "docs/reading-list.md",
+    "file_index": 1,
+    "title": "视频生成论文课程的依赖路线",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频生成论文课程的依赖路线。图中表达的关键模块包括：先修诊断、共同主干：tokenizer 表示 · 目标 · 评测、共同加深：随机未来 posterior · prior · calibration、共同加深：Video DiT token · topology · fusion · scaling、分支 A：因果 · 流式 · 实时、分支 B：少步 · 后训练 · 蒸馏、分支 C：原生音视频、分支 D：World Action · JEPA、分支 E：细粒度可控生成、分支 F：视频退化修复。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/042",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 视频生成论文课程的依赖路线\n    accDescr: 学习者先完成先修诊断，再通过 tokenizer 表示、生成目标和评测组成的共同主干，补齐变分随机未来的训练后验、部署先验与校准，再完成 Video DiT 的 token、注意力、融合与扩展加深单元。之后可选择八条任务分支并进入共同验收。\n\n    P[\"先修诊断\"] --> K[\"共同主干：tokenizer 表示 · 目标 · 评测\"]\n    K --> U[\"共同加深：随机未来<br/>posterior · prior · calibration\"]\n    U --> B[\"共同加深：Video DiT<br/>token · topology · fusion · scaling\"]\n    B --> S[\"分支 A：因果 · 流式 · 实时\"]\n    B --> D[\"分支 B：少步 · 后训练 · 蒸馏\"]\n    B --> A[\"分支 C：原生音视频\"]\n    B --> W[\"分支 D：World Action · JEPA\"]\n    B --> G[\"分支 E：细粒度可控生成\"]\n    B --> R[\"分支 F：视频退化修复\"]\n    B --> M[\"分支 G：多视角 · 4D\"]\n    B --> PERS[\"分支 H：开放集视频个性化\"]\n    D --> S\n    S --> V[\"共同验收：复现 + 反证 + 边界\"]\n    D --> V\n    A --> V\n    W --> V\n    G --> V\n    R --> V\n    M --> V\n    PERS --> V\n    V --> C[\"跨分支结课项目\"]\n\n    classDef gate fill:#f2f2f2,stroke:#222,color:#111\n    classDef trunk fill:#d9ecff,stroke:#0067a5,color:#111\n    classDef branch fill:#fff0cc,stroke:#a65f00,color:#111\n    classDef verify fill:#dff2e5,stroke:#147a4b,color:#111\n    class P,C gate\n    class K,U,B trunk\n    class S,D,A,W,G,R,M,PERS branch\n    class V verify\n```\n"
+  },
+  {
+    "id": "043",
+    "path": "docs/reading-list.md",
+    "file_index": 2,
+    "title": "从论文声明到保留或降级结论的验证回路",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：从论文声明到保留或降级结论的验证回路。图中表达的关键模块包括：提取一条声明、改写成可测命题、画质 / 时间一致、退化恢复 / 事实保真、延迟 / 流式、音视频同步、身份 / 绑定 / 泄漏、相机 / 轨迹 / 姿态控制、动作 / 闭环、冻结版本 · 条件 · 预算。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/043",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 从论文声明到保留或降级结论的验证回路\n    accDescr: 先把论文声明改写成可测量命题，再按声明类型选择质量、退化恢复、延迟、音视频同步、主体绑定/泄漏、显式视觉控制或闭环控制协议。固定版本、条件和预算后运行最小复现，再加入最可能推翻结论的干预。证据通过则保留带边界的结论，否则降级并记录失败。\n\n    C[\"提取一条声明\"] --> M[\"改写成可测命题\"]\n    M --> T{\"声明类型\"}\n    T --> Q[\"画质 / 时间一致\"]\n    T --> E[\"退化恢复 / 事实保真\"]\n    T --> L[\"延迟 / 流式\"]\n    T --> A[\"音视频同步\"]\n    T --> I[\"身份 / 绑定 / 泄漏\"]\n    T --> V[\"相机 / 轨迹 / 姿态控制\"]\n    T --> W[\"动作 / 闭环\"]\n    Q --> F[\"冻结版本 · 条件 · 预算\"]\n    E --> F\n    L --> F\n    A --> F\n    I --> F\n    V --> F\n    W --> F\n    F --> R[\"最小复现\"]\n    R --> X[\"反证干预\"]\n    X --> J{\"证据仍成立？\"}\n    J -->|\"是\"| K[\"保留结论并写边界\"]\n    J -->|\"否\"| G[\"降级结论并保存失败\"]\n    K --> N[\"下一条声明\"]\n    G --> N\n\n    classDef claim fill:#d9ecff,stroke:#0067a5,color:#111\n    classDef test fill:#fff0cc,stroke:#a65f00,color:#111\n    classDef outcome fill:#dff2e5,stroke:#147a4b,color:#111\n    class C,M,T claim\n    class Q,E,L,A,I,V,W,F,R,X,J test\n    class K,G,N outcome\n```\n"
+  },
+  {
+    "id": "044",
+    "path": "docs/tasks/action-conditioned-prediction.md",
+    "file_index": 1,
+    "title": "动作条件世界模型的数据合同与三种 rollout",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：动作条件世界模型的数据合同与三种 rollout。图中表达的关键模块包括：OFFLINE LOG · preserve clocks、sensor frames o, t_obs、commands a, t_cmd、executed controls a_exec, t_exec、reward / done / safety、clock alignment units + frames + latency、LEARNED WORLD MODEL、history X + proprio q + goal g、scheduled action A、action-conditioned latent transition。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/044",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 动作条件世界模型的数据合同与三种 rollout\n    accDescr: 记录器把带时间戳的观测、命令、实际执行动作和结果写入离线数据。动作对齐后，模型预测 latent、观测、奖励和终止。固定开环使用记录动作；模型内闭环让策略读取生成状态；真实 MPC 只在模型里搜索并把短前缀交给真实环境，随后回读真实观测。\n\n    subgraph log[\"OFFLINE LOG · preserve clocks\"]\n        sensor[\"sensor frames<br/>o, t_obs\"]\n        command[\"commands<br/>a, t_cmd\"]\n        executed[\"executed controls<br/>a_exec, t_exec\"]\n        outcome[\"reward / done / safety\"]\n        command --> executed\n        sensor --> align[\"clock alignment<br/>units + frames + latency\"]\n        executed --> align\n        outcome --> align\n    end\n\n    subgraph wm[\"LEARNED WORLD MODEL\"]\n        context[\"history X + proprio q + goal g\"]\n        action[\"scheduled action A\"]\n        transition[\"action-conditioned<br/>latent transition\"]\n        obshead[\"observation head<br/>pixel / token / representation\"]\n        taskhead[\"reward + continue / done<br/>value or constraint heads\"]\n        context --> transition\n        action --> transition\n        transition --> obshead\n        transition --> taskhead\n    end\n\n    align --> context\n    align --> action\n\n    subgraph modes[\"ROLLOUT MODES\"]\n        fixed[\"fixed open-loop<br/>logged action schedule\"]\n        imagined[\"policy-in-model<br/>a_k from generated state\"]\n        mpc[\"receding-horizon MPC<br/>search H, execute h_e\"]\n        realenv[\"real environment<br/>returns fresh observation\"]\n        imagined --> transition\n        mpc --> transition\n        mpc -->|\"execute short prefix\"| realenv\n        realenv -->|\"replace prediction with sensor\"| context\n    end\n\n    fixed --> action\n    obshead --> imagined\n    taskhead --> imagined\n    obshead --> mpc\n    taskhead --> mpc\n```\n"
+  },
+  {
+    "id": "045",
+    "path": "docs/tasks/action-conditioned-prediction.md",
+    "file_index": 2,
+    "title": "动作条件模型的证据阶梯与证伪出口",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：动作条件模型的证据阶梯与证伪出口。图中表达的关键模块包括：candidate action-conditioned model、reject causal claim repair data pipeline、downgrade to passive continuation、association-only evidence、short-horizon predictor only、model-exploitation risk、planning evidence only、scoped closed-loop evidence within tested embodiment/task。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/045",
+    "source": "```mermaid\nflowchart TD\n    accTitle: 动作条件模型的证据阶梯与证伪出口\n    accDescr: 评测先检查时钟和动作单位，再比较被动、动作打乱与动作条件模型。通过同状态不同动作的反事实测试后，才进入模型内策略排序和真实 MPC。任一层失败都将主张降级，画面好看不能绕过动作、因果或闭环门。\n\n    start[\"candidate action-conditioned model\"] --> contract{\"L0 contract valid?<br/>timestamps, units, no future leak\"}\n    contract -->|\"no\"| reject0[\"reject causal claim<br/>repair data pipeline\"]\n    contract -->|\"yes\"| shuffle{\"L1 action used?<br/>beats passive and shuffled controls\"}\n    shuffle -->|\"no\"| passive[\"downgrade to passive continuation\"]\n    shuffle -->|\"yes\"| fork{\"L2 intervention?<br/>same state, different actions\"}\n    fork -->|\"no\"| associational[\"association-only evidence\"]\n    fork -->|\"yes\"| rollout{\"L3 calibrated rollout?<br/>multi-step + uncertainty + done\"}\n    rollout -->|\"no\"| short[\"short-horizon predictor only\"]\n    rollout -->|\"yes\"| exploit{\"L4 planner audit?<br/>predicted vs real ranking\"}\n    exploit -->|\"no\"| modelbug[\"model-exploitation risk\"]\n    exploit -->|\"yes\"| closed{\"L5 real closed loop?<br/>fresh sensors + deadline + safety\"}\n    closed -->|\"no\"| simulator[\"planning evidence only\"]\n    closed -->|\"yes\"| strong[\"scoped closed-loop evidence<br/>within tested embodiment/task\"]\n```\n"
+  },
+  {
+    "id": "046",
+    "path": "docs/tasks/controllable-video-generation.md",
+    "file_index": 1,
+    "title": "细粒度可控视频的五阶段合同",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：细粒度可控视频的五阶段合同。图中表达的关键模块包括：SIGNALS、camera K, T、tracks / boxes / masks position + visibility、pose / depth / normal edge / flow、identity / appearance reference set、CONTRACT coordinates · clocks · masks confidence · conflicts、INJECTION、adapter / ControlNet residual、attention / feature tokens、latent / noise inference guidance。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/046",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 细粒度可控视频的五阶段合同\n    accDescr: 相机、对象轨迹、结构序列和身份外观四类信号先经过坐标、时间、可见性、置信度和冲突规则规范化，再通过 adapter residual、attention feature injection 或 latent inference guidance 进入生成器，输出分别经过控制遵循、参考保真、运动自然性和多样性四道验收，失败时回到合同而不是修饰结果。\n\n    subgraph S[\"SIGNALS\"]\n        cam[\"camera<br/>K, T\"]\n        trk[\"tracks / boxes / masks<br/>position + visibility\"]\n        str[\"pose / depth / normal<br/>edge / flow\"]\n        id[\"identity / appearance<br/>reference set\"]\n    end\n    C[\"CONTRACT<br/>coordinates · clocks · masks<br/>confidence · conflicts\"]\n    subgraph I[\"INJECTION\"]\n        ad[\"adapter / ControlNet<br/>residual\"]\n        at[\"attention / feature<br/>tokens\"]\n        gd[\"latent / noise<br/>inference guidance\"]\n    end\n    G[\"GENERATOR<br/>video latent → frames\"]\n    subgraph E[\"EVALUATE SEPARATELY\"]\n        e1[\"control adherence\"]\n        e2[\"fidelity\"]\n        e3[\"motion naturalness\"]\n        e4[\"conditional diversity\"]\n    end\n\n    cam --> C\n    trk --> C\n    str --> C\n    id --> C\n    C --> ad\n    C --> at\n    C --> gd\n    ad --> G\n    at --> G\n    gd --> G\n    G --> e1\n    G --> e2\n    G --> e3\n    G --> e4\n    e1 -. \"revise specification\" .-> C\n    e2 -. \"revise specification\" .-> C\n    e3 -. \"revise specification\" .-> C\n    e4 -. \"revise specification\" .-> C\n```\n"
+  },
+  {
+    "id": "047",
+    "path": "docs/tasks/digital-human.md",
+    "file_index": 1,
+    "title": "数字人视频任务边界决策树",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：数字人视频任务边界决策树。图中表达的关键模块包括：模型需要输出人物视频、原生音视频生成、多镜头人物视频、口型重定向、视频或运动驱动的肖像/人体动画、运动驱动人体或肖像动画、说话肖像、音频驱动全身。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/047",
+    "source": "```mermaid\nflowchart TD\n    accTitle: 数字人视频任务边界决策树\n    accDescr: 根据输出是否同时生成音频、是否包含多个镜头、是否已有视频以及主要驱动信号，区分七类任务。\n    A[模型需要输出人物视频] --> B{音轨也由模型生成?}\n    B -->|是| NAV[原生音视频生成]\n    B -->|否| C{要求规划多个镜头?}\n    C -->|是| MS[多镜头人物视频]\n    C -->|否| D{输入中已有待修改视频?}\n    D -->|是| E{主要只改嘴形?}\n    E -->|是| LS[口型重定向]\n    E -->|否| PA[视频或运动驱动的肖像/人体动画]\n    D -->|否| F{显式驱动信号是什么?}\n    F -->|脸/身体姿态或驱动视频| MD[运动驱动人体或肖像动画]\n    F -->|音频| G{输出范围到哪里?}\n    G -->|头肩为主| TP[说话肖像]\n    G -->|全身| FB[音频驱动全身]\n```\n"
+  },
+  {
+    "id": "048",
+    "path": "docs/tasks/digital-human.md",
+    "file_index": 2,
+    "title": "从授权输入到可审计数字人输出的合同链",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：从授权输入到可审计数字人输出的合同链。图中表达的关键模块包括：身份与声音素材、拒绝生成或请求补充授权、标准化音频与视频时间轴、记录身份/音频/运动/文本/分镜条件、固定模型、权重、随机种子和运行环境、生成视频与可选音轨、同步与延迟评测、身份/运动/画质评测、长时/跨语言/反事实评测、结果卡与置信区间。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/048",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 从授权输入到可审计数字人输出的合同链\n    accDescr: 展示运行前的权利检查、条件对齐、生成、分支评测以及来源凭证写入与撤回处理。\n    A[身份与声音素材] --> B{授权范围有效?}\n    B -->|否| STOP[拒绝生成或请求补充授权]\n    B -->|是| C[标准化音频与视频时间轴]\n    C --> D[记录身份/音频/运动/文本/分镜条件]\n    D --> E[固定模型、权重、随机种子和运行环境]\n    E --> F[生成视频与可选音轨]\n    F --> G1[同步与延迟评测]\n    F --> G2[身份/运动/画质评测]\n    F --> G3[长时/跨语言/反事实评测]\n    G1 --> H[结果卡与置信区间]\n    G2 --> H\n    G3 --> H\n    H --> I[写入内容凭证、模型版本与编辑历史]\n    I --> J{收到撤回或争议?}\n    J -->|是| K[停止后续使用并保留审计记录]\n    J -->|否| L[按授权范围发布]\n```\n"
+  },
+  {
+    "id": "049",
+    "path": "docs/tasks/frame-interpolation.md",
+    "file_index": 1,
+    "title": "双帧视频插值的张量数据流",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：双帧视频插值的张量数据流。图中表达的关键模块包括：I0: B x 3 x H x W、共享或双塔编码器、I1: B x 3 x H x W、tau: B x 1 或时间图、运动与对应估计、多尺度特征: B x C_l x H_l x W_l、Ft_to_0, Ft_to_1: B x 2 x H_l x W_l、visibility / weight: B x 1 x H_l x W_l、backward warp 或 forward splat、对齐端点像素或特征。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/049",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 双帧视频插值的张量数据流\n    accDescr: 两个 RGB 端点和查询时间进入共享编码器形成多尺度特征，运动分支估计目标到端点的双向流与可见性，采样分支对齐像素或特征，融合细化得到目标帧；训练时真实中间帧只进入损失和特权教师，不进入部署输入。\n\n    i0[\"I0: B x 3 x H x W\"] --> encoder[\"共享或双塔编码器\"]\n    i1[\"I1: B x 3 x H x W\"] --> encoder\n    tau[\"tau: B x 1 或时间图\"] --> motion[\"运动与对应估计\"]\n    encoder --> pyramid[\"多尺度特征: B x C_l x H_l x W_l\"]\n    pyramid --> motion\n    motion --> flow[\"Ft_to_0, Ft_to_1: B x 2 x H_l x W_l\"]\n    motion --> mask[\"visibility / weight: B x 1 x H_l x W_l\"]\n    pyramid --> sampler[\"backward warp 或 forward splat\"]\n    flow --> sampler\n    sampler --> aligned[\"对齐端点像素或特征\"]\n    aligned --> fuse[\"mask 融合与 residual refine\"]\n    mask --> fuse\n    fuse --> output[\"Ihat_tau: B x 3 x H x W\"]\n    gt[\"训练专用 I_tau GT\"] -. \"重建、感知、几何或蒸馏监督\" .-> fuse\n```\n"
+  },
+  {
+    "id": "050",
+    "path": "docs/tasks/frame-interpolation.md",
+    "file_index": 2,
+    "title": "视频帧插值技术路线与可组合模块",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频帧插值技术路线与可组合模块。图中表达的关键模块包括：VFI: I0, I1, tau -> I_tau、对应与重采样、高效端到端 CNN、Transformer / SSM 全局交互、Diffusion / DiT 条件生成、flow + backward warp、flow + forward splat、kernel / deformable sampling、depth / visibility / occlusion、RIFE: intermediate flow。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/050",
+    "source": "```mermaid\nflowchart TD\n    accTitle: 视频帧插值技术路线与可组合模块\n    accDescr: 视频帧插值从显式对应和局部重采样、端到端高效卷积与全局注意三条重建路线发展，并出现条件 diffusion 或 DiT 生成路线；深度、遮挡、相关体、蒸馏与细化可跨路线组合，AMT 和 IFRNet 属于卷积或相关驱动而不是 Transformer。\n\n    task[\"VFI: I0, I1, tau -> I_tau\"] --> correspondence[\"对应与重采样\"]\n    task --> direct[\"高效端到端 CNN\"]\n    task --> attention[\"Transformer / SSM 全局交互\"]\n    task --> generative[\"Diffusion / DiT 条件生成\"]\n\n    correspondence --> flowwarp[\"flow + backward warp\"]\n    correspondence --> splat[\"flow + forward splat\"]\n    correspondence --> kernel[\"kernel / deformable sampling\"]\n    flowwarp --> depth[\"depth / visibility / occlusion\"]\n    splat --> depth\n    kernel --> depth\n\n    direct --> rife[\"RIFE: intermediate flow\"]\n    direct --> ifr[\"IFRNet: flow + feature refine\"]\n    direct --> amt[\"AMT: all-pairs + multi-field\"]\n\n    attention --> vfiformer[\"VFIformer / VFIT\"]\n    attention --> mamba[\"motion-guided SSM\"]\n\n    generative --> latent[\"latent diffusion\"]\n    generative --> pixel[\"pixel diffusion\"]\n    generative --> sequence[\"joint or autoregressive sequence\"]\n\n    depth -. \"可组合\" .-> rife\n    depth -. \"可组合\" .-> ifr\n    depth -. \"可组合\" .-> vfiformer\n    correspondence -. \"运动先验\" .-> generative\n```\n"
+  },
+  {
+    "id": "051",
+    "path": "docs/tasks/frame-interpolation.md",
+    "file_index": 3,
+    "title": "可复核的视频帧插值评测协议",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：可复核的视频帧插值评测协议。图中表达的关键模块包括：数据集版本与授权、端点间隔、tau、输出倍数、原分辨率或裁剪、RGB/Y、边界处理、单帧 midpoint / arbitrary-time、联合多帧 / 整段路径、PSNR、SSIM、LPIPS、FloLPIPS、FVD、逐帧曲线、固定硬件的 latency、memory、params、按遮挡、位移、纹理、曝光与最差分位数分桶。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/051",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 可复核的视频帧插值评测协议\n    accDescr: 先冻结数据版本、时间间隔、目标时刻、裁剪和颜色空间，再区分单帧重建与整段生成，分别计算失真、感知和时间指标，最后在固定硬件上测时延显存并按失败属性分桶。\n\n    data[\"数据集版本与授权\"] --> sampling[\"端点间隔、tau、输出倍数\"]\n    sampling --> prep[\"原分辨率或裁剪、RGB/Y、边界处理\"]\n    prep --> mode{\"输出协议\"}\n    mode --> single[\"单帧 midpoint / arbitrary-time\"]\n    mode --> sequence[\"联合多帧 / 整段路径\"]\n    single --> image_metrics[\"PSNR、SSIM、LPIPS\"]\n    sequence --> temporal_metrics[\"FloLPIPS、FVD、逐帧曲线\"]\n    image_metrics --> system[\"固定硬件的 latency、memory、params\"]\n    temporal_metrics --> system\n    system --> strata[\"按遮挡、位移、纹理、曝光与最差分位数分桶\"]\n```\n"
+  },
+  {
+    "id": "052",
+    "path": "docs/tasks/image-to-video.md",
+    "file_index": 1,
+    "title": "图像条件视频任务的边界判定",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：图像条件视频任务的边界判定。图中表达的关键模块包括：要分类一个视频生成请求、image-conditioned video editing、video continuation / prediction、camera-conditioned T2V、严格 I2V / TI2V、keyframe transition、角色或肖像 animation、reference-to-video。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/052",
+    "source": "```mermaid\nflowchart TD\n    accTitle: 图像条件视频任务的边界判定\n    accDescr: 先判断源视频是待编辑的完整时间轴还是仅作为历史前缀，再判断是否有输入图及其是否占据输出时间轴；无输入图而只有相机与文本时才是相机条件文本到视频。\n\n    start[\"要分类一个视频生成请求\"] --> source{\"是否有源视频上下文？\"}\n    source -- \"是\" --> role{\"保留并修改既有时间轴？\"}\n    role -- \"是\" --> edit[\"image-conditioned video editing\"]\n    role -- \"否，仅历史前缀\" --> continuation[\"video continuation / prediction\"]\n    source -- \"否\" --> hasimg{\"是否有输入图？\"}\n    hasimg -- \"否，仅相机 + 文本\" --> cam[\"camera-conditioned T2V\"]\n    hasimg -- \"是\" --> timeline{\"输入图是否是输出中的已知时刻？\"}\n    timeline -- \"首帧\" --> i2v[\"严格 I2V / TI2V\"]\n    timeline -- \"首尾或稀疏时刻\" --> key[\"keyframe transition\"]\n    timeline -- \"否\" --> driving{\"是否有 pose、audio 或 driving video？\"}\n    driving -- \"是\" --> animate[\"角色或肖像 animation\"]\n    driving -- \"否，仅身份/风格\" --> ref[\"reference-to-video\"]\n```\n"
+  },
+  {
+    "id": "053",
+    "path": "docs/tasks/image-to-video.md",
+    "file_index": 2,
+    "title": "图像到视频的条件注入与失败定位链",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：图像到视频的条件注入与失败定位链。图中表达的关键模块包括：训练视频 X: B x F x 3 x H x W、时空 VAE、Z0: B x f x C x h x w、Zt: 加噪或 flow path、Iref: B x 3 x H x W、VAE / CLIP / vision encoder、帧替换或 mask、zero-pad / repeat + channel concat、image tokens + cross-attention、低频或结构化噪声初始化。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/053",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 图像到视频的条件注入与失败定位链\n    accDescr: RGB 视频经时空编码器成为视频 latent，参考图可通过帧替换、通道拼接、图像 token cross attention 或低频噪声初始化进入去噪器；文本经 cross attention，flow 轨迹姿态和相机经控制残差或显式 warp 进入；输出解码后分别检查锚点、身份、运动、控制和长时稳定性。\n\n    video[\"训练视频 X: B x F x 3 x H x W\"] --> vae[\"时空 VAE\"]\n    vae --> latent[\"Z0: B x f x C x h x w\"]\n    latent --> noise[\"Zt: 加噪或 flow path\"]\n    image[\"Iref: B x 3 x H x W\"] --> imageenc[\"VAE / CLIP / vision encoder\"]\n    imageenc --> replace[\"帧替换或 mask\"]\n    imageenc --> concat[\"zero-pad / repeat + channel concat\"]\n    imageenc --> tokens[\"image tokens + cross-attention\"]\n    imageenc --> init[\"低频或结构化噪声初始化\"]\n    text[\"text: B x L x D\"] --> tokens\n    control[\"flow / pose / trajectory / camera\"] --> adapter[\"adapter / ControlNet residual\"]\n    control --> warp[\"显式 motion field / warp\"]\n    audio[\"audio in: B x La x Da + time map\"] --> audiocond[\"audio cross-attention / residual\"]\n    noise --> denoiser[\"3D U-Net 或 Video DiT\"]\n    replace --> denoiser\n    concat --> denoiser\n    tokens --> denoiser\n    init --> denoiser\n    adapter --> denoiser\n    warp --> denoiser\n    audiocond --> denoiser\n    denoiser --> decode[\"VAE decode\"]\n    decode --> output[\"Xhat: B x F x 3 x H x W\"]\n    output --> gates[\"锚点 | 身份 | 运动 | 控制 | 长时\"]\n```\n"
+  },
+  {
+    "id": "054",
+    "path": "docs/tasks/interactive-world-generation.md",
+    "file_index": 1,
+    "title": "交互式世界生成的最小闭环合同",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：交互式世界生成的最小闭环合同。图中表达的关键模块包括：Human / Policy 提出 / 选择、已接受动作序列 A_t、观测 o_t + 历史 h_t、因果 world generator、推测记忆 m_pred 可回滚、非权威、候选未来 o_hat / s_hat / r_hat、真实环境或权威引擎 执行已选动作、实际观测 o_real(t+1:t+K)、标记为事后证据 用于后续展示 / 决策 / 训练、拒绝 / 降权 / 回退。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/054",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 交互式世界生成的最小闭环合同\n    accDescr: 人或策略提出并选择动作，权威环境执行该动作；模型产生候选未来，环境产生实际观测，两者进入事后审计，审计结果只用于后续展示、决策或训练，真实观测再回写权威历史与记忆。\n\n    actor[\"Human / Policy<br/>提出 / 选择\"] --> action[\"已接受动作序列 A_t\"]\n    obs[\"观测 o_t + 历史 h_t\"] --> model[\"因果 world generator\"]\n    action --> model\n    memory[\"推测记忆 m_pred<br/>可回滚、非权威\"] -. \"读取\" .-> model\n    model --> candidates[\"候选未来 o_hat / s_hat / r_hat\"]\n    model -. \"speculative 写入\" .-> memory\n\n    action --> env[\"真实环境或权威引擎<br/>执行已选动作\"]\n    env --> actual[\"实际观测 o_real(t+1:t+K)\"]\n    candidates -. \"预测证据\" .-> audit{\"动作有效 / 状态一致 / 不确定性可接受?\"}\n    actual -. \"事实证据\" .-> audit\n    audit -- \"通过\" --> commit[\"标记为事后证据<br/>用于后续展示 / 决策 / 训练\"]\n    audit -- \"失败\" --> reject[\"拒绝 / 降权 / 回退\"]\n    actual --> obs\n    actual --> auth[\"权威记忆 m_auth\"]\n    auth -. \"confirmed 读取\" .-> model\n```\n"
+  },
+  {
+    "id": "055",
+    "path": "docs/tasks/interactive-world-generation.md",
+    "file_index": 2,
+    "title": "持久世界的写入、离开、干预与回访协议",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：持久世界的写入、离开、干预与回访协议。图中表达的关键模块包括：*、*、*。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/055",
+    "source": "```mermaid\nstateDiagram-v2\n    accTitle: 持久世界的写入、离开、干预与回访协议\n    accDescr: 系统建立初始锚点，执行对象或环境干预，离开当前视野并经过干扰段，再按独立动作返回；回访时同时核验几何、对象身份、事件状态和不确定性，失败则回退而不是把重新生成的相似画面算作记忆成功。\n\n    [*] --> Anchor: 记录初始几何与实体 ID\n    Anchor --> Intervene: 开门 / 移动物体 / 消耗资源\n    Intervene --> Write: 写入事件与状态变更\n    Write --> Leave: 离开视野\n    Leave --> Distractor: 长时间与相似地点干扰\n    Distractor --> Retrieve: 按位置、内容或事件检索\n    Retrieve --> Return: 独立动作序列回到目标\n    Return --> Verify\n    Verify --> Pass: 几何 + 身份 + 事件状态正确\n    Verify --> Fail: 漂移 / 覆写 / 错检索 / 低置信\n    Fail --> Abstain: 拒绝、重定位或权威状态回退\n    Pass --> [*]\n    Abstain --> [*]\n```\n"
+  },
+  {
+    "id": "056",
+    "path": "docs/tasks/multiview-4d-generation.md",
+    "file_index": 1,
+    "title": "多视角与4D生成的五条技术路线",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：多视角与4D生成的五条技术路线。图中表达的关键模块包括：观测 / 条件 同步多相机 · 单目视频 · 图像 · 文字、合同 相机 K · 时间 t · 已见/未见区域、A 动态重建 canonical + deformation radiance / Gaussian、B 生成式提升 video prior → novel views → optimize 4D state、C 直接 V×T diffusion joint view-time attention query pixels、D 显式 4D 生成 SDS / feed-forward Gaussians / surfaces、E 长时多视角 3D bridge · self-forcing streaming reward/control、输出 像素网格或可渲染状态、证据门 reprojection · occlusion · geometry novel view/time · cost · uncertainty。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/056",
+    "source": "~~~mermaid\nflowchart LR\n    accTitle: 多视角与4D生成的五条技术路线\n    accDescr: 校准观测、单目视频、图像或文字条件分别进入动态场景重建、生成式提升、直接多视角视频扩散、显式四维生成和长时多视角自回归路线，最后都必须经过视角时间几何和系统证据门。\n\n    O[\"观测 / 条件<br/>同步多相机 · 单目视频 · 图像 · 文字\"]\n    C[\"合同<br/>相机 K · 时间 t · 已见/未见区域\"]\n    R[\"A 动态重建<br/>canonical + deformation<br/>radiance / Gaussian\"]\n    L[\"B 生成式提升<br/>video prior → novel views<br/>→ optimize 4D state\"]\n    D[\"C 直接 V×T diffusion<br/>joint view-time attention<br/>query pixels\"]\n    G[\"D 显式 4D 生成<br/>SDS / feed-forward<br/>Gaussians / surfaces\"]\n    S[\"E 长时多视角<br/>3D bridge · self-forcing<br/>streaming reward/control\"]\n    X[\"输出<br/>像素网格或可渲染状态\"]\n    E[\"证据门<br/>reprojection · occlusion · geometry<br/>novel view/time · cost · uncertainty\"]\n\n    O --> C\n    C --> R\n    C --> L\n    C --> D\n    C --> G\n    C --> S\n    R --> X\n    L --> X\n    D --> X\n    G --> X\n    S --> X\n    X --> E\n~~~\n"
+  },
+  {
+    "id": "057",
+    "path": "docs/tasks/multiview-4d-generation.md",
+    "file_index": 2,
+    "title": "多视角4D生成的六道独立证据门",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：多视角4D生成的六道独立证据门。图中表达的关键模块包括：冻结测试单元 scene · cameras · times · seen/unseen mask、G1 输入证据保真 seen-region residual、G2 跨视角 reprojection · epipolar · loop closure、G3 跨时间 3D tracks · motion · occlusion order、G4 状态/几何 depth · surface · pose · topology、G5 生成区域 semantic · diversity · uncertainty、G6 系统 build time · render FPS · memory · asset size、降级主张并定位失败 不得用总分掩盖、报告适用域、置信区间 与未覆盖查询。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/057",
+    "source": "~~~mermaid\nflowchart TD\n    accTitle: 多视角4D生成的六道独立证据门\n    accDescr: 固定场景与查询网格后依次检查输入证据保真、跨视角重投影、跨时间轨迹和显隐、几何或表面、未见区域生成，以及渲染和构建成本；任一硬门失败都不能用其他平均分抵消。\n\n    A[\"冻结测试单元<br/>scene · cameras · times · seen/unseen mask\"] --> B[\"G1 输入证据保真<br/>seen-region residual\"]\n    B --> C[\"G2 跨视角<br/>reprojection · epipolar · loop closure\"]\n    C --> D[\"G3 跨时间<br/>3D tracks · motion · occlusion order\"]\n    D --> E[\"G4 状态/几何<br/>depth · surface · pose · topology\"]\n    E --> F[\"G5 生成区域<br/>semantic · diversity · uncertainty\"]\n    F --> G[\"G6 系统<br/>build time · render FPS · memory · asset size\"]\n    G --> H{\"全部硬门通过？\"}\n    H -- \"否\" --> I[\"降级主张并定位失败<br/>不得用总分掩盖\"]\n    H -- \"是\" --> J[\"报告适用域、置信区间<br/>与未覆盖查询\"]\n~~~\n"
+  },
+  {
+    "id": "058",
+    "path": "docs/tasks/native-audio-video-generation.md",
+    "file_index": 1,
+    "title": "音视频生成合同判别树",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：音视频生成合同判别树。图中表达的关键模块包括：输入条件 C 与目标 MP4、V2A：生成 A、A2V：生成 V、共同条件双支路、级联工作流、推理期耦合、产品能力；架构未知、原生联合 p(V,A|C)、双支路 + 逐层双向交互、共享 attention / packed tokens。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/058",
+    "source": "```mermaid\nflowchart TD\n    accTitle: 音视频生成合同判别树\n    accDescr: 先判断音频与视频是否都是未知输出，再判断是否在同一采样轨迹中推进、轨迹内是否存在可定位的双向交换或共享生成层；否则分别归入单向条件、共同条件、级联、推理期耦合或仅有产品声明。\n\n    start[\"输入条件 C 与目标 MP4\"] --> both{\"A 与 V 都是未知输出？\"}\n    both -->|否，V 已知| v2a[\"V2A：生成 A\"]\n    both -->|否，A 已知| a2v[\"A2V：生成 V\"]\n    both -->|是| same{\"同一采样轨迹？\"}\n    same -->|否，无先后依赖| shared[\"共同条件双支路\"]\n    same -->|否，有先后依赖| staged[\"级联工作流\"]\n    same -->|是| learned{\"有已学习的双向交换或共享层？\"}\n    learned -->|否，仅外部评分器| aligner[\"推理期耦合\"]\n    learned -->|无法披露| product[\"产品能力；架构未知\"]\n    learned -->|是| native[\"原生联合 p(V,A|C)\"]\n    native --> branch{\"表示组织方式\"}\n    branch --> twin[\"双支路 + 逐层双向交互\"]\n    branch --> packed[\"共享 attention / packed tokens\"]\n    twin --> verify[\"语义、时序、声源、单模态与系统门\"]\n    packed --> verify\n```\n"
+  },
+  {
+    "id": "059",
+    "path": "docs/tasks/personalized-video-generation.md",
+    "file_index": 1,
+    "title": "图像参考视频任务的边界决策树",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：图像参考视频任务的边界决策树。图中表达的关键模块包括：有视觉参考的视频请求、V2V / video editing、严格 I2V / keyframe transition、角色或数字人 animation、story / multishot 个性化模块提供 identity state、开放集视频个性化 / S2V、报告适配数据、步数、时间、参数、存储、报告共享训练数据、参考接口与 binding。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/059",
+    "source": "~~~mermaid\nflowchart TD\n    accTitle: 图像参考视频任务的边界决策树\n    accDescr: 先判断是否有完整源视频，再判断参考图是否占输出时间轴、是否存在姿态音频驱动或跨镜头状态；只有参考只定义主体且输出是新时间轴时进入开放集视频个性化。\n\n    Q0[\"有视觉参考的视频请求\"] --> V{\"是否有完整源视频？\"}\n    V -- \"是，需保留/修改时间轴\" --> V2V[\"V2V / video editing\"]\n    V -- \"否\" --> A{\"参考图是否是已知输出时刻？\"}\n    A -- \"首帧/关键帧\" --> I2V[\"严格 I2V / keyframe transition\"]\n    A -- \"否\" --> D{\"主要由 pose/audio/driving 驱动？\"}\n    D -- \"是\" --> ANI[\"角色或数字人 animation\"]\n    D -- \"否\" --> S{\"目标是否跨多个镜头维护事实？\"}\n    S -- \"是\" --> STORY[\"story / multishot<br/>个性化模块提供 identity state\"]\n    S -- \"否，新场景/动作/构图\" --> PERS[\"开放集视频个性化 / S2V\"]\n    PERS --> B{\"是否每主体优化？\"}\n    B -- \"是\" --> TUNE[\"报告适配数据、步数、时间、参数、存储\"]\n    B -- \"否\" --> AMORT[\"报告共享训练数据、参考接口与 binding\"]\n~~~\n"
+  },
+  {
+    "id": "060",
+    "path": "docs/tasks/personalized-video-generation.md",
+    "file_index": 2,
+    "title": "多主体身份绑定的反证实验",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：多主体身份绑定的反证实验。图中表达的关键模块包括：冻结参考槽 R1 人 · R2 狗 · R3 玩具、冻结 prompt / camera / seed 为每槽指定角色与动作、原始 binding、交换 R1 ↔ R2 文字角色不变、空置 R2 / 增加无关参考、去背景 / 改裁切 / 改姿态、遮挡 → 出画 → 重现、同一模型与预算生成、逐帧检测、分割、跟踪、相似矩阵 S[n,m,t。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/060",
+    "source": "~~~mermaid\nflowchart LR\n    accTitle: 多主体身份绑定的反证实验\n    accDescr: 同一人物狗和玩具参考经过原始、交换、空槽、去背景和姿态扰动五种条件生成；输出形成逐帧参考到主体相似矩阵，并分别检查融合、丢失、属性动作交换、参考泄漏和遮挡后身份重现。\n\n    R[\"冻结参考槽<br/>R1 人 · R2 狗 · R3 玩具\"]\n    P[\"冻结 prompt / camera / seed<br/>为每槽指定角色与动作\"]\n    C1[\"原始 binding\"]\n    C2[\"交换 R1 ↔ R2<br/>文字角色不变\"]\n    C3[\"空置 R2 / 增加无关参考\"]\n    C4[\"去背景 / 改裁切 / 改姿态\"]\n    C5[\"遮挡 → 出画 → 重现\"]\n    G[\"同一模型与预算生成\"]\n    T[\"逐帧检测、分割、跟踪\"]\n    M[\"相似矩阵 S[n,m,t]<br/>一一 assignment + margin\"]\n    F1[\"BLEND<br/>两槽匹配同一混合主体\"]\n    F2[\"DROP<br/>期望槽无 track\"]\n    F3[\"SWAP<br/>身份/属性/动作互换\"]\n    F4[\"LEAK<br/>背景/姿态/裁切被复制\"]\n    F5[\"DRIFT<br/>遮挡后换身份\"]\n\n    R --> C1\n    R --> C2\n    R --> C3\n    R --> C4\n    R --> C5\n    P --> G\n    C1 --> G\n    C2 --> G\n    C3 --> G\n    C4 --> G\n    C5 --> G\n    G --> T --> M\n    M --> F1\n    M --> F2\n    M --> F3\n    M --> F4\n    M --> F5\n~~~\n"
+  },
+  {
+    "id": "061",
+    "path": "docs/tasks/story-multishot.md",
+    "file_index": 1,
+    "title": "故事与多镜头任务边界判定树",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：故事与多镜头任务边界判定树。图中表达的关键模块包括：给定故事、参考或视频条件、story visualization、storyboard generation、video-to-video、video continuation、长单镜头或多事件连续镜头、独立片段拼接，不构成故事合同、multi-shot narrative video。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/061",
+    "source": "```mermaid\nflowchart TD\n    accTitle: 故事与多镜头任务边界判定树\n    accDescr: 先判断输出是静态还是视频，再判断是否依赖源视频时间轴、是否只有连续前缀续写，以及是否存在显式镜头边界；只有含多个镜头且共享叙事状态的输出才进入本章核心范围。\n\n    input[\"给定故事、参考或视频条件\"] --> moving{\"输出包含时间运动吗？\"}\n    moving -->|否| static{\"每段是单张还是关键帧对？\"}\n    static -->|图像序列| storyvis[\"story visualization\"]\n    static -->|首尾/关键帧| board[\"storyboard generation\"]\n    moving -->|是| source{\"源视频是否规定主要时间轴？\"}\n    source -->|是| v2v[\"video-to-video\"]\n    source -->|否| prefix{\"是否只延续一个已有前缀？\"}\n    prefix -->|是| continue[\"video continuation\"]\n    prefix -->|否| cut{\"成片是否有可定位的切镜/转场？\"}\n    cut -->|否| longshot[\"长单镜头或多事件连续镜头\"]\n    cut -->|是| state{\"镜头是否共享人物、世界与剧情状态？\"}\n    state -->|否| montage[\"独立片段拼接，不构成故事合同\"]\n    state -->|是| multishot[\"multi-shot narrative video\"]\n```\n"
+  },
+  {
+    "id": "062",
+    "path": "docs/tasks/story-multishot.md",
+    "file_index": 2,
+    "title": "可回滚的多镜头故事生成事务",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：可回滚的多镜头故事生成事务。图中表达的关键模块包括：故事 S + 用户参考、编译角色/场景/道具 bible、镜头 DAG：prompt、时长、切点、相机、依赖、建立 Z0 与 plan version v0、选择当前镜头需要的 memory/reference、生成候选 Xi 与 provenance、原子提交：更新实体/场景/道具/事实/memory、导出视频 + EDL + 状态/seed 清单、保持 Zi-1 不变；修改局部条件或 seed、定位最早受影响镜头 j。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/062",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 可回滚的多镜头故事生成事务\n    accDescr: 故事先被编译成角色场景设定和带依赖的镜头计划。每个镜头只从已接受状态生成，验证通过才提交记忆；局部失败重试当前镜头，设定或上游事实冲突则回滚到最早受影响镜头并使后续结果失效。\n\n    story[\"故事 S + 用户参考\"] --> compile[\"编译角色/场景/道具 bible\"]\n    compile --> plan[\"镜头 DAG：prompt、时长、切点、相机、依赖\"]\n    plan --> checkpoint[\"建立 Z0 与 plan version v0\"]\n    checkpoint --> select[\"选择当前镜头需要的 memory/reference\"]\n    select --> render[\"生成候选 Xi 与 provenance\"]\n    render --> validate{\"身份、状态、动作、相机、切点<br/>与叙事依赖都通过？\"}\n    validate -->|是| commit[\"原子提交：更新实体/场景/道具/事实/memory\"]\n    commit --> done{\"所有镜头完成？\"}\n    done -->|否| select\n    done -->|是| final[\"导出视频 + EDL + 状态/seed 清单\"]\n    validate -->|局部渲染失败| retry[\"保持 Zi-1 不变；修改局部条件或 seed\"]\n    retry --> render\n    validate -->|bible/计划/上游事实冲突| earliest[\"定位最早受影响镜头 j\"]\n    earliest --> invalidate[\"恢复 Zj-1；使 Xj:K 与其 memory 失效；v=v+1\"]\n    invalidate --> plan\n    render -. \"拒绝结果绝不写入 memory\" .-> checkpoint\n```\n"
+  },
+  {
+    "id": "063",
+    "path": "docs/tasks/text-to-video.md",
+    "file_index": 1,
+    "title": "T2V task boundary by condition and feedback",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：T2V task boundary by condition and feedback。图中表达的关键模块包括：动作条件或交互式 world model、纯 T2V、I2V / TI2V、V2V / 编辑 / 修复、结构控制的视频生成、开放式创作: 约束是否实现、闭环预测: 动作后果是否可干预且可复现。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/063",
+    "source": "~~~mermaid\nflowchart TD\n    accTitle: T2V task boundary by condition and feedback\n    accDescr: A decision tree separates pure text-to-video from reference-conditioned generation, video editing, and closed-loop world models.\n\n    q0{是否持续接收动作与新观测?}\n    q0 -- 是 --> wm[动作条件或交互式 world model]\n    q0 -- 否 --> q1{除文本外是否有内容或结构条件?}\n    q1 -- 否 --> t2v[纯 T2V]\n    q1 -- 首帧或参考图 --> i2v[I2V / TI2V]\n    q1 -- 来源视频 --> v2v[V2V / 编辑 / 修复]\n    q1 -- 姿态/深度/轨迹 --> ctrl[结构控制的视频生成]\n    t2v --> open[开放式创作: 约束是否实现]\n    wm --> intervene[闭环预测: 动作后果是否可干预且可复现]\n\n    classDef decision fill:#fff7ed,stroke:#c2410c,color:#431407,stroke-width:2px\n    classDef pure fill:#ede9fe,stroke:#7c3aed,color:#2e1065,stroke-width:2px\n    classDef hybrid fill:#dbeafe,stroke:#2563eb,color:#172554,stroke-width:2px\n    classDef closed fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px\n    class q0,q1 decision\n    class t2v,open pure\n    class i2v,v2v,ctrl hybrid\n    class wm,intervene closed\n~~~\n"
+  },
+  {
+    "id": "064",
+    "path": "docs/tasks/text-to-video.md",
+    "file_index": 2,
+    "title": "Text-to-video training and inference contract",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：Text-to-video training and inference contract。图中表达的关键模块包括：视频 + 标题/字幕/ASR/OCR、镜头切分与时间对齐、授权/去重/安全/质量过滤、多粒度 caption + 事件结构、(clip, prompt, metadata)、video codec / tokenizer、text encoder / prompt compiler、latent / token tensor、condition tokens、diffusion / flow loss。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/064",
+    "source": "~~~mermaid\nflowchart TB\n    accTitle: Text-to-video training and inference contract\n    accDescr: The chart traces raw video-text data through base training, makes preference post-training optional, and shows that version-matched runtime prompt tokens enter inference together with the frozen generator and sampling configuration.\n\n    raw[视频 + 标题/字幕/ASR/OCR] --> shot[镜头切分与时间对齐]\n    shot --> govern[授权/去重/安全/质量过滤]\n    govern --> caption[多粒度 caption + 事件结构]\n    caption --> pair[(clip, prompt, metadata)]\n    pair --> codec[video codec / tokenizer]\n    pair --> text[text encoder / prompt compiler]\n    codec --> latent[latent / token tensor]\n    text --> cond[condition tokens]\n    latent --> objective{基础训练目标}\n    cond --> objective\n    objective --> diff[diffusion / flow loss]\n    objective --> ar[AR / masked likelihood]\n    diff --> pretrained[pretrained generator]\n    ar --> pretrained\n    preference[偏好对 / reward data] --> post[DPO / RL / reward post-train]\n    pretrained --> post\n    post --> model[versioned generator]\n    pretrained -->|可选: 直接冻结| model\n    runtime[运行时原始 prompt] --> runtext[版本化 compiler / text encoder]\n    runtext --> runcond[inference condition tokens]\n    model --> infer[seed + solver + guidance + length]\n    runcond --> infer\n    infer --> output[video + optional audio]\n    output --> record[事实表 + 失败标签 + 成本/延迟]\n\n    classDef data fill:#dbeafe,stroke:#2563eb,color:#172554\n    classDef train fill:#ede9fe,stroke:#7c3aed,color:#2e1065\n    classDef gate fill:#fff7ed,stroke:#c2410c,color:#431407\n    classDef out fill:#dcfce7,stroke:#16a34a,color:#14532d\n    class raw,shot,govern,caption,pair,codec,text,latent,cond,preference,runtime,runtext,runcond data\n    class objective,diff,ar,pretrained,post,model train\n    class infer gate\n    class output,record out\n~~~\n"
+  },
+  {
+    "id": "065",
+    "path": "docs/tasks/text-to-video.md",
+    "file_index": 3,
+    "title": "Post-training routes and evidence risks for T2V",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：Post-training routes and evidence risks for T2V。图中表达的关键模块包括：预训练生成器、SFT: 高质量/难例/指令数据、偏好数据: 人类或 MLLM 成对选择、Video reward model、DPO / diffusion-DPO、RL / GRPO 类更新、蒸馏/少步一致性、更新后的生成器、Prompt optimizer、optimized prompt。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/065",
+    "source": "~~~mermaid\nflowchart TD\n    accTitle: Post-training routes and evidence risks for T2V\n    accDescr: Supervised tuning, preference optimization, reward optimization, prompt optimization, and distillation target different failure modes and each has a distinct validation risk.\n\n    pre[预训练生成器] --> sft[SFT: 高质量/难例/指令数据]\n    pref[偏好数据: 人类或 MLLM 成对选择] --> rm[Video reward model]\n    pref --> dpo[DPO / diffusion-DPO]\n    pre --> dpo\n    pre --> rl[RL / GRPO 类更新]\n    rm --> rl\n    pre --> distill[蒸馏/少步一致性]\n    sft --> updated[更新后的生成器]\n    dpo --> updated\n    rl --> updated\n    distill --> updated\n    pref --> promptopt[Prompt optimizer]\n    promptopt --> optprompt[optimized prompt]\n    pre --> frozen[冻结/版本化生成器]\n    optprompt --> frozen\n    updated --> candidate[候选模型或系统]\n    frozen --> candidate\n    candidate --> stress{留出难例与外部评测}\n    stress -->|通过| release[冻结模型/编译器/评测版本]\n    stress -->|失败| risk[reward hacking / 多样性下降 / 偏好过拟合]\n\n    classDef base fill:#dbeafe,stroke:#2563eb,color:#172554\n    classDef route fill:#ede9fe,stroke:#7c3aed,color:#2e1065\n    classDef gate fill:#fff7ed,stroke:#c2410c,color:#431407\n    classDef pass fill:#dcfce7,stroke:#16a34a,color:#14532d\n    class pre,pref,rm base\n    class sft,dpo,rl,distill,promptopt,optprompt,updated,frozen,candidate route\n    class stress,risk gate\n    class release pass\n~~~\n"
+  },
+  {
+    "id": "066",
+    "path": "docs/tasks/unconditional-video-generation.md",
+    "file_index": 1,
+    "title": "无条件视频生成的部署输入判定树",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：无条件视频生成的部署输入判定树。图中表达的关键模块包括：一次部署采样、pure p(X)、prefix / first-frame conditional、generated history only: self-conditioned factorization、p(X | class/domain)、T2V、I2V / prediction、world model、learned-token conditional、Sora。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/066",
+    "source": "```mermaid\nflowchart TD\n    accTitle: 无条件视频生成的部署输入判定树\n    accDescr: 从一次部署采样是否接收样本特定外生信息开始判断。没有外生信息且首帧也由模型生成时属于纯边际分布；标签、文本、参考图、视频前缀和动作分别落入不同条件任务。模型自身生成的历史仍可用于自条件分解。\n\n    api[\"一次部署采样\"] --> ext{\"有样本特定的外生输入吗?\"}\n    ext -->|\"没有\"| first{\"完整视频含首帧<br/>都由同一模型采样?\"}\n    first -->|\"是\"| marginal[\"pure p(X)\"]\n    first -->|\"否\"| prefix[\"prefix / first-frame conditional\"]\n    marginal --> history[\"generated history only:<br/>self-conditioned factorization\"]\n    ext -->|\"类别或域 token\"| class_c[\"p(X | class/domain)\"]\n    ext -->|\"文本\"| t2v[\"T2V\"]\n    ext -->|\"图像或视频前缀\"| i2v[\"I2V / prediction\"]\n    ext -->|\"动作与状态\"| world[\"world model\"]\n    ext -->|\"参考样本推得 token\"| learned[\"learned-token conditional\"]\n    sora[\"Sora\"] -. \"文本或媒体条件系统\" .-> t2v\n    cosmos[\"Cosmos\"] -. \"physical-AI / world family\" .-> world\n```\n"
+  },
+  {
+    "id": "067",
+    "path": "docs/tasks/unconditional-video-generation.md",
+    "file_index": 2,
+    "title": "无条件视频生成的训练采样与证据闭环",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：无条件视频生成的训练采样与证据闭环。图中表达的关键模块包括：raw videos + source IDs、deduplicate and source-level split、fixed clip contract: T H W FPS crop、GAN、AR / masked tokens、diffusion / DiT、flow / ODE、frozen checkpoint、independent seeds、declared sampler and stop rule。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/067",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 无条件视频生成的训练采样与证据闭环\n    accDescr: 数据先经过源级划分去重和统一视频预处理，再进入 GAN token masked diffusion 或 flow 训练。部署采样只从独立随机源出发，经生成器和可选解码器得到完整视频。固定的真实集与生成集共同进入分布指标、长尾覆盖和训练集近邻记忆审计。\n\n    raw[\"raw videos + source IDs\"] --> audit[\"deduplicate and<br/>source-level split\"]\n    audit --> clip[\"fixed clip contract:<br/>T H W FPS crop\"]\n    clip --> family{\"training objective\"}\n    family --> gan[\"GAN\"]\n    family --> token[\"AR / masked tokens\"]\n    family --> diff[\"diffusion / DiT\"]\n    family --> flow[\"flow / ODE\"]\n    gan --> model[\"frozen checkpoint\"]\n    token --> model\n    diff --> model\n    flow --> model\n    seed[\"independent seeds\"] --> sampler[\"declared sampler<br/>and stop rule\"]\n    model --> sampler\n    sampler --> decode[\"decoder + fixed postprocess\"]\n    decode --> fake[\"all generated videos\"]\n    audit --> real[\"held-out real videos\"]\n    fake --> metrics[\"FVD IS PR DC<br/>with uncertainty\"]\n    real --> metrics\n    fake --> memory[\"train nearest-neighbor<br/>spatial + temporal replication\"]\n    clip -. \"train split only\" .-> memory\n    metrics --> claim[\"bounded claim\"]\n    memory --> claim\n```\n"
+  },
+  {
+    "id": "068",
+    "path": "docs/tasks/video-inpainting.md",
+    "file_index": 1,
+    "title": "视频补全、对象移除、扩画幅、局部编辑与生成填充的任务边界",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频补全、对象移除、扩画幅、局部编辑与生成填充的任务边界。图中表达的关键模块包括：源视频 + 时空 mask + 可选条件、Video outpainting\\n扩展视野，保护原画布、Video inpainting / completion\\n像素与时间重建、Object removal\\n对象 + 影子/反射/交互、Generative fill\\n区域内一对多生成、Masked / global V2V editing\\n允许语义重绘、报告 mask 内质量 + mask 外保护 + 时间一致、另报指令遵循、源视频保真与编辑范围。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/068",
+    "source": "```mermaid\nflowchart TD\n    accTitle: 视频补全、对象移除、扩画幅、局部编辑与生成填充的任务边界\n    accDescr: 根据未知区域位于原画布内外、目标是否恢复原内容、是否需要删除对象效应以及是否允许修改已知区，把输入分到六种不同验收合同。\n\n    start[\"源视频 + 时空 mask + 可选条件\"] --> inside{\"未知区在原画布内?\"}\n    inside -- \"否\" --> outpaint[\"Video outpainting\\n扩展视野，保护原画布\"]\n    inside -- \"是\" --> restore{\"目标是恢复缺失内容?\"}\n    restore -- \"是\" --> inpaint[\"Video inpainting / completion\\n像素与时间重建\"]\n    restore -- \"否\" --> remove{\"需要删除对象及其效应?\"}\n    remove -- \"是\" --> removal[\"Object removal\\n对象 + 影子/反射/交互\"]\n    remove -- \"否\" --> local{\"已知区是否必须严格不变?\"}\n    local -- \"是\" --> fill[\"Generative fill\\n区域内一对多生成\"]\n    local -- \"否\" --> v2v[\"Masked / global V2V editing\\n允许语义重绘\"]\n    inpaint --> contract[\"报告 mask 内质量 + mask 外保护 + 时间一致\"]\n    removal --> contract\n    outpaint --> contract\n    fill --> contract\n    v2v --> edit_contract[\"另报指令遵循、源视频保真与编辑范围\"]\n```\n"
+  },
+  {
+    "id": "069",
+    "path": "docs/tasks/video-inpainting.md",
+    "file_index": 2,
+    "title": "视频补全中的误差传播与四道证据闸门",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频补全中的误差传播与四道证据闸门。图中表达的关键模块包括：视频 x 与 hole mask m、估计并补全双向 flow、按置信度传播像素/特征、标为 residual hole、可靠锚点 + 置信度图、Transformer / diffusion 生成残余洞、扩大上下文 / 降低锚点权重 / 重采样、decoded RGB 硬 composite、mask 内、mask 外、warp、成本分栏验收。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/069",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 视频补全中的误差传播与四道证据闸门\n    accDescr: flow、可见性、传播、生成、窗口记忆和最终合成依次通过独立检查；任何上游误差都可能污染后续锚点，因此同时保存置信度、残余洞和外部区审计。\n\n    input[\"视频 x 与 hole mask m\"] --> flow[\"估计并补全双向 flow\"]\n    flow --> visibility{\"可见、未遮挡、未越界?\"}\n    visibility -- \"是\" --> propagate[\"按置信度传播像素/特征\"]\n    visibility -- \"否\" --> residual[\"标为 residual hole\"]\n    propagate --> audit1{\"forward-backward / 边界检查\"}\n    audit1 -- \"失败\" --> residual\n    audit1 -- \"通过\" --> anchors[\"可靠锚点 + 置信度图\"]\n    anchors --> synth[\"Transformer / diffusion 生成残余洞\"]\n    residual --> synth\n    synth --> temporal{\"跨帧、跨窗口、身份检查\"}\n    temporal -- \"失败\" --> revise[\"扩大上下文 / 降低锚点权重 / 重采样\"]\n    revise --> synth\n    temporal -- \"通过\" --> composite[\"decoded RGB 硬 composite\"]\n    composite --> final[\"mask 内、mask 外、warp、成本分栏验收\"]\n```\n"
+  },
+  {
+    "id": "070",
+    "path": "docs/tasks/video-prediction.md",
+    "file_index": 1,
+    "title": "视频预测的训练与推理张量合同",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频预测的训练与推理张量合同。图中表达的关键模块包括：recorded train/eval video: B x (Tc+Th) x 3 x H x W、TRAIN ONLY · removed at deployment、X past for training: B x Tc x 3 x H x W、Y future GT: B x Th x 3 x H x W、corruption / noisy future posterior or teacher forcing foresight teacher / target、training forward + objective、DEPLOYMENT INFERENCE · no future-GT path、X observed past: B x Tc x 3 x H x W、encoder / state update、noise or latent seed: K x B x ...。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/070",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 视频预测的训练与推理张量合同\n    accDescr: 训练视频切成过去前缀和未来目标。训练期未来真值可进入加噪、posterior、teacher forcing 或 foresight target，并通过损失更新参数；这些路径在部署时移除。部署推理只使用过去、随机种子和自身预测状态。\n\n    clip[\"recorded train/eval video:<br/>B x (Tc+Th) x 3 x H x W\"] --> split{\"按时间切分\"}\n\n    subgraph train[\"TRAIN ONLY · removed at deployment\"]\n        trainpast[\"X past for training:<br/>B x Tc x 3 x H x W\"]\n        gt[\"Y future GT:<br/>B x Th x 3 x H x W\"]\n        gt --> trainpath[\"corruption / noisy future<br/>posterior or teacher forcing<br/>foresight teacher / target\"]\n        trainpast --> trainforward\n        trainpath --> trainforward[\"training forward + objective\"]\n    end\n\n    subgraph deploy[\"DEPLOYMENT INFERENCE · no future-GT path\"]\n        past[\"X observed past:<br/>B x Tc x 3 x H x W\"]\n        past --> enc[\"encoder / state update\"]\n        noise[\"noise or latent seed: K x B x ...\"] --> predictor[\"frame or block predictor\"]\n        enc --> predictor\n        predictor --> pred[\"Yhat block: K x B x b x 3 x H x W\"]\n        pred --> stop{\"reached Th?\"}\n        stop -->|\"no\"| update[\"append, recurrent update, or context packing\"]\n        update -->|\"self-conditioned next step\"| predictor\n        stop -->|\"yes\"| samples[\"K rollouts: K x B x Th x 3 x H x W\"]\n    end\n\n    split -->|\"训练前缀\"| trainpast\n    split -->|\"训练/评价未来\"| gt\n    split -. \"部署只暴露已观测前缀\" .-> past\n    trainforward -. \"updates theta; not an inference input\" .-> predictor\n    samples --> eval[\"offline metrics and downstream tests\"]\n    gt -. \"offline comparison only\" .-> eval\n```\n"
+  },
+  {
+    "id": "071",
+    "path": "docs/tasks/video-prediction.md",
+    "file_index": 2,
+    "title": "视频预测的五条技术路线及其证据出口",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频预测的五条技术路线及其证据出口。图中表达的关键模块包括：past-only prefix X、deterministic pixel / transform、stochastic latent、diffusion / score、latent / token / foundation continuation、decision-aware predictive state、one future: distortion and rollout drift、K futures: coverage and calibration、representation probes、planning / control utility。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/071",
+    "source": "```mermaid\nflowchart TD\n    accTitle: 视频预测的五条技术路线及其证据出口\n    accDescr: 所有路线都接收过去前缀，但分别预测像素或变换、随机隐变量、扩散分数、latent 或 token、以及决策相关状态；它们最终进入像素评估、分布评估或闭环决策评估，路线之间可以组合。\n\n    input[\"past-only prefix X\"] --> det[\"deterministic pixel / transform\"]\n    input --> stoch[\"stochastic latent\"]\n    input --> diff[\"diffusion / score\"]\n    input --> token[\"latent / token / foundation continuation\"]\n    input --> decision[\"decision-aware predictive state\"]\n    det --> pixel[\"one future: distortion and rollout drift\"]\n    stoch --> dist[\"K futures: coverage and calibration\"]\n    diff --> dist\n    diff --> pixel\n    token --> decode{\"decode pixels?\"}\n    decode -->|\"yes\"| pixel\n    decode -->|\"no\"| probe[\"representation probes\"]\n    decision --> control[\"planning / control utility\"]\n    token --> decision\n    dist --> claim[\"conditional future evidence\"]\n    pixel --> claim\n    probe --> claim\n    control --> strong[\"interventional / closed-loop evidence\"]\n```\n"
+  },
+  {
+    "id": "072",
+    "path": "docs/tasks/video-restoration.md",
+    "file_index": 1,
+    "title": "视频退化修复合同与补全边界",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频退化修复合同与补全边界。图中表达的关键模块包括：clean video X、blur / downsample / noise / compression、degraded observation Y、align + fuse、propagate + attend、generative prior、restored video X-hat、evidence fidelity、temporal stability、perceptual detail。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/072",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 视频退化修复合同与补全边界\n    accDescr: 干净视频经模糊、降采样、噪声和压缩形成退化观测；恢复方法可用对齐融合、传播注意或生成先验；输出分别检查证据保真、时间稳定与感知细节。缺失支持经 mask 进入独立的视频补全合同。\n\n    clean[\"clean video X\"] --> degrade[\"blur / downsample / noise / compression\"] --> observed[\"degraded observation Y\"]\n    observed --> align[\"align + fuse\"]\n    observed --> propagate[\"propagate + attend\"]\n    observed --> prior[\"generative prior\"]\n    align --> restored[\"restored video X-hat\"]\n    propagate --> restored\n    prior --> restored\n    restored --> fidelity[\"evidence fidelity\"]\n    restored --> stability[\"temporal stability\"]\n    restored --> detail[\"perceptual detail\"]\n    mask[\"missing support + mask\"] --> inpaint[\"video inpainting\\nseparate contract\"]\n```\n"
+  },
+  {
+    "id": "073",
+    "path": "docs/tasks/video-restoration.md",
+    "file_index": 2,
+    "title": "视频退化修复部署路线选择",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频退化修复部署路线选择。图中表达的关键模块包括：degraded video、bidirectional propagation\\nor full-clip attention、causal state + bounded buffer、fidelity-first reconstruction、degradation estimation\\n或 test-time adaptation、regression / transformer、GAN / diffusion + uncertainty、distill / sparse attention / tiny decoder。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/073",
+    "source": "```mermaid\nflowchart TD\n    accTitle: 视频退化修复部署路线选择\n    accDescr: 先判断是否允许读取未来帧，再判断退化是否已知、是否需要生成先验以及是否受播放 deadline 约束，从而选择双向离线、因果传播、盲退化估计或少步流式路线。\n\n    start[\"degraded video\"] --> future{\"允许读未来帧？\"}\n    future -- \"yes\" --> offline[\"bidirectional propagation\\nor full-clip attention\"]\n    future -- \"no\" --> causal[\"causal state + bounded buffer\"]\n    offline --> blind{\"退化参数已知？\"}\n    causal --> blind\n    blind -- \"known\" --> faithful[\"fidelity-first reconstruction\"]\n    blind -- \"unknown\" --> estimate[\"degradation estimation\\n或 test-time adaptation\"]\n    faithful --> detail{\"观测是否足够？\"}\n    estimate --> detail\n    detail -- \"mostly yes\" --> regression[\"regression / transformer\"]\n    detail -- \"no, need prior\" --> generative[\"GAN / diffusion + uncertainty\"]\n    causal --> deadline{\"有播放 deadline？\"}\n    deadline -- \"yes\" --> fast[\"distill / sparse attention / tiny decoder\"]\n```\n"
+  },
+  {
+    "id": "074",
+    "path": "docs/tasks/video-to-video.md",
+    "file_index": 1,
+    "title": "严格视频到视频编辑的边界判定",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：严格视频到视频编辑的边界判定。图中表达的关键模块包括：一个视频条件任务、I2V / T2V / conditional synthesis\\n不是严格 V2V、animation / continuation\\n不是严格 V2V、degradation restoration\\n邻接任务、video inpainting\\n邻接任务、local V2V\\n硬或软编辑区、global V2V\\n仍需守恒结构、motion V2V\\n身份与物理守恒、novel-view editing\\n同一动态场景。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/074",
+    "source": "```mermaid\nflowchart TD\n    accTitle: 严格视频到视频编辑的边界判定\n    accDescr: 先判断是否有完整源视频，再判断源视频是否定义待修改时间轴；若目标是恢复原内容，继续区分全帧退化观测与由 mask 指定的缺失支持，其余再按局部反事实、全局反事实、运动或相机重定位分流。\n\n    q0[\"一个视频条件任务\"] --> q1{\"有完整源视频 X 吗？\"}\n    q1 -- \"否\" --> gen[\"I2V / T2V / conditional synthesis\\n不是严格 V2V\"]\n    q1 -- \"是\" --> q2{\"输出要修改 X 的既有时间轴吗？\"}\n    q2 -- \"否，仅用作驱动或历史\" --> other[\"animation / continuation\\n不是严格 V2V\"]\n    q2 -- \"是\" --> q3{\"目标只是恢复原内容吗？\"}\n    q3 -- \"是\" --> q_restore{\"全帧退化还是缺失支持？\"}\n    q_restore -- \"blur / noise / SR / compression\" --> restore[\"degradation restoration\\n邻接任务\"]\n    q_restore -- \"mask / missing support\" --> inpaint[\"video inpainting\\n邻接任务\"]\n    q3 -- \"否\" --> q4{\"改变的是什么？\"}\n    q4 -- \"局部内容\" --> local[\"local V2V\\n硬或软编辑区\"]\n    q4 -- \"全局外观或语义\" --> global[\"global V2V\\n仍需守恒结构\"]\n    q4 -- \"运动\" --> motion[\"motion V2V\\n身份与物理守恒\"]\n    q4 -- \"相机 / 视角\" --> view[\"novel-view editing\\n同一动态场景\"]\n```\n"
+  },
+  {
+    "id": "075",
+    "path": "docs/tasks/video-to-video.md",
+    "file_index": 2,
+    "title": "视频编辑方法主线选择器",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频编辑方法主线选择器。图中表达的关键模块包括：源视频 + 编辑合同、mask-aware native editor\\n或传播后硬合成、inversion + attention / feature injection、native DiT / rectified-flow editor、warp / correspondence / first-frame propagation、motion-conditioned editor、3D / 4D-aware route、external memory + state snapshots、causal cache + bounded latency、full-context inference。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/075",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 视频编辑方法主线选择器\n    accDescr: 根据是否需要像素级边界、是否只有少量样例、编辑幅度、运动与三维控制、长时多轮和在线因果性，选择传播、测试时注入、原生编辑模型、三维控制或记忆流式路线。\n\n    start[\"源视频 + 编辑合同\"] --> exact{\"mask 外要像素级锁定？\"}\n    exact -- \"是\" --> masked[\"mask-aware native editor\\n或传播后硬合成\"]\n    exact -- \"否\" --> few{\"无专用训练数据 / 需即插即用？\"}\n    few -- \"是\" --> inject[\"inversion + attention / feature injection\"]\n    few -- \"否\" --> scale{\"需要大幅语义变化？\"}\n    scale -- \"是\" --> native[\"native DiT / rectified-flow editor\"]\n    scale -- \"否，参考首帧或关键帧\" --> prop[\"warp / correspondence / first-frame propagation\"]\n    native --> ctrl{\"显式改变运动、视角或内禀属性？\"}\n    ctrl -- \"2D 轨迹 / pose\" --> motion[\"motion-conditioned editor\"]\n    ctrl -- \"3D 点轨迹 / 相机 / RGBX\" --> geom[\"3D / 4D-aware route\"]\n    ctrl -- \"否\" --> session{\"多轮或在线？\"}\n    masked --> session\n    inject --> session\n    prop --> session\n    motion --> session\n    geom --> session\n    session -- \"多轮长视频\" --> memory[\"external memory + state snapshots\"]\n    session -- \"因果流式\" --> stream[\"causal cache + bounded latency\"]\n    session -- \"单轮离线\" --> offline[\"full-context inference\"]\n```\n"
+  },
+  {
+    "id": "076",
+    "path": "docs/tasks/video-virtual-try-on.md",
+    "file_index": 1,
+    "title": "视频虚拟试衣任务边界决策树",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频虚拟试衣任务边界决策树。图中表达的关键模块包括：视觉条件的视频请求、人物动画 / 个性化 / 通用编辑、source-video VVT 严格 V2V 专项、pose-driven try-on animation VVT，但非严格 V2V、image VTON 无时序证据、还需测量、服装规格、3D cloth 或实穿试验、进入五本守恒账与时序评测。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/076",
+    "source": "~~~mermaid\nflowchart TD\n    accTitle: 视频虚拟试衣任务边界决策树\n    accDescr: 先判断是否存在目标服装，再判断是否有完整源人物视频；有源视频且要求同时间轴换装时进入严格V2V专项，无源视频但有人物图和姿态序列时进入试衣动画。单帧、普通补全、身份个性化和物理仿真分别路由到邻接任务。\n\n    Q0[\"视觉条件的视频请求\"] --> G{\"是否有目标服装参考？\"}\n    G -- \"否\" --> N[\"人物动画 / 个性化 / 通用编辑\"]\n    G -- \"是\" --> V{\"是否有完整人物源视频？\"}\n    V -- \"是，保留同一时间轴\" --> SV[\"source-video VVT<br/>严格 V2V 专项\"]\n    V -- \"否\" --> P{\"人物图 + pose/driving sequence？\"}\n    P -- \"是\" --> PA[\"pose-driven try-on animation<br/>VVT，但非严格 V2V\"]\n    P -- \"否，只需一张图\" --> IV[\"image VTON<br/>无时序证据\"]\n    SV --> PHY{\"是否声称真实尺码/舒适/力学？\"}\n    PA --> PHY\n    PHY -- \"是\" --> SIM[\"还需测量、服装规格、3D cloth 或实穿试验\"]\n    PHY -- \"否，仅视觉换装\" --> LED[\"进入五本守恒账与时序评测\"]\n~~~\n"
+  },
+  {
+    "id": "077",
+    "path": "docs/tasks/video-virtual-try-on.md",
+    "file_index": 2,
+    "title": "视频虚拟试衣的多账本评测流程",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频虚拟试衣的多账本评测流程。图中表达的关键模块包括：冻结 source / garment / instruction seed / fps / resolution / preprocessing、SSIM / LPIPS + 五账本、不报像素 GT 指标 五账本 + human、目标服装 结构 / logo / text / material、人物与体型 ID / skin / hair / hand / silhouette、场景与非目标 background / camera / props、时序与交互 motion / occlusion / seam / re-entry、系统 TTFF / P95 / FPS / memory、拒绝；平均分不得抵消、盲化人工成对比较 分层 bootstrap CI + failure gallery。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/077",
+    "source": "~~~mermaid\nflowchart TD\n    accTitle: 视频虚拟试衣的多账本评测流程\n    accDescr: 先冻结输入输出与预处理版本，再分 paired 和 unpaired；随后并行检查目标服装、人物体型、背景、时序交互和系统性能，任何安全或身份硬失败都直接拒绝，只有全部门通过才进入人工盲评和统计报告。\n\n    F[\"冻结 source / garment / instruction<br/>seed / fps / resolution / preprocessing\"] --> S{\"paired reconstruction<br/>还是 unpaired transfer？\"}\n    S -- \"paired\" --> P[\"SSIM / LPIPS + 五账本\"]\n    S -- \"unpaired\" --> U[\"不报像素 GT 指标<br/>五账本 + human\"]\n    P --> G[\"目标服装<br/>结构 / logo / text / material\"]\n    U --> G\n    P --> B[\"人物与体型<br/>ID / skin / hair / hand / silhouette\"]\n    U --> B\n    P --> C[\"场景与非目标<br/>background / camera / props\"]\n    U --> C\n    P --> T[\"时序与交互<br/>motion / occlusion / seam / re-entry\"]\n    U --> T\n    P --> R[\"系统<br/>TTFF / P95 / FPS / memory\"]\n    U --> R\n    G --> H{\"是否存在硬失败？\"}\n    B --> H\n    C --> H\n    T --> H\n    R --> H\n    H -- \"身份错、裸露、目标衣服错、严重泄漏\" --> X[\"拒绝；平均分不得抵消\"]\n    H -- \"全部通过\" --> M[\"盲化人工成对比较<br/>分层 bootstrap CI + failure gallery\"]\n~~~\n"
+  },
+  {
+    "id": "078",
+    "path": "docs/taxonomy.md",
+    "file_index": 1,
+    "title": "视频生成任务的三个可组合坐标",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频生成任务的三个可组合坐标。图中表达的关键模块包括：条件来源 C 无 / 文字语义 / 图像视频音频 / 状态动作、源内容关系 R 从零创作 / 参考约束 / 变换编辑 / 退化恢复 / 缺失补全、交互时域 H open-loop clip / 长期记忆 / closed-loop、任务合同 T 输入 · 输出 · 不变量 · 干预 · 时域、验收证据 条件响应 · 保留误差 · 多样性 · deadline · 闭环效用、模型实现 AR / masked / diffusion / flow / GAN / hybrid。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/078",
+    "source": "~~~mermaid\nflowchart LR\n    accTitle: 视频生成任务的三个可组合坐标\n    accDescr: 条件来源、与源内容的关系和交互时域共同形成任务合同；任务合同再确定必须保持的内容、允许改变的内容和相应评测，而不是先由模型名称决定任务。\n\n    C[\"条件来源 C<br/>无 / 文字语义 / 图像视频音频 / 状态动作\"]\n    R[\"源内容关系 R<br/>从零创作 / 参考约束 / 变换编辑 / 退化恢复 / 缺失补全\"]\n    H[\"交互时域 H<br/>open-loop clip / 长期记忆 / closed-loop\"]\n    T[\"任务合同 T<br/>输入 · 输出 · 不变量 · 干预 · 时域\"]\n    E[\"验收证据<br/>条件响应 · 保留误差 · 多样性 · deadline · 闭环效用\"]\n    M[\"模型实现<br/>AR / masked / diffusion / flow / GAN / hybrid\"]\n\n    C --> T\n    R --> T\n    H --> T\n    T --> E\n    M -. \"实现任务，不定义任务\" .-> T\n~~~\n"
+  },
+  {
+    "id": "079",
+    "path": "docs/taxonomy.md",
+    "file_index": 2,
+    "title": "从任务合同到证伪测试",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：从任务合同到证伪测试。图中表达的关键模块包括：定义 I / O 模态 · 单位 · 时间轴、保持账本 K 身份 · 几何 · mask 外 · 状态、变化账本 Δ 对象 · 动作 · 风格 · 相机、反事实干预 一次只改变一个条件、协议网格 多 seed · 多时长 · 多难度 · 多负载、记录失败、回滚 修任务定义 / 数据 / 模型 / 系统、报告分布与不确定性 不是只展示最佳样例。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/079",
+    "source": "~~~mermaid\nflowchart TD\n    accTitle: 从任务合同到证伪测试\n    accDescr: 输入输出定义后，分别建立保持账本与变化账本，再对条件做反事实干预，并在多个随机种子、时间长度和系统负载下验收；未通过则回到任务或系统设计，而不是挑选最好样例。\n\n    A[\"定义 I / O<br/>模态 · 单位 · 时间轴\"] --> B[\"保持账本 K<br/>身份 · 几何 · mask 外 · 状态\"]\n    B --> C[\"变化账本 Δ<br/>对象 · 动作 · 风格 · 相机\"]\n    C --> D[\"反事实干预<br/>一次只改变一个条件\"]\n    D --> E[\"协议网格<br/>多 seed · 多时长 · 多难度 · 多负载\"]\n    E --> F{\"全部硬门槛通过？\"}\n    F -- 否 --> G[\"记录失败、回滚<br/>修任务定义 / 数据 / 模型 / 系统\"]\n    F -- 是 --> H[\"报告分布与不确定性<br/>不是只展示最佳样例\"]\n    G --> A\n~~~\n"
+  },
+  {
+    "id": "080",
+    "path": "docs/timeline.md",
+    "file_index": 1,
+    "title": "视频生成技术发展的并行泳道",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频生成技术发展的并行泳道。图中表达的关键模块包括：生成机制基础：视频如何被表示与生成、显式运动与 时序预测、随机生成与 序列建模、Diffusion / Flow 目标 与 Video DiT 骨干、视频基础模型与创作能力：规模、条件与模态如何扩展、T2V 与视频 Token 技术前驱、规模化预训练与 可迁移 Backbone、多条件与 多参考接口、相机 × 世界时间 多视角 / 4D、源视频约束与 可寻址编辑。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/080",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 视频生成技术发展的并行泳道\n    accDescr: 生成机制基础、视频基础模型与创作能力、World Model 与行动闭环三条技术路线并行发展，最后落到应用工作流和分层评测；多条件、多镜头、音视频与统一系统是不同维度。\n\n    subgraph generation_track [\"生成机制基础：视频如何被表示与生成\"]\n        direction LR\n        motion_prediction[\"显式运动与<br/>时序预测\"] --> probabilistic_generation[\"随机生成与<br/>序列建模\"]\n        probabilistic_generation --> scalable_generation[\"Diffusion / Flow 目标<br/>与 Video DiT 骨干\"]\n    end\n\n    subgraph foundation_track [\"视频基础模型与创作能力：规模、条件与模态如何扩展\"]\n        direction LR\n        text_video[\"T2V 与视频 Token<br/>技术前驱\"] --> foundation_backbone[\"规模化预训练与<br/>可迁移 Backbone\"]\n        foundation_backbone --> multi_condition[\"多条件与<br/>多参考接口\"]\n        multi_condition --> view_time_4d[\"相机 × 世界时间<br/>多视角 / 4D\"]\n        foundation_backbone --> source_editing[\"源视频约束与<br/>可寻址编辑\"]\n        foundation_backbone --> timeline_authoring[\"多段 Prompt / 分镜<br/>与跨镜头连续\"]\n        foundation_backbone --> native_av[\"原生联合<br/>音视频\"]\n        multi_condition --> unified_creation[\"不同层级的统一<br/>接口 / Backbone / Checkpoint\"]\n        view_time_4d --> unified_creation\n        source_editing --> unified_creation\n        timeline_authoring --> unified_creation\n        native_av --> unified_creation\n    end\n\n    subgraph world_track [\"World Model 与行动闭环：动作如何改变未来\"]\n        direction LR\n        state_space[\"状态空间与<br/>model-based control\"] --> latent_planning[\"Latent imagination<br/>与 planning\"]\n        action_rollout[\"动作条件视觉 Rollout<br/>不等同闭环\"] --> world_model_evidence[\"动作条件状态转移<br/>持久性与干预证据\"]\n        latent_planning --> world_model_evidence\n        world_model_evidence -.-> closed_loop_control[\"闭环决策验证<br/>动作 → 响应 → 观测 → 再决策\"]\n    end\n\n    subgraph application_layer [\"应用层：能力如何落地\"]\n        workflows[\"创作、编辑、游戏、<br/>机器人与数据合成\"]\n    end\n\n    subgraph validation_framework [\"验证框架：能力如何被证明\"]\n        evidence[\"质量、物理、反事实、<br/>闭环与安全评测\"]\n    end\n\n    probabilistic_generation -.->|\"生成机制\"| text_video\n    scalable_generation -.->|\"规模化底座\"| foundation_backbone\n    motion_prediction -.->|\"预测传统\"| latent_planning\n    scalable_generation -.->|\"生成式视觉先验\"| action_rollout\n    foundation_backbone -.->|\"视觉先验可复用；仍需动作数据\"| action_rollout\n    multi_condition --> workflows\n    view_time_4d --> workflows\n    source_editing --> workflows\n    timeline_authoring --> workflows\n    native_av --> workflows\n    unified_creation --> workflows\n    world_model_evidence --> workflows\n    closed_loop_control --> workflows\n    evidence -.-> foundation_backbone\n    evidence -.-> world_model_evidence\n    evidence -.-> closed_loop_control\n    evidence -.-> workflows\n\n    classDef foundation fill:#f3f4f6,stroke:#6b7280,stroke-width:2px,color:#1f2937\n    classDef creative fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f\n    classDef world fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#3b0764\n    classDef outcome fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d\n\n    class motion_prediction,probabilistic_generation,scalable_generation foundation\n    class text_video,foundation_backbone,multi_condition,view_time_4d,source_editing,timeline_authoring,native_av,unified_creation creative\n    class state_space,latent_planning,action_rollout,world_model_evidence,closed_loop_control world\n    class evidence foundation\n    class workflows outcome\n```\n"
+  },
+  {
+    "id": "081",
+    "path": "docs/timeline.md",
+    "file_index": 2,
+    "title": "时间线节点的四条独立证据轴",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：时间线节点的四条独立证据轴。图中表达的关键模块包括：公开与学术状态、首次预印本 / 技术报告 确定最早公开时间、正式发表 期刊或会议 proceedings、研究谱系、机制、任务与实验边界、研究里程碑 本页编辑判断、复现材料、官方代码 / 权重 / 数据、可复现范围 仍需独立验收、产品与访问状态。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/081",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 时间线节点的四条独立证据轴\n    accDescr: 首次预印本可以确定最早公开时间，后续才可能进入正式期刊或会议；研究里程碑是本页根据机制和实验作出的编辑判断；代码与权重决定可复现范围；托管产品则另有开放、受限或下线状态。四条证据轴共同形成节点的完整状态，任一轴都不能自动推出另一轴。\n\n    subgraph publication_lane [\"公开与学术状态\"]\n        direction LR\n        first_public[\"首次预印本 / 技术报告<br/>确定最早公开时间\"] --> formal_publication[\"正式发表<br/>期刊或会议 proceedings\"]\n    end\n\n    subgraph milestone_lane [\"研究谱系\"]\n        direction LR\n        mechanism_evidence[\"机制、任务与实验边界\"] --> editorial_milestone[\"研究里程碑<br/>本页编辑判断\"]\n    end\n\n    subgraph artifact_lane [\"复现材料\"]\n        direction LR\n        official_artifact[\"官方代码 / 权重 / 数据\"] --> reproducible_scope[\"可复现范围<br/>仍需独立验收\"]\n    end\n\n    subgraph product_lane [\"产品与访问状态\"]\n        direction LR\n        official_release[\"官方发布 / 模型卡\"] --> availability[\"截止日快照<br/>开放 / 受限 / 下线\"]\n    end\n\n    first_public -.->|\"不自动推出\"| editorial_milestone\n    formal_publication -.->|\"不自动推出\"| reproducible_scope\n    official_release -.->|\"不自动推出\"| mechanism_evidence\n    official_artifact -.->|\"不自动推出\"| availability\n\n    formal_publication --> evidence_record[\"四维证据记录<br/>而非单一‘发布’标签\"]\n    editorial_milestone --> evidence_record\n    reproducible_scope --> evidence_record\n    availability --> evidence_record\n\n    classDef publication fill:#e69f00,stroke:#7a4d00,stroke-width:2px,color:#111827\n    classDef research fill:#56b4e9,stroke:#155e75,stroke-width:2px,color:#111827\n    classDef artifact fill:#009e73,stroke:#065f46,stroke-width:2px,color:#ffffff\n    classDef product fill:#cc79a7,stroke:#831843,stroke-width:2px,color:#111827\n    classDef record fill:#f3f4f6,stroke:#374151,stroke-width:3px,color:#111827\n\n    class first_public,formal_publication publication\n    class mechanism_evidence,editorial_milestone research\n    class official_artifact,reproducible_scope artifact\n    class official_release,availability product\n    class evidence_record record\n```\n"
+  },
+  {
+    "id": "082",
+    "path": "docs/video-reasoning.md",
+    "file_index": 1,
+    "title": "视频推理的三个时间轴与四级证据",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：视频推理的三个时间轴与四级证据。图中表达的关键模块包括：1. Output time、x1、x2、...、xT、2. Denoising time、zK: noise、early plan、constraint binding、z0: rendering。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/082",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 视频推理的三个时间轴与四级证据\n    accDescr: 输出时间沿帧序列展开可见轨迹，去噪时间从早期计划进入约束绑定和后期渲染，交互时间执行动作、短片段生成、验证与重规划。R1 最终答案、R2 过程有效、R3 因果干预和 R4 闭环回报构成逐级增强的局部机制证据。\n\n    subgraph output_clock[\"1. Output time\"]\n        direction LR\n        x_1[\"x1\"] --> x_2[\"x2\"] --> x_3[\"...\"] --> x_t[\"xT\"]\n    end\n\n    subgraph denoise_clock[\"2. Denoising time\"]\n        direction LR\n        z_k[\"zK: noise\"] --> early[\"early plan\"] --> bind[\"constraint binding\"] --> z_0[\"z0: rendering\"]\n    end\n\n    subgraph interaction_clock[\"3. Interaction time\"]\n        direction LR\n        action[\"action\"] --> rollout[\"short rollout\"] --> verify[\"verifier\"] --> replan[\"replan\"] --> next_action[\"next action\"]\n        next_action --> action\n    end\n\n    final_answer[\"R1 final answer\"] --> process_validity[\"R2 process validity\"] --> causal_intervention[\"R3 causal intervention\"] --> closed_loop_return[\"R4 closed-loop return\"]\n    x_t -. \"observable result\" .-> final_answer\n    z_0 -. \"probe plus intervention required\" .-> process_validity\n    verify -. \"counterfactual tests\" .-> causal_intervention\n    next_action -. \"decision utility\" .-> closed_loop_return\n```\n"
+  },
+  {
+    "id": "083",
+    "path": "docs/world-models.md",
+    "file_index": 1,
+    "title": "RSSM 的先验想象与后验观测校正",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：RSSM 的先验想象与后验观测校正。图中表达的关键模块包括：真实观测 o_t、Encoder、上一确定性状态 h_(t-1)、Recurrent transition、上一随机状态 z_(t-1)、已执行动作 a_(t-1)、确定性记忆 h_t、Prior p(z_t | h_t)、Posterior q(z_t | h_t, o_t)、随机状态 z_t。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/083",
+    "source": "~~~mermaid\nflowchart LR\n    accTitle: RSSM 的先验想象与后验观测校正\n    accDescr: 上一确定性状态、随机状态和已执行动作进入 recurrent transition，形成当前记忆。没有新观测时从 prior 继续 rollout；真实观测到达时由 encoder 与 posterior 校正随机状态，再用于解码观测、奖励或价值。\n\n    O[\"真实观测 o_t\"] --> E[\"Encoder\"]\n    H0[\"上一确定性状态 h_(t-1)\"] --> R[\"Recurrent transition\"]\n    Z0[\"上一随机状态 z_(t-1)\"] --> R\n    A0[\"已执行动作 a_(t-1)\"] --> R\n    R --> H[\"确定性记忆 h_t\"]\n    H --> PR[\"Prior p(z_t | h_t)\"]\n    H --> PO[\"Posterior q(z_t | h_t, o_t)\"]\n    E --> PO\n    PR -. \"无新观测时 rollout\" .-> Z[\"随机状态 z_t\"]\n    PO -- \"有真实观测时校正\" --> Z\n    H --> D[\"Decoder / reward / value\"]\n    Z --> D\n~~~\n"
+  },
+  {
+    "id": "084",
+    "path": "docs/world-models.md",
+    "file_index": 2,
+    "title": "带验证器和不确定性的滚动时域闭环",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：带验证器和不确定性的滚动时域闭环。图中表达的关键模块包括：真实观测 + persistent state、生成 K 个动作/未来候选、预测任务价值、估计不确定性、Action verifier、综合评分：价值 - 风险 - 违规、只执行首个动作或短 action chunk、读取真实新观测、后验校正并更新实体/空间/事件记忆、减速 / 重新感知 / 安全策略。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/084",
+    "source": "~~~mermaid\nflowchart LR\n    accTitle: 带验证器和不确定性的滚动时域闭环\n    accDescr: 系统从真实观测与持久状态产生多个动作和未来候选，由任务价值、不确定性与动作验证器共同评分，只执行首个动作或短动作块。新观测用于后验校正与记忆更新；预测现实偏差过大时转入减速、重新感知或安全策略。\n\n    S[\"真实观测 + persistent state\"] --> C[\"生成 K 个动作/未来候选\"]\n    C --> V[\"预测任务价值\"]\n    C --> U[\"估计不确定性\"]\n    C --> W[\"Action verifier\"]\n    V --> Q[\"综合评分：价值 - 风险 - 违规\"]\n    U --> Q\n    W --> Q\n    Q --> X[\"只执行首个动作或短 action chunk\"]\n    X --> O[\"读取真实新观测\"]\n    O --> M[\"后验校正并更新实体/空间/事件记忆\"]\n    M --> S\n    O --> F{\"预测与现实偏差过大？\"}\n    F -- \"是\" --> SAFE[\"减速 / 重新感知 / 安全策略\"]\n    SAFE --> S\n    F -- \"否\" --> M\n~~~\n"
+  },
+  {
+    "id": "085",
+    "path": "resources/datasets.md",
+    "file_index": 1,
+    "title": "可审计的现代 Video Data Engine",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：可审计的现代 Video Data Engine。图中表达的关键模块包括：1. 来源、权利与摄取、来源池 授权 / 逐项 CC / URL / 合成、不可变摄取 source ID / 时间 / checksum / codec、隔离清单 对象与理由、2. 切分、筛选与去重去污染、镜头或 episode 切分 cut / fade / task boundary、技术质量与运动 decode / FPS / 模糊 / 光流 / 转场、内容与安全 覆盖 / 审美 / PII / 未成年人 / NSFW、跨源多模态去重 hash / pHash / audio / embedding / local match、Benchmark 去污染 完整 / 局部 / 近重复 / caption overlap。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/085",
+    "source": "```mermaid\nflowchart TB\n    accTitle: 可审计的现代 Video Data Engine\n    accDescr: 候选来源先经过权利门和不可变摄取，再依次切分、筛选、跨源去重与 benchmark 去污染、分层描述和核验、混合分组、训练评测防火墙、版本化划分与训练审计；更正和删除通过 tombstone、派生数据及 checkpoint 台账回流到权利门和 manifest。\n\n    subgraph source_plane[\"1. 来源、权利与摄取\"]\n        direction LR\n        source_pool[\"来源池<br/>授权 / 逐项 CC / URL / 合成\"] --> rights_gate{\"权利门<br/>许可 / ToS / 同意 / 肖像 / opt-out\"}\n        rights_gate -->|通过| immutable_ingest[\"不可变摄取<br/>source ID / 时间 / checksum / codec\"]\n        rights_gate -->|拒绝或隔离| quarantine[\"隔离清单<br/>对象与理由\"]\n    end\n\n    subgraph curation_plane[\"2. 切分、筛选与去重去污染\"]\n        direction LR\n        shot_episode_split[\"镜头或 episode 切分<br/>cut / fade / task boundary\"] --> technical_motion_filter[\"技术质量与运动<br/>decode / FPS / 模糊 / 光流 / 转场\"]\n        technical_motion_filter --> content_safety_filter[\"内容与安全<br/>覆盖 / 审美 / PII / 未成年人 / NSFW\"]\n        content_safety_filter --> cross_source_dedup[\"跨源多模态去重<br/>hash / pHash / audio / embedding / local match\"]\n        cross_source_dedup --> benchmark_decontam[\"Benchmark 去污染<br/>完整 / 局部 / 近重复 / caption overlap\"]\n    end\n\n    subgraph annotation_plane[\"3. 描述、核验与混合分组\"]\n        direction LR\n        hierarchical_caption[\"分层 Caption<br/>原文 + ASR/OCR + short + dense + structured\"] --> caption_verifier{\"Caption 核验<br/>实体 / 数量 / 动作 / 顺序 / 相机 / hallucination\"}\n        caption_verifier -->|通过| mix_group[\"混合、课程与不可拆分 group<br/>质量 × 运动 × 多样性 × 任务\"]\n        caption_verifier -.->|重采帧、重描述或剔除| hierarchical_caption\n    end\n\n    subgraph release_plane[\"4. 防火墙、版本发布与审计\"]\n        direction LR\n        train_eval_firewall[\"Train / Eval Firewall<br/>冻结 benchmark 与 sealed evaluation\"] --> versioned_split_manifests[(\"版本化 split manifests<br/>media / URL / metadata / group / tombstone\")]\n        versioned_split_manifests --> training_audit[\"训练与独立审计<br/>版本 / 阈值 / mixture / checkpoint\"]\n    end\n\n    immutable_ingest --> shot_episode_split\n    benchmark_decontam --> hierarchical_caption\n    mix_group --> train_eval_firewall\n    training_audit -.->|失败分析回流| mix_group\n\n    provenance_ledger[(\"贯穿式 provenance ledger<br/>来源 / 权利 / 变换 / 模型版本 / 阈值\")]\n    provenance_ledger -.-> immutable_ingest\n    provenance_ledger -.-> cross_source_dedup\n    provenance_ledger -.-> hierarchical_caption\n    provenance_ledger -.-> versioned_split_manifests\n\n    removal_correction[\"Removal / Correction<br/>对象 / 理由 / 生效时间\"] --> tombstone_version[\"Tombstone + 新版本<br/>可传播的撤回与更正\"]\n    tombstone_version --> versioned_split_manifests\n    tombstone_version --> derived_checkpoint_ledger[\"派生数据 / checkpoint 台账<br/>影响范围与处置状态\"]\n    derived_checkpoint_ledger -.->|撤回或重授权反馈| rights_gate\n```\n"
+  },
+  {
+    "id": "086",
+    "path": "resources/open-models.md",
+    "file_index": 1,
+    "title": "开放视频模型的可复现发布面证据链",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：开放视频模型的可复现发布面证据链。图中表达的关键模块包括：官方身份 作者仓库 + 模型卡、固定版本 Git commit + model revision、Paper / Code / Weights、Inference / Training、Data / Eval / Environment、硬件预检 VRAM / disk / CUDA / dtype、隔离 记录缺口，不下载或部署、最小运行 固定输入 / seed / steps、视觉与条件回读 身份 / 运动 / 同步 / 漂移 / 安全、可复现 manifest 版本 / hashes / 命令 / 硬件 / 日志。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/086",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 开放视频模型的可复现发布面证据链\n    accDescr: 先确认官方身份和固定版本，再分别核对论文、代码、权重、推理、训练、数据与评测；随后求代码、权重、数据和依赖许可证的交集，做硬件预检与固定种子最小运行，最后视觉回读并写入可复现 manifest。任何关键发布面缺失、许可不相容或运行失败都进入隔离。\n\n    A[\"官方身份<br/>作者仓库 + 模型卡\"] --> B[\"固定版本<br/>Git commit + model revision\"]\n    B --> C{\"发布面拆分\"}\n    C --> C1[\"Paper / Code / Weights\"]\n    C --> C2[\"Inference / Training\"]\n    C --> C3[\"Data / Eval / Environment\"]\n    C1 --> D{\"许可证交集<br/>代码 × 权重 × 数据 × 依赖\"}\n    C2 --> D\n    C3 --> D\n    D -->|相容| E[\"硬件预检<br/>VRAM / disk / CUDA / dtype\"]\n    D -->|缺失或冲突| Q[\"隔离<br/>记录缺口，不下载或部署\"]\n    E --> F[\"最小运行<br/>固定输入 / seed / steps\"]\n    F --> G{\"输出契约通过？<br/>尺寸 / 帧数 / FPS / 音频 / 无 NaN\"}\n    G -->|否| Q\n    G -->|是| V[\"视觉与条件回读<br/>身份 / 运动 / 同步 / 漂移 / 安全\"]\n    V --> M[\"可复现 manifest<br/>版本 / hashes / 命令 / 硬件 / 日志\"]\n```\n"
+  },
+  {
+    "id": "087",
+    "path": "resources/open-models.md",
+    "file_index": 2,
+    "title": "开放视频模型选择树",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：开放视频模型选择树。图中表达的关键模块包括：基础生成 Hunyuan 1.5 / Wan2.2-5B / LTX-2.5 / SANA、Joint AV H3-Base / LTX-2.5 / Cosmos 3、Causal / forcing MAGI / LongSANA / FramePack / SkyReels-V2、Control stack Bernini / VACE / VAP / FlashMotion、Action loop Cosmos 3 / DreamX / Matrix 3.5 / V-JEPA2-AC、优先完整训练面 Open-Sora / Hunyuan1.5 / LTX trainer / Lance / Bernini-R / Lumos / FlashMotion、推理优先 按官方显存与任务 checkpoint 缩小范围、进入受控实验 固定 manifest 与评测、换候选或记录为 R0/R1 不声称可复现。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/087",
+    "source": "```mermaid\nflowchart TD\n    accTitle: 开放视频模型选择树\n    accDescr: 从研究问题出发区分基础生成、长视频、编辑控制、原生音视频和动作世界模型，再按是否需要训练代码与硬件预算选择候选；最后必须通过版本、许可和最小运行门。\n\n    Q{\"主要研究问题？\"}\n    Q -->|短片 T2V / I2V| G[\"基础生成<br/>Hunyuan 1.5 / Wan2.2-5B / LTX-2.5 / SANA\"]\n    Q -->|原生音视频| AV[\"Joint AV<br/>H3-Base / LTX-2.5 / Cosmos 3\"]\n    Q -->|长视频 / streaming| L[\"Causal / forcing<br/>MAGI / LongSANA / FramePack / SkyReels-V2\"]\n    Q -->|编辑 / 控制| E[\"Control stack<br/>Bernini / VACE / VAP / FlashMotion\"]\n    Q -->|动作 / world model| W[\"Action loop<br/>Cosmos 3 / DreamX / Matrix 3.5 / V-JEPA2-AC\"]\n\n    G --> T{\"必须训练或微调？\"}\n    AV --> T\n    L --> T\n    E --> T\n    W --> T\n    T -->|是| TR[\"优先完整训练面<br/>Open-Sora / Hunyuan1.5 / LTX trainer / Lance / Bernini-R / Lumos / FlashMotion\"]\n    T -->|否| INF[\"推理优先<br/>按官方显存与任务 checkpoint 缩小范围\"]\n    TR --> V{\"版本 + 许可 + 最小运行通过？\"}\n    INF --> V\n    V -->|是| EXP[\"进入受控实验<br/>固定 manifest 与评测\"]\n    V -->|否| HOLD[\"换候选或记录为 R0/R1<br/>不声称可复现\"]\n```\n"
+  },
+  {
+    "id": "088",
+    "path": "resources/open-models.md",
+    "file_index": 3,
+    "title": "开放模型最小复现链",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：开放模型最小复现链。图中表达的关键模块包括：冻结代码 / 权重 / 环境 / 参数、记录缺失，不进入能力比较、保留日志与最小失败复现、修正解码、封装或参数、S2 多 prompt × 多 seed、自动指标 + 盲评 + 失败模式、报告质量、成本、许可与安全边界。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/088",
+    "source": "```mermaid\nflowchart LR\n    accTitle: 开放模型最小复现链\n    accDescr: 从代码权重环境和推理参数冻结开始，依次通过资产完整、管线运行、媒体合同和多样本评测，最后形成可审计结论。\n\n    F[\"冻结代码 / 权重 / 环境 / 参数\"] --> S0{\"S0 资产完整？\"}\n    S0 -->|否| X0[\"记录缺失，不进入能力比较\"]\n    S0 -->|是| S1{\"S1 官方样例可运行？\"}\n    S1 -->|否| X1[\"保留日志与最小失败复现\"]\n    S1 -->|是| M{\"输出媒体合同通过？\"}\n    M -->|否| X2[\"修正解码、封装或参数\"]\n    M -->|是| S2[\"S2 多 prompt × 多 seed\"]\n    S2 --> E[\"自动指标 + 盲评 + 失败模式\"]\n    E --> C[\"报告质量、成本、许可与安全边界\"]\n```\n"
+  },
+  {
+    "id": "089",
+    "path": "sources/research_20260829_evaluation.md",
+    "file_index": 1,
+    "title": "Repository claims and named benchmark families到Benchmark registry and evaluation protocol的流程",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：Repository claims and named benchmark families到Benchmark registry and evaluation protocol的流程。图中表达的关键模块包括：Repository claims and named benchmark families、Exact-title and concept discovery、Verify title, version, protocol and numbers、Verify current arXiv version and label provisional、Exclude from technical claims、Classify task and evidence ceiling、Cross-check evaluator, human labels, code and limitations、Benchmark registry and evaluation protocol。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/089",
+    "source": "```mermaid\nflowchart TD\n    A[\"Repository claims and named benchmark families\"] --> B[\"Exact-title and concept discovery\"]\n    B --> C{\"Primary source available?\"}\n    C -->|\"Official proceedings or standard\"| D[\"Verify title, version, protocol and numbers\"]\n    C -->|\"Preprint only\"| E[\"Verify current arXiv version and label provisional\"]\n    C -->|\"No primary record\"| X[\"Exclude from technical claims\"]\n    D --> F[\"Classify task and evidence ceiling\"]\n    E --> F\n    F --> G[\"Cross-check evaluator, human labels, code and limitations\"]\n    G --> H[\"Benchmark registry and evaluation protocol\"]\n```\n"
+  },
+  {
+    "id": "090",
+    "path": "sources/research_20260829_evaluation.md",
+    "file_index": 2,
+    "title": "Write claim card: task, conditions, use and failure cost到Per-dimension results, failures and Pareto frontier的流程",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：Write claim card: task, conditions, use and failure cost到Per-dimension results, failures and Pareto frontier的流程。图中表达的关键模块包括：Write claim card: task, conditions, use and failure cost、Quality, coverage, condition and temporal diagnostics、Edit success, source fidelity, locality and temporal preservation、Problem preservation, final answer, legal process and compute budget、Claim ceiling L0-L2: generated-video diagnosis、Paired interventions, rollout horizon and policy utility、Metric suite plus controlled-corruption meta-evaluation、Calibrate frozen judge on held-out human gold、Blind pairwise human audit with uncertainty、Efficiency/SLO, safety, watermark and C2PA gates。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/090",
+    "source": "```mermaid\nflowchart TD\n    A[\"Write claim card: task, conditions, use and failure cost\"] --> B{\"Task type\"}\n    B -->|\"Open generation\"| G[\"Quality, coverage, condition and temporal diagnostics\"]\n    B -->|\"Video editing\"| E[\"Edit success, source fidelity, locality and temporal preservation\"]\n    B -->|\"Video reasoning\"| R[\"Problem preservation, final answer, legal process and compute budget\"]\n    B -->|\"World model\"| W{\"Action-conditioned?\"}\n    W -->|\"No\"| W0[\"Claim ceiling L0-L2: generated-video diagnosis\"]\n    W -->|\"Yes\"| W1[\"Paired interventions, rollout horizon and policy utility\"]\n    G --> M[\"Metric suite plus controlled-corruption meta-evaluation\"]\n    E --> M\n    R --> M\n    W0 --> M\n    W1 --> M\n    M --> J[\"Calibrate frozen judge on held-out human gold\"]\n    J --> H[\"Blind pairwise human audit with uncertainty\"]\n    H --> S[\"Efficiency/SLO, safety, watermark and C2PA gates\"]\n    S --> P[\"Per-dimension results, failures and Pareto frontier\"]\n```\n"
+  },
+  {
+    "id": "091",
+    "path": "sources/research_20260829_generative_models.md",
+    "file_index": 1,
+    "title": "R · Representation\\npixel / continuous latent / discrete token到StreamDiffusionV2\\nmodel + cache/scheduler/pipeline + SLO的流程",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：R · Representation\\npixel / continuous latent / discrete token到StreamDiffusionV2\\nmodel + cache/scheduler/pipeline + SLO的流程。图中表达的关键模块包括：R · Representation\\npixel / continuous latent / discrete token、F · Factorization\\njoint / AR / masked / hierarchy / causal chunk、O · Objective\\nELBO-score / FM-RF / CM-shortcut / DMD / GAN、B · Backbone\\nU-Net / DiT / decoder Transformer / recurrent、D · Deployment\\noffline / few-step / streaming / interactive、Configured video generator\\n(R, F, O, B, D)、Claim-specific evidence\\nquality · NFE · TTFF · deadline · drift · control、NOVA\\ncontinuous latent + frame/set AR + diffusion loss、Pyramid Flow\\nlatent + temporal pyramid AR + FM + DiT、CausVid\\ncausal factorization + DMD + few-step streaming。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/091",
+    "source": "```mermaid\nflowchart LR\n    R[\"R · Representation\\npixel / continuous latent / discrete token\"]\n    F[\"F · Factorization\\njoint / AR / masked / hierarchy / causal chunk\"]\n    O[\"O · Objective\\nELBO-score / FM-RF / CM-shortcut / DMD / GAN\"]\n    B[\"B · Backbone\\nU-Net / DiT / decoder Transformer / recurrent\"]\n    D[\"D · Deployment\\noffline / few-step / streaming / interactive\"]\n\n    M[\"Configured video generator\\n(R, F, O, B, D)\"]\n    E[\"Claim-specific evidence\\nquality · NFE · TTFF · deadline · drift · control\"]\n\n    R --> M\n    F --> M\n    O --> M\n    B --> M\n    D --> M\n    M --> E\n\n    X1[\"NOVA\\ncontinuous latent + frame/set AR + diffusion loss\"] -. example .-> M\n    X2[\"Pyramid Flow\\nlatent + temporal pyramid AR + FM + DiT\"] -. example .-> M\n    X3[\"CausVid\\ncausal factorization + DMD + few-step streaming\"] -. example .-> M\n    X4[\"StreamDiffusionV2\\nmodel + cache/scheduler/pipeline + SLO\"] -. example .-> E\n```\n"
+  },
+  {
+    "id": "092",
+    "path": "sources/research_20260829_physical_consistency.md",
+    "file_index": 1,
+    "title": "L0 · 视觉真实感单帧外观与参考相似到禁止压成一个不透明总分的流程",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：L0 · 视觉真实感单帧外观与参考相似到禁止压成一个不透明总分的流程。图中表达的关键模块包括：L0 · 视觉真实感 单帧外观与参考相似、L1 · 时间连贯性 身份、几何、无闪烁、L2 · 物理合理性 人类或 VLM：可能发生吗、L3 · 测量型物理忠实度 已知 s0、u、θ、b；轨迹/接触/参数 ± 不确定性、L4 · 反事实忠实度 成对干预、参数扫描、分支局部性、L5 · 闭环可执行性 动作恢复、rollout、恢复与任务成功、L6 · 决策忠实度 策略排序、regret、风险与优化增益、L7 · 真实世界效用 真实机器人/驾驶成功与标定风险、禁止压成一个不透明总分。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/092",
+    "source": "```mermaid\nflowchart TB\n    L0[\"L0 · 视觉真实感<br/>单帧外观与参考相似\"] --> L1[\"L1 · 时间连贯性<br/>身份、几何、无闪烁\"]\n    L1 --> L2[\"L2 · 物理合理性<br/>人类或 VLM：可能发生吗\"]\n    L2 --> L3[\"L3 · 测量型物理忠实度<br/>已知 s0、u、θ、b；轨迹/接触/参数 ± 不确定性\"]\n    L3 --> L4[\"L4 · 反事实忠实度<br/>成对干预、参数扫描、分支局部性\"]\n    L4 --> L5[\"L5 · 闭环可执行性<br/>动作恢复、rollout、恢复与任务成功\"]\n    L5 --> L6[\"L6 · 决策忠实度<br/>策略排序、regret、风险与优化增益\"]\n    L6 --> L7[\"L7 · 真实世界效用<br/>真实机器人/驾驶成功与标定风险\"]\n\n    L2 -. \"可扩展但定性\" .-> J[\"禁止压成一个不透明总分\"]\n    L3 -. \"可测量但依赖提取器\" .-> J\n    L5 -. \"具身但依赖 IDM/仿真器\" .-> J\n```\n"
+  },
+  {
+    "id": "093",
+    "path": "sources/research_20260829_physical_consistency.md",
+    "file_index": 2,
+    "title": "成组数据真实标定 + 模拟干预 + action logs到按证据层分别报告的流程",
+    "prompt": "创建一张用于中文学术教程的高质量横向信息图。主题：成组数据真实标定 + 模拟干预 + action logs到按证据层分别报告的流程。图中表达的关键模块包括：成组数据 真实标定 + 模拟干预 + action logs、状态/表示 2D track · depth · 3D/4D · latent、训练时 SFT · property control · PDE/constraint loss、训练后 DPO/RL · verifiable reward、推理时 simulator loop · candidate search · verifier、生成/rollout、开放域 judge 语义与显眼违规、程序测量 轨迹、接触、参数、不确定性、成对干预 单调性、局部性、OOD、闭环环境 执行、regret、任务成功、安全。使用清晰的流程、分层或关系结构与箭头表达因果、数据流或能力边界；白色或浅灰背景，深蓝与青蓝为主色，少量紫色或橙色突出重点，简洁现代、可读性优先。所有可见文字必须为简体中文，文字尽量少且字号大；不要出现英文、代码、Mermaid 风格、水印、Logo、装饰性伪文本。画面要适合嵌入 Markdown 文档，16:9 横向构图。",
+    "image": "assets/imagegen-diagrams/093",
+    "source": "```mermaid\nflowchart LR\n    A[\"成组数据<br/>真实标定 + 模拟干预 + action logs\"] --> B[\"状态/表示<br/>2D track · depth · 3D/4D · latent\"]\n    B --> C{\"物理注入位置\"}\n    C --> C1[\"训练时<br/>SFT · property control · PDE/constraint loss\"]\n    C --> C2[\"训练后<br/>DPO/RL · verifiable reward\"]\n    C --> C3[\"推理时<br/>simulator loop · candidate search · verifier\"]\n    C1 --> D[\"生成/rollout\"]\n    C2 --> D\n    C3 --> D\n    D --> E1[\"开放域 judge<br/>语义与显眼违规\"]\n    D --> E2[\"程序测量<br/>轨迹、接触、参数、不确定性\"]\n    D --> E3[\"成对干预<br/>单调性、局部性、OOD\"]\n    D --> E4[\"闭环环境<br/>执行、regret、任务成功、安全\"]\n    E1 --> F[\"按证据层分别报告\"]\n    E2 --> F\n    E3 --> F\n    E4 --> F\n```\n"
+  }
+]

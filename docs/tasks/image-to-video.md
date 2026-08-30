@@ -55,25 +55,7 @@ c_{\mathrm{motion}},c_{\mathrm{cam}},c_{\mathrm{audio}}),
 
 Animate Anyone 用参考人物图和姿态序列驱动角色，属于 reference-driven character animation；不能用它证明通用场景首帧 I2V 已解决 [[29]](#ref-29)。VACE 同时覆盖视频生成、编辑、参考图和控制信号，只有其“图像作为时间锚点、无源视频”的子协议属于 I2V [[30]](#ref-30)。CameraCtrl 从文本和相机轨迹生成视频，若没有输入锚点图，任务仍是 camera-conditioned T2V [[31]](#ref-31)。
 
-```mermaid
-flowchart TD
-    accTitle: 图像条件视频任务的边界判定
-    accDescr: 先判断源视频是待编辑的完整时间轴还是仅作为历史前缀，再判断是否有输入图及其是否占据输出时间轴；无输入图而只有相机与文本时才是相机条件文本到视频。
-
-    start["要分类一个视频生成请求"] --> source{"是否有源视频上下文？"}
-    source -- "是" --> role{"保留并修改既有时间轴？"}
-    role -- "是" --> edit["image-conditioned video editing"]
-    role -- "否，仅历史前缀" --> continuation["video continuation / prediction"]
-    source -- "否" --> hasimg{"是否有输入图？"}
-    hasimg -- "否，仅相机 + 文本" --> cam["camera-conditioned T2V"]
-    hasimg -- "是" --> timeline{"输入图是否是输出中的已知时刻？"}
-    timeline -- "首帧" --> i2v["严格 I2V / TI2V"]
-    timeline -- "首尾或稀疏时刻" --> key["keyframe transition"]
-    timeline -- "否" --> driving{"是否有 pose、audio 或 driving video？"}
-    driving -- "是" --> animate["角色或肖像 animation"]
-    driving -- "否，仅身份/风格" --> ref["reference-to-video"]
-```
-
+![图 052：图像条件视频任务的边界判定](assets/imagegen-diagrams/052/diagram.png)
 **图的顺序化文字替代：**
 
 1. 先检查是否有源视频：保留并修改既有时间轴属于 video editing；只把已发生片段当历史、生成未知未来属于 continuation/prediction。
@@ -138,36 +120,7 @@ A_{\mathrm{out}}\in\mathbb R^{B\times C_a\times S}.
 
 ### 2.3 六种条件注入位置
 
-```mermaid
-flowchart TB
-    accTitle: 图像到视频的条件注入与失败定位链
-    accDescr: RGB 视频经时空编码器成为视频 latent，参考图可通过帧替换、通道拼接、图像 token cross attention 或低频噪声初始化进入去噪器；文本经 cross attention，flow 轨迹姿态和相机经控制残差或显式 warp 进入；输出解码后分别检查锚点、身份、运动、控制和长时稳定性。
-
-    video["训练视频 X: B x F x 3 x H x W"] --> vae["时空 VAE"]
-    vae --> latent["Z0: B x f x C x h x w"]
-    latent --> noise["Zt: 加噪或 flow path"]
-    image["Iref: B x 3 x H x W"] --> imageenc["VAE / CLIP / vision encoder"]
-    imageenc --> replace["帧替换或 mask"]
-    imageenc --> concat["zero-pad / repeat + channel concat"]
-    imageenc --> tokens["image tokens + cross-attention"]
-    imageenc --> init["低频或结构化噪声初始化"]
-    text["text: B x L x D"] --> tokens
-    control["flow / pose / trajectory / camera"] --> adapter["adapter / ControlNet residual"]
-    control --> warp["显式 motion field / warp"]
-    audio["audio in: B x La x Da + time map"] --> audiocond["audio cross-attention / residual"]
-    noise --> denoiser["3D U-Net 或 Video DiT"]
-    replace --> denoiser
-    concat --> denoiser
-    tokens --> denoiser
-    init --> denoiser
-    adapter --> denoiser
-    warp --> denoiser
-    audiocond --> denoiser
-    denoiser --> decode["VAE decode"]
-    decode --> output["Xhat: B x F x 3 x H x W"]
-    output --> gates["锚点 | 身份 | 运动 | 控制 | 长时"]
-```
-
+![图 053：图像到视频的条件注入与失败定位链](assets/imagegen-diagrams/053/diagram.png)
 **图的顺序化文字替代：**
 
 1. 训练视频先经时空 VAE 得到干净视频 latent，再进入加噪或 flow-matching 路径。

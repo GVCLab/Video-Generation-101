@@ -82,41 +82,7 @@ A=a_{T_c:T_c+T_h-1}\in\mathbb R^{B\times T_h\times d_a}.
 
 ## 🧩 2. Tensor、训练与 rollout 合同
 
-```mermaid
-flowchart TB
-    accTitle: 视频预测的训练与推理张量合同
-    accDescr: 训练视频切成过去前缀和未来目标。训练期未来真值可进入加噪、posterior、teacher forcing 或 foresight target，并通过损失更新参数；这些路径在部署时移除。部署推理只使用过去、随机种子和自身预测状态。
-
-    clip["recorded train/eval video:<br/>B x (Tc+Th) x 3 x H x W"] --> split{"按时间切分"}
-
-    subgraph train["TRAIN ONLY · removed at deployment"]
-        trainpast["X past for training:<br/>B x Tc x 3 x H x W"]
-        gt["Y future GT:<br/>B x Th x 3 x H x W"]
-        gt --> trainpath["corruption / noisy future<br/>posterior or teacher forcing<br/>foresight teacher / target"]
-        trainpast --> trainforward
-        trainpath --> trainforward["training forward + objective"]
-    end
-
-    subgraph deploy["DEPLOYMENT INFERENCE · no future-GT path"]
-        past["X observed past:<br/>B x Tc x 3 x H x W"]
-        past --> enc["encoder / state update"]
-        noise["noise or latent seed: K x B x ..."] --> predictor["frame or block predictor"]
-        enc --> predictor
-        predictor --> pred["Yhat block: K x B x b x 3 x H x W"]
-        pred --> stop{"reached Th?"}
-        stop -->|"no"| update["append, recurrent update, or context packing"]
-        update -->|"self-conditioned next step"| predictor
-        stop -->|"yes"| samples["K rollouts: K x B x Th x 3 x H x W"]
-    end
-
-    split -->|"训练前缀"| trainpast
-    split -->|"训练/评价未来"| gt
-    split -. "部署只暴露已观测前缀" .-> past
-    trainforward -. "updates theta; not an inference input" .-> predictor
-    samples --> eval["offline metrics and downstream tests"]
-    gt -. "offline comparison only" .-> eval
-```
-
+![图 070：视频预测的训练与推理张量合同](assets/imagegen-diagrams/070/diagram.png)
 **顺序化文字替代：**
 
 1. 把完整训练片段沿时间切成 $X$ 与 $Y$，并保留原始时间戳/FPS。
@@ -158,31 +124,7 @@ Self Forcing 用自回归 rollout、KV cache、少步 diffusion 和 stochastic g
 
 ## 🧭 3. 技术路线：表示、随机性与 rollout 是三条正交轴
 
-```mermaid
-flowchart TD
-    accTitle: 视频预测的五条技术路线及其证据出口
-    accDescr: 所有路线都接收过去前缀，但分别预测像素或变换、随机隐变量、扩散分数、latent 或 token、以及决策相关状态；它们最终进入像素评估、分布评估或闭环决策评估，路线之间可以组合。
-
-    input["past-only prefix X"] --> det["deterministic pixel / transform"]
-    input --> stoch["stochastic latent"]
-    input --> diff["diffusion / score"]
-    input --> token["latent / token / foundation continuation"]
-    input --> decision["decision-aware predictive state"]
-    det --> pixel["one future: distortion and rollout drift"]
-    stoch --> dist["K futures: coverage and calibration"]
-    diff --> dist
-    diff --> pixel
-    token --> decode{"decode pixels?"}
-    decode -->|"yes"| pixel
-    decode -->|"no"| probe["representation probes"]
-    decision --> control["planning / control utility"]
-    token --> decision
-    dist --> claim["conditional future evidence"]
-    pixel --> claim
-    probe --> claim
-    control --> strong["interventional / closed-loop evidence"]
-```
-
+![图 071：视频预测的五条技术路线及其证据出口](assets/imagegen-diagrams/071/diagram.png)
 **顺序化文字替代：**
 
 1. 所有路线都从只含过去的前缀开始。

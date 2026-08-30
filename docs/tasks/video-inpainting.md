@@ -58,27 +58,7 @@ m_{\text{obj}}
 
 2025–2026 年对象移除研究的关键进展，正是从“补对象轮廓里的像素”走向“发现并消除对象造成的环境效应” [[28]](#ref-28), [[29]](#ref-29), [[30]](#ref-30), [[31]](#ref-31), [[32]](#ref-32), [[34]](#ref-34)。
 
-```mermaid
-flowchart TD
-    accTitle: 视频补全、对象移除、扩画幅、局部编辑与生成填充的任务边界
-    accDescr: 根据未知区域位于原画布内外、目标是否恢复原内容、是否需要删除对象效应以及是否允许修改已知区，把输入分到六种不同验收合同。
-
-    start["源视频 + 时空 mask + 可选条件"] --> inside{"未知区在原画布内?"}
-    inside -- "否" --> outpaint["Video outpainting\n扩展视野，保护原画布"]
-    inside -- "是" --> restore{"目标是恢复缺失内容?"}
-    restore -- "是" --> inpaint["Video inpainting / completion\n像素与时间重建"]
-    restore -- "否" --> remove{"需要删除对象及其效应?"}
-    remove -- "是" --> removal["Object removal\n对象 + 影子/反射/交互"]
-    remove -- "否" --> local{"已知区是否必须严格不变?"}
-    local -- "是" --> fill["Generative fill\n区域内一对多生成"]
-    local -- "否" --> v2v["Masked / global V2V editing\n允许语义重绘"]
-    inpaint --> contract["报告 mask 内质量 + mask 外保护 + 时间一致"]
-    removal --> contract
-    outpaint --> contract
-    fill --> contract
-    v2v --> edit_contract["另报指令遵循、源视频保真与编辑范围"]
-```
-
+![图 068：视频补全、对象移除、扩画幅、局部编辑与生成填充的任务边界](assets/imagegen-diagrams/068/diagram.png)
 **图的顺序化文字替代：** 先判断未知区是否在原画布外；若在外，是 outpainting。若在原画布内，再判断目标是否恢复缺失内容；是则属于 inpainting / completion。若不是，再判断是否删除对象及其副作用；是则属于 object removal。其余任务按已知区是否必须严格不变，分成区域内 generative fill 与更一般的 masked / global V2V editing。前三类和区域生成至少共同报告 mask 内质量、mask 外保护与时间一致；V2V 还要单独报告指令遵循和编辑范围。
 
 ## 🖼️ 3. 一张图读懂现代证据管线
@@ -196,27 +176,7 @@ m_z\odot z^{\text{gen}}_{k-1}
 
 E²FGVI 把 flow completion、feature propagation 与 content hallucination 三个模块端到端联合优化 [[10]](#ref-10)。这降低了分阶段手工流水线的接口误差，却没有消除错误传播：错误 flow 会复制错误纹理，错误纹理会成为 attention 的高置信锚点，生成器再把它扩散到残余洞；窗口把错误结果当下一段条件时，局部伪影还会变成长程漂移。
 
-```mermaid
-flowchart LR
-    accTitle: 视频补全中的误差传播与四道证据闸门
-    accDescr: flow、可见性、传播、生成、窗口记忆和最终合成依次通过独立检查；任何上游误差都可能污染后续锚点，因此同时保存置信度、残余洞和外部区审计。
-
-    input["视频 x 与 hole mask m"] --> flow["估计并补全双向 flow"]
-    flow --> visibility{"可见、未遮挡、未越界?"}
-    visibility -- "是" --> propagate["按置信度传播像素/特征"]
-    visibility -- "否" --> residual["标为 residual hole"]
-    propagate --> audit1{"forward-backward / 边界检查"}
-    audit1 -- "失败" --> residual
-    audit1 -- "通过" --> anchors["可靠锚点 + 置信度图"]
-    anchors --> synth["Transformer / diffusion 生成残余洞"]
-    residual --> synth
-    synth --> temporal{"跨帧、跨窗口、身份检查"}
-    temporal -- "失败" --> revise["扩大上下文 / 降低锚点权重 / 重采样"]
-    revise --> synth
-    temporal -- "通过" --> composite["decoded RGB 硬 composite"]
-    composite --> final["mask 内、mask 外、warp、成本分栏验收"]
-```
-
+![图 069：视频补全中的误差传播与四道证据闸门](assets/imagegen-diagrams/069/diagram.png)
 **图的顺序化文字替代：** 视频和 mask 先产生双向 flow；只有可见、未遮挡且未越界的对应才进入传播。传播结果还要通过 forward–backward 与边界检查，不可靠位置回到 residual hole。可靠锚点与残余洞共同进入 Transformer 或 diffusion；跨帧、跨窗口和身份检查失败时，应降低错误锚点权重、扩大上下文或重采样。通过后在 decoded RGB 上硬合成，并把洞内、洞外、时序和成本分开验收。
 
 ## 🧬 5. 技术路线：不是“传统方法被 DiT 取代”

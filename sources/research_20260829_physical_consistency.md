@@ -116,21 +116,7 @@ E_k=
 
 ## 4. 证据阶梯
 
-```mermaid
-flowchart TB
-    L0["L0 · 视觉真实感<br/>单帧外观与参考相似"] --> L1["L1 · 时间连贯性<br/>身份、几何、无闪烁"]
-    L1 --> L2["L2 · 物理合理性<br/>人类或 VLM：可能发生吗"]
-    L2 --> L3["L3 · 测量型物理忠实度<br/>已知 s0、u、θ、b；轨迹/接触/参数 ± 不确定性"]
-    L3 --> L4["L4 · 反事实忠实度<br/>成对干预、参数扫描、分支局部性"]
-    L4 --> L5["L5 · 闭环可执行性<br/>动作恢复、rollout、恢复与任务成功"]
-    L5 --> L6["L6 · 决策忠实度<br/>策略排序、regret、风险与优化增益"]
-    L6 --> L7["L7 · 真实世界效用<br/>真实机器人/驾驶成功与标定风险"]
-
-    L2 -. "可扩展但定性" .-> J["禁止压成一个不透明总分"]
-    L3 -. "可测量但依赖提取器" .-> J
-    L5 -. "具身但依赖 IDM/仿真器" .-> J
-```
-
+![图 092：L0 · 视觉真实感单帧外观与参考相似到禁止压成一个不透明总分的流程](assets/imagegen-diagrams/092/diagram.png)
 使用规则：
 
 - claim 不得高于实际通过的最高证据层；L2 高分不能写成 L3，L3 也不能自动写成 L6。
@@ -256,26 +242,7 @@ flowchart TB
 
 ## 7. 训练、后训练与验证路线
 
-```mermaid
-flowchart LR
-    A["成组数据<br/>真实标定 + 模拟干预 + action logs"] --> B["状态/表示<br/>2D track · depth · 3D/4D · latent"]
-    B --> C{"物理注入位置"}
-    C --> C1["训练时<br/>SFT · property control · PDE/constraint loss"]
-    C --> C2["训练后<br/>DPO/RL · verifiable reward"]
-    C --> C3["推理时<br/>simulator loop · candidate search · verifier"]
-    C1 --> D["生成/rollout"]
-    C2 --> D
-    C3 --> D
-    D --> E1["开放域 judge<br/>语义与显眼违规"]
-    D --> E2["程序测量<br/>轨迹、接触、参数、不确定性"]
-    D --> E3["成对干预<br/>单调性、局部性、OOD"]
-    D --> E4["闭环环境<br/>执行、regret、任务成功、安全"]
-    E1 --> F["按证据层分别报告"]
-    E2 --> F
-    E3 --> F
-    E4 --> F
-```
-
+![图 093：成组数据真实标定 + 模拟干预 + action logs到按证据层分别报告的流程](assets/imagegen-diagrams/093/diagram.png)
 推荐的工程顺序：
 
 1. **先定义 claim。** 如果目标只是减少明显穿透，就不应把工作描述成“学习真实世界定律”；如果目标是机器人 planning，就必须预先定义决策指标。

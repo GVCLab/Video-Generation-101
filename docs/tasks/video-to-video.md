@@ -64,26 +64,7 @@ T_{\mathrm{V2V}}=(X,U,M,R,C,H)\rightarrow(Y,\Delta,D),
 | driving video + 人像参考 → 新人物动画 | 通常否 | driving video 提供动作控制；若还要编辑 driving video 本身才进入 V2V |
 | 主体参考集 + prompt → 新时间轴视频 | 否 | 没有完整源视频可守恒；属于[开放集视频个性化](personalized-video-generation.md) |
 
-```mermaid
-flowchart TD
-    accTitle: 严格视频到视频编辑的边界判定
-    accDescr: 先判断是否有完整源视频，再判断源视频是否定义待修改时间轴；若目标是恢复原内容，继续区分全帧退化观测与由 mask 指定的缺失支持，其余再按局部反事实、全局反事实、运动或相机重定位分流。
-
-    q0["一个视频条件任务"] --> q1{"有完整源视频 X 吗？"}
-    q1 -- "否" --> gen["I2V / T2V / conditional synthesis\n不是严格 V2V"]
-    q1 -- "是" --> q2{"输出要修改 X 的既有时间轴吗？"}
-    q2 -- "否，仅用作驱动或历史" --> other["animation / continuation\n不是严格 V2V"]
-    q2 -- "是" --> q3{"目标只是恢复原内容吗？"}
-    q3 -- "是" --> q_restore{"全帧退化还是缺失支持？"}
-    q_restore -- "blur / noise / SR / compression" --> restore["degradation restoration\n邻接任务"]
-    q_restore -- "mask / missing support" --> inpaint["video inpainting\n邻接任务"]
-    q3 -- "否" --> q4{"改变的是什么？"}
-    q4 -- "局部内容" --> local["local V2V\n硬或软编辑区"]
-    q4 -- "全局外观或语义" --> global["global V2V\n仍需守恒结构"]
-    q4 -- "运动" --> motion["motion V2V\n身份与物理守恒"]
-    q4 -- "相机 / 视角" --> view["novel-view editing\n同一动态场景"]
-```
-
+![图 074：严格视频到视频编辑的边界判定](assets/imagegen-diagrams/074/diagram.png)
 **顺序化文字替代：** 先确认存在完整源视频；再确认输出修改的是这条既有时间轴，而非把它当驱动或历史。若目标只是恢复原内容，再判断是全帧退化观测的 restoration，还是由 mask 指定缺失支持的 inpainting。其余按局部、全局、运动或相机 / 视角编辑分流，每一支都同时写出编辑目标和守恒目标。
 
 ## 2. 方法选择器：控制越强，证据合同越具体
@@ -101,32 +82,7 @@ flowchart TD
 5. 若改变速度、运动路径或镜头结构，进入 retime / restructure，并显式冻结身份和因果连续性。
 6. 所有路线都输出 edit ledger，并分别验收 edit success、source fidelity、locality、temporal consistency 和 identity/motion preservation。
 
-```mermaid
-flowchart LR
-    accTitle: 视频编辑方法主线选择器
-    accDescr: 根据是否需要像素级边界、是否只有少量样例、编辑幅度、运动与三维控制、长时多轮和在线因果性，选择传播、测试时注入、原生编辑模型、三维控制或记忆流式路线。
-
-    start["源视频 + 编辑合同"] --> exact{"mask 外要像素级锁定？"}
-    exact -- "是" --> masked["mask-aware native editor\n或传播后硬合成"]
-    exact -- "否" --> few{"无专用训练数据 / 需即插即用？"}
-    few -- "是" --> inject["inversion + attention / feature injection"]
-    few -- "否" --> scale{"需要大幅语义变化？"}
-    scale -- "是" --> native["native DiT / rectified-flow editor"]
-    scale -- "否，参考首帧或关键帧" --> prop["warp / correspondence / first-frame propagation"]
-    native --> ctrl{"显式改变运动、视角或内禀属性？"}
-    ctrl -- "2D 轨迹 / pose" --> motion["motion-conditioned editor"]
-    ctrl -- "3D 点轨迹 / 相机 / RGBX" --> geom["3D / 4D-aware route"]
-    ctrl -- "否" --> session{"多轮或在线？"}
-    masked --> session
-    inject --> session
-    prop --> session
-    motion --> session
-    geom --> session
-    session -- "多轮长视频" --> memory["external memory + state snapshots"]
-    session -- "因果流式" --> stream["causal cache + bounded latency"]
-    session -- "单轮离线" --> offline["full-context inference"]
-```
-
+![图 075：视频编辑方法主线选择器](assets/imagegen-diagrams/075/diagram.png)
 **顺序化文字替代：** 先由 mask 外是否需要像素级锁定决定是否使用 mask-aware 路线。没有专用训练数据时优先考虑 inversion 与测试时注入；大幅语义变化优先原生编辑模型；首帧或关键帧驱动的小改动可走对应传播。运动、相机和材质分解需要更具体的 2D / 3D / RGBX 控制。最后按离线、多轮长视频或因果流式选择状态管理。上方 PNG 用于快速识别输出关系；本 Mermaid 保留“任务合同 → 控制自由度 → 时序形态”的可编辑精确分支。
 
 ## 3. 八条机制路线及各自的守恒假设

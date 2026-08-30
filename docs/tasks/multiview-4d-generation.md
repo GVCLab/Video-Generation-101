@@ -100,35 +100,7 @@ canonical deformation 假设某个持久点可被追踪；物体出现、消失�
 
 ## 3. 五条技术路线不是一条升级链
 
-~~~mermaid
-flowchart LR
-    accTitle: 多视角与4D生成的五条技术路线
-    accDescr: 校准观测、单目视频、图像或文字条件分别进入动态场景重建、生成式提升、直接多视角视频扩散、显式四维生成和长时多视角自回归路线，最后都必须经过视角时间几何和系统证据门。
-
-    O["观测 / 条件<br/>同步多相机 · 单目视频 · 图像 · 文字"]
-    C["合同<br/>相机 K · 时间 t · 已见/未见区域"]
-    R["A 动态重建<br/>canonical + deformation<br/>radiance / Gaussian"]
-    L["B 生成式提升<br/>video prior → novel views<br/>→ optimize 4D state"]
-    D["C 直接 V×T diffusion<br/>joint view-time attention<br/>query pixels"]
-    G["D 显式 4D 生成<br/>SDS / feed-forward<br/>Gaussians / surfaces"]
-    S["E 长时多视角<br/>3D bridge · self-forcing<br/>streaming reward/control"]
-    X["输出<br/>像素网格或可渲染状态"]
-    E["证据门<br/>reprojection · occlusion · geometry<br/>novel view/time · cost · uncertainty"]
-
-    O --> C
-    C --> R
-    C --> L
-    C --> D
-    C --> G
-    C --> S
-    R --> X
-    L --> X
-    D --> X
-    G --> X
-    S --> X
-    X --> E
-~~~
-
+![图 056：多视角与4D生成的五条技术路线](assets/imagegen-diagrams/056/diagram.png)
 顺序化文字替代：先冻结相机、时间与已见/未见区域合同，再选择动态重建、生成式提升、直接视角时间扩散、显式 4D 生成或长时多视角路线；所有路线最终都必须通过同一组几何、遮挡、时间、系统成本和不确定性检查。
 
 ### 3.1 路线 A：观测驱动的动态场景重建
@@ -254,22 +226,7 @@ CAT4D 与 4DiM 都显式混合这些数据类型；GenXD 还通过 CamVid-30K �
 
 ## 6. 评测：从一条漂亮视频升级到 4D 证据
 
-~~~mermaid
-flowchart TD
-    accTitle: 多视角4D生成的六道独立证据门
-    accDescr: 固定场景与查询网格后依次检查输入证据保真、跨视角重投影、跨时间轨迹和显隐、几何或表面、未见区域生成，以及渲染和构建成本；任一硬门失败都不能用其他平均分抵消。
-
-    A["冻结测试单元<br/>scene · cameras · times · seen/unseen mask"] --> B["G1 输入证据保真<br/>seen-region residual"]
-    B --> C["G2 跨视角<br/>reprojection · epipolar · loop closure"]
-    C --> D["G3 跨时间<br/>3D tracks · motion · occlusion order"]
-    D --> E["G4 状态/几何<br/>depth · surface · pose · topology"]
-    E --> F["G5 生成区域<br/>semantic · diversity · uncertainty"]
-    F --> G["G6 系统<br/>build time · render FPS · memory · asset size"]
-    G --> H{"全部硬门通过？"}
-    H -- "否" --> I["降级主张并定位失败<br/>不得用总分掩盖"]
-    H -- "是" --> J["报告适用域、置信区间<br/>与未覆盖查询"]
-~~~
-
+![图 057：多视角4D生成的六道独立证据门](assets/imagegen-diagrams/057/diagram.png)
 顺序化文字替代：固定场景、相机、时间和已见/未见 mask 后，依次检查观测保真、跨视角、跨时间、几何、生成区域与系统代价；任一硬门失败就降低能力主张，不能用其他分数平均掉。
 
 ### 6.1 六类指标分别测什么

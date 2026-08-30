@@ -27,31 +27,7 @@
 
 ## 2. 端到端闭环：checkpoint 只是中间件
 
-```mermaid
-flowchart LR
-    accTitle: 视频基础模型从数据治理到服务审计的端到端闭环
-    accDescr: 训练侧从权利与来源清单、切镜去重过滤、结构化 caption、混合采样进入 tokenizer 和 generator，再经后训练与蒸馏；部署侧由编排器组合基础权重、适配器、超分插帧和音频，经过输入输出安全与来源声明后由 API 提供服务，评测和事故样本回流到数据与后训练。
-
-    subgraph TR["训练与发布"]
-        R["权利、来源、版本清单"] --> F["切镜、过滤、去重"] --> C["caption / 元数据 / 条件"] --> M["配比、课程、数据切分"]
-        M --> T["视频 / 音频 tokenizer"] --> G["generator 预训练"] --> P["SFT / preference / RL"]
-        P --> D["蒸馏 / 量化 / 任务 checkpoint"]
-    end
-
-    subgraph SV["产品与服务"]
-        D --> O["版本化编排器"]
-        O --> U["SR / 插帧 / 修复"]
-        O --> A["联合音频或 V2A"]
-        U --> S["输入输出安全 / provenance"]
-        A --> S
-        S --> API["API / UI / 本地 pipeline"]
-    end
-
-    E["离线评测 + 在线 SLO + 人工审计"] -->|失败样本| F
-    E -->|偏好与风险样本| P
-    API --> E
-```
-
+![图 006：视频基础模型从数据治理到服务审计的端到端闭环](assets/imagegen-diagrams/006/diagram.png)
 图的顺序文字替代：
 
 1. 先冻结素材权利、来源和版本，再做切镜、质量/安全过滤与近重复去除。
@@ -151,31 +127,7 @@ tokenizer 的验收必须同时覆盖：静态纹理、快速运动、镜头切�
 
 ## 6. 从 checkpoint 到 API：能力归因与治理
 
-```mermaid
-flowchart TB
-    accTitle: 产品能力到可下载权重的归因边界
-    accDescr: 产品声明首先落到版本化 API 和编排器，编排器可能组合基础 checkpoint、任务适配器、超分插帧、音频模块与安全模块；只有在固定这些依赖并做消融后，能力才能归因到单 checkpoint，开放性则需分别检查代码、权重、训练配方、数据和许可证。
-
-    PC["产品能力声明"] --> API["版本化 API / UI"]
-    API --> ORC["路由、重写、缓存、重试、编排"]
-    ORC --> CK["基础 checkpoint"]
-    ORC --> AD["任务 checkpoint / LoRA / 控制器"]
-    ORC --> PP["SR / 插帧 / 修复 / 音频"]
-    ORC --> SAFE["moderation / watermark / provenance"]
-
-    CK --> CA["固定依赖 + 消融：可归因能力"]
-    AD --> CA
-    PP --> SY["系统级能力"]
-    SAFE --> SY
-
-    CK --> RS["release surface 审计"]
-    RS --> RC["代码"]
-    RS --> RW["权重"]
-    RS --> RT["训练配方"]
-    RS --> RD["数据"]
-    RS --> RL["许可证"]
-```
-
+![图 007：产品能力到可下载权重的归因边界](assets/imagegen-diagrams/007/diagram.png)
 图的顺序文字替代：
 
 1. 用户看到的能力先属于某个版本的 API 或 UI，而不是自动属于模型权重。

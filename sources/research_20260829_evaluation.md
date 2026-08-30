@@ -89,19 +89,7 @@ For each promoted source, the audit checked the title, venue/status, current ver
 
 The review workflow is shown below. This is a trace diagram, not a numerical PRISMA flow because a complete candidate denominator was not captured.
 
-```mermaid
-flowchart TD
-    A["Repository claims and named benchmark families"] --> B["Exact-title and concept discovery"]
-    B --> C{"Primary source available?"}
-    C -->|"Official proceedings or standard"| D["Verify title, version, protocol and numbers"]
-    C -->|"Preprint only"| E["Verify current arXiv version and label provisional"]
-    C -->|"No primary record"| X["Exclude from technical claims"]
-    D --> F["Classify task and evidence ceiling"]
-    E --> F
-    F --> G["Cross-check evaluator, human labels, code and limitations"]
-    G --> H["Benchmark registry and evaluation protocol"]
-```
-
+![图 089：Repository claims and named benchmark families到Benchmark registry and evaluation protocol的流程](assets/imagegen-diagrams/089/diagram.png)
 ## Evidence levels
 
 Evidence level describes the source and the maximum claim it can safely support. It is not a score for paper quality.
@@ -443,26 +431,7 @@ The interpretation boundary is non-negotiable: absence of C2PA does not prove me
 
 The protocol below prevents a metric from being promoted beyond the task it measures.
 
-```mermaid
-flowchart TD
-    A["Write claim card: task, conditions, use and failure cost"] --> B{"Task type"}
-    B -->|"Open generation"| G["Quality, coverage, condition and temporal diagnostics"]
-    B -->|"Video editing"| E["Edit success, source fidelity, locality and temporal preservation"]
-    B -->|"Video reasoning"| R["Problem preservation, final answer, legal process and compute budget"]
-    B -->|"World model"| W{"Action-conditioned?"}
-    W -->|"No"| W0["Claim ceiling L0-L2: generated-video diagnosis"]
-    W -->|"Yes"| W1["Paired interventions, rollout horizon and policy utility"]
-    G --> M["Metric suite plus controlled-corruption meta-evaluation"]
-    E --> M
-    R --> M
-    W0 --> M
-    W1 --> M
-    M --> J["Calibrate frozen judge on held-out human gold"]
-    J --> H["Blind pairwise human audit with uncertainty"]
-    H --> S["Efficiency/SLO, safety, watermark and C2PA gates"]
-    S --> P["Per-dimension results, failures and Pareto frontier"]
-```
-
+![图 090：Write claim card: task, conditions, use and failure cost到Per-dimension results, failures and Pareto frontier的流程](assets/imagegen-diagrams/090/diagram.png)
 | Task | Evaluation unit | Primary evidence | Claim that remains unsupported |
 |---|---|---|---|
 | Open generation | Prompt by seed | Quality, distribution/coverage, compositional adherence, time, task-specific physics and human preference | Action causality or planning value |

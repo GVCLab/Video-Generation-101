@@ -29,45 +29,7 @@
 
 **图的证据边界：** `STEPS SAME` 只表示该路线本身不压缩基础 sampler 的 NFE；`PREFERENCE UP` 是优化意图，不是对所有提示词的保证；测试时搜索常增加而非减少端到端推理成本；蒸馏常依赖教师，但并非逻辑上永远需要外部教师。只有显式加入偏好或 reward 的蒸馏，才同时承担“对齐”和“加速”两份合同。
 
-~~~mermaid
-flowchart LR
-    accTitle: 视频生成后训练的五条并行决策路线
-    accDescr: 一个预训练视频生成器分别连接到数据和监督微调、成对偏好优化、奖励和强化学习、测试时搜索或引导、以及教师蒸馏；每条路线独立标注它主要改变能力、偏好、训练成本、推理成本或采样步数。
-
-    base["预训练视频生成器"]
-
-    subgraph routes["并行选择，不是必经流水线"]
-        direction TB
-        sft["1 · DATA / SFT<br/>精选视频与条件数据"] --> sft_effect["能力或接口 ↑<br/>基础步数不变"]
-        pair["2 · PAIRWISE<br/>chosen / rejected"] --> pair_effect["偏好目标 ↑<br/>基础步数不变"]
-        rl["3 · REWARD / RL<br/>rollout、评分、反馈"] --> rl_effect["偏好目标 ↑<br/>训练成本 ↑"]
-        test["4 · TEST-TIME<br/>搜索、引导、临时参数"] --> test_effect["当次偏好 ↑<br/>推理成本 ↑"]
-        distill["5 · DISTILL<br/>教师压缩到少步 student"] --> distill_effect["NFE ↓<br/>教师依赖"]
-    end
-
-    base --> sft
-    base --> pair
-    base --> rl
-    base --> test
-    base --> distill
-
-    warning["只有加入 reward / preference<br/>蒸馏才同时改偏好"]
-    distill_effect -.-> warning
-
-    classDef baseStyle fill:#ffffff,stroke:#111827,stroke-width:3px,color:#111827
-    classDef dataStyle fill:#56b4e9,stroke:#075985,stroke-width:2px,color:#082f49
-    classDef pairStyle fill:#e69f00,stroke:#92400e,stroke-width:2px,color:#451a03
-    classDef rlStyle fill:#009e73,stroke:#065f46,stroke-width:2px,color:#052e16
-    classDef testStyle fill:#cc79a7,stroke:#831843,stroke-width:2px,color:#500724
-    classDef distillStyle fill:#f0e442,stroke:#854d0e,stroke-width:2px,color:#422006
-    class base baseStyle
-    class sft,sft_effect dataStyle
-    class pair,pair_effect pairStyle
-    class rl,rl_effect rlStyle
-    class test,test_effect testStyle
-    class distill,distill_effect,warning distillStyle
-~~~
-
+![图 033：视频生成后训练的五条并行决策路线](assets/imagegen-diagrams/033/diagram.png)
 **顺序化文字替代：**
 
 1. 从同一个预训练视频生成器出发，不预设后训练顺序。

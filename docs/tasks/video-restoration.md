@@ -48,24 +48,7 @@ restorer 接收 $(Y,\widehat\phi,C)$，输出
 
 **图注：** restoration 的目标不是单纯“变清晰”。传统回归路线容易过平滑；GAN/diffusion 路线能补出锐利纹理，却可能稳定地生成从未存在的文字、牙齿、窗格或人脸细节。合格协议必须同时报告 evidence fidelity、temporal stability 与 perceptual detail，任何一项都不能替代另外两项。
 
-```mermaid
-flowchart LR
-    accTitle: 视频退化修复合同与补全边界
-    accDescr: 干净视频经模糊、降采样、噪声和压缩形成退化观测；恢复方法可用对齐融合、传播注意或生成先验；输出分别检查证据保真、时间稳定与感知细节。缺失支持经 mask 进入独立的视频补全合同。
-
-    clean["clean video X"] --> degrade["blur / downsample / noise / compression"] --> observed["degraded observation Y"]
-    observed --> align["align + fuse"]
-    observed --> propagate["propagate + attend"]
-    observed --> prior["generative prior"]
-    align --> restored["restored video X-hat"]
-    propagate --> restored
-    prior --> restored
-    restored --> fidelity["evidence fidelity"]
-    restored --> stability["temporal stability"]
-    restored --> detail["perceptual detail"]
-    mask["missing support + mask"] --> inpaint["video inpainting\nseparate contract"]
-```
-
+![图 072：视频退化修复合同与补全边界](assets/imagegen-diagrams/072/diagram.png)
 **顺序化文字替代：** 干净视频先经过明确的退化算子形成观测；系统再从对齐融合、时序传播/注意力或生成先验中选择路线；恢复结果同时通过证据保真、时间稳定和感知细节三道门。若输入是由 mask 定义的缺失像素，则转入独立的视频补全合同。
 
 ## 2. 退化不是一个标签，而是一份可复现协议
@@ -188,26 +171,7 @@ PSNR 高可能对应过平滑；感知分高可能来自合理但错误的纹理
 
 双向传播和 full-clip attention 可以读取未来帧，因此通常不适合低延迟直播。在线系统在时刻 $t$ 只能使用 $Y_{\le t+b}$，其中 $b$ 是公开缓冲区；必须报告 first-frame latency、steady-state throughput、window seam、状态增长和 scene-cut reset。
 
-```mermaid
-flowchart TD
-    accTitle: 视频退化修复部署路线选择
-    accDescr: 先判断是否允许读取未来帧，再判断退化是否已知、是否需要生成先验以及是否受播放 deadline 约束，从而选择双向离线、因果传播、盲退化估计或少步流式路线。
-
-    start["degraded video"] --> future{"允许读未来帧？"}
-    future -- "yes" --> offline["bidirectional propagation\nor full-clip attention"]
-    future -- "no" --> causal["causal state + bounded buffer"]
-    offline --> blind{"退化参数已知？"}
-    causal --> blind
-    blind -- "known" --> faithful["fidelity-first reconstruction"]
-    blind -- "unknown" --> estimate["degradation estimation\n或 test-time adaptation"]
-    faithful --> detail{"观测是否足够？"}
-    estimate --> detail
-    detail -- "mostly yes" --> regression["regression / transformer"]
-    detail -- "no, need prior" --> generative["GAN / diffusion + uncertainty"]
-    causal --> deadline{"有播放 deadline？"}
-    deadline -- "yes" --> fast["distill / sparse attention / tiny decoder"]
-```
-
+![图 073：视频退化修复部署路线选择](assets/imagegen-diagrams/073/diagram.png)
 **顺序化文字替代：** 若允许未来帧，可选双向传播或整段注意；否则使用因果状态和有界缓冲。已知退化优先 fidelity-first 重建，未知退化需估计或测试时适配。当观测不足才引入生成先验并报告不确定性；在线 deadline 还要求少步、稀疏注意和端到端延迟验收。
 
 ## 7. Milestone：按任务合同变化，而不是按宣传画质排序

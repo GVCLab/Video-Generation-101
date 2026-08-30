@@ -85,30 +85,7 @@ M_{KV}\propto L\,N_{history}\,d,
 
 ## 3. 一张技术栈图：实时不是单个算法
 
-```mermaid
-flowchart TB
-    accTitle: 因果流式视频生成的五层技术栈
-    accDescr: 条件进入因果视频生成器。少步蒸馏降低每块网络调用，on-policy 训练降低自身历史导致的分布偏移，记忆策略控制长期状态和显存，流式系统负责解码调度与期限。评测分别检查质量、长时稳定、交互响应和系统延迟。
-
-    C["条件层<br/>文本 / 图像 / 动作 / 源视频"] --> B["因果生成骨干<br/>frame-wise 或 chunk-wise DiT"]
-    D["少步蒸馏<br/>DMD / consistency / flow map"] --> B
-    O["on-policy 训练<br/>self-generated history"] --> B
-    B <--> M["有界长期记忆<br/>window / sink / compression / retrieval / state"]
-    B --> S["流式系统<br/>VAE 解码 / batching / pipeline / deadline"]
-    S --> F["持续发帧<br/>并接收下一次条件"]
-    F -.->|"新条件进入下一块"| C
-    F --> E["四类评测<br/>质量 · 时长 · 交互 · 系统"]
-
-    classDef input fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e
-    classDef model fill:#ccfbf1,stroke:#0f766e,color:#134e4a
-    classDef system fill:#fef3c7,stroke:#b45309,color:#78350f
-    classDef eval fill:#f3e8ff,stroke:#7e22ce,color:#581c87
-    class C input
-    class B,D,O,M model
-    class S,F system
-    class E eval
-```
-
+![图 014：因果流式视频生成的五层技术栈](assets/imagegen-diagrams/014/diagram.png)
 这五层可独立变化。评测发现的暴露偏移、漂移、冻结、遗忘或 deadline miss，应分别反馈到 on-policy 训练、memory policy 或 serving 层。一个论文可能只改训练范式，一个只压缩 KV cache，另一个只做 serving scheduler；比较时必须指出增益来自哪一层，否则容易把多卡系统吞吐误写成生成模型本身的质量进步。
 
 ## 4. 训练路线一：Diffusion Forcing 改变“哪些位置有多噪”
@@ -124,50 +101,7 @@ z_i(\tau_i)=\alpha(\tau_i)z_i^0+\sigma(\tau_i)\epsilon_i,
 
 ### 4.1 逐位置噪声怎样变成滚动提交
 
-```mermaid
-flowchart TB
-    accTitle: 逐位置噪声与滚动提交
-    accDescr: 三个面板对比干净历史加单一目标、全序列共享噪声以及逐位置不同噪声的滚动窗口；滚动采样只在最早活动单元完成去噪后提交并右移窗口，且噪声日程本身不推出因果访问、自生成历史、少步或实时服务。
-
-    subgraph A["A · next-unit 极限"]
-        direction LR
-        A0["已提交历史<br/>τ=0"] --> A1["一个噪声目标<br/>τ∈(0,1]"]
-        A1 -->|"τ↓；多次网络调用"| A2["目标到 τ=0"]
-        A2 --> A3["提交下一单元"]
-        A1 -.->|"更远未来不创建"| A4["尚不存在的 future"]
-    end
-
-    subgraph B["B · full-sequence diffusion"]
-        direction LR
-        B0["全片位置共享<br/>τ_i=τ"] --> B1["全局去噪一步"]
-        B1 -->|"所有位置一起 τ↓"| B2["整段继续迭代"]
-        B2 --> B3["全片完成后提交"]
-    end
-
-    subgraph C["C · rolling per-token noise"]
-        direction LR
-        C0["不可变 prefix<br/>τ=0"] --> C1["活动窗口示例<br/>τ=[.25,.5,.75,1]"]
-        C1 -->|"窗口内联合 τ↓"| C2["最左活动单元<br/>到 τ=0"]
-        C2 --> C3["只提交该 frame/chunk"]
-        C3 --> C4["窗口右移"]
-        C4 --> C5["追加新位置<br/>τ=1"]
-        C5 --> C1
-    end
-
-    A3 -.->|"对照；不是执行先后"| B0
-    B3 -.->|"对照；不是执行先后"| C0
-    C4 -.-> G["rolling schedule 不推出<br/>① causal access<br/>② GT 或 self history<br/>③ 每次 commit 的真实 NFE<br/>④ TTFF / p99 / deadline"]
-
-    classDef clean fill:#dcfce7,stroke:#15803d,color:#14532d
-    classDef active fill:#dbeafe,stroke:#2563eb,color:#1e3a5f
-    classDef commit fill:#fef3c7,stroke:#b45309,color:#78350f
-    classDef gate fill:#f3e8ff,stroke:#7e22ce,color:#581c87
-    class A0,C0 clean
-    class A1,A2,B0,B1,B2,C1,C2,C5 active
-    class A3,B3,C3,C4 commit
-    class G,A4 gate
-```
-
+![图 015：逐位置噪声与滚动提交](assets/imagegen-diagrams/015/diagram.png)
 顺序文字替代：A 只把一个噪声目标去噪到 $\tau=0$ 后提交，更远未来尚不存在；B 让整段共享同一噪声阶段，所有位置一起下降，最后一次提交全片；C 保留 $\tau=0$ 的不可变前缀，让活动窗口中的位置处于不同噪声等级，最左单元完成后才提交、右移并追加一个 $\tau=1$ 的新位置。图中实线表示去噪或提交，虚线表示四个仍需独立证明的 gate。$[0,0,.25,.5,.75,1]$ 只是单调 rolling schedule 的例子，不是所有 Diffusion Forcing 训练样本的必要形式。
 
 两个反例尤其重要：即使 $\tau_i$ 不同，只要 attention 仍读取未来且系统等待全片才交付，它就不是 causal streaming；“4 denoising steps”描述一次输出单元的网络调用预算，不是“生成或提交 4 帧”。
@@ -287,48 +221,7 @@ M_{recent}+M_{anchor}+M_{persistent}+M_{compressed}
 
 而 $M_{ext}(k)$ 可以随已提交时长 $k$ 增长。把检索索引放到 CPU 或磁盘，只证明 resident GPU memory 有界，不能写成总系统成本恒定。
 
-```mermaid
-flowchart TB
-    accTitle: 长时生成的有界记忆合同
-    accDescr: 每个已提交视频块先进入近期窗口，过期内容可被固定为锚点、选择为持久块、压缩或分层合并、汇总为递归状态、写入可检索外存或丢弃；下一块只读取受 GPU 工作集约束的内容，因此固定显存不等于无损长期记忆，外存和检索成本也须另计。
-
-    K["已提交块 b_k"] --> W["近期窗口 W"]
-    W --> R["有界 working-set reader"]
-    W -->|"ages out"| P["retention policy<br/>路线可组合"]
-    P -.-> A["固定 sink / anchor"]
-    P -.-> S["选择持久 salient blocks"]
-    P -.-> C["量化 / 低秩 / 剪枝 / 分层合并<br/>有损变换"]
-    P -.-> H["更新递归 / SSM 状态<br/>h_k=U(h_{k-1},b_k)"]
-    P -.-> X["写入可检索外存<br/>M_ext(k) 可增长"]
-    P -.-> D["evict / drop"]
-
-    A --> R
-    S --> R
-    C --> R
-    H --> R
-    Q["当前 query / state"] --> X
-    X -->|"top-r retrieved blocks"| R
-    R --> N["生成下一块 b_{k+1}"]
-    N --> J["commit"]
-    J --> W
-
-    F0["baseline：保留全部 raw KV<br/>M_full(k)=O(k)"] --> R0["GPU memory 随时长增长"]
-    T1["对象离场后返回"] -.->|"测 eviction / retrieval"| P
-    T2["场景切换或新 prompt"] -.->|"测 anchor lock-in"| A
-    T3["小而快的物体"] -.->|"测压缩损失"| C
-    T4["错误块已 commit"] -.->|"测 cache poisoning"| R
-    R --> E["验收<br/>quality-time · survival curve<br/>peak GPU · external latency"]
-
-    classDef live fill:#dbeafe,stroke:#2563eb,color:#1e3a5f
-    classDef route fill:#fef3c7,stroke:#b45309,color:#78350f
-    classDef risk fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
-    classDef eval fill:#f3e8ff,stroke:#7e22ce,color:#581c87
-    class K,W,R,N,J live
-    class P,A,S,C,H,X route
-    class D,F0,R0,T1,T2,T3,T4 risk
-    class E eval
-```
-
+![图 016：长时生成的有界记忆合同](assets/imagegen-diagrams/016/diagram.png)
 顺序文字替代：已提交块先进入 recent window；过期后可以固定为锚点、选择为持久块、经过有损压缩、汇总进递归状态、写入外部索引或彻底丢弃。下一块只读取 GPU 预算内的 working set，并可按 query 从外存取回 top-$r$ 块；生成、提交后再写回窗口。对象离场回归、场景切换、小快物体和错误块四个 probe 分别检查遗忘、锚点污染、压缩损失和 cache poisoning。窗口恒定但回归身份失败，只能证明 fixed resident memory，不能证明长期记忆。
 
 几条 2026 年路线说明“压 cache”也不是单一问题：
@@ -363,40 +256,7 @@ H_j^{\text{before future perturbation}}
 \qquad j\le h-R.
 ```
 
-```mermaid
-flowchart TB
-    accTitle: 流式提交、回压与恢复状态机
-    accDescr: 条件先被接纳到尚未提交的未来，生成器产生 speculative chunk，经解码、边界裁切、质量和期限 gate 后才写入不可变前缀并播放；失败只可重做未提交内容，拥塞时必须执行预先声明的降级或回压，错误缓存则重置或重新锚定。
-
-    I["条件到达<br/>记录 arrival timestamp"] --> A["admission<br/>绑定到未提交索引"]
-    A --> G["生成 speculative frame/chunk"]
-    G --> D["decode + overlap/crop"]
-    D --> Q{"质量与 deadline gate"}
-    Q -->|"通过"| C["commit<br/>写 hash 与不可变前缀"]
-    C --> M["更新 generator memory"]
-    C --> P["mux / transport / display"]
-    P --> N["推进 playback clock"]
-    N --> G
-
-    Q -->|"质量失败且尚有预算"| G
-    Q -->|"deadline 风险"| B["声明的降级策略<br/>降 NFE / 分辨率 / 跳过未提交单元"]
-    B --> Q
-    B -->|"预算仍不足"| R["backpressure / reject<br/>不得静默改写已提交帧"]
-    M -->|"重复错误或 scene reset"| X["清 cache / re-anchor"]
-    X --> G
-    U["新 prompt / 动作"] -.->|"只影响未提交未来"| A
-    F["future-leak probe"] -.->|"比较 commit hashes"| C
-
-    classDef process fill:#dbeafe,stroke:#2563eb,color:#1e3a5f
-    classDef commit fill:#dcfce7,stroke:#15803d,color:#14532d
-    classDef risk fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
-    classDef audit fill:#f3e8ff,stroke:#7e22ce,color:#581c87
-    class I,A,G,D,Q,M,P,N process
-    class C commit
-    class B,R,X risk
-    class U,F audit
-```
-
+![图 017：流式提交、回压与恢复状态机](assets/imagegen-diagrams/017/diagram.png)
 顺序文字替代：条件只能进入未提交未来；speculative 输出经过 decode、边界裁切以及质量/期限 gate 后才 commit、写 hash、更新记忆并显示。失败可以在预算内重做 speculative 单元；逼近期限则按预注册策略降级，仍不足时回压或拒绝。新条件不能静默改写已提交前缀，future-leak probe 通过 hash 直接检查这一点。
 
 ### 8.2 Real-time 是带负载与恢复条件的端到端 SLO

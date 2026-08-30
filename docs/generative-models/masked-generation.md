@@ -6,51 +6,7 @@
 
 ## 1. 先按四层拆开
 
-```mermaid
-flowchart TB
-    accTitle: 掩码生成的四层关系
-    accDescr: 图从训练腐败与目标、反向或启发式采样、集合顺序、视频时间因果四层区分 masked modeling、吸收态离散扩散、MaskGIT、next-set AR 和帧间因果混合模型。
-
-    subgraph training_layer["训练腐败与目标"]
-        masked_objective["随机缺失条件预测<br/>masked modeling"]
-        absorbing_process["吸收态前向过程<br/>clean → MASK"]
-    end
-
-    subgraph sampling_layer["推理采样策略"]
-        maskgit_sampler["置信度排序 + schedule<br/>MaskGIT 式迭代提交"]
-        reverse_sampler["时间或速率定义的<br/>概率化反向过程"]
-    end
-
-    subgraph order_layer["联合分布或集合顺序"]
-        next_set_ar["有序集合 S1, S2, …<br/>next-set AR"]
-        adaptive_order["样本依赖的动态顺序<br/>需把选择策略计入"]
-    end
-
-    subgraph video_layer["视频时间结构"]
-        full_bidirectional["整段双向补全"]
-        frame_causal["帧间因果<br/>帧内双向"]
-    end
-
-    masked_objective --> maskgit_sampler
-    absorbing_process --> reverse_sampler
-    absorbing_process -.->|"特定参数化下是<br/>加权交叉熵积分"| masked_objective
-    maskgit_sampler -.->|"若提交集合构成分区"| adaptive_order
-    next_set_ar --> adaptive_order
-    maskgit_sampler --> full_bidirectional
-    maskgit_sampler --> frame_causal
-    reverse_sampler --> full_bidirectional
-    reverse_sampler --> frame_causal
-
-    classDef objective fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
-    classDef sampler fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#3b0764
-    classDef order fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#713f12
-    classDef video fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
-    class masked_objective,absorbing_process objective
-    class maskgit_sampler,reverse_sampler sampler
-    class next_set_ar,adaptive_order order
-    class full_bidirectional,frame_causal video
-```
-
+![图 023：掩码生成的四层关系](assets/imagegen-diagrams/023/diagram.png)
 顺序化文字替代：第一，训练端可以只做随机缺失条件预测，也可以先定义 clean token 逐渐进入 `[MASK]` 吸收态的前向过程；第二，前者常接置信度排序的 MaskGIT 式采样，后者有由时间或转移速率定义的概率化反向过程；第三，在特定吸收态参数化下，扩散目标可化成加权 masked 交叉熵，但采样器仍未因此相同；第四，若每轮提交的 token 集合形成有序分区，采样可用 next-set AR 语言描述，不过动态选择策略也是生成过程的一部分；第五，以上任一采样器还可选择整段双向注意力，或“帧间因果、帧内双向”的视频时间结构。
 
 这张图对应四个不能互相替代的问题：
@@ -133,36 +89,7 @@ ICLR 2025 的 time-agnostic 分析还发现，常见低温 categorical sampling 
 
 MaskGIT 在训练时随机 mask 图像 token，在推理时从全 mask 开始，每轮并行预测当前未知位置，采样候选 token，再按置信度与剩余-mask schedule 决定保留哪些候选。原论文比较多种 schedule，并在其图像实验中选择 cosine；这是一项经验设计，不是所有 masked model 的定律 [[2]](#ref-2)。Phenaki 把相似的双向 masked transformer 用到视频 token，并报告通常使用 12–48 个采样步骤；其 tokenizer 则在时间上因果，这是 tokenizer 可变长能力与生成器双向补全的组合 [[5]](#ref-5)。
 
-```mermaid
-flowchart LR
-    accTitle: MaskGIT 式一轮解码的状态变化
-    accDescr: 图展示从当前 mask 集合开始，并行预测和采样候选，按置信度与 schedule 提交高分候选、重掩低分候选；原版已提交位置被冻结，可选 Token-Critic 才提供另一种接受拒绝机制。
-
-    current_state["当前状态<br/>已提交 token + mask"] --> parallel_predict["并行预测<br/>所有当前 mask 位置"]
-    parallel_predict --> sample_candidates["从分类分布采样<br/>候选 token"]
-    sample_candidates --> score_candidates["计算候选置信度<br/>可叠加退火随机量"]
-    schedule_count["schedule γ(j/J)<br/>给出下一轮 mask 数"] --> rank_candidates["跨位置排序"]
-    score_candidates --> rank_candidates
-    rank_candidates --> commit_high["提交高分候选"]
-    rank_candidates --> remask_low["低分候选重新 mask"]
-    commit_high --> frozen_context["原版中已提交位置<br/>设高置信并冻结"]
-    frozen_context --> next_state["下一轮状态"]
-    remask_low --> next_state
-    next_state --> finished{"mask 是否清零？"}
-    finished -->|"否"| parallel_predict
-    finished -->|"是"| decoded_tokens(["完整 token → 视频解码"])
-    token_critic["可选 Token-Critic<br/>学习接受 / 拒绝"] -.-> score_candidates
-
-    classDef state fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
-    classDef operation fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#3b0764
-    classDef decision fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#713f12
-    classDef output fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
-    class current_state,next_state,schedule_count state
-    class parallel_predict,sample_candidates,score_candidates,rank_candidates,commit_high,remask_low,frozen_context,token_critic operation
-    class finished decision
-    class decoded_tokens output
-```
-
+![图 024：MaskGIT 式一轮解码的状态变化](assets/imagegen-diagrams/024/diagram.png)
 顺序化文字替代：第一，输入由已经提交的 token 与当前 `[MASK]` 位置组成；第二，模型在一次前向中预测所有当前 mask 位置并分别采样候选；第三，为候选计算概率置信度，并可加入随轮次退火的随机扰动；第四，schedule 决定下一轮仍需 mask 的数量，跨位置排序后提交高分候选、重掩低分候选；第五，原版 MaskGIT 给已提交位置高置信度，使其后续保持冻结；第六，若仍有 mask 就重复，否则将完整 token 解码成视频；第七，Token-Critic 是另训的接受/拒绝模型，不应冒充原版 max-probability 规则。
 
 设共有 $J$ 轮，$\gamma:[0,1]\rightarrow[0,1]$ 单调下降，可用
@@ -237,33 +164,7 @@ MAR 进一步说明 next-set AR 与离散码本并不绑定：它在连续图像
 
 ### 6.2 帧间 AR、帧内 masked：MAGI 与 Lumos-1
 
-```mermaid
-flowchart LR
-    accTitle: 帧间因果与帧内掩码的双层串行深度
-    accDescr: 图展示完整历史帧作为因果上下文，当前帧内部用多轮双向掩码生成，完成后写入历史缓存再生成下一帧；总串行深度约为帧数乘帧内轮数。
-
-    past_frames["完整历史帧<br/>1 … k-1"] --> current_mask["当前第 k 帧<br/>空间 token 全部或部分 mask"]
-    current_mask --> intra_rounds["帧内 J 轮<br/>双向预测、提交、重掩"]
-    intra_rounds --> complete_frame["完成第 k 帧"]
-    complete_frame --> history_cache["写入因果历史 / KV cache"]
-    history_cache --> next_frame["第 k+1 帧<br/>重新开始帧内迭代"]
-    next_frame -.-> intra_rounds
-
-    training_context["训练端关键选择"] --> complete_teacher["完整真值历史帧<br/>Complete Teacher Forcing"]
-    training_context --> masked_teacher["被 mask 的历史帧<br/>Masked Teacher Forcing"]
-    complete_teacher -.-> past_frames
-    masked_teacher -.-> past_frames
-
-    classDef context fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
-    classDef generation fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#3b0764
-    classDef complete fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
-    classDef caution fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#713f12
-    class past_frames,history_cache context
-    class current_mask,intra_rounds,next_frame generation
-    class complete_frame,complete_teacher complete
-    class training_context,masked_teacher caution
-```
-
+![图 025：帧间因果与帧内掩码的双层串行深度](assets/imagegen-diagrams/025/diagram.png)
 顺序化文字替代：第一，把已经完成的第 $1$ 到 $k-1$ 帧作为因果历史；第二，将第 $k$ 帧的空间 token 设为全部或部分 mask；第三，在当前帧内部做 $J$ 轮双向预测、提交与重掩；第四，当前帧完成后写入历史或 KV cache；第五，对第 $k+1$ 帧重复；第六，训练时还要选择历史是完整真值帧还是被 mask 的帧，MAGI 的 Complete Teacher Forcing 选择前者，以缩小其设定中的训练—推理上下文差异。
 
 MAGI 把帧内 masked modeling 与帧间 causal modeling 结合。其 Complete Teacher Forcing（CTF）让目标帧的 mask 预测条件于**完整 observation frames**，而不是 Masked Teacher Forcing（MTF）中的残缺历史；官方 CVPR 2025 论文在首帧条件预测协议下报告 FVD 相对改善 23%，并展示从 16 帧训练窗口 rollout 超过 100 帧 [[12]](#ref-12)。这些数字属于论文设置，不能写成所有数据和分辨率上的保证。

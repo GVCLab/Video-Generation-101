@@ -71,7 +71,7 @@ Wiedemer 等人的核心问题是：大语言模型从任务专用系统演变�
 
 因此，这篇论文最稳妥的历史定位是：**它以当时罕见的任务广度和实验规模，把视频生成模型从内容生成器重新表述为潜在的通用视觉学习器与 reasoner，并把后续研究问题清楚地暴露出来。**
 
-![Video reasoning 研究成熟度路线图](../assets/diagrams/video-reasoning-roadmap.png)
+![视频推理研究成熟度路线图](../assets/zh/video-reasoning-roadmap.png)
 
 > 图中表示的是证据与系统能力的成熟度，而非严格年份。历史时间线以本节的 zero-shot 发现为原点，在后文分别向前追溯、向后展开。
 
@@ -388,34 +388,7 @@ The Seriality Gap in Video Diffusion Models 用可控的多球依赖链指出：
 
 本节把这四级局部机制证据记作 **R1–R4**。它们只回答“视频推理结论由什么实验支持”，不等同于[评测指南](evaluation.md)中世界模型能力的全局 L0–L7；例如 R4 闭环回报仍可能只发生在模拟器里，不能自动上升为全局 L7 现实效用。
 
-```mermaid
-flowchart TB
-    accTitle: 视频推理的三个时间轴与四级证据
-    accDescr: 输出时间沿帧序列展开可见轨迹，去噪时间从早期计划进入约束绑定和后期渲染，交互时间执行动作、短片段生成、验证与重规划。R1 最终答案、R2 过程有效、R3 因果干预和 R4 闭环回报构成逐级增强的局部机制证据。
-
-    subgraph output_clock["1. Output time"]
-        direction LR
-        x_1["x1"] --> x_2["x2"] --> x_3["..."] --> x_t["xT"]
-    end
-
-    subgraph denoise_clock["2. Denoising time"]
-        direction LR
-        z_k["zK: noise"] --> early["early plan"] --> bind["constraint binding"] --> z_0["z0: rendering"]
-    end
-
-    subgraph interaction_clock["3. Interaction time"]
-        direction LR
-        action["action"] --> rollout["short rollout"] --> verify["verifier"] --> replan["replan"] --> next_action["next action"]
-        next_action --> action
-    end
-
-    final_answer["R1 final answer"] --> process_validity["R2 process validity"] --> causal_intervention["R3 causal intervention"] --> closed_loop_return["R4 closed-loop return"]
-    x_t -. "observable result" .-> final_answer
-    z_0 -. "probe plus intervention required" .-> process_validity
-    verify -. "counterfactual tests" .-> causal_intervention
-    next_action -. "decision utility" .-> closed_loop_return
-```
-
+![图 082：视频推理的三个时间轴与四级证据](assets/imagegen-diagrams/082/diagram.png)
 **顺序化文字替代：**
 
 1. 输出时间从 $x_1$ 走到 $x_T$，提供可观察轨迹和最终答案，但不单独证明内部因果计算。

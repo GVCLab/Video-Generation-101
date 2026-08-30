@@ -78,29 +78,7 @@ Oasis 正是典型分层案例：项目页同时展示更大在线 demo，并开
 
 ## 🔁 3. 闭环合同：预测分支与真实执行分支必须分开
 
-```mermaid
-flowchart TB
-    accTitle: 交互式世界生成的最小闭环合同
-    accDescr: 人或策略提出并选择动作，权威环境执行该动作；模型产生候选未来，环境产生实际观测，两者进入事后审计，审计结果只用于后续展示、决策或训练，真实观测再回写权威历史与记忆。
-
-    actor["Human / Policy<br/>提出 / 选择"] --> action["已接受动作序列 A_t"]
-    obs["观测 o_t + 历史 h_t"] --> model["因果 world generator"]
-    action --> model
-    memory["推测记忆 m_pred<br/>可回滚、非权威"] -. "读取" .-> model
-    model --> candidates["候选未来 o_hat / s_hat / r_hat"]
-    model -. "speculative 写入" .-> memory
-
-    action --> env["真实环境或权威引擎<br/>执行已选动作"]
-    env --> actual["实际观测 o_real(t+1:t+K)"]
-    candidates -. "预测证据" .-> audit{"动作有效 / 状态一致 / 不确定性可接受?"}
-    actual -. "事实证据" .-> audit
-    audit -- "通过" --> commit["标记为事后证据<br/>用于后续展示 / 决策 / 训练"]
-    audit -- "失败" --> reject["拒绝 / 降权 / 回退"]
-    actual --> obs
-    actual --> auth["权威记忆 m_auth"]
-    auth -. "confirmed 读取" .-> model
-```
-
+![图 054：交互式世界生成的最小闭环合同](assets/imagegen-diagrams/054/diagram.png)
 **图的顺序化文字替代：**
 
 1. 人或策略在带时间戳的接口上提出动作；系统记录实际接受的序列 $A_t$ 及 hold 区间。
@@ -219,26 +197,7 @@ Sekai2 本身是 2026 数据集报告，不是完成的 interactive model；其�
 
 ## 🧠 6. 长程记忆与回访：把“像”升级为“还是同一个世界”
 
-```mermaid
-stateDiagram-v2
-    accTitle: 持久世界的写入、离开、干预与回访协议
-    accDescr: 系统建立初始锚点，执行对象或环境干预，离开当前视野并经过干扰段，再按独立动作返回；回访时同时核验几何、对象身份、事件状态和不确定性，失败则回退而不是把重新生成的相似画面算作记忆成功。
-
-    [*] --> Anchor: 记录初始几何与实体 ID
-    Anchor --> Intervene: 开门 / 移动物体 / 消耗资源
-    Intervene --> Write: 写入事件与状态变更
-    Write --> Leave: 离开视野
-    Leave --> Distractor: 长时间与相似地点干扰
-    Distractor --> Retrieve: 按位置、内容或事件检索
-    Retrieve --> Return: 独立动作序列回到目标
-    Return --> Verify
-    Verify --> Pass: 几何 + 身份 + 事件状态正确
-    Verify --> Fail: 漂移 / 覆写 / 错检索 / 低置信
-    Fail --> Abstain: 拒绝、重定位或权威状态回退
-    Pass --> [*]
-    Abstain --> [*]
-```
-
+![图 055：持久世界的写入、离开、干预与回访协议](assets/imagegen-diagrams/055/diagram.png)
 **图的顺序化文字替代：**
 
 1. 在初始视图记录几何锚点、实体 ID 和可干预状态。

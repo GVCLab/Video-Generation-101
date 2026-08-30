@@ -43,27 +43,7 @@ z_T=\mathrm{sg}\!\left(f_{\bar\theta}(x)_{T}\right),
 
 I-JEPA 通过“大目标块 + 空间分散的 context”把任务推向对象级语义；V-JEPA 将 mask 扩展到时空 tube，并在论文配置中遮住约 90% token。target encoder 看完整视频，context encoder 丢弃 masked token，损失只在 target 位置计算。[[3]](#ref-3), [[4]](#ref-4)
 
-```mermaid
-flowchart LR
-    accTitle: 典型 teacher student JEPA 的信息流与梯度边界
-    accDescr: 完整样本经过掩码后只有可见 token 进入 context encoder；完整样本进入 EMA target encoder，目标输出由 stop gradient 截断。predictor 使用 context 表征和目标位置预测被遮挡表征，损失只更新 context encoder 与 predictor，再由指数滑动平均更新 target encoder。
-    x_full["完整图像或视频 x"] --> mask["采样 context C 与 target T"]
-    mask --> x_context["仅可见 token x_C"]
-    x_context --> context["context encoder f_theta"]
-    mask --> query["目标位置 query q_T"]
-    context --> predictor["predictor g_phi"]
-    query --> predictor
-    x_full --> target["EMA target encoder f_bar_theta"]
-    target --> stopgrad["stop-gradient 后取 target token"]
-    predictor --> predicted["预测表征 z_hat_T"]
-    stopgrad --> target_z["目标表征 z_T"]
-    predicted --> loss["target-only latent loss"]
-    target_z --> loss
-    loss -->|"梯度"| context
-    loss -->|"梯度"| predictor
-    context -.->|"EMA 参数更新"| target
-```
-
+![图 036：典型 teacher student JEPA 的信息流与梯度边界](assets/imagegen-diagrams/036/diagram.png)
 **文字替代：** 完整样本分成可见 context 与被遮挡 target；在线 encoder 只看 context，predictor 再接收 target 位置。完整样本由 EMA target encoder 编码，target 输出被 stop-gradient 截断。两路表征在 target 位置比较，梯度只回到在线 encoder 和 predictor，在线权重再以 EMA 更新 target encoder。
 
 ### 2.1 “能量”到底是什么
@@ -142,22 +122,7 @@ E(a_{1:H};z_t,s_t,z_g)
 
 ## 6. 可检验能力里程碑
 
-```mermaid
-flowchart LR
-    accTitle: JEPA 路线按可检验能力而不是模型年份分层
-    accDescr: 静态图像 masked embedding prediction 先扩展到视频时空表征，再由 action free 大规模视频 encoder 提供视觉先验。加入动作条件 rollout 后才可进行反事实预测，连接目标能量、搜索和真实观测重规划后才形成闭环控制。dense、自监督稳定性、长期策略动力学和多未来表达是横向分支，不能自动升级到更高控制层。
-    image["图像 masked embedding<br>I-JEPA"] --> video["视频时空表征<br>V-JEPA"]
-    video --> foundation["大规模 action-free encoder<br>V-JEPA 2"]
-    foundation --> action["动作条件 latent rollout<br>V-JEPA 2-AC"]
-    action --> planning["goal energy + CEM"]
-    planning --> closed["真实观测重规划<br>MPC 闭环"]
-    dense["dense / multi-level feature<br>V-JEPA 2.1"] -.-> foundation
-    stable["显式防坍塌<br>LeJEPA"] -.-> image
-    stable --> end2end["端到端动作 world model<br>LeWorldModel"]
-    longterm["策略条件长期动力学<br>TD-JEPA"] -.-> action
-    branches["分支或变分未来<br>Branch-JEPA / Var-JEPA"] -.-> action
-```
-
+![图 037：JEPA 路线按可检验能力而不是模型年份分层](assets/imagegen-diagrams/037/diagram.png)
 **文字替代：** 主线从图像 masked embedding、视频时空表征、大规模 action-free encoder、动作条件 rollout，依次进入目标能量、CEM 和 MPC 闭环。V-JEPA 2.1 解决 dense feature；LeJEPA / LeWorldModel 解决另一类稳定训练与端到端控制；TD-JEPA 研究长期策略动力学；Branch-JEPA / Var-JEPA 研究多未来。横向分支没有闭环证据时不能自动升到控制层。
 
 | 可检验能力 | 代表里程碑 | 当时新增证据 | 仍不能声称 |
@@ -180,31 +145,7 @@ DINO-WM 是重要邻近基线：它冻结 DINOv2 patch feature，学习动作条
 
 V-JEPA 2-AC 冻结 V-JEPA 2 ViT-g frame encoder，在少于 62 小时 DROID 轨迹上训练 block-causal predictor。输入含视觉 feature、7D 末端执行器动作与 proprioceptive state；训练包含 teacher-forced 单步预测和两步 rollout loss。部署时，视觉目标编码成 `z_g`，CEM 在固定候选预算内最小化终点 latent 与目标的 L1 energy，只执行首个动作，再用新观测重规划。[[6]](#ref-6)
 
-```mermaid
-flowchart LR
-    accTitle: 动作条件 latent 训练与闭环 MPC 是两个独立验收环
-    accDescr: 训练环把当前视觉、机器人状态和真实动作序列输入动作 predictor，并以未来 target encoder 表征监督。部署环从同一当前状态采样候选动作序列，滚动预测终点 latent，以目标 latent 能量排序并用 CEM 更新分布，只执行首个动作；环境返回真实观测后重新编码和规划。
-    current["当前观测 o_t"] --> frozen["冻结视觉 encoder"]
-    frozen --> z_now["当前 latent z_t"]
-    state["proprioception s_t"] --> train_predictor["动作 predictor"]
-    action_data["数据中的动作 a_t:t+H"] --> train_predictor
-    z_now --> train_predictor
-    future["真实未来观测"] --> target_future["future target latent"]
-    train_predictor --> predicted_future["预测 future latent"]
-    predicted_future --> train_loss["多步 latent loss"]
-    target_future --> train_loss
-    z_now --> rollout["候选动作序列 rollout"]
-    state --> rollout
-    sampler["CEM 候选分布"] --> rollout
-    rollout --> terminal["预测终点 latent"]
-    goal["视觉目标 latent z_g"] --> energy["目标 energy"]
-    terminal --> energy
-    energy --> sampler
-    energy --> first["选择序列并只执行第一步"]
-    first --> environment["真实机器人或环境"]
-    environment --> current
-```
-
+![图 038：动作条件 latent 训练与闭环 MPC 是两个独立验收环](assets/imagegen-diagrams/038/diagram.png)
 **文字替代：** 训练环用真实动作序列预测未来 target latent；部署环从当前 latent 和机器人状态出发，用 CEM 反复采样动作序列、latent rollout、按目标 energy 排序，只执行最佳序列第一步。环境的新观测回到 encoder，形成 receding-horizon MPC。
 
 “zero-shot”在这项机器人实验里有严格限定：部署实验室、具体对象和任务没有提供任务奖励或环境特定训练轨迹，但动作模型见过 DROID 的同类 Franka embodiment，且长任务需要人工提供视觉子目标。论文在两个实验室、每项 10 次试验下报告 reach 100%、cup / box grasp 65% / 25%、cup / box pick-place 80% / 65%；这些是小样本协议结果，不是跨机器人通用成功率。[[6]](#ref-6), [[7]](#ref-7)

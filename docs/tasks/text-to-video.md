@@ -24,31 +24,7 @@ s=(T,H,W,f,\rho,\gamma,\text{seed},\ldots)
 
 ## 三条边界：条件、来源像素和反馈
 
-~~~mermaid
-flowchart TD
-    accTitle: T2V task boundary by condition and feedback
-    accDescr: A decision tree separates pure text-to-video from reference-conditioned generation, video editing, and closed-loop world models.
-
-    q0{是否持续接收动作与新观测?}
-    q0 -- 是 --> wm[动作条件或交互式 world model]
-    q0 -- 否 --> q1{除文本外是否有内容或结构条件?}
-    q1 -- 否 --> t2v[纯 T2V]
-    q1 -- 首帧或参考图 --> i2v[I2V / TI2V]
-    q1 -- 来源视频 --> v2v[V2V / 编辑 / 修复]
-    q1 -- 姿态/深度/轨迹 --> ctrl[结构控制的视频生成]
-    t2v --> open[开放式创作: 约束是否实现]
-    wm --> intervene[闭环预测: 动作后果是否可干预且可复现]
-
-    classDef decision fill:#fff7ed,stroke:#c2410c,color:#431407,stroke-width:2px
-    classDef pure fill:#ede9fe,stroke:#7c3aed,color:#2e1065,stroke-width:2px
-    classDef hybrid fill:#dbeafe,stroke:#2563eb,color:#172554,stroke-width:2px
-    classDef closed fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
-    class q0,q1 decision
-    class t2v,open pure
-    class i2v,v2v,ctrl hybrid
-    class wm,intervene closed
-~~~
-
+![图 063：T2V task boundary by condition and feedback](assets/imagegen-diagrams/063/diagram.png)
 顺序替代：先问系统是否持续接收动作与新观测；只要存在这种在线反馈，就进入动作条件或交互式 world model，再在该任务内部记录观测是像素、状态还是二者兼有。没有闭环反馈时，再判断是否含文本以外的来源内容或结构条件：首帧/参考图转到 I2V/TI2V，来源视频转到 V2V、编辑或修复，姿态/深度/轨迹属于结构控制生成；只有文本、seed 和生成配置时才是纯 T2V。
 
 | 任务 | 最小输入 | 主要验收对象 | 本仓库入口 |
@@ -84,46 +60,7 @@ flowchart TD
 
 一个可复现实验必须保存的不只是 prompt，还包括 prompt 的结构化版本、数据过滤版本、编码器、codec、噪声/流时间、采样器与 seed。
 
-~~~mermaid
-flowchart TB
-    accTitle: Text-to-video training and inference contract
-    accDescr: The chart traces raw video-text data through base training, makes preference post-training optional, and shows that version-matched runtime prompt tokens enter inference together with the frozen generator and sampling configuration.
-
-    raw[视频 + 标题/字幕/ASR/OCR] --> shot[镜头切分与时间对齐]
-    shot --> govern[授权/去重/安全/质量过滤]
-    govern --> caption[多粒度 caption + 事件结构]
-    caption --> pair[(clip, prompt, metadata)]
-    pair --> codec[video codec / tokenizer]
-    pair --> text[text encoder / prompt compiler]
-    codec --> latent[latent / token tensor]
-    text --> cond[condition tokens]
-    latent --> objective{基础训练目标}
-    cond --> objective
-    objective --> diff[diffusion / flow loss]
-    objective --> ar[AR / masked likelihood]
-    diff --> pretrained[pretrained generator]
-    ar --> pretrained
-    preference[偏好对 / reward data] --> post[DPO / RL / reward post-train]
-    pretrained --> post
-    post --> model[versioned generator]
-    pretrained -->|可选: 直接冻结| model
-    runtime[运行时原始 prompt] --> runtext[版本化 compiler / text encoder]
-    runtext --> runcond[inference condition tokens]
-    model --> infer[seed + solver + guidance + length]
-    runcond --> infer
-    infer --> output[video + optional audio]
-    output --> record[事实表 + 失败标签 + 成本/延迟]
-
-    classDef data fill:#dbeafe,stroke:#2563eb,color:#172554
-    classDef train fill:#ede9fe,stroke:#7c3aed,color:#2e1065
-    classDef gate fill:#fff7ed,stroke:#c2410c,color:#431407
-    classDef out fill:#dcfce7,stroke:#16a34a,color:#14532d
-    class raw,shot,govern,caption,pair,codec,text,latent,cond,preference,runtime,runtext,runcond data
-    class objective,diff,ar,pretrained,post,model train
-    class infer gate
-    class output,record out
-~~~
-
+![图 064：Text-to-video training and inference contract](assets/imagegen-diagrams/064/diagram.png)
 顺序替代：原始视频及标题、字幕、ASR、OCR 先做镜头切分、授权/去重/安全/质量过滤，再由 captioner 编译多粒度事件描述；视频经 codec 得到 latent/token，文本经编码器得到条件；基础模型用 diffusion/flow 或 AR/masked likelihood 训练。偏好对或 reward data 可以再与预训练生成器进入 DPO/RL 后训练，也可以跳过该阶段直接冻结基础模型。推理时，原始用户 prompt 必须经版本匹配的 compiler/text encoder 产生 condition tokens，与冻结生成器、seed、求解器、guidance 和长度共同进入采样，最后记录事实命中、失败类型、成本和延迟。
 
 一个足以复现实验的最小记录可写成：
@@ -226,42 +163,7 @@ Classifier-free guidance 或更强文本编码器只能改变条件强度，不�
 
 预训练优化的是数据分布拟合；后训练开始直接优化可用性，但 reward 只能覆盖它测得到的内容。
 
-~~~mermaid
-flowchart TD
-    accTitle: Post-training routes and evidence risks for T2V
-    accDescr: Supervised tuning, preference optimization, reward optimization, prompt optimization, and distillation target different failure modes and each has a distinct validation risk.
-
-    pre[预训练生成器] --> sft[SFT: 高质量/难例/指令数据]
-    pref[偏好数据: 人类或 MLLM 成对选择] --> rm[Video reward model]
-    pref --> dpo[DPO / diffusion-DPO]
-    pre --> dpo
-    pre --> rl[RL / GRPO 类更新]
-    rm --> rl
-    pre --> distill[蒸馏/少步一致性]
-    sft --> updated[更新后的生成器]
-    dpo --> updated
-    rl --> updated
-    distill --> updated
-    pref --> promptopt[Prompt optimizer]
-    promptopt --> optprompt[optimized prompt]
-    pre --> frozen[冻结/版本化生成器]
-    optprompt --> frozen
-    updated --> candidate[候选模型或系统]
-    frozen --> candidate
-    candidate --> stress{留出难例与外部评测}
-    stress -->|通过| release[冻结模型/编译器/评测版本]
-    stress -->|失败| risk[reward hacking / 多样性下降 / 偏好过拟合]
-
-    classDef base fill:#dbeafe,stroke:#2563eb,color:#172554
-    classDef route fill:#ede9fe,stroke:#7c3aed,color:#2e1065
-    classDef gate fill:#fff7ed,stroke:#c2410c,color:#431407
-    classDef pass fill:#dcfce7,stroke:#16a34a,color:#14532d
-    class pre,pref,rm base
-    class sft,dpo,rl,distill,promptopt,optprompt,updated,frozen,candidate route
-    class stress,risk gate
-    class release pass
-~~~
-
+![图 065：Post-training routes and evidence risks for T2V](assets/imagegen-diagrams/065/diagram.png)
 顺序替代：预训练生成器可走高质量 SFT、直接偏好 DPO、reward-model 加 RL，或少步蒸馏，这些路线会更新生成器；prompt optimizer 则产生优化后的 prompt，送入冻结的版本化生成器，改变的是候选系统输入而非模型权重。两类候选都必须在未用于奖励训练的难例与外部评测上检查；通过后冻结模型、编译器与评测版本，失败则定位 reward hacking、多样性下降、语义篡改或偏好过拟合。
 
 | 工作 | 更新对象 | 训练信号 | 应如何解释证据 |

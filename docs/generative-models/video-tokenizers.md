@@ -112,31 +112,7 @@ r_{elem}=\frac{CTHW}{C_zT'H'W'},\qquad
 N_{token}=T'H'W'.
 ```
 
-```mermaid
-flowchart TB
-    accTitle: 视频 tokenizer 的张量与码率四本账
-    accDescr: 输入视频经连续或离散表示后，依次区分网格和元素压缩、名义 token 容量及带概率模型和熵编码的真实位流，并用九帧例子说明名义时间四倍在有限片段中实际只有三倍。
-
-    input["输入 x: [B,C,T,H,W]"] --> encoder["encoder / downsample"]
-    encoder --> continuous["连续 z: [B,Cz,T',H',W']<br/>必须写 dtype"]
-    encoder --> discrete["离散 i: [B,T',H',W']<br/>状态 1…Kc"]
-
-    input -."T,H,W".-> grid["账 1：grid<br/>rt, rhw, rgrid"]
-    continuous -."Cz + dtype".-> elements["账 2：elements / storage<br/>relem 不等于 bitrate"]
-    discrete -."Ntoken + Kc".-> nominal["账 3：nominal capacity<br/>log2(Kc) bits/token"]
-    nominal --> probability["概率模型"]
-    probability --> coder["entropy / arithmetic coder"]
-    coder --> overhead["header + chunk + index + side info"]
-    overhead --> actual["账 4：actual bitstream<br/>bpp=bits/(T·H·W)<br/>bitrate=bits/duration"]
-
-    example["短片实例<br/>[1,3,9,512,512]"] --> cexample["continuous [1,16,3,64,64]"]
-    example --> dexample["discrete [1,3,64,64]"]
-    cexample --> exact["exact: rt=3, rhw=64<br/>rgrid=192, relem=36"]
-    dexample --> exact
-    exact --> nominal_cfg["名义 t4·s8·s8：渐近<br/>rgrid=256, relem=48"]
-    nominal_cfg --> warning["配置名 ≠ 短片实际比<br/>未编码 ≠ 码率"]
-```
-
+![图 034：视频 tokenizer 的张量与码率四本账](assets/imagegen-diagrams/034/diagram.png)
 顺序化文字替代：输入 `[B,C,T,H,W]` 经 encoder 形成 continuous `[B,Cz,T',H',W']` 或 discrete `[B,T',H',W']`。第一本账只计算时间、空间和时空网格比；第二本账加入输入/latent 通道与 dtype；第三本账用 $N_{token}$ 与 $\log_2K_c$ 计算离散代码的名义容量；第四本账必须再经过概率模型、熵或算术编码，并计入 header、chunk、index 与 side information，才得到 actual bits、bpp 和带 duration/FPS 的 bitrate。Cosmos 官方示例把 `[1,3,9,512,512]` 变成 continuous `[1,16,3,64,64]` 或 discrete `[1,3,64,64]` [[20]](#ref-20)：精确 $r_t=3$、$r_{hw}=64$、$r_{grid}=192$、continuous $r_{elem}=36$；名义 $t4s8s8$ 的长片渐近值才是 $r_{grid}=256$、$r_{elem}=48$。配置名不能替代有限 clip 的实际 shape。
 
 ### 3.1 四本账各自回答什么
@@ -183,36 +159,7 @@ T'=1+\left\lfloor\frac{T-1}{f_t}\right\rfloor
 
 但不同实现有不同 padding、stride、chunk 和 crop，**实际 API 输出 shape 优先于公式或型号名**。Cosmos 明确第一个 temporal token 锚定第一帧 [[20]](#ref-20)；HunyuanVideo 公开 CausalConv3D、名义 $t4s8s8$ 与 16 latent channels，这足以核 shape，不足以推 bitrate [[21]](#ref-21)。
 
-```mermaid
-flowchart TB
-    accTitle: 因果视频 tokenizer 的首帧与分块边界
-    accDescr: 九帧输入经只读当前和过去的编码形成三个时间潜位置，首位置锚定第一帧；分块推理可携带或重置缓存并可能需要预热重叠和裁剪，必须检验提交帧接缝，而且 codec 因果不推出生成器因果、流式或实时。
-
-    frames["输入 x1 … x9"] --> rule["codec past-only access<br/>receptive fields 可重叠"]
-    rule --> z0["z0<br/>first temporal token<br/>anchors x1"]
-    rule --> z1["z1<br/>只读当前与过去"]
-    rule --> z2["z2<br/>只读当前与过去"]
-    z0 --> shape["常见 T'=ceil(T/ft)<br/>但 actual API shape wins"]
-    z1 --> shape
-    z2 --> shape
-
-    subgraph chunks["chunk 状态与提交"]
-        previous["chunk k−1 状态"] --> carry["cache carried"]
-        reset["cold start / reset"] --> current["chunk k"]
-        carry --> current
-        current --> warm["optional warm-up / overlap / crop"]
-        warm --> commit["committed frames"]
-        commit --> seam["cache carry/reset seam test"]
-    end
-
-    shape --> current
-
-    causal_codec["causal codec"] -."不推出".-> causal_generator["causal upper generator"]
-    causal_generator -."不推出".-> streaming["streaming commit"]
-    streaming -."不推出".-> realtime["real-time SLO"]
-    realtime --> measure["测 TTFF + steady FPS/deadline<br/>peak memory + quality drift"]
-```
-
+![图 035：因果视频 tokenizer 的首帧与分块边界](assets/imagegen-diagrams/035/diagram.png)
 顺序化文字替代：输入 $x_1\ldots x_9$ 经过只读当前与过去的 codec，形成 $z_0,z_1,z_2$；第一个 temporal token 锚定第一帧，后续 receptive field 可以重叠，不能画成永远独占的四帧桶。实现可从 cold start/reset 进入 chunk $k$，也可携带 chunk $k-1$ 的 cache；随后可能有 warm-up、overlap 和 crop，只有 committed frames 可见，并须比较 cache carry 与 reset 的接缝。causal codec 不推出 causal upper generator，后者也不推出 streaming commit 或 real-time SLO；TTFF、稳态 FPS/deadline、峰值显存和质量漂移都要测量。
 
 ### 4.2 Prefix-invariance 是最小因果证据

@@ -62,51 +62,7 @@ C_k=(s_k,\tau_k,\mathcal F_k,v_k,m_k,q_k,w_k,\pi_k).
 
 ![细粒度可控视频的五阶段合同：控制信号经坐标、时间、遮挡与冲突规则规范化后，通过 adapter、attention 或 guidance 进入生成器，最后分开评估控制、保真、运动和多样性。](../../assets/diagrams/controllable-video-contract.png)
 
-```mermaid
-flowchart LR
-    accTitle: 细粒度可控视频的五阶段合同
-    accDescr: 相机、对象轨迹、结构序列和身份外观四类信号先经过坐标、时间、可见性、置信度和冲突规则规范化，再通过 adapter residual、attention feature injection 或 latent inference guidance 进入生成器，输出分别经过控制遵循、参考保真、运动自然性和多样性四道验收，失败时回到合同而不是修饰结果。
-
-    subgraph S["SIGNALS"]
-        cam["camera<br/>K, T"]
-        trk["tracks / boxes / masks<br/>position + visibility"]
-        str["pose / depth / normal<br/>edge / flow"]
-        id["identity / appearance<br/>reference set"]
-    end
-    C["CONTRACT<br/>coordinates · clocks · masks<br/>confidence · conflicts"]
-    subgraph I["INJECTION"]
-        ad["adapter / ControlNet<br/>residual"]
-        at["attention / feature<br/>tokens"]
-        gd["latent / noise<br/>inference guidance"]
-    end
-    G["GENERATOR<br/>video latent → frames"]
-    subgraph E["EVALUATE SEPARATELY"]
-        e1["control adherence"]
-        e2["fidelity"]
-        e3["motion naturalness"]
-        e4["conditional diversity"]
-    end
-
-    cam --> C
-    trk --> C
-    str --> C
-    id --> C
-    C --> ad
-    C --> at
-    C --> gd
-    ad --> G
-    at --> G
-    gd --> G
-    G --> e1
-    G --> e2
-    G --> e3
-    G --> e4
-    e1 -. "revise specification" .-> C
-    e2 -. "revise specification" .-> C
-    e3 -. "revise specification" .-> C
-    e4 -. "revise specification" .-> C
-```
-
+![图 046：细粒度可控视频的五阶段合同](assets/imagegen-diagrams/046/diagram.png)
 **图的顺序化文字替代：**
 
 1. 输入分成四类：相机内外参、对象轨迹/框/掩码、姿态/深度/法线/边缘/光流结构序列，以及身份/外观参考。

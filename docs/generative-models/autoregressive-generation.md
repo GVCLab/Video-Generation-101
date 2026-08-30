@@ -60,53 +60,7 @@ p(Y_k\mid Y_{<k},c).
 
 ### 1.4 一张图定位一个 AR 系统
 
-~~~mermaid
-flowchart LR
-    accTitle: 自回归视频生成的三层选择
-    accDescr: 先选择像素、离散码或连续 latent 表示，再选择 token、集合、尺度、帧或时间块作为外层提交单位，最后选择 categorical、逐 token diffusion 或 flow、以及单元内 masked 或 discrete-diffusion refinement；不同组合形成 VideoGPT、InfinityStar、NOVA、Lumos-1 和 CausVid 等系统。
-
-    subgraph representation_layer["表示层"]
-        raw_pixels["原始像素"]
-        discrete_codes["离散视觉码"]
-        continuous_latents["连续 latent"]
-    end
-
-    subgraph commit_layer["外层提交粒度"]
-        pixel_token_commit["pixel / token"]
-        set_commit["token set"]
-        scale_commit["pyramid scale"]
-        frame_commit["frame"]
-        chunk_commit["temporal chunk"]
-    end
-
-    subgraph conditional_layer["单个条件分布的实现"]
-        categorical_head["categorical head"]
-        diffusion_flow_head["逐 token diffusion / flow head"]
-        masked_refinement["单元内 masked / discrete diffusion"]
-        full_backbone_denoising["单元内 full-backbone denoising"]
-    end
-
-    raw_pixels --> pixel_token_commit
-    discrete_codes --> pixel_token_commit
-    discrete_codes --> scale_commit
-    discrete_codes --> frame_commit
-    continuous_latents --> set_commit
-    continuous_latents --> frame_commit
-    continuous_latents --> chunk_commit
-
-    pixel_token_commit --> categorical_head
-    scale_commit --> categorical_head
-    set_commit --> diffusion_flow_head
-    frame_commit --> masked_refinement
-    frame_commit --> full_backbone_denoising
-    chunk_commit --> full_backbone_denoising
-
-    categorical_head --> discrete_ar_route["VideoGPT / VideoPoet / InfinityStar"]
-    diffusion_flow_head --> nova_route["MAR / NOVA"]
-    masked_refinement --> lumos_route["Lumos-1"]
-    full_backbone_denoising --> causvid_route["CausVid / Self Forcing"]
-~~~
-
+![图 012：自回归视频生成的三层选择](assets/imagegen-diagrams/012/diagram.png)
 **图的顺序化文字替代：**
 
 1. 先确定生成变量是原始像素、离散视觉码还是连续 latent。
@@ -391,32 +345,7 @@ CausVid 依赖高质量双向 teacher，并使用 distribution matching distilla
 
 ### 6.5 一张时序图看训练—推理差异
 
-~~~mermaid
-sequenceDiagram
-    accTitle: Teacher forcing 与 self forcing 的历史来源
-    accDescr: Teacher forcing 在每一步向生成器提供真实历史并逐位置计算损失；self forcing 则让生成器采样当前单元、将其提交到 rollout 状态和 KV cache，再用自生成历史生成下一单元，最后施加视频级监督。
-
-    participant dataset as 真实视频样本
-    participant generator as 因果生成器
-    participant rollout_state as rollout 状态与 KV
-    participant objective as 训练目标
-
-    Note over dataset,objective: Teacher forcing
-    loop 每个外层位置 k
-        dataset->>generator: 提供真实前缀 x_<k
-        generator->>objective: 预测 x_k 并计算位置损失
-    end
-
-    Note over dataset,objective: Self forcing
-    dataset->>generator: 提供初始条件
-    loop 每个外层位置 k
-        rollout_state->>generator: 提供自生成前缀与缓存
-        generator->>rollout_state: 采样并提交当前单元
-    end
-    rollout_state->>objective: 形成完整自生成视频
-    objective->>generator: 视频级监督与截断梯度
-~~~
-
+![图 013：Teacher forcing 与 self forcing 的历史来源](assets/imagegen-diagrams/013/diagram.png)
 **图的顺序化文字替代：**
 
 1. Teacher forcing 对每个位置都把 ground-truth 前缀交给生成器。

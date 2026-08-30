@@ -93,55 +93,7 @@ p_\theta(\hat o_{k+1},\hat r_k,\hat c_k\mid\hat h_k,a_k),
 
 action chunk $A_{k:k+L-1}$ 同时改变三个合同：模型一次预测/输出的动作数 $L$、实际执行的前缀 $h_e$、以及下一次真实观测到来前的盲飞时间。所谓“7 Hz”可能指 action head 更新、视频 token 解码、完整 chunk 生成或真实 robot control；除非同时给出 batch、硬件、分辨率、上下文、去噪步数、chunk 长度、异步流水和 p50/p95 sense-to-act latency，否则不同论文的 Hz 不可横比。ViPRA 的项目页分别给出 action chunk 与视频生成速率；DreamZero 的技术材料则把原始 chunk 延迟、并行 CFG、KV cache 和异步执行分开报告 [[19]](#ref-19), [[21]](#ref-21)。
 
-```mermaid
-flowchart LR
-    accTitle: 动作条件世界模型的数据合同与三种 rollout
-    accDescr: 记录器把带时间戳的观测、命令、实际执行动作和结果写入离线数据。动作对齐后，模型预测 latent、观测、奖励和终止。固定开环使用记录动作；模型内闭环让策略读取生成状态；真实 MPC 只在模型里搜索并把短前缀交给真实环境，随后回读真实观测。
-
-    subgraph log["OFFLINE LOG · preserve clocks"]
-        sensor["sensor frames<br/>o, t_obs"]
-        command["commands<br/>a, t_cmd"]
-        executed["executed controls<br/>a_exec, t_exec"]
-        outcome["reward / done / safety"]
-        command --> executed
-        sensor --> align["clock alignment<br/>units + frames + latency"]
-        executed --> align
-        outcome --> align
-    end
-
-    subgraph wm["LEARNED WORLD MODEL"]
-        context["history X + proprio q + goal g"]
-        action["scheduled action A"]
-        transition["action-conditioned<br/>latent transition"]
-        obshead["observation head<br/>pixel / token / representation"]
-        taskhead["reward + continue / done<br/>value or constraint heads"]
-        context --> transition
-        action --> transition
-        transition --> obshead
-        transition --> taskhead
-    end
-
-    align --> context
-    align --> action
-
-    subgraph modes["ROLLOUT MODES"]
-        fixed["fixed open-loop<br/>logged action schedule"]
-        imagined["policy-in-model<br/>a_k from generated state"]
-        mpc["receding-horizon MPC<br/>search H, execute h_e"]
-        realenv["real environment<br/>returns fresh observation"]
-        imagined --> transition
-        mpc --> transition
-        mpc -->|"execute short prefix"| realenv
-        realenv -->|"replace prediction with sensor"| context
-    end
-
-    fixed --> action
-    obshead --> imagined
-    taskhead --> imagined
-    obshead --> mpc
-    taskhead --> mpc
-```
-
+![图 044：动作条件世界模型的数据合同与三种 rollout](assets/imagegen-diagrams/044/diagram.png)
 **顺序化文字替代：**
 
 1. 记录原始观测时刻、命令时刻、实际执行时刻、reward、done 和安全事件。
@@ -259,26 +211,7 @@ open-loop 平均误差小，不代表可规划。优化器会在大量候选中�
 
 WorldGym 用 autoregressive action-conditioned video、Monte Carlo policy rollout 与视觉语言 reward 评估策略排序；作者发现排序可与真实表现相关，但也明确暴露现实物体交互不足，因此 policy ranking 不能升级为绝对物理精度或安全认证 [[30]](#ref-30)。RoboWM-Bench 把生成行为经 inverse dynamics/retargeting 后送入物理模拟执行，能发现接触和空间错误，但这个链路仍不是“原始模型直接控制真实机器人” [[31]](#ref-31)。MiraBench 把 physics adherence、action-following fidelity 与 optimism bias 分开，并显示视觉保真不能可靠替代动作正确性 [[32]](#ref-32)。
 
-```mermaid
-flowchart TD
-    accTitle: 动作条件模型的证据阶梯与证伪出口
-    accDescr: 评测先检查时钟和动作单位，再比较被动、动作打乱与动作条件模型。通过同状态不同动作的反事实测试后，才进入模型内策略排序和真实 MPC。任一层失败都将主张降级，画面好看不能绕过动作、因果或闭环门。
-
-    start["candidate action-conditioned model"] --> contract{"L0 contract valid?<br/>timestamps, units, no future leak"}
-    contract -->|"no"| reject0["reject causal claim<br/>repair data pipeline"]
-    contract -->|"yes"| shuffle{"L1 action used?<br/>beats passive and shuffled controls"}
-    shuffle -->|"no"| passive["downgrade to passive continuation"]
-    shuffle -->|"yes"| fork{"L2 intervention?<br/>same state, different actions"}
-    fork -->|"no"| associational["association-only evidence"]
-    fork -->|"yes"| rollout{"L3 calibrated rollout?<br/>multi-step + uncertainty + done"}
-    rollout -->|"no"| short["short-horizon predictor only"]
-    rollout -->|"yes"| exploit{"L4 planner audit?<br/>predicted vs real ranking"}
-    exploit -->|"no"| modelbug["model-exploitation risk"]
-    exploit -->|"yes"| closed{"L5 real closed loop?<br/>fresh sensors + deadline + safety"}
-    closed -->|"no"| simulator["planning evidence only"]
-    closed -->|"yes"| strong["scoped closed-loop evidence<br/>within tested embodiment/task"]
-```
-
+![图 045：动作条件模型的证据阶梯与证伪出口](assets/imagegen-diagrams/045/diagram.png)
 **顺序化文字替代：**
 
 1. 先检查时间戳、单位、坐标和未来信息泄漏；失败时不能讨论因果。

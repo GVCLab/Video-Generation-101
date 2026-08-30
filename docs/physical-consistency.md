@@ -70,22 +70,7 @@ E_k=
 
 **图 1：Claim 不得高于证据。** 图中的阶梯不是“模型自然会一路升级”，而是每升一级都多一个独立验证 gate。PNG 将 L0、L1、L2、L3、L4 和 L5–L7 六个宏台阶画在一起；下面的可编辑版本把最后一个宏台阶继续拆成可执行性、决策忠实度和真实效用，因此共有 L0–L7 八级。全文只使用这套 L0–L7 编号。
 
-```mermaid
-flowchart TB
-    accTitle: 物理一致性证据阶梯
-    accDescr: 从视觉真实感到真实世界效用共八级；每一级都需要额外的测量、反事实或闭环证据，能力声明不能高于实际通过的等级。
-    L0["L0 · 视觉真实感<br/>单帧外观与参考相似"] --> L1["L1 · 时间连贯性<br/>身份、几何、无闪烁"]
-    L1 --> L2["L2 · 物理合理性<br/>人类或 VLM：可能发生吗"]
-    L2 --> L3["L3 · 测量型物理忠实度<br/>已知 s0、u、θ、b；轨迹/接触/参数 ± 不确定性"]
-    L3 --> L4["L4 · 反事实忠实度<br/>成对干预、参数扫描、分支局部性"]
-    L4 --> L5["L5 · 闭环可执行性<br/>动作恢复、rollout、失败恢复"]
-    L5 --> L6["L6 · 决策忠实度<br/>策略排序、regret、风险与优化增益"]
-    L6 --> L7["L7 · 真实世界效用<br/>真实机器人/驾驶成功与标定风险"]
-    L2 -.-> J["禁止把不同证据层<br/>压成不透明总分"]
-    L3 -.-> J
-    L5 -.-> J
-```
-
+![图 039：物理一致性证据阶梯](assets/imagegen-diagrams/039/diagram.png)
 顺序化文字替代：外观与平滑只到 L1；开放域人/VLM 常识判断到 L2；有标定状态和程序测量才到 L3；系统改变动作或参数并得到正确差分到 L4；独立环境持续执行到 L5；策略排序、regret 和真实收益分别推进到 L6–L7。
 
 ## 3. 物理一致性具体包含什么
@@ -382,43 +367,7 @@ Physics-IQ Verified 说明 ground truth、prompt 和聚合方式的修订足以�
 
 **图：claim 必须在独立证据上存活。** 训练 reward 可以帮助改模型，却不能自动充当终评；封存参照或独立环境只流向测量与证伪 gate，不回流给生成器。图中的“换 evaluator”不是调到结果变好，而是当提取器或标注协议被校准样本证明失效时，版本化修正并重新评估全部模型。
 
-```mermaid
-flowchart TB
-    accTitle: 物理一致性的可证伪证据闭环
-    accDescr: 预先冻结初态、动作、物性、边界和随机种子，经状态表示进入生成器或模拟器；rollout 用程序测量和不确定性形成约束或奖励；封存参照或独立环境只进入测量与证伪门；通过才按 L0 到 L7 报告，失败则定位数据、模型、测量器或声明并重新运行。
-
-    subgraph setup["A · 冻结生成合同"]
-        direction LR
-        contract["条件合同<br/>s0 · action u · 参数 θ · 边界 b · seeds"] --> state["状态接口<br/>track · depth · 3D/4D · field · latent"]
-        state --> model["Generator / simulator<br/>固定 checkpoint 与推理配置"]
-        model --> rollout["rollout<br/>保留失败和测量缺失样本"]
-    end
-
-    subgraph audit["B · 独立测量与证伪"]
-        direction LR
-        measure["测量 + 不确定性<br/>轨迹 · 接触 · 守恒账 · 反事实差分"] --> signal["constraint / reward / diagnostic<br/>每项单独报告"]
-        signal --> gate{"预注册证伪 gate<br/>阈值 · coverage · seeds · OOD"}
-        sealed["封存参照 / 独立环境<br/>真实标定 · 未见干预 · task return"] -.->|只供终评| measure
-        sealed -.->|防止 evaluator 投机| gate
-    end
-
-    rollout --> measure
-    gate -->|全部必要 gate 通过| claim["只报告已通过的 L0–L7<br/>附适用域与失败覆盖"]
-    gate -->|任一必要 gate 失败| diagnose["定位失败来源<br/>condition · state · model · extractor · evaluator"]
-    diagnose -->|版本化修改并重跑| contract
-
-    classDef input fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
-    classDef process fill:#ffedd5,stroke:#ea580c,stroke-width:2px,color:#7c2d12
-    classDef evidence fill:#f3e8ff,stroke:#7e22ce,stroke-width:2px,color:#581c87
-    classDef gateStyle fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
-    classDef pass fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
-    class contract,state,sealed input
-    class model,rollout process
-    class measure,signal evidence
-    class gate,diagnose gateStyle
-    class claim pass
-```
-
+![图 040：物理一致性的可证伪证据闭环](assets/imagegen-diagrams/040/diagram.png)
 顺序化文字替代：第一，冻结初态、动作、物性、边界、种子和允许的 claim；第二，把条件转换为适合材料的显式或 latent 状态；第三，用冻结配置生成 rollout，并保留生成失败和测量缺失；第四，用带提取器误差的程序测量得到轨迹、接触、守恒账与反事实差分；第五，把各项约束、reward 或诊断分开；第六，封存真实参照或独立环境只在终评时进入测量和 gate；第七，所有必要 gate 通过才报告相应 L0–L7，任一失败就定位 condition、state、model、extractor 或 evaluator，版本化修改后从合同重跑。
 
 一个 gate 不应把七个维度先加权平均。若接触时刻完全错误，较高的清晰度不能把它“平均及格”；若 tracker 在困难样本上失效，删除这些样本会制造选择偏差。至少同时报告：每项误差的分布与置信区间、有效测量 coverage、失败率、多个 seed、ID 与 OOD 切片，以及所有必要 gate 的逐项通过率。GAUGE 把真实标定轨迹、物理 metadata 和不确定性一起纳入协议，说明“方程形状看似正确”仍可能恢复出错误加速度、动量传递或振荡时刻 [[17]](#ref-17)。
@@ -433,28 +382,7 @@ flowchart TB
 
 ### 7.2 约束可以在哪里注入，终评证据必须独立汇合
 
-```mermaid
-flowchart LR
-    accTitle: 物理一致性训练与验证闭环
-    accDescr: 成组数据先转换为状态表示，再分别在训练、后训练或推理阶段注入物理约束，最后以开放域裁判、程序测量、成组干预和闭环环境四路证据独立验收。
-    A["成组数据<br/>真实标定 + 模拟干预 + action logs"] --> B["状态/表示<br/>track · depth · 3D/4D · field · latent"]
-    B --> C{"物理注入位置"}
-    C --> C1["训练时<br/>SFT · property control · constraint loss"]
-    C --> C2["训练后<br/>DPO/RL · verifiable reward"]
-    C --> C3["推理时<br/>simulator loop · search · verifier"]
-    C1 --> D["生成或 rollout"]
-    C2 --> D
-    C3 --> D
-    D --> E1["开放域 Judge<br/>语义与显眼违规"]
-    D --> E2["程序测量<br/>轨迹、接触、参数、不确定性"]
-    D --> E3["成组干预<br/>单调性、局部性、OOD"]
-    D --> E4["闭环环境<br/>执行、regret、任务成功、安全"]
-    E1 --> F["按证据层分别报告"]
-    E2 --> F
-    E3 --> F
-    E4 --> F
-```
-
+![图 041：物理一致性训练与验证闭环](assets/imagegen-diagrams/041/diagram.png)
 推荐顺序：先写可证伪 claim；再建立成组干预数据；按材料选择状态瓶颈；决定物理进入训练、后训练还是推理；冻结训练用 evaluator，同时封存独立终评器；最后让人/VLM、程序测量、反事实和闭环四路证据各自报告，不用加权平均掩盖某一路完全失败。
 
 刚体适合 3D pose/trajectory；软体需要 mesh/point/strain；流体需要速度、体积分数或其他场量。用同一个稀疏点轨迹覆盖所有材料，会把“接口简单”误写成“物理统一”。

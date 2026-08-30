@@ -67,56 +67,7 @@ N_{\mathrm{eff,source}}
 
 下面给出可编辑、可搜索、对读屏器更友好的确定性版本：
 
-```mermaid
-flowchart TB
-    accTitle: 可审计的现代 Video Data Engine
-    accDescr: 候选来源先经过权利门和不可变摄取，再依次切分、筛选、跨源去重与 benchmark 去污染、分层描述和核验、混合分组、训练评测防火墙、版本化划分与训练审计；更正和删除通过 tombstone、派生数据及 checkpoint 台账回流到权利门和 manifest。
-
-    subgraph source_plane["1. 来源、权利与摄取"]
-        direction LR
-        source_pool["来源池<br/>授权 / 逐项 CC / URL / 合成"] --> rights_gate{"权利门<br/>许可 / ToS / 同意 / 肖像 / opt-out"}
-        rights_gate -->|通过| immutable_ingest["不可变摄取<br/>source ID / 时间 / checksum / codec"]
-        rights_gate -->|拒绝或隔离| quarantine["隔离清单<br/>对象与理由"]
-    end
-
-    subgraph curation_plane["2. 切分、筛选与去重去污染"]
-        direction LR
-        shot_episode_split["镜头或 episode 切分<br/>cut / fade / task boundary"] --> technical_motion_filter["技术质量与运动<br/>decode / FPS / 模糊 / 光流 / 转场"]
-        technical_motion_filter --> content_safety_filter["内容与安全<br/>覆盖 / 审美 / PII / 未成年人 / NSFW"]
-        content_safety_filter --> cross_source_dedup["跨源多模态去重<br/>hash / pHash / audio / embedding / local match"]
-        cross_source_dedup --> benchmark_decontam["Benchmark 去污染<br/>完整 / 局部 / 近重复 / caption overlap"]
-    end
-
-    subgraph annotation_plane["3. 描述、核验与混合分组"]
-        direction LR
-        hierarchical_caption["分层 Caption<br/>原文 + ASR/OCR + short + dense + structured"] --> caption_verifier{"Caption 核验<br/>实体 / 数量 / 动作 / 顺序 / 相机 / hallucination"}
-        caption_verifier -->|通过| mix_group["混合、课程与不可拆分 group<br/>质量 × 运动 × 多样性 × 任务"]
-        caption_verifier -.->|重采帧、重描述或剔除| hierarchical_caption
-    end
-
-    subgraph release_plane["4. 防火墙、版本发布与审计"]
-        direction LR
-        train_eval_firewall["Train / Eval Firewall<br/>冻结 benchmark 与 sealed evaluation"] --> versioned_split_manifests[("版本化 split manifests<br/>media / URL / metadata / group / tombstone")]
-        versioned_split_manifests --> training_audit["训练与独立审计<br/>版本 / 阈值 / mixture / checkpoint"]
-    end
-
-    immutable_ingest --> shot_episode_split
-    benchmark_decontam --> hierarchical_caption
-    mix_group --> train_eval_firewall
-    training_audit -.->|失败分析回流| mix_group
-
-    provenance_ledger[("贯穿式 provenance ledger<br/>来源 / 权利 / 变换 / 模型版本 / 阈值")]
-    provenance_ledger -.-> immutable_ingest
-    provenance_ledger -.-> cross_source_dedup
-    provenance_ledger -.-> hierarchical_caption
-    provenance_ledger -.-> versioned_split_manifests
-
-    removal_correction["Removal / Correction<br/>对象 / 理由 / 生效时间"] --> tombstone_version["Tombstone + 新版本<br/>可传播的撤回与更正"]
-    tombstone_version --> versioned_split_manifests
-    tombstone_version --> derived_checkpoint_ledger["派生数据 / checkpoint 台账<br/>影响范围与处置状态"]
-    derived_checkpoint_ledger -.->|撤回或重授权反馈| rights_gate
-```
-
+![图 085：可审计的现代 Video Data Engine](assets/imagegen-diagrams/085/diagram.png)
 顺序化文字替代：
 
 1. 登记来源、权利证据与 opt-out 通道；通过权利门后再做不可变摄取。

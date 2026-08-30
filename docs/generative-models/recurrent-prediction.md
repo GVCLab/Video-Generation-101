@@ -33,28 +33,7 @@ $h_t$ 可以是 LSTM feature map、Transformer KV、deterministic–stochastic s
 
 ## 🧭 2. 一套 rollout 外壳，多种预测机制
 
-```mermaid
-flowchart LR
-    accTitle: 递归视频预测的共同 rollout 外壳与四类条件头
-    accDescr: 已观测帧和动作进入状态更新器，状态分别驱动直接像素或变换、随机潜变量、可逆流和扩散条件头，产出按帧或块提交；提交结果反馈到下一步，真实环境观测也可重新锚定状态。
-
-    observed_history["已观测帧或 latent"] --> state_update["状态更新 U"]
-    action_condition["动作与其他条件"] --> state_update
-    recurrent_state["递归状态 h"] --> state_update
-    state_update --> recurrent_state
-    recurrent_state --> deterministic_head["直接像素 / 运动变换"]
-    recurrent_state --> latent_head["随机 latent"]
-    recurrent_state --> flow_head["条件 normalizing flow"]
-    recurrent_state --> diffusion_head["帧 / 块 diffusion"]
-    deterministic_head --> committed_unit["提交帧或 chunk"]
-    latent_head --> committed_unit
-    flow_head --> committed_unit
-    diffusion_head --> committed_unit
-    committed_unit -. "open-loop 反馈" .-> observed_history
-    committed_unit --> environment["播放或环境执行"]
-    environment -. "新观测闭环校正" .-> observed_history
-```
-
+![图 026：递归视频预测的共同 rollout 外壳与四类条件头](assets/imagegen-diagrams/026/diagram.png)
 **图的顺序化文字替代：**
 
 1. 已观测帧或 latent、动作和旧状态共同进入状态更新器。
@@ -240,32 +219,7 @@ Self Forcing 则真正把生成结果提交为下一步训练历史，但论文�
 
 ## 🎮 11. 动作干预与 closed-loop planning：从“会续写”到“可用模型”
 
-```mermaid
-sequenceDiagram
-    accTitle: 动作干预与闭环规划的最小证据循环
-    accDescr: 从同一初始状态复制多个动作干预，预测器在固定随机种子下生成反事实结果，评测器核对动作效应；规划器随后在预测模型中比较候选序列，只执行第一步，环境返回真实观测并更新状态，循环记录任务成功、失效与期限。
-
-    participant environment as 真实环境或保真模拟器
-    participant predictor as 动作条件预测器
-    participant evaluator as 干预评测器
-    participant planner as 规划器
-
-    environment->>predictor: 相同初始观测与状态
-    loop 成对动作 a / a' / no-op
-        predictor->>predictor: 固定 seed，替换且仅替换动作
-        predictor->>evaluator: 反事实 rollout
-        environment->>evaluator: 对应真实执行或 simulator truth
-        evaluator->>evaluator: 核对方向、时序、幅度与失败
-    end
-    loop 每个 closed-loop 决策时刻
-        planner->>predictor: 候选动作序列
-        predictor->>planner: 预测 reward、风险与不确定性
-        planner->>environment: 只执行第一步动作
-        environment->>predictor: 返回新观测并更新 belief
-        environment->>evaluator: 任务结果与端到端延迟
-    end
-```
-
+![图 027：动作干预与闭环规划的最小证据循环](assets/imagegen-diagrams/027/diagram.png)
 **图的顺序化文字替代：**
 
 1. 从相同初始状态复制试验，只改变动作，并固定其他条件与随机种子。

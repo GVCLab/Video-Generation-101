@@ -72,28 +72,7 @@ R(m)=(P,C,W,I,T,D,E,L,H),
 
 **图 1：开放模型不是一个下载按钮。** 主链把模型身份、版本、发布物、许可证、硬件、运行证据和最终 manifest 连起来；红色出口表示证据不足时的隔离路径。上图是教学总览，下方 Mermaid 是可编辑且适合读屏器的规范版本。
 
-```mermaid
-flowchart LR
-    accTitle: 开放视频模型的可复现发布面证据链
-    accDescr: 先确认官方身份和固定版本，再分别核对论文、代码、权重、推理、训练、数据与评测；随后求代码、权重、数据和依赖许可证的交集，做硬件预检与固定种子最小运行，最后视觉回读并写入可复现 manifest。任何关键发布面缺失、许可不相容或运行失败都进入隔离。
-
-    A["官方身份<br/>作者仓库 + 模型卡"] --> B["固定版本<br/>Git commit + model revision"]
-    B --> C{"发布面拆分"}
-    C --> C1["Paper / Code / Weights"]
-    C --> C2["Inference / Training"]
-    C --> C3["Data / Eval / Environment"]
-    C1 --> D{"许可证交集<br/>代码 × 权重 × 数据 × 依赖"}
-    C2 --> D
-    C3 --> D
-    D -->|相容| E["硬件预检<br/>VRAM / disk / CUDA / dtype"]
-    D -->|缺失或冲突| Q["隔离<br/>记录缺口，不下载或部署"]
-    E --> F["最小运行<br/>固定输入 / seed / steps"]
-    F --> G{"输出契约通过？<br/>尺寸 / 帧数 / FPS / 音频 / 无 NaN"}
-    G -->|否| Q
-    G -->|是| V["视觉与条件回读<br/>身份 / 运动 / 同步 / 漂移 / 安全"]
-    V --> M["可复现 manifest<br/>版本 / hashes / 命令 / 硬件 / 日志"]
-```
-
+![图 086：开放视频模型的可复现发布面证据链](assets/imagegen-diagrams/086/diagram.png)
 顺序化文字替代：确认作者身份；固定代码和权重 revision；分别核对九个发布面；求许可证交集；检查显存、磁盘、CUDA 和精度；用固定输入与随机种子跑最小样例；验证输出媒体契约；人工回读条件遵循和失败模式；最后保存 manifest、hash、命令、硬件和日志。任一关键门失败都应记录并隔离。
 
 ---
@@ -159,31 +138,7 @@ flowchart LR
 
 ## 4. 先选研究问题，再选模型
 
-```mermaid
-flowchart TD
-    accTitle: 开放视频模型选择树
-    accDescr: 从研究问题出发区分基础生成、长视频、编辑控制、原生音视频和动作世界模型，再按是否需要训练代码与硬件预算选择候选；最后必须通过版本、许可和最小运行门。
-
-    Q{"主要研究问题？"}
-    Q -->|短片 T2V / I2V| G["基础生成<br/>Hunyuan 1.5 / Wan2.2-5B / LTX-2.5 / SANA"]
-    Q -->|原生音视频| AV["Joint AV<br/>H3-Base / LTX-2.5 / Cosmos 3"]
-    Q -->|长视频 / streaming| L["Causal / forcing<br/>MAGI / LongSANA / FramePack / SkyReels-V2"]
-    Q -->|编辑 / 控制| E["Control stack<br/>Bernini / VACE / VAP / FlashMotion"]
-    Q -->|动作 / world model| W["Action loop<br/>Cosmos 3 / DreamX / Matrix 3.5 / V-JEPA2-AC"]
-
-    G --> T{"必须训练或微调？"}
-    AV --> T
-    L --> T
-    E --> T
-    W --> T
-    T -->|是| TR["优先完整训练面<br/>Open-Sora / Hunyuan1.5 / LTX trainer / Lance / Bernini-R / Lumos / FlashMotion"]
-    T -->|否| INF["推理优先<br/>按官方显存与任务 checkpoint 缩小范围"]
-    TR --> V{"版本 + 许可 + 最小运行通过？"}
-    INF --> V
-    V -->|是| EXP["进入受控实验<br/>固定 manifest 与评测"]
-    V -->|否| HOLD["换候选或记录为 R0/R1<br/>不声称可复现"]
-```
-
+![图 087：开放视频模型选择树](assets/imagegen-diagrams/087/diagram.png)
 ### 4.1 按显存筛选时的正确读法
 
 | 官方入口级别 | 可先考虑的路线 | 关键限定 |
@@ -220,22 +175,7 @@ flowchart TD
 
 单个“最好看”的视频只能证明一次成功，不能证明模型稳定。最低限度应使用多个 prompt 与 seed，并统一输出合同：容器、编码、宽高、FPS、帧数、音轨和时长。FFmpeg 可检查媒体规格，但不能替代语义和物理评测 [[30]](#ref-30)。
 
-```mermaid
-flowchart LR
-    accTitle: 开放模型最小复现链
-    accDescr: 从代码权重环境和推理参数冻结开始，依次通过资产完整、管线运行、媒体合同和多样本评测，最后形成可审计结论。
-
-    F["冻结代码 / 权重 / 环境 / 参数"] --> S0{"S0 资产完整？"}
-    S0 -->|否| X0["记录缺失，不进入能力比较"]
-    S0 -->|是| S1{"S1 官方样例可运行？"}
-    S1 -->|否| X1["保留日志与最小失败复现"]
-    S1 -->|是| M{"输出媒体合同通过？"}
-    M -->|否| X2["修正解码、封装或参数"]
-    M -->|是| S2["S2 多 prompt × 多 seed"]
-    S2 --> E["自动指标 + 盲评 + 失败模式"]
-    E --> C["报告质量、成本、许可与安全边界"]
-```
-
+![图 088：开放模型最小复现链](assets/imagegen-diagrams/088/diagram.png)
 ---
 
 ## 6. 训练与微调：先问“开放到哪一层”

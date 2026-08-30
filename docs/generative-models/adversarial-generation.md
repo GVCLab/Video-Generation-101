@@ -22,40 +22,7 @@
 6. 在安全与来源控制后部署离线 API 或因果流式服务，并同时报告质量、系统与任务/安全证据。
 7. 在把产品能力归给某个 checkpoint 前，分开审计产品/checkpoint 边界以及公开代码、权重、数据与可复现 recipe。
 
-```mermaid
-flowchart LR
-    accTitle: 对抗学习在视频生成中的三种角色
-    accDescr: 完整 GAN 从噪声直接生成视频，重建判别器只训练 tokenizer 的 decoder，对抗蒸馏则在 diffusion 或 flow 教师之后训练少步学生。
-
-    data[(真实视频 x)]
-    noise[噪声 z 与条件 c]
-    full_g["完整 GAN<br/>G(z,c)"]
-    full_d["帧/时空/多尺度/条件 D"]
-    encoder["编码器 E"]
-    decoder["解码器 D_dec"]
-    recon_d["重建判别器 D_rec"]
-    prior["latent 先验<br/>AR / masked / diffusion / flow"]
-    teacher["diffusion / flow 教师"]
-    student["少步学生 G_s"]
-    distill_d["对抗 critic<br/>只在显式使用时"]
-
-    noise --> full_g --> full_d
-    data --> full_d
-    data --> encoder --> decoder --> recon_d
-    data --> recon_d
-    encoder --> prior --> decoder
-    teacher --> student
-    noise --> student --> distill_d
-    data --> distill_d
-
-    classDef role fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#172554
-    classDef critic fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#450a0a
-    classDef source fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
-    class full_g,encoder,decoder,prior,teacher,student role
-    class full_d,recon_d,distill_d critic
-    class data,noise source
-```
-
+![图 010：对抗学习在视频生成中的三种角色](assets/imagegen-diagrams/010/diagram.png)
 图 2 顺序化文字替代：路径一把噪声和条件送入完整 GAN 生成器，再用真实与生成视频训练视频判别器；路径二把真实视频经编码器和解码器重建，判别器只约束重建，latent 的生成由另一个先验完成；路径三先有 diffusion 或 flow 教师，再用蒸馏信号训练少步学生，仅当方法确实训练了区分真假的 critic 时才进入“对抗”分支。三条路径可在同一系统中同时出现，但它们的优化对象和证据不能混用。
 
 ## 1. 什么才算对抗目标
@@ -96,36 +63,7 @@ flowchart LR
 
 判别器并不直接约束“整个真实世界分布”；它只约束自己的输入视野、下采样和条件接口能表达的统计量。因此需把“判别器数量”与“观测设计”分开。
 
-```mermaid
-flowchart TB
-    accTitle: 四类视频判别视野与它们的盲区
-    accDescr: 帧判别器保护纹理，时空判别器检查运动，多尺度设计交换分辨率和时长，条件判别器再检查文本、首帧或动作是否匹配；任一视野都不能单独保证长期一致。
-
-    video["候选视频 x̂<br/>T × H × W"]
-    frame_sample["抽取单帧/少量帧"]
-    clip_sample["连续或带时间戳的 clip"]
-    scale_split["高清短视野<br/>低清长视野"]
-    condition["条件 c<br/>文本/首帧/类别/动作"]
-    frame_d["帧/空间 D<br/>纹理与形状"]
-    temporal_d["时空 D<br/>运动与闪烁"]
-    multi_d["多尺度 D<br/>局部细节与全局节奏"]
-    cond_d["条件 D<br/>真实性 + 匹配性"]
-    blind["共同盲区<br/>超出训练窗口的身份、因果和状态"]
-
-    video --> frame_sample --> frame_d --> blind
-    video --> clip_sample --> temporal_d --> blind
-    video --> scale_split --> multi_d --> blind
-    video --> cond_d --> blind
-    condition --> cond_d
-
-    classDef view fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0c4a6e
-    classDef disc fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#450a0a
-    classDef warn fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f
-    class video,frame_sample,clip_sample,scale_split,condition view
-    class frame_d,temporal_d,multi_d,cond_d disc
-    class blind warn
-```
-
+![图 011：四类视频判别视野与它们的盲区](assets/imagegen-diagrams/011/diagram.png)
 图 3 顺序化文字替代：从候选视频出发，可以抽取单帧送入帧判别器，把连续或带时间戳的 clip 送入时空判别器，把高清短视野与低清长视野送入多尺度判别器，或把视频和文本、首帧、类别、动作联合送入条件判别器。它们分别擅长纹理、局部运动、跨尺度结构和条件匹配，但只要视野没有覆盖整个 rollout，就不能单独保证长期身份、状态与因果一致。
 
 ### 2.1 帧与时空判别器

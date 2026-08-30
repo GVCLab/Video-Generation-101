@@ -40,43 +40,7 @@
 
 ## 2. 总路线图：共同主干与加深单元，八条任务分支
 
-```mermaid
-flowchart TB
-    accTitle: 视频生成论文课程的依赖路线
-    accDescr: 学习者先完成先修诊断，再通过 tokenizer 表示、生成目标和评测组成的共同主干，补齐变分随机未来的训练后验、部署先验与校准，再完成 Video DiT 的 token、注意力、融合与扩展加深单元。之后可选择八条任务分支并进入共同验收。
-
-    P["先修诊断"] --> K["共同主干：tokenizer 表示 · 目标 · 评测"]
-    K --> U["共同加深：随机未来<br/>posterior · prior · calibration"]
-    U --> B["共同加深：Video DiT<br/>token · topology · fusion · scaling"]
-    B --> S["分支 A：因果 · 流式 · 实时"]
-    B --> D["分支 B：少步 · 后训练 · 蒸馏"]
-    B --> A["分支 C：原生音视频"]
-    B --> W["分支 D：World Action · JEPA"]
-    B --> G["分支 E：细粒度可控生成"]
-    B --> R["分支 F：视频退化修复"]
-    B --> M["分支 G：多视角 · 4D"]
-    B --> PERS["分支 H：开放集视频个性化"]
-    D --> S
-    S --> V["共同验收：复现 + 反证 + 边界"]
-    D --> V
-    A --> V
-    W --> V
-    G --> V
-    R --> V
-    M --> V
-    PERS --> V
-    V --> C["跨分支结课项目"]
-
-    classDef gate fill:#f2f2f2,stroke:#222,color:#111
-    classDef trunk fill:#d9ecff,stroke:#0067a5,color:#111
-    classDef branch fill:#fff0cc,stroke:#a65f00,color:#111
-    classDef verify fill:#dff2e5,stroke:#147a4b,color:#111
-    class P,C gate
-    class K,U,B trunk
-    class S,D,A,W,G,R,M,PERS branch
-    class V verify
-```
-
+![图 042：视频生成论文课程的依赖路线](assets/imagegen-diagrams/042/diagram.png)
 文字替代：先通过先修诊断，再完成 tokenizer/目标/评测共同主干；随后补齐随机未来的 posterior/prior、collapse 与 calibration，并完成 Video DiT 的 token、attention、fusion、scaling 加深单元。表示、随机未来概率合同与 backbone 都是八条任务分支共享的技术先修，不另算应用分支；之后才选一条主修分支。少步蒸馏又是流式生成的常见前提，因此分支 B 连接分支 A。八条分支都必须经过同一套“复现、反证、证据边界”验收，最后再做跨分支项目。颜色只辅助分组，节点标签和箭头已经给出全部语义。
 
 ### 怎样选主修分支
@@ -510,43 +474,7 @@ flowchart TB
 
 ## 12. 所有分支共用的验证回路
 
-```mermaid
-flowchart LR
-    accTitle: 从论文声明到保留或降级结论的验证回路
-    accDescr: 先把论文声明改写成可测量命题，再按声明类型选择质量、退化恢复、延迟、音视频同步、主体绑定/泄漏、显式视觉控制或闭环控制协议。固定版本、条件和预算后运行最小复现，再加入最可能推翻结论的干预。证据通过则保留带边界的结论，否则降级并记录失败。
-
-    C["提取一条声明"] --> M["改写成可测命题"]
-    M --> T{"声明类型"}
-    T --> Q["画质 / 时间一致"]
-    T --> E["退化恢复 / 事实保真"]
-    T --> L["延迟 / 流式"]
-    T --> A["音视频同步"]
-    T --> I["身份 / 绑定 / 泄漏"]
-    T --> V["相机 / 轨迹 / 姿态控制"]
-    T --> W["动作 / 闭环"]
-    Q --> F["冻结版本 · 条件 · 预算"]
-    E --> F
-    L --> F
-    A --> F
-    I --> F
-    V --> F
-    W --> F
-    F --> R["最小复现"]
-    R --> X["反证干预"]
-    X --> J{"证据仍成立？"}
-    J -->|"是"| K["保留结论并写边界"]
-    J -->|"否"| G["降级结论并保存失败"]
-    K --> N["下一条声明"]
-    G --> N
-
-    classDef claim fill:#d9ecff,stroke:#0067a5,color:#111
-    classDef test fill:#fff0cc,stroke:#a65f00,color:#111
-    classDef outcome fill:#dff2e5,stroke:#147a4b,color:#111
-    class C,M,T claim
-    class Q,E,L,A,I,V,W,F,R,X,J test
-    class K,G,N outcome
-```
-
+![图 043：从论文声明到保留或降级结论的验证回路](assets/imagegen-diagrams/043/diagram.png)
 文字替代：先从论文中只取一条声明，把它改写为可测命题；根据声明属于画质、退化恢复、延迟、音视频同步、主体身份/绑定/泄漏、相机/轨迹/姿态控制还是动作闭环，选择相应协议。冻结模型版本、输入条件、预算和硬件后做最小复现，再加入最可能推翻结论的干预。证据仍成立时保留带适用边界的结论；不成立时降级结论并保存失败，两者都进入下一条声明。
 
 ## 13. 跨分支结课项目

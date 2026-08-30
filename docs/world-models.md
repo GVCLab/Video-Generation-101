@@ -78,25 +78,7 @@ q_\phi(z_t\mid h_t,o_t) &\quad\text{（后验，用于观测校正）}.
 
 这里的 posterior 在新观测到来时校正 belief，prior 在没有新观测时按动作想象；数学上与随机未来模型共享 variational state-space 接口。ELBO、prior–posterior gap、posterior collapse、aleatoric/epistemic 分账见[变分随机视频生成](generative-models/variational-generation.md)；reward/continue、planner、return 与 model exploitation 仍由本章负责。两种验收不能互相替代。
 
-~~~mermaid
-flowchart LR
-    accTitle: RSSM 的先验想象与后验观测校正
-    accDescr: 上一确定性状态、随机状态和已执行动作进入 recurrent transition，形成当前记忆。没有新观测时从 prior 继续 rollout；真实观测到达时由 encoder 与 posterior 校正随机状态，再用于解码观测、奖励或价值。
-
-    O["真实观测 o_t"] --> E["Encoder"]
-    H0["上一确定性状态 h_(t-1)"] --> R["Recurrent transition"]
-    Z0["上一随机状态 z_(t-1)"] --> R
-    A0["已执行动作 a_(t-1)"] --> R
-    R --> H["确定性记忆 h_t"]
-    H --> PR["Prior p(z_t | h_t)"]
-    H --> PO["Posterior q(z_t | h_t, o_t)"]
-    E --> PO
-    PR -. "无新观测时 rollout" .-> Z["随机状态 z_t"]
-    PO -- "有真实观测时校正" --> Z
-    H --> D["Decoder / reward / value"]
-    Z --> D
-~~~
-
+![图 083：RSSM 的先验想象与后验观测校正](assets/imagegen-diagrams/083/diagram.png)
 _图 1：RSSM 的“先验想象—后验校正”结构。实线表示有观测时的更新，虚线表示仅依靠 learned dynamics 的 rollout。_
 
 顺序化文字替代：
@@ -265,28 +247,7 @@ World Action Verifier（WAV）提供了一个可插入这两种级联系统的�
 
 ### 6.4 Receding horizon：每次只相信一小段未来
 
-~~~mermaid
-flowchart LR
-    accTitle: 带验证器和不确定性的滚动时域闭环
-    accDescr: 系统从真实观测与持久状态产生多个动作和未来候选，由任务价值、不确定性与动作验证器共同评分，只执行首个动作或短动作块。新观测用于后验校正与记忆更新；预测现实偏差过大时转入减速、重新感知或安全策略。
-
-    S["真实观测 + persistent state"] --> C["生成 K 个动作/未来候选"]
-    C --> V["预测任务价值"]
-    C --> U["估计不确定性"]
-    C --> W["Action verifier"]
-    V --> Q["综合评分：价值 - 风险 - 违规"]
-    U --> Q
-    W --> Q
-    Q --> X["只执行首个动作或短 action chunk"]
-    X --> O["读取真实新观测"]
-    O --> M["后验校正并更新实体/空间/事件记忆"]
-    M --> S
-    O --> F{"预测与现实偏差过大？"}
-    F -- "是" --> SAFE["减速 / 重新感知 / 安全策略"]
-    SAFE --> S
-    F -- "否" --> M
-~~~
-
+![图 084：带验证器和不确定性的滚动时域闭环](assets/imagegen-diagrams/084/diagram.png)
 _图 3：带 verifier、不确定性和 persistent state 的 receding-horizon 闭环。_
 
 顺序化文字替代：

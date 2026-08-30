@@ -81,45 +81,7 @@ f(x,\tau)-\frac{1}{2}g(\tau)^2s_\tau(x).
 
 ### 2.2 一张图看清从 score 到 flow
 
-~~~mermaid
-flowchart TB
-    accTitle: Diffusion 到连续运输的桥梁
-    accDescr: 左侧展示数据经加噪得到边缘分布并学习 score，随后分为反向 SDE 和概率流 ODE；右侧展示 Flow Matching 从条件路径、条件速度、边缘速度场到学习 ODE 轨迹的三层关系。
-
-    subgraph diffusion_bridge["Diffusion / score 路线"]
-        data_distribution["数据分布 p_data"]
-        forward_noising["前向 SDE / 离散加噪"]
-        noisy_marginals["噪声边缘族 p_tau"]
-        learned_score["学习 score s_tau"]
-        reverse_sde["反向时间 SDE"]
-        probability_flow_ode["PF-ODE"]
-
-        data_distribution --> forward_noising
-        forward_noising --> noisy_marginals
-        noisy_marginals --> learned_score
-        learned_score --> reverse_sde
-        learned_score --> probability_flow_ode
-    end
-
-    subgraph flow_matching_bridge["Flow Matching 路线"]
-        endpoint_condition["端点 / 条件 Z"]
-        conditional_path["条件概率路径 p_s(x | Z)"]
-        conditional_velocity["条件速度 u_s(x | Z)"]
-        marginal_field["边缘速度场 u_s(x)"]
-        learned_field["学习速度场 v_theta"]
-        learned_trajectory["数值积分得到 ODE 轨迹"]
-
-        endpoint_condition --> conditional_path
-        conditional_path --> conditional_velocity
-        conditional_velocity -->|条件期望| marginal_field
-        marginal_field -->|回归| learned_field
-        learned_field --> learned_trajectory
-    end
-
-    probability_flow_ode -.->|同为 ODE，但构造与监督不同| learned_trajectory
-    probability_flow_ode --> consistency_reference["CM 可沿参考 PF-ODE 学流映射"]
-~~~
-
+![图 020：Diffusion 到连续运输的桥梁](assets/imagegen-diagrams/020/diagram.png)
 **图的顺序化文字替代：**
 
 1. 数据经离散加噪或前向 SDE 形成噪声边缘族。
@@ -171,72 +133,7 @@ v_\theta(\hat X_s,s),
 
 **图：五层不能压成一个方法名。** 第一、二层描述模型学到的场与对应连续过程；第三层只替换已有模型的积分方法或时间网格；第四层会优化新的参数或 student；第五层处理视频时间 $k$ 上的因果性和系统交付。图中 `CM / PD` 是紧凑记忆标签，不表示二者损失相同；`Shortcut / MeanFlow` 也只表示两者都学习跨区间运输信息。
 
-~~~mermaid
-flowchart TB
-    accTitle: DDPM、SDE、PF-ODE、Flow Matching、Rectified Flow、Consistency 与 DMD 的五层关系
-    accDescr: 训练层分为 diffusion 或 score 与 Flow Matching 或 Rectified Flow；连续过程层分为 reverse SDE、PF-ODE 与学习 ODE；不重训层只更换 DDIM 或 DPM-Solver；另训练的少步层按轨迹或 flow map、分布、区间运输分开；因果、分块、KV cache 与持续发帧属于正交部署轴。
-
-    subgraph train["1 · 训练统计量 / objective"]
-        direction LR
-        diff["DDPM / score<br/>ε、x0、v 或 score 回归"]
-        fm["Flow Matching<br/>条件速度回归"]
-        rf["Rectified Flow / reflow<br/>直线条件桥与重耦合"]
-        fm -->|一种路径与耦合选择| rf
-    end
-
-    subgraph dynamics["2 · 连续过程 / dynamics"]
-        direction LR
-        rsde["Reverse SDE<br/>随机样本路径"]
-        pfode["PF-ODE<br/>确定样本路径"]
-        learnedode["Learned ODE<br/>积分边缘速度场"]
-    end
-
-    diff -->|同一 score，不同动力学| rsde
-    diff -->|同一 score，不同动力学| pfode
-    fm -->|学习边缘速度| learnedode
-    rf -->|学习更易积分的速度场| learnedode
-
-    subgraph solver["3 · 只改推理 / no retraining"]
-        direction LR
-        fastsolver["DDIM / DPM-Solver / 时间网格<br/>复用已有 denoiser 或 score"]
-    end
-
-    diff -->|不训练新 student| fastsolver
-
-    subgraph student["4 · 另训练少步模型 / new parameters"]
-        direction LR
-        trajectory["PD / CD / CM<br/>教师轨迹或终点 flow map"]
-        standalone["Standalone CT<br/>可不依赖外部教师"]
-        distribution["DMD / DMD2<br/>目标 score − fake score；分布对齐"]
-        interval["Shortcut / MeanFlow / α-Flow<br/>步长条件或区间平均运输"]
-        standalone -.->|CM 的另一训练路线| trajectory
-    end
-
-    pfode -->|常见参考轨迹；PD 也可用确定性 sampler| trajectory
-    diff -->|预训练教师 score| distribution
-    fm -->|trajectory FM 与 bootstrap| interval
-    rf -.->|可提供重耦合轨迹| interval
-
-    subgraph deployment["5 · 视频部署轴 / orthogonal axis"]
-        direction LR
-        serving["causal attention · chunking · KV cache<br/>首帧延迟 · 稳态吞吐 · 持续发帧"]
-    end
-
-    fastsolver -.->|仍需另选视频 factorization| serving
-    trajectory -.->|仍需另选视频 factorization| serving
-    distribution -.->|仍需另选视频 factorization| serving
-    interval -.->|仍需另选视频 factorization| serving
-
-    classDef diffusion fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
-    classDef flow fill:#ffedd5,stroke:#ea580c,stroke-width:2px,color:#7c2d12
-    classDef few fill:#f3e8ff,stroke:#7e22ce,stroke-width:2px,color:#581c87
-    classDef deploy fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
-    class diff,rsde,pfode,fastsolver diffusion
-    class fm,rf,learnedode flow
-    class trajectory,standalone,distribution,interval few
-    class serving deploy
-~~~
-
+![图 021：DDPM、SDE、PF-ODE、Flow Matching、Rectified Flow、Consistency 与 DMD 的五层关系](assets/imagegen-diagrams/021/diagram.png)
 **顺序化文字替代：** 第一，DDPM/score 训练学习可换算的 denoiser 或 score，既能驱动随机 reverse SDE，也能驱动确定 PF-ODE；第二，FM/RF 回归的是由所选概率路径和耦合诱导的边缘速度，生成时积分 learned ODE；第三，DDIM、DPM-Solver 或新时间网格通常复用已有场，不产生新 student；第四，PD/CD/CM 对齐轨迹或 flow map，DMD/DMD2 对齐教师与学生分布，Shortcut/MeanFlow/$\alpha$-Flow 学习跨步长或区间运输；第五，以上任一路线都还需独立选择 causal attention、chunking、KV cache 和服务流水线，少 NFE 本身不提供 streaming。
 
 | 看到的词 | 它真正改变什么 | 不能据此推出什么 | 最低复现字段 |
@@ -485,45 +382,7 @@ CausVid 把 50-step 双向视频 diffusion 教师蒸馏为 4-step 因果自回�
 - **Streaming**：系统能否边接收条件、边生成、边交付，并维持跨 chunk 状态？
 - **Real-time**：在明确硬件与服务级目标（SLO）下，首帧、截止期与抖动是否达标？
 
-~~~mermaid
-flowchart LR
-    accTitle: Few-Step 与流式生成的正交关系
-    accDescr: 图中三列分别表示少步学习目标、视频数据时间分解和部署执行方式。任一生成系统都要从三列分别作选择，少步并不会自动推出因果、流式或实时。
-
-    subgraph objective_axis["轴一：噪声 / 运输时间目标"]
-        field_objective["场：FM / RF"]
-        map_objective["映射：CM / Shortcut / MeanFlow"]
-        distribution_objective["分布：DMD / DMD2"]
-    end
-
-    subgraph factorization_axis["轴二：视频数据时间分解"]
-        joint_factorization["整段双向联合"]
-        pyramid_factorization["空间时间金字塔"]
-        causal_factorization["按帧 / chunk 因果"]
-    end
-
-    subgraph deployment_axis["轴三：部署执行"]
-        offline_batch["离线整段生成"]
-        streaming_state["状态化流式生成"]
-        realtime_slo["实时 SLO：TTFF / deadline / jitter"]
-    end
-
-    field_objective --> configured_generator["具体生成系统"]
-    map_objective --> configured_generator
-    distribution_objective --> configured_generator
-    joint_factorization --> configured_generator
-    pyramid_factorization --> configured_generator
-    causal_factorization --> configured_generator
-    offline_batch --> configured_generator
-    streaming_state --> configured_generator
-    realtime_slo --> configured_generator
-
-    configured_generator -.-> pyramidal_example["Pyramidal Flow：FM + 金字塔"]
-    configured_generator -.-> rcm_example["rCM：少步 map + 离线短视频"]
-    configured_generator -.-> causvid_example["CausVid：DMD2 + 因果学生"]
-    configured_generator -.-> streamv2_example["StreamDiffusionV2：训练无关的流式服务管线"]
-~~~
-
+![图 022：Few-Step 与流式生成的正交关系](assets/imagegen-diagrams/022/diagram.png)
 **图的顺序化文字替代：**
 
 1. 先在噪声/运输时间轴上选择场学习、映射学习或分布蒸馏。

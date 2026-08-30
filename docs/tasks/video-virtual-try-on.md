@@ -71,24 +71,7 @@ Y\sim p_\theta(Y\mid x_{person},G,P_{1:T}),
 | **source-video VVT** | 源人物视频 + 目标服装 | **目标服装** | **人物、体型、动作、场景、时间** | **是** |
 | **pose-driven VVT** | 人物图 + 服装 + pose 序列 | **目标服装** | **人物身份、驱动、服装时序** | **是** |
 
-~~~mermaid
-flowchart TD
-    accTitle: 视频虚拟试衣任务边界决策树
-    accDescr: 先判断是否存在目标服装，再判断是否有完整源人物视频；有源视频且要求同时间轴换装时进入严格V2V专项，无源视频但有人物图和姿态序列时进入试衣动画。单帧、普通补全、身份个性化和物理仿真分别路由到邻接任务。
-
-    Q0["视觉条件的视频请求"] --> G{"是否有目标服装参考？"}
-    G -- "否" --> N["人物动画 / 个性化 / 通用编辑"]
-    G -- "是" --> V{"是否有完整人物源视频？"}
-    V -- "是，保留同一时间轴" --> SV["source-video VVT<br/>严格 V2V 专项"]
-    V -- "否" --> P{"人物图 + pose/driving sequence？"}
-    P -- "是" --> PA["pose-driven try-on animation<br/>VVT，但非严格 V2V"]
-    P -- "否，只需一张图" --> IV["image VTON<br/>无时序证据"]
-    SV --> PHY{"是否声称真实尺码/舒适/力学？"}
-    PA --> PHY
-    PHY -- "是" --> SIM["还需测量、服装规格、3D cloth 或实穿试验"]
-    PHY -- "否，仅视觉换装" --> LED["进入五本守恒账与时序评测"]
-~~~
-
+![图 076：视频虚拟试衣任务边界决策树](assets/imagegen-diagrams/076/diagram.png)
 **顺序化文字替代：** 先检查是否给出目标服装；没有目标服装时，通常是人物动画、个性化或通用编辑。有完整人物源视频并要求同一时间轴换装时，进入 source-video VVT；只有人物图和姿态/驱动序列时，进入 pose-driven VVT；只有单帧输出则是 image VTON。任何关于真实尺码、舒适度或物理布料的主张，还必须增加测量、规格、物理模拟或实穿证据。
 
 ### 1.4 最小 tensor 与时钟合同
@@ -424,33 +407,7 @@ CLIP 更适合粗语义，不足以验证小字/logo；DINOv2 对局部结构更
 
 因此正文只在**同一论文、同一表、同一协议**内讨论相对变化，并把跨论文数字当作协议案例，不做总榜。
 
-~~~mermaid
-flowchart TD
-    accTitle: 视频虚拟试衣的多账本评测流程
-    accDescr: 先冻结输入输出与预处理版本，再分 paired 和 unpaired；随后并行检查目标服装、人物体型、背景、时序交互和系统性能，任何安全或身份硬失败都直接拒绝，只有全部门通过才进入人工盲评和统计报告。
-
-    F["冻结 source / garment / instruction<br/>seed / fps / resolution / preprocessing"] --> S{"paired reconstruction<br/>还是 unpaired transfer？"}
-    S -- "paired" --> P["SSIM / LPIPS + 五账本"]
-    S -- "unpaired" --> U["不报像素 GT 指标<br/>五账本 + human"]
-    P --> G["目标服装<br/>结构 / logo / text / material"]
-    U --> G
-    P --> B["人物与体型<br/>ID / skin / hair / hand / silhouette"]
-    U --> B
-    P --> C["场景与非目标<br/>background / camera / props"]
-    U --> C
-    P --> T["时序与交互<br/>motion / occlusion / seam / re-entry"]
-    U --> T
-    P --> R["系统<br/>TTFF / P95 / FPS / memory"]
-    U --> R
-    G --> H{"是否存在硬失败？"}
-    B --> H
-    C --> H
-    T --> H
-    R --> H
-    H -- "身份错、裸露、目标衣服错、严重泄漏" --> X["拒绝；平均分不得抵消"]
-    H -- "全部通过" --> M["盲化人工成对比较<br/>分层 bootstrap CI + failure gallery"]
-~~~
-
+![图 077：视频虚拟试衣的多账本评测流程](assets/imagegen-diagrams/077/diagram.png)
 **顺序化文字替代：** 首先冻结源视频、服装、指令、seed、分辨率、帧率与预处理版本；再把 paired reconstruction 与 unpaired transfer 分开，后者不使用像素 ground truth 指标。两条 track 都并行检查目标服装、人物/体型、背景/非目标内容、时序交互和系统性能。任何身份错误、非自愿暴露、目标服装错误或严重泄漏都直接拒绝；全部硬门通过后，才进行盲化人工比较、置信区间与失败样本报告。
 
 ### 10.4 人工评测也要可审计

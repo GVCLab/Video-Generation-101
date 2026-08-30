@@ -31,26 +31,7 @@
 
 StoryDALL-E 与 Make-A-Story 都属于静态 story visualization/continuation：前者从源图与故事生成后续图像，后者用视觉记忆维持多图一致性 [[2]](#ref-2) [[3]](#ref-3)。Phenaki 能按连续文本生成可变长度视频，但其核心证据是长时间 token 建模，不是显式切镜合同 [[4]](#ref-4)。SEINE 处理首尾条件下的转场/补间，适合连接两个片段，却也不自动成为多镜头叙事器 [[6]](#ref-6)。
 
-```mermaid
-flowchart TD
-    accTitle: 故事与多镜头任务边界判定树
-    accDescr: 先判断输出是静态还是视频，再判断是否依赖源视频时间轴、是否只有连续前缀续写，以及是否存在显式镜头边界；只有含多个镜头且共享叙事状态的输出才进入本章核心范围。
-
-    input["给定故事、参考或视频条件"] --> moving{"输出包含时间运动吗？"}
-    moving -->|否| static{"每段是单张还是关键帧对？"}
-    static -->|图像序列| storyvis["story visualization"]
-    static -->|首尾/关键帧| board["storyboard generation"]
-    moving -->|是| source{"源视频是否规定主要时间轴？"}
-    source -->|是| v2v["video-to-video"]
-    source -->|否| prefix{"是否只延续一个已有前缀？"}
-    prefix -->|是| continue["video continuation"]
-    prefix -->|否| cut{"成片是否有可定位的切镜/转场？"}
-    cut -->|否| longshot["长单镜头或多事件连续镜头"]
-    cut -->|是| state{"镜头是否共享人物、世界与剧情状态？"}
-    state -->|否| montage["独立片段拼接，不构成故事合同"]
-    state -->|是| multishot["multi-shot narrative video"]
-```
-
+![图 061：故事与多镜头任务边界判定树](assets/imagegen-diagrams/061/diagram.png)
 **顺序化文字替代：** 先看输出是否真的有运动；静态输出是故事图或 storyboard。若有运动，再排除由源视频时间轴约束的 V2V 和只延续一个前缀的 continuation。剩余输出若没有可定位镜头边界，是长单镜头；有边界但没有共享叙事状态，只是 montage；同时有边界与共享状态，才是本章所称 multi-shot narrative video。
 
 ### 1.1 一个重要纠错：SVD 不是 LLM storyboard 证据
@@ -173,29 +154,7 @@ CausalCine 用内容感知历史 KV memory routing 与少步蒸馏做在线导�
 
 **图 1：把跨镜头一致性变成可检查的循环。** 图中“通过”只表示候选镜头满足当前合同，不代表整部影片已经正确；“冲突”路径必须回到受影响的生成步骤，而不能把失败结果写入长期记忆。下方 Mermaid 给出带版本、依赖和失效传播的规范版本。
 
-```mermaid
-flowchart TB
-    accTitle: 可回滚的多镜头故事生成事务
-    accDescr: 故事先被编译成角色场景设定和带依赖的镜头计划。每个镜头只从已接受状态生成，验证通过才提交记忆；局部失败重试当前镜头，设定或上游事实冲突则回滚到最早受影响镜头并使后续结果失效。
-
-    story["故事 S + 用户参考"] --> compile["编译角色/场景/道具 bible"]
-    compile --> plan["镜头 DAG：prompt、时长、切点、相机、依赖"]
-    plan --> checkpoint["建立 Z0 与 plan version v0"]
-    checkpoint --> select["选择当前镜头需要的 memory/reference"]
-    select --> render["生成候选 Xi 与 provenance"]
-    render --> validate{"身份、状态、动作、相机、切点<br/>与叙事依赖都通过？"}
-    validate -->|是| commit["原子提交：更新实体/场景/道具/事实/memory"]
-    commit --> done{"所有镜头完成？"}
-    done -->|否| select
-    done -->|是| final["导出视频 + EDL + 状态/seed 清单"]
-    validate -->|局部渲染失败| retry["保持 Zi-1 不变；修改局部条件或 seed"]
-    retry --> render
-    validate -->|bible/计划/上游事实冲突| earliest["定位最早受影响镜头 j"]
-    earliest --> invalidate["恢复 Zj-1；使 Xj:K 与其 memory 失效；v=v+1"]
-    invalidate --> plan
-    render -. "拒绝结果绝不写入 memory" .-> checkpoint
-```
-
+![图 062：可回滚的多镜头故事生成事务](assets/imagegen-diagrams/062/diagram.png)
 **顺序化文字替代：** 故事先编译为角色、场景、道具设定和带依赖的镜头 DAG；每个镜头只从最近一次已接受状态取条件。候选通过身份、事实、动作、相机和切点验证后才原子提交。局部画质失败只重试当前镜头；若发现设定或上游事实错误，则回到最早受影响镜头，撤销它及所有后继镜头与记忆，升级计划版本后重算。被拒绝结果永不污染长期状态。
 
 ### 4.1 为什么要回滚而不是“在下一镜头修一下”

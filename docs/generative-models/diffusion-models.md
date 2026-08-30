@@ -14,29 +14,7 @@ X_0=\left(x_0^{(1)},x_0^{(2)},\ldots,x_0^{(K)}\right).
 
 上标 $`k\in\lbrace1,\ldots,K\rbrace`$ 表示第几帧，即现实画面怎样随时间演化；下标 $\tau\in[0,T]$ 表示这整段视频处在多强的噪声下。于是 $x_\tau^{(k)}$ 是“第 $k$ 帧在噪声等级 $\tau$ 的状态”，$X_0$ 是整段干净视频而不是第一帧，$X_T$ 则接近先验噪声。条件 $c$ 可以是文本、首帧、参考视频、深度、姿态、相机轨迹或动作。
 
-```mermaid
-flowchart LR
-    accTitle: 视频与噪声双时间轴
-    accDescr: 视频时间 k 在同一噪声层内排列各帧，噪声时间 tau 把整段干净视频推向高斯先验；生成时同一 score 可驱动随机 reverse SDE 或确定性 PF-ODE 返回数据端。
-
-    first_frame["第 1 帧<br/>xτ^(1)"] -->|视频推进| middle_frame["第 k 帧<br/>xτ^(k)"] -->|视频推进| last_frame["第 K 帧<br/>xτ^(K)"]
-    clean_video["干净视频 X0<br/>τ = 0"] -->|前向加噪| noisy_video["扰动视频 Xτ<br/>k 不前进"] -->|继续加噪| gaussian_prior["高斯先验 XT<br/>τ = T"]
-    last_frame -.->|同一噪声层| noisy_video
-    gaussian_prior -->|τ 下降| reverse_sde["Reverse SDE<br/>随机路径"]
-    gaussian_prior -->|τ 下降| pf_ode["PF-ODE<br/>确定路径"]
-    reverse_sde --> generated_sde(["生成样本 X̂0"])
-    pf_ode --> generated_ode(["生成样本 X̂0"])
-
-    classDef data fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
-    classDef noise fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#3b0764
-    classDef stochastic fill:#fef9c3,stroke:#ca8a04,stroke-width:2px,color:#713f12
-    classDef output fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
-    class first_frame,middle_frame,last_frame data
-    class clean_video,noisy_video,gaussian_prior,pf_ode noise
-    class reverse_sde stochastic
-    class generated_sde,generated_ode output
-```
-
+![图 018：视频与噪声双时间轴](assets/imagegen-diagrams/018/diagram.png)
 顺序化文字替代：第一，固定一个噪声等级 $\tau$，按 $k=1,\ldots,K$ 排列视频帧；第二，固定整段视频的帧索引结构，增加 $\tau$，把 $X_0$ 逐渐扰动为 $X_T$；第三，从 $X_T$ 出发降低 $\tau$；第四，可沿带随机项的 reverse SDE 或不带随机项的 PF-ODE 生成 $\hat X_0$；第五，在精确 score 与精确积分的理想条件下，两条反向过程共享各噪声时刻的边缘分布，但不共享逐样本轨迹。
 
 这一区分也澄清了三个常见说法。其一，“一次生成 16 帧”描述的是 $K$；“采样 20 步”描述的是噪声轴离散点数。其二，frame-wise causal attention 限制的是 $k$ 方向的信息访问，并不规定 $\tau$ 方向采用 DDPM、ODE 还是少步蒸馏。其三，网络调用次数（number of function evaluations，NFE）减少，只说明噪声轴计算可能变少，不自动说明系统能在视频结束前持续发帧。
@@ -267,31 +245,7 @@ Classifier-free guidance（CFG）在训练时随机丢弃条件，使一个网�
 
 这里先按“是否训练新参数、主要对齐轨迹还是分布”做最小分叉；若要同时判断 DDPM/score、reverse SDE、PF-ODE、FM/RF、CM/DMD 与 causal streaming 分别处在哪一层，请对照 [Flow 专章的五层机制地图](flow-consistency-models.md#five-layer-map)。核心原则是：输出参数化不等于训练 objective，确定性动力学不等于 FM，不重训的 solver 不等于少步 student，少 NFE 也不等于视频能持续发帧。
 
-```mermaid
-flowchart TB
-    accTitle: 扩散生成三类加速路线
-    accDescr: 从已训练的扩散或 score 模型出发，若不重训则选择 training-free sampler 或 solver；若训练新模型，则按对齐同一生成轨迹还是对齐目标分布，分别进入 consistency 路线或 DMD 与对抗蒸馏路线。
-
-    teacher_field(["已训练 diffusion<br/>或 score 场"]) --> retrain_choice{"允许训练新模型？"}
-    retrain_choice -->|否| solver_route["Training-free solver<br/>DDIM / DPM-Solver"]
-    retrain_choice -->|是| alignment_choice{"主要对齐对象？"}
-    alignment_choice -->|同一轨迹端点| consistency_route["Consistency trajectory<br/>一步或多步 refinement"]
-    alignment_choice -->|目标生成分布| dmd_route["DMD / DMD2<br/>score 差 + 可选 GAN"]
-    solver_route --> generated_output(["较少 NFE 的输出"])
-    consistency_route --> generated_output
-    dmd_route --> generated_output
-    generated_output --> deployment_check["统一验收<br/>质量 · 覆盖 · 延迟 · 硬件"]
-
-    classDef source fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#3b0764
-    classDef decision fill:#fef9c3,stroke:#ca8a04,stroke-width:2px,color:#713f12
-    classDef method fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
-    classDef result fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
-    class teacher_field source
-    class retrain_choice,alignment_choice decision
-    class solver_route,consistency_route,dmd_route method
-    class generated_output,deployment_check result
-```
-
+![图 019：扩散生成三类加速路线](assets/imagegen-diagrams/019/diagram.png)
 顺序化文字替代：第一，从已经训练好的 diffusion 或 score 场出发；第二，若不能重训，使用兼容的 DDIM、PF-ODE 或 DPM-Solver 等 sampler/solver；第三，若允许训练新模型，再判断监督主要对齐同一生成轨迹上的端点，还是对齐 student 与目标的生成分布；第四，前者进入 consistency/trajectory 路线，后者进入 DMD 或带对抗项的 DMD2 路线；第五，三条路线都必须在相同分辨率、时长、条件、NFE、硬件和精度下重新验收质量、覆盖与延迟。
 
 #### Training-free sampler 与 solver

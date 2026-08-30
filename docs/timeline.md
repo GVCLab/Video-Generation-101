@@ -21,78 +21,7 @@
 
 ## 并行泳道索引
 
-```mermaid
-flowchart TB
-    accTitle: 视频生成技术发展的并行泳道
-    accDescr: 生成机制基础、视频基础模型与创作能力、World Model 与行动闭环三条技术路线并行发展，最后落到应用工作流和分层评测；多条件、多镜头、音视频与统一系统是不同维度。
-
-    subgraph generation_track ["生成机制基础：视频如何被表示与生成"]
-        direction LR
-        motion_prediction["显式运动与<br/>时序预测"] --> probabilistic_generation["随机生成与<br/>序列建模"]
-        probabilistic_generation --> scalable_generation["Diffusion / Flow 目标<br/>与 Video DiT 骨干"]
-    end
-
-    subgraph foundation_track ["视频基础模型与创作能力：规模、条件与模态如何扩展"]
-        direction LR
-        text_video["T2V 与视频 Token<br/>技术前驱"] --> foundation_backbone["规模化预训练与<br/>可迁移 Backbone"]
-        foundation_backbone --> multi_condition["多条件与<br/>多参考接口"]
-        multi_condition --> view_time_4d["相机 × 世界时间<br/>多视角 / 4D"]
-        foundation_backbone --> source_editing["源视频约束与<br/>可寻址编辑"]
-        foundation_backbone --> timeline_authoring["多段 Prompt / 分镜<br/>与跨镜头连续"]
-        foundation_backbone --> native_av["原生联合<br/>音视频"]
-        multi_condition --> unified_creation["不同层级的统一<br/>接口 / Backbone / Checkpoint"]
-        view_time_4d --> unified_creation
-        source_editing --> unified_creation
-        timeline_authoring --> unified_creation
-        native_av --> unified_creation
-    end
-
-    subgraph world_track ["World Model 与行动闭环：动作如何改变未来"]
-        direction LR
-        state_space["状态空间与<br/>model-based control"] --> latent_planning["Latent imagination<br/>与 planning"]
-        action_rollout["动作条件视觉 Rollout<br/>不等同闭环"] --> world_model_evidence["动作条件状态转移<br/>持久性与干预证据"]
-        latent_planning --> world_model_evidence
-        world_model_evidence -.-> closed_loop_control["闭环决策验证<br/>动作 → 响应 → 观测 → 再决策"]
-    end
-
-    subgraph application_layer ["应用层：能力如何落地"]
-        workflows["创作、编辑、游戏、<br/>机器人与数据合成"]
-    end
-
-    subgraph validation_framework ["验证框架：能力如何被证明"]
-        evidence["质量、物理、反事实、<br/>闭环与安全评测"]
-    end
-
-    probabilistic_generation -.->|"生成机制"| text_video
-    scalable_generation -.->|"规模化底座"| foundation_backbone
-    motion_prediction -.->|"预测传统"| latent_planning
-    scalable_generation -.->|"生成式视觉先验"| action_rollout
-    foundation_backbone -.->|"视觉先验可复用；仍需动作数据"| action_rollout
-    multi_condition --> workflows
-    view_time_4d --> workflows
-    source_editing --> workflows
-    timeline_authoring --> workflows
-    native_av --> workflows
-    unified_creation --> workflows
-    world_model_evidence --> workflows
-    closed_loop_control --> workflows
-    evidence -.-> foundation_backbone
-    evidence -.-> world_model_evidence
-    evidence -.-> closed_loop_control
-    evidence -.-> workflows
-
-    classDef foundation fill:#f3f4f6,stroke:#6b7280,stroke-width:2px,color:#1f2937
-    classDef creative fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
-    classDef world fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#3b0764
-    classDef outcome fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
-
-    class motion_prediction,probabilistic_generation,scalable_generation foundation
-    class text_video,foundation_backbone,multi_condition,view_time_4d,source_editing,timeline_authoring,native_av,unified_creation creative
-    class state_space,latent_planning,action_rollout,world_model_evidence,closed_loop_control world
-    class evidence foundation
-    class workflows outcome
-```
-
+![图 080：视频生成技术发展的并行泳道](assets/imagegen-diagrams/080/diagram.png)
 | 泳道 | 核心问题 | 阅读方法 | 对应专题 |
 |---|---|---|---|
 | **生成机制基础** | 视频如何表示、压缩、预测和采样？ | 显式运动与统计动态 → 深度视频预测 → 随机预测与 GAN → 视频 Token → Diffusion/Flow objective 与 U-Net/Video DiT backbone 的正交扩展 | [生成模型路线](generative-models.md) · [变分随机视频生成](generative-models/variational-generation.md) · [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md) · [Video DiT 与骨干扩展](generative-models/video-dit-backbones.md) |
@@ -109,54 +38,7 @@ flowchart TB
 
 一个节点同时有四种状态：首次公开的时间、学术发表状态、是否被本页判定为研究里程碑，以及截止日能否实际获取或使用。这四者相互独立。
 
-```mermaid
-flowchart LR
-    accTitle: 时间线节点的四条独立证据轴
-    accDescr: 首次预印本可以确定最早公开时间，后续才可能进入正式期刊或会议；研究里程碑是本页根据机制和实验作出的编辑判断；代码与权重决定可复现范围；托管产品则另有开放、受限或下线状态。四条证据轴共同形成节点的完整状态，任一轴都不能自动推出另一轴。
-
-    subgraph publication_lane ["公开与学术状态"]
-        direction LR
-        first_public["首次预印本 / 技术报告<br/>确定最早公开时间"] --> formal_publication["正式发表<br/>期刊或会议 proceedings"]
-    end
-
-    subgraph milestone_lane ["研究谱系"]
-        direction LR
-        mechanism_evidence["机制、任务与实验边界"] --> editorial_milestone["研究里程碑<br/>本页编辑判断"]
-    end
-
-    subgraph artifact_lane ["复现材料"]
-        direction LR
-        official_artifact["官方代码 / 权重 / 数据"] --> reproducible_scope["可复现范围<br/>仍需独立验收"]
-    end
-
-    subgraph product_lane ["产品与访问状态"]
-        direction LR
-        official_release["官方发布 / 模型卡"] --> availability["截止日快照<br/>开放 / 受限 / 下线"]
-    end
-
-    first_public -.->|"不自动推出"| editorial_milestone
-    formal_publication -.->|"不自动推出"| reproducible_scope
-    official_release -.->|"不自动推出"| mechanism_evidence
-    official_artifact -.->|"不自动推出"| availability
-
-    formal_publication --> evidence_record["四维证据记录<br/>而非单一‘发布’标签"]
-    editorial_milestone --> evidence_record
-    reproducible_scope --> evidence_record
-    availability --> evidence_record
-
-    classDef publication fill:#e69f00,stroke:#7a4d00,stroke-width:2px,color:#111827
-    classDef research fill:#56b4e9,stroke:#155e75,stroke-width:2px,color:#111827
-    classDef artifact fill:#009e73,stroke:#065f46,stroke-width:2px,color:#ffffff
-    classDef product fill:#cc79a7,stroke:#831843,stroke-width:2px,color:#111827
-    classDef record fill:#f3f4f6,stroke:#374151,stroke-width:3px,color:#111827
-
-    class first_public,formal_publication publication
-    class mechanism_evidence,editorial_milestone research
-    class official_artifact,reproducible_scope artifact
-    class official_release,availability product
-    class evidence_record record
-```
-
+![图 081：时间线节点的四条独立证据轴](assets/imagegen-diagrams/081/diagram.png)
 **图示文字替代：**预印本只确定首次公开，正式发表只说明进入某个期刊或会议记录；里程碑是技术史判断，代码/权重决定可复现范围，产品可用性则是会随时间变化的访问快照。
 
 | 页面标签 | 严格含义 | 不能推出 |

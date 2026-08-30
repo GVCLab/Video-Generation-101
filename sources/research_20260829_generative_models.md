@@ -378,30 +378,7 @@ Few-step 只降低每帧/chunk 的 NFE，causal factorization 只限制信息方
 
 图名建议为“视频生成系统不是单标签：五个正交选择汇合为一个可评测系统”。图不能画成 VAE → AR → Diffusion → Streaming 的线性进化，因为五轴可以自由组合。画面应先让五个独立选择汇入 `Configured generator`，再从系统声明反向指向相应证据。
 
-```mermaid
-flowchart LR
-    R["R · Representation\npixel / continuous latent / discrete token"]
-    F["F · Factorization\njoint / AR / masked / hierarchy / causal chunk"]
-    O["O · Objective\nELBO-score / FM-RF / CM-shortcut / DMD / GAN"]
-    B["B · Backbone\nU-Net / DiT / decoder Transformer / recurrent"]
-    D["D · Deployment\noffline / few-step / streaming / interactive"]
-
-    M["Configured video generator\n(R, F, O, B, D)"]
-    E["Claim-specific evidence\nquality · NFE · TTFF · deadline · drift · control"]
-
-    R --> M
-    F --> M
-    O --> M
-    B --> M
-    D --> M
-    M --> E
-
-    X1["NOVA\ncontinuous latent + frame/set AR + diffusion loss"] -. example .-> M
-    X2["Pyramid Flow\nlatent + temporal pyramid AR + FM + DiT"] -. example .-> M
-    X3["CausVid\ncausal factorization + DMD + few-step streaming"] -. example .-> M
-    X4["StreamDiffusionV2\nmodel + cache/scheduler/pipeline + SLO"] -. example .-> E
-```
-
+![图 091：R · Representation\npixel / continuous latent / discrete token到StreamDiffusionV2\nmodel + cache/scheduler/pipeline + SLO的流程](assets/imagegen-diagrams/091/diagram.png)
 ### 10.2 节点与视觉规范
 
 | 节点 ID | 形状 | 色彩建议 | 文本上限 | 进入/离开边 |

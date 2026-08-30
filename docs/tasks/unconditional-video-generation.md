@@ -60,25 +60,7 @@ $T,H,W,\mathrm{fps}$ 是全局采样规格，不是样本语义条件。若用�
 
 **图 1：从任务定义到证据的最短链。** “无外部条件”约束部署输入；统一输出合同之后，质量、覆盖、长尾与未复制必须分开评测，并固定特征、时长和随机种子。下方判定树进一步区分类别、文本、图像前缀、动作和自条件。
 
-```mermaid
-flowchart TD
-    accTitle: 无条件视频生成的部署输入判定树
-    accDescr: 从一次部署采样是否接收样本特定外生信息开始判断。没有外生信息且首帧也由模型生成时属于纯边际分布；标签、文本、参考图、视频前缀和动作分别落入不同条件任务。模型自身生成的历史仍可用于自条件分解。
-
-    api["一次部署采样"] --> ext{"有样本特定的外生输入吗?"}
-    ext -->|"没有"| first{"完整视频含首帧<br/>都由同一模型采样?"}
-    first -->|"是"| marginal["pure p(X)"]
-    first -->|"否"| prefix["prefix / first-frame conditional"]
-    marginal --> history["generated history only:<br/>self-conditioned factorization"]
-    ext -->|"类别或域 token"| class_c["p(X | class/domain)"]
-    ext -->|"文本"| t2v["T2V"]
-    ext -->|"图像或视频前缀"| i2v["I2V / prediction"]
-    ext -->|"动作与状态"| world["world model"]
-    ext -->|"参考样本推得 token"| learned["learned-token conditional"]
-    sora["Sora"] -. "文本或媒体条件系统" .-> t2v
-    cosmos["Cosmos"] -. "physical-AI / world family" .-> world
-```
-
+![图 066：无条件视频生成的部署输入判定树](assets/imagegen-diagrams/066/diagram.png)
 **顺序化文字替代：**
 
 1. 先检查一次部署采样是否接收样本特定的外生信息。
@@ -152,35 +134,7 @@ x_\tau=(1-\tau)\epsilon+\tau X,
 
 学习 $v_\theta\approx u^*$，再积分 $\mathrm d x/\mathrm d\tau=v_\theta(x,\tau)$。Flow Matching 提供了通用连续归一化流训练框架 [[24]](#ref-24)；它减少到多少步、是否仍需首帧，必须由具体视频系统证明。
 
-```mermaid
-flowchart LR
-    accTitle: 无条件视频生成的训练采样与证据闭环
-    accDescr: 数据先经过源级划分去重和统一视频预处理，再进入 GAN token masked diffusion 或 flow 训练。部署采样只从独立随机源出发，经生成器和可选解码器得到完整视频。固定的真实集与生成集共同进入分布指标、长尾覆盖和训练集近邻记忆审计。
-
-    raw["raw videos + source IDs"] --> audit["deduplicate and<br/>source-level split"]
-    audit --> clip["fixed clip contract:<br/>T H W FPS crop"]
-    clip --> family{"training objective"}
-    family --> gan["GAN"]
-    family --> token["AR / masked tokens"]
-    family --> diff["diffusion / DiT"]
-    family --> flow["flow / ODE"]
-    gan --> model["frozen checkpoint"]
-    token --> model
-    diff --> model
-    flow --> model
-    seed["independent seeds"] --> sampler["declared sampler<br/>and stop rule"]
-    model --> sampler
-    sampler --> decode["decoder + fixed postprocess"]
-    decode --> fake["all generated videos"]
-    audit --> real["held-out real videos"]
-    fake --> metrics["FVD IS PR DC<br/>with uncertainty"]
-    real --> metrics
-    fake --> memory["train nearest-neighbor<br/>spatial + temporal replication"]
-    clip -. "train split only" .-> memory
-    metrics --> claim["bounded claim"]
-    memory --> claim
-```
-
+![图 067：无条件视频生成的训练采样与证据闭环](assets/imagegen-diagrams/067/diagram.png)
 **顺序化文字替代：**
 
 1. 原始视频先按 source ID 去重和划分，再按固定 $T,H,W,$ FPS 与 crop 生成 clip。

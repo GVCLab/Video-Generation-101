@@ -41,33 +41,7 @@ _Coding Agent 扩展研究覆盖面，研究者对结论与证据负责。_
 
 仓库以“原理 → 系统 → 能力 → 世界 → 应用”为主轴，并让评测与治理贯穿每一层。
 
-~~~mermaid
-flowchart LR
-    accTitle: Video Generation 101 知识全景
-    accDescr: 知识体系从生成基础出发，经过基础模型与可控能力，延伸到视频推理和世界模型，最终服务真实应用；证据体系贯穿各层并约束能力结论。
-
-    generation["生成基础<br/>表示、时间与生成机制"] --> foundation["基础模型<br/>规模、条件与多模态"]
-    foundation --> capabilities["可控能力<br/>编辑、个性化与多视角"]
-    foundation --> world["世界理解<br/>推理、物理与动作后果"]
-    capabilities --> applications["应用落地<br/>创作、修复、数字人与试衣"]
-    world --> applications
-    evidence["证据体系<br/>评测、复现与闭环验证"] -.-> generation
-    evidence -.-> foundation
-    evidence -.-> capabilities
-    evidence -.-> world
-    evidence -.-> applications
-
-    classDef foundation_style fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
-    classDef capability_style fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#3b0764
-    classDef outcome_style fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
-    classDef evidence_style fill:#f3f4f6,stroke:#6b7280,stroke-width:2px,color:#1f2937
-
-    class generation,foundation foundation_style
-    class capabilities,world capability_style
-    class applications outcome_style
-    class evidence evidence_style
-~~~
-
+![图 001：Video Generation 101 知识全景](assets/imagegen-diagrams/001/创建一张用于中文学术教程的高质量横向信息图_主题_Video_2026-08-30T17-01-58.png)
 ### 内容导航
 
 | 板块 | 核心入口 | 延伸专题 |

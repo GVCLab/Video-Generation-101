@@ -68,27 +68,7 @@ Super SloMo 通过时间相关的流组合和 visibility map 支持多个查询�
 
 ## 🧩 2. 一条可检查形状的 tensor/data flow
 
-```mermaid
-flowchart LR
-    accTitle: 双帧视频插值的张量数据流
-    accDescr: 两个 RGB 端点和查询时间进入共享编码器形成多尺度特征，运动分支估计目标到端点的双向流与可见性，采样分支对齐像素或特征，融合细化得到目标帧；训练时真实中间帧只进入损失和特权教师，不进入部署输入。
-
-    i0["I0: B x 3 x H x W"] --> encoder["共享或双塔编码器"]
-    i1["I1: B x 3 x H x W"] --> encoder
-    tau["tau: B x 1 或时间图"] --> motion["运动与对应估计"]
-    encoder --> pyramid["多尺度特征: B x C_l x H_l x W_l"]
-    pyramid --> motion
-    motion --> flow["Ft_to_0, Ft_to_1: B x 2 x H_l x W_l"]
-    motion --> mask["visibility / weight: B x 1 x H_l x W_l"]
-    pyramid --> sampler["backward warp 或 forward splat"]
-    flow --> sampler
-    sampler --> aligned["对齐端点像素或特征"]
-    aligned --> fuse["mask 融合与 residual refine"]
-    mask --> fuse
-    fuse --> output["Ihat_tau: B x 3 x H x W"]
-    gt["训练专用 I_tau GT"] -. "重建、感知、几何或蒸馏监督" .-> fuse
-```
-
+![图 049：双帧视频插值的张量数据流](assets/imagegen-diagrams/049/diagram.png)
 最低限度应在实现文档里写出三件事：flow 的方向、坐标单位和 `align_corners`/边界采样约定。只写“warp 两帧”而不写 $F_{\tau\rightarrow0}$ 还是 $F_{0\rightarrow\tau}$，复现时很容易得到符号相反但仍能运行的代码。
 
 ### 2.1 backward warping：目标像素去哪里取值
@@ -128,40 +108,7 @@ Softmax Splatting 用可学习的重要性 $Z(x)$ 对碰撞做指数归一化 [[
 
 ## 🗺️ 3. 机制地图：不要按网络名字硬分家
 
-```mermaid
-flowchart TD
-    accTitle: 视频帧插值技术路线与可组合模块
-    accDescr: 视频帧插值从显式对应和局部重采样、端到端高效卷积与全局注意三条重建路线发展，并出现条件 diffusion 或 DiT 生成路线；深度、遮挡、相关体、蒸馏与细化可跨路线组合，AMT 和 IFRNet 属于卷积或相关驱动而不是 Transformer。
-
-    task["VFI: I0, I1, tau -> I_tau"] --> correspondence["对应与重采样"]
-    task --> direct["高效端到端 CNN"]
-    task --> attention["Transformer / SSM 全局交互"]
-    task --> generative["Diffusion / DiT 条件生成"]
-
-    correspondence --> flowwarp["flow + backward warp"]
-    correspondence --> splat["flow + forward splat"]
-    correspondence --> kernel["kernel / deformable sampling"]
-    flowwarp --> depth["depth / visibility / occlusion"]
-    splat --> depth
-    kernel --> depth
-
-    direct --> rife["RIFE: intermediate flow"]
-    direct --> ifr["IFRNet: flow + feature refine"]
-    direct --> amt["AMT: all-pairs + multi-field"]
-
-    attention --> vfiformer["VFIformer / VFIT"]
-    attention --> mamba["motion-guided SSM"]
-
-    generative --> latent["latent diffusion"]
-    generative --> pixel["pixel diffusion"]
-    generative --> sequence["joint or autoregressive sequence"]
-
-    depth -. "可组合" .-> rife
-    depth -. "可组合" .-> ifr
-    depth -. "可组合" .-> vfiformer
-    correspondence -. "运动先验" .-> generative
-```
-
+![图 050：视频帧插值技术路线与可组合模块](assets/imagegen-diagrams/050/diagram.png)
 这张图纠正两个常见误分类：**IFRNet 是 encoder–decoder CNN，不是 Transformer**；**AMT 的 Transforms 不是 Transformer**，官方摘要明确称其为 convolution-based model [[9]](#ref-9), [[13]](#ref-13)。
 
 ## 🌊 4. 显式运动、遮挡与局部采样
@@ -313,23 +260,7 @@ BiM-VFI 用由相对距离与方向描述的 bidirectional motion field 缓解�
 
 ## 📊 10. Benchmark 不是一个名字，而是一组数据协议
 
-```mermaid
-flowchart LR
-    accTitle: 可复核的视频帧插值评测协议
-    accDescr: 先冻结数据版本、时间间隔、目标时刻、裁剪和颜色空间，再区分单帧重建与整段生成，分别计算失真、感知和时间指标，最后在固定硬件上测时延显存并按失败属性分桶。
-
-    data["数据集版本与授权"] --> sampling["端点间隔、tau、输出倍数"]
-    sampling --> prep["原分辨率或裁剪、RGB/Y、边界处理"]
-    prep --> mode{"输出协议"}
-    mode --> single["单帧 midpoint / arbitrary-time"]
-    mode --> sequence["联合多帧 / 整段路径"]
-    single --> image_metrics["PSNR、SSIM、LPIPS"]
-    sequence --> temporal_metrics["FloLPIPS、FVD、逐帧曲线"]
-    image_metrics --> system["固定硬件的 latency、memory、params"]
-    temporal_metrics --> system
-    system --> strata["按遮挡、位移、纹理、曝光与最差分位数分桶"]
-```
-
+![图 051：可复核的视频帧插值评测协议](assets/imagegen-diagrams/051/diagram.png)
 ### 10.1 常用数据集的正确用途
 
 | 数据集/协议 | 常见设置 | 能测什么 | 可比性陷阱 |
