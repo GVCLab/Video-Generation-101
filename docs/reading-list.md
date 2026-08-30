@@ -43,10 +43,11 @@
 ```mermaid
 flowchart TB
     accTitle: 视频生成论文课程的依赖路线
-    accDescr: 学习者先完成先修诊断，再通过 tokenizer 表示、生成目标和评测组成的共同主干，并完成 Video DiT 的 token、注意力、融合与扩展加深单元。之后可选择因果流式、少步与后训练、原生音视频、World Action 与 JEPA、细粒度可控生成、视频退化修复、多视角与4D七条任务分支。每条分支都进入共同验收，并以跨分支结课项目结束。
+    accDescr: 学习者先完成先修诊断，再通过 tokenizer 表示、生成目标和评测组成的共同主干，补齐变分随机未来的训练后验、部署先验与校准，再完成 Video DiT 的 token、注意力、融合与扩展加深单元。之后可选择七条任务分支并进入共同验收。
 
     P["先修诊断"] --> K["共同主干：tokenizer 表示 · 目标 · 评测"]
-    K --> B["共同加深：Video DiT<br/>token · topology · fusion · scaling"]
+    K --> U["共同加深：随机未来<br/>posterior · prior · calibration"]
+    U --> B["共同加深：Video DiT<br/>token · topology · fusion · scaling"]
     B --> S["分支 A：因果 · 流式 · 实时"]
     B --> D["分支 B：少步 · 后训练 · 蒸馏"]
     B --> A["分支 C：原生音视频"]
@@ -69,12 +70,12 @@ flowchart TB
     classDef branch fill:#fff0cc,stroke:#a65f00,color:#111
     classDef verify fill:#dff2e5,stroke:#147a4b,color:#111
     class P,C gate
-    class K,B trunk
+    class K,U,B trunk
     class S,D,A,W,G,R,M branch
     class V verify
 ```
 
-文字替代：先通过先修诊断，再完成 tokenizer/目标/评测共同主干和 Video DiT 的 token、attention、fusion、scaling 加深单元。Tokenizer 与 backbone 都是七条任务分支共享的技术先修，不另算应用分支；之后才选一条主修分支。少步蒸馏又是流式生成的常见前提，因此分支 B 连接分支 A。七条分支都必须经过同一套“复现、反证、证据边界”验收，最后再做跨分支项目。颜色只辅助分组，节点标签和箭头已经给出全部语义。
+文字替代：先通过先修诊断，再完成 tokenizer/目标/评测共同主干；随后补齐随机未来的 posterior/prior、collapse 与 calibration，并完成 Video DiT 的 token、attention、fusion、scaling 加深单元。表示、随机未来概率合同与 backbone 都是七条任务分支共享的技术先修，不另算应用分支；之后才选一条主修分支。少步蒸馏又是流式生成的常见前提，因此分支 B 连接分支 A。七条分支都必须经过同一套“复现、反证、证据边界”验收，最后再做跨分支项目。颜色只辅助分组，节点标签和箭头已经给出全部语义。
 
 ### 怎样选主修分支
 
@@ -116,6 +117,21 @@ flowchart TB
 | 离散 token 何时成为实际码流 | [Image and Video Tokenization with Binary Spherical Quantization](https://proceedings.iclr.cc/paper_files/paper/2025/hash/e25198b6a75f74277ee3a2bd4165d9ef-Abstract-Conference.html) | 只有接上先验、概率模型与算术编码后，bpp 才是 bitstream 证据 | **A·正式发表，ICLR 2025** |
 | 固定网格怎样变成内容自适应预算 | [InfoTok](https://proceedings.iclr.cc/paper_files/paper/2026/hash/432f048a844654ba981953491e6dc80e-Abstract-Conference.html) | token 节省要连同 router、变长 batching、最坏长度和下游质量报告 | **A·正式发表，ICLR 2026** |
 
+### 随机未来加深单元：先验收部署分布，再读世界模型
+
+这组阅读解决一个经常被 tokenizer 和 diffusion 掩盖的问题：同一真实历史存在多个合理未来时，训练 posterior 可以看真实未来，部署 prior 不能。完整数学、2015–2026 谱系与 `LatentFork-1` 见[变分随机视频生成](generative-models/variational-generation.md)。
+
+| 阶段 | 论文 | 带着什么问题读 | 证据 |
+|---|---|---|---|
+| fixed prior | [SV2P](https://iclr.cc/virtual/2018/poster/162) | future-aware posterior 怎样把多未来放进 latent？best-of-100 为什么不是校准？ | **A·ICLR 2018** |
+| learned prior | [SVG-LP](https://proceedings.mlr.press/v80/denton18a.html) | history-conditioned prior 比固定 Gaussian 改了什么部署接口？ | **A·ICML 2018** |
+| fully latent dynamics | [SRVP](https://proceedings.mlr.press/v119/franceschi20a.html) | 把 dynamics 与 frame synthesis 解耦后，哪些误差不再来自像素回灌？ | **A·ICML 2020** |
+| hierarchy 与规模 | [GHVAE](https://openaccess.thecvf.com/content/CVPR2021/html/Wu_Greedy_Hierarchical_Variational_Autoencoders_for_Large-Scale_Video_Prediction_CVPR_2021_paper.html)；[CW-VAE](https://proceedings.neurips.cc/paper/2021/hash/f490d0af974fedf90cb0f1edce8e3dd5-Abstract.html) | 贪心层级和慢时钟分别解决优化/显存还是时间抽象？ | **A·CVPR / NeurIPS 2021** |
+| 控制中心评测 | [VP²](https://iclr.cc/virtual/2023/poster/10863) | 感知指标为什么可能不能预测固定 planner 的任务成功？ | **A·ICLR 2023** |
+| 对象粒子前沿 | [LPWM](https://openreview.net/forum?id=lTaPtGiUUc) | inverse-action posterior、policy prior、particle dynamics prior 怎样形成两层变分接口？ | **A·ICLR 2026 Oral** |
+
+通关产物是三张表：`train-only information / deployment information / forbidden leakage`，`single / average / best-of-K / posterior oracle`，以及 `aleatoric / epistemic / partial observability`。若论文只写 latent/VAE、却无法填出 future-aware posterior、history-only prior 和 KL/ELBO，就不能收入严格主线。
+
 ### Backbone 加深单元：共同先修，不是第八条分支
 
 这组阅读不要求背模型名，而是用同一张账回答：latent/patch 后有多少 token、谁能读取谁、条件在哪里融合、位置怎样编码、每步激活多少参数、算法 FLOPs 怎样落到 kernel/通信和端到端 NFE。完整公式、精读与 `BackboneFork-1`/`ServeFork-1` 见[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)。
@@ -143,13 +159,13 @@ flowchart TB
 
 ### 最小复现与反证任务
 
-用一个“移动方块在岔路口向左或向右”的小数据集，固定相同历史但保留两个合理未来：
+用 `Forking-Squares-v1`：64×64、8 帧历史、24 帧未来；同一 prefix 的重复未来共享前缀，可见 cue 为 cyan/amber/violet 时，left/right/stop 真概率分别为 0.6/0.3/0.1、0.2/0.7/0.1、0.1/0.2/0.7：
 
-1. 实现或复用 MSE predictor、离散分类/混合分布和 stochastic generator 三类最小模型；模型可以很小，但数据划分与随机种子必须固定。
-2. 同时报 pixel error、分支覆盖率、最优样本与平均样本；观察 MSE 是否用模糊平均换取更低误差。
-3. 对同一段 16 帧视频做 tokenizer 重建，报告 latent/token 的 shape、dtype、时空网格、元素/token 数、重建误差和运动事件是否保存；只有实际产生可解码 bitstream 时才报告 bpp/bitrate。
+1. 对齐专章 fork：A 为无 latent 的 MSE/deterministic predictor，B 为 posterior + fixed Gaussian prior，C 为 history-conditioned learned prior，D 为 global + per-step hierarchy；Q 只作 posterior-assisted oracle，不进入部署排名。模型可以很小，但数据划分、decoder、预算和随机种子必须固定；C–B 只能解释为整系统优化/归纳偏置差异，不能单独证明 learned prior 的表达能力必要性。
+2. 每个历史固定 64 个样本，同报 single、sample-average、best-of-64、event Brier/NLL/ECE、rare-mode recall、spurious-mode rate 与 posterior oracle；观察 MSE 是否用模糊平均换取更低误差，也检查 best-of-64 是否靠撒网改善。
+3. 对同一段 32 帧序列（8 context + 24 future）做 tokenizer 重建，报告 latent/token 的 shape、dtype、时空网格、元素/token 数、重建误差和运动事件是否保存；只有实际产生可解码 bitstream 时才报告 bpp/bitrate。
 4. 固定同一个 generator、数据与训练预算替换 tokenizer，拆分“重建更好”与“下游生成更好”。
-5. 写一张七轴模型卡：`representation / temporal factorization / objective / backbone / conditions / execution / evidence`；其中 backbone 至少填 patch/grid、mixer/mask、position/fusion 和 total/active parameters，execution 至少填 NFE、precision、cache、parallelism 与硬件。
+5. 写一张七轴模型卡：`representation / temporal factorization / objective / backbone / conditions / execution / evidence`；其中 stochastic future 还必须填 posterior/prior 可见信息、per-level KL、latent intervention 和 prior–posterior gap，backbone 至少填 patch/grid、mixer/mask、position/fusion 和 total/active parameters，execution 至少填 NFE、precision、cache、parallelism 与硬件。
 
 **反证条件：** 如果你无法仅凭方法和实验部分填完七轴，或把重建误差当成生成质量、把 attention FLOPs 当成端到端 latency，就不能进入分支。主干通关产物不是排行榜，而是一张能容纳后续所有论文的比较表。
 

@@ -127,7 +127,8 @@ Video Diffusion Models 曾在同一研究框架里覆盖无条件生成、文本
 
 - 预测条件来自真实过去，未来要与过去状态连续。
 - T2V 的文字通常不提供逐时刻真实状态；生成一个合理视频不等于预测给定场景的未来。
-- 单一 ground truth 不能完整覆盖随机未来，应报告概率覆盖、best-of-$N$ 与校准，而不是只追逐逐像素误差。
+- 单一 ground truth 不能完整覆盖随机未来；应分栏报告概率覆盖/校准，以及固定预算 best-of-$N$。后者只是一种 coverage/search oracle，不是 calibration。
+- 若模型声称 stochastic latent，还要核对训练 posterior 是否看真实未来、部署 prior 是否只看历史，以及测试是否严格从 prior 采样；完整分类门见[变分随机视频生成](generative-models/variational-generation.md)。
 
 ### 4.4 动作条件预测与交互世界
 
@@ -231,7 +232,7 @@ $$
 | 首次公开 / 正式发表 | 工作 | 任务合同上的变化 | 当时仍未解决 |
 |---|---|---|---|
 | 2015 / NeurIPS 2015 | Action-Conditional Video Prediction | 把动作作为显式控制量注入未来帧预测 [[3]](#ref-3) | Atari 域、像素误差偏置、随机未来和现实控制迁移 |
-| 2022 / 技术报告 | Video Diffusion Models | 同一 diffusion 框架覆盖无条件、文字条件、预测与扩展 [[1]](#ref-1) | 计算成本、长时状态、任务专属协议仍分离 |
+| 2022 / NeurIPS 2022 | Video Diffusion Models | 同一 diffusion 框架覆盖无条件、文字条件、预测与扩展 [[1]](#ref-1) | 计算成本、长时状态、任务专属协议仍分离 |
 | 2023 / NeurIPS 2023 | VideoComposer | 把文字、空间条件、运动向量和条件序列放入可组合时空控制接口 [[10]](#ref-10) | 控制信号仍会冲突，精确 3D 相机/遮挡与大规模 DiT 迁移尚未解决 |
 | 2023 / 技术报告 | Stable Video Diffusion | 大规模视频预训练并展示 I2V / 相机适配 [[2]](#ref-2) | 参考保持不稳定，开放权重能力与产品能力不能混同 |
 | 2023 / SIGGRAPH 2024 | MotionCtrl | 在一个控制器中显式分离相机姿态与对象轨迹，并发布适配多个视频底座的工件 [[11]](#ref-11) | 2D/相对控制、估计噪声、遮挡与新视角几何仍限制精度 |
@@ -264,13 +265,13 @@ DreamGen 的价值不在“生成了机器人视频”本身，而在把生成�
 
 1. 写出你的 $I,O,K,\Delta,H,E$；若写不清，先不要挑模型。
 2. 在第三节找到最近任务，再用第四节排除容易混淆的邻居。
-3. 进入对应专章，查看机制路线、数据、协议和最新论文；超分/去模糊/去噪/去压缩见[视频退化修复](tasks/video-restoration.md)，mask 缺失区见[视频补全](tasks/video-inpainting.md)，显式相机/轨迹/姿态条件见[细粒度可控生成](tasks/controllable-video-generation.md)，联合画面与声音见[原生音视频](tasks/native-audio-video-generation.md)。
+3. 进入对应专章，查看机制路线、数据、协议和最新论文；超分/去模糊/去噪/去压缩见[视频退化修复](tasks/video-restoration.md)，mask 缺失区见[视频补全](tasks/video-inpainting.md)，显式相机/轨迹/姿态条件见[细粒度可控生成](tasks/controllable-video-generation.md)，联合画面与声音见[原生音视频](tasks/native-audio-video-generation.md)。若问题是“同一真实历史怎样产生多个概率可信的未来”，先读[变分随机视频生成](generative-models/variational-generation.md)，再回到[视频预测](tasks/video-prediction.md)选择 task protocol。
 4. 若一个系统同时支持多个任务，为每个任务分别验收，不共享一个总分。
 5. 若目标涉及动作或现实决策，继续阅读[World Model](world-models.md)、[物理一致性](physical-consistency.md)和[相关应用](applications.md)。
 
 ## 参考文献
 
-<a id="ref-1"></a>[1] [Video Diffusion Models](https://arxiv.org/abs/2204.03458). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. arXiv preprint. 2022.
+<a id="ref-1"></a>[1] [Video Diffusion Models](https://proceedings.neurips.cc/paper_files/paper/2022/hash/39235c56aef13fb05a6adc95eb9d8d66-Abstract-Conference.html). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. NeurIPS. 2022.
 
 <a id="ref-2"></a>[2] [Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets](https://arxiv.org/abs/2311.15127). Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, et al. arXiv preprint. 2023.
 

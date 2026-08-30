@@ -95,7 +95,7 @@ flowchart TB
 
 | 泳道 | 核心问题 | 阅读方法 | 对应专题 |
 |---|---|---|---|
-| **生成机制基础** | 视频如何表示、压缩、预测和采样？ | 显式运动与统计动态 → 深度视频预测 → 随机预测与 GAN → 视频 Token → Diffusion/Flow objective 与 U-Net/Video DiT backbone 的正交扩展 | [生成模型路线](generative-models.md) · [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md) · [Video DiT 与骨干扩展](generative-models/video-dit-backbones.md) |
+| **生成机制基础** | 视频如何表示、压缩、预测和采样？ | 显式运动与统计动态 → 深度视频预测 → 随机预测与 GAN → 视频 Token → Diffusion/Flow objective 与 U-Net/Video DiT backbone 的正交扩展 | [生成模型路线](generative-models.md) · [变分随机视频生成](generative-models/variational-generation.md) · [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md) · [Video DiT 与骨干扩展](generative-models/video-dit-backbones.md) |
 | **视频基础模型与创作能力** | 模型如何从技术前驱扩展为规模化、可迁移的多模态系统？ | 先读 T2V、视频 Token 与规模化预训练，再分别看开放生成、多条件/多参考、相机 × 世界时间的多视角/4D、源视频约束与编辑、多段 prompt/分镜、跨镜头连续和原生联合音视频；遇到“统一”时继续追问统一发生在哪一层 | [视频基础模型路线](foundation-models.md) · [多视角/4D](tasks/multiview-4d-generation.md) · [视频编辑 milestones](tasks/video-to-video.md) · [任务地图](taxonomy.md) |
 | **World Model 与行动闭环** | 模型能否维护状态、响应动作，并进一步支持反事实、规划或持续交互？ | 分别追踪决策型 latent dynamics 与动作条件视觉 rollout；先检查动作条件转移、状态持久和干预证据，若声称支持决策或控制，再要求“动作 → 环境响应 → 新观测 → 再决策”的闭环验证 | [World Model 专章](world-models.md) · [JEPA 路线](jepa.md) |
 | **应用层** | 技术在哪里产生价值，又提出哪些新约束？ | 内容、编辑与退化修复工作流、数字人、游戏与交互、数据合成、自动驾驶、机器人和科学可视化 | [相关应用](applications.md) · [退化修复](tasks/video-restoration.md) · [任务地图](taxonomy.md) |
@@ -314,7 +314,7 @@ flowchart LR
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2017-sv2p.jpg" alt="SV2P 多种随机未来概念图"></td>
-<td><strong>2017 — <a href="https://openreview.net/forum?id=rk49Mg-CW">SV2P</a></strong> <code>随机预测</code><br><strong>表示/机制：</strong>为未来序列引入随机 latent，使同一历史上下文能够采样出不同的多帧未来。<br><strong>控制/任务：</strong>同时覆盖无动作与动作条件的真实视频预测。<br><strong>意义/边界：</strong>较早有效处理真实视频中的 one-to-many 未来；多样性、清晰度和长期一致性仍存在权衡。<br><strong>资源：</strong><a href="https://openreview.net/forum?id=rk49Mg-CW">Paper</a> · <a href="https://sites.google.com/site/stochasticvideoprediction/main">Project</a> · <a href="https://github.com/tensorflow/tensor2tensor/blob/master/tensor2tensor/models/video/sv2p.py">Code（已归档）</a> · Weights：未公开 · Demo：—</td>
+<td><strong>2017 首次公开 → ICLR 2018 — <a href="https://openreview.net/forum?id=rk49Mg-CW">SV2P</a></strong> <code>随机预测</code><br><strong>表示/机制：</strong>为未来序列引入随机 latent，使同一历史上下文能够采样出不同的多帧未来。<br><strong>控制/任务：</strong>同时覆盖无动作与动作条件的真实视频预测。<br><strong>意义/边界：</strong>较早有效处理真实视频中的 one-to-many 未来；多样性、清晰度和长期一致性仍存在权衡。<br><strong>资源：</strong><a href="https://openreview.net/forum?id=rk49Mg-CW">Paper</a> · <a href="https://sites.google.com/site/stochasticvideoprediction/main">Project</a> · <a href="https://github.com/tensorflow/tensor2tensor/blob/master/tensor2tensor/models/video/sv2p.py">Code（已归档）</a> · Weights：未公开 · Demo：—</td>
 </tr>
 </table>
 
@@ -369,13 +369,32 @@ flowchart LR
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2019-videoflow.jpg" alt="VideoFlow 条件 normalizing flow 概念图"></td>
-<td><strong>2019 — <a href="https://research.google/pubs/videoflow-a-conditional-flow-based-model-for-stochastic-video-generation/">VideoFlow</a></strong> <code>Normalizing Flow</code><br><strong>表示/机制：</strong>用可逆多尺度 normalizing flow 建模条件视频分布，并直接优化 likelihood。<br><strong>控制/任务：</strong>根据历史帧采样多个随机未来。<br><strong>意义/边界：</strong>补齐 GAN/VAE 之外的显式密度路线；这里的“flow”是可逆 normalizing flow，不等同于 2022 年后的 Flow Matching。<br><strong>资源：</strong><a href="https://research.google/pubs/videoflow-a-conditional-flow-based-model-for-stochastic-video-generation/">Paper</a> · Project：— · <a href="https://github.com/tensorflow/tensor2tensor/blob/master/tensor2tensor/models/video/next_frame_glow.py">Code（已归档）</a> · Weights：未公开 · Demo：—</td>
+<td><strong>2019 首次公开 → ICLR 2020 — <a href="https://research.google/pubs/videoflow-a-conditional-flow-based-model-for-stochastic-video-generation/">VideoFlow</a></strong> <code>Normalizing Flow</code><br><strong>表示/机制：</strong>用可逆多尺度 normalizing flow 建模条件视频分布，并直接优化 likelihood。<br><strong>控制/任务：</strong>根据历史帧采样多个随机未来。<br><strong>意义/边界：</strong>补齐 GAN/VAE 之外的显式密度路线；这里的“flow”是可逆 normalizing flow，不等同于 2022 年后的 Flow Matching。<br><strong>资源：</strong><a href="https://research.google/pubs/videoflow-a-conditional-flow-based-model-for-stochastic-video-generation/">Paper</a> · Project：— · <a href="https://github.com/tensorflow/tensor2tensor/blob/master/tensor2tensor/models/video/next_frame_glow.py">Code（已归档）</a> · Weights：未公开 · Demo：—</td>
 </tr>
 </table>
 
 ### 随机预测与 GAN 的核心矛盾
 
 对抗训练通常有利于感知锐度，但优化可能敏感，也不提供显式、易处理的 likelihood；显式概率模型能覆盖不确定性，却常受采样速度、重建或架构约束。样本质量与模式覆盖无法由单一指标同时充分衡量。
+
+### 变分随机未来的延伸支线｜2019–2026
+
+这条支线没有在 2018 停止，但也不能把所有带 latent/VAE 的新系统收进来。direct stochastic-future 节点需要 future-aware posterior、不看未来的 deployment prior 与 KL/ELBO；相邻 RSSM/world-model 支线则用新观测校正 posterior、用 action-conditioned prior 想象，并另验 action/reward/return 与 model exploitation。LPWM 是对象粒子与 latent action 的桥接节点。
+
+| 首次公开 / 正式状态 | 节点 | 合同改变 | 证据边界 |
+|---|---|---|---|
+| 2019 / ICCV 2019 | [Improved Conditional VRNNs](https://openaccess.thecvf.com/content_ICCV_2019/html/Castrejon_Improved_Conditional_VRNNs_for_Video_Prediction_ICCV_2019_paper.html) | deep latent hierarchy + higher-capacity likelihood | hierarchy 与 capacity 效应缠绕；frame metric 多为 best-of-100 |
+| 2020 / ICML 2020 | [SRVP](https://proceedings.mlr.press/v119/franceschi20a.html) | fully latent residual dynamics，frame synthesis 与 dynamics 解耦 | 一阶 residual 是结构限制；oracle frame metric 与 FVD 协议不同 |
+| 2020 / ICLR 2021 | [DreamerV2](https://iclr.cc/virtual/2021/poster/2742) | categorical RSSM + KL balancing 的相邻控制支线 | Atari 55 tasks；discrete state 的里程碑不应归给 V3 |
+| 2021 / CVPR、NeurIPS | [GHVAE](https://openaccess.thecvf.com/content/CVPR2021/html/Wu_Greedy_Hierarchical_Variational_Autoencoders_for_Large-Scale_Video_Prediction_CVPR_2021_paper.html)；[CW-VAE](https://proceedings.neurips.cc/paper/2021/hash/f490d0af974fedf90cb0f1edce8e3dd5-Abstract.html) | 贪心 deep hierarchy；slow-clock temporal abstraction | 模块数/容量是混杂；1000-frame 证据主要来自受控域 |
+| 2022 / ICLR、CLeaR | [VPR](https://openreview.net/forum?id=JxFgJbZ-wft)；[VIM](https://proceedings.mlr.press/v177/assouel22a.html) | event-triggered hierarchy；object + categorical mechanism | 主要是合成事件/对象场景，不能外推开放视频 |
+| 2023 / TMLR 2024 | [DDLP](https://openreview.net/forum?id=Wqn8zirthg) | particle-tracking posterior + Transformer dynamics prior | LPWM 的直接粒子前身；对象化场景、遮挡与相机运动仍是边界 |
+| 2024 / ICML 2024 | [Stochastic Frame Prediction](https://proceedings.mlr.press/v235/jang24c.html) | categorical future latent 作为表示学习信号 | 单 future frame、生成质量非主证据 |
+| 2023 / Nature 2025 | [DreamerV3](https://www.nature.com/articles/s41586-025-08744-2) | categorical RSSM、split KL、free bits 与 unimix | 150+ 控制任务；return 不是 uncertainty calibration |
+| 2026 / ICLR 2026 Oral | [LPWM](https://openreview.net/forum?id=lTaPtGiUUc) | object particles + inverse-action posterior/policy prior + dynamics ELBO | 对象中心前沿，仍受 identity、对象数和相机运动限制 |
+| 2026 / Neural Networks | [Implicit hierarchical temporal–spatial residual model](https://doi.org/10.1016/j.neunet.2026.108732) | prior–posterior residual + spatial hierarchy | 3 数据集作者协议；不证明 VAE 重回开放域 foundation-model 主干 |
+
+纠错：2018 的 [Hierarchical Long-term Video Prediction without Supervision](https://proceedings.mlr.press/v80/wichers18a.html) 是高层 feature predictor + feature-space adversarial loss，没有上述 q/p/ELBO 合同，不能写成“分层随机 latent”。完整纳入/排除表和实验阈值见[变分随机视频生成](generative-models/variational-generation.md)。
 
 ---
 
@@ -528,7 +547,7 @@ flowchart LR
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2022-video-diffusion.jpg" alt="Video Diffusion Models 时空去噪概念图"></td>
-<td><strong>2022 — <a href="https://arxiv.org/abs/2204.03458">Video Diffusion Models</a></strong> <code>视频 diffusion</code><br><strong>表示/机制：</strong>将图像 diffusion 的 U-Net 扩展到时空域，联合图像与视频训练，并通过条件采样进行空间与时间延展。<br><strong>控制/任务：</strong>无条件视频、视频预测和扩展。<br><strong>意义/边界：</strong>系统证明 diffusion 可用于视频；像素空间训练和多步采样成本很高。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2204.03458">Paper</a> · <a href="https://video-diffusion.github.io/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
+<td><strong>2022 / NeurIPS 2022 — <a href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/39235c56aef13fb05a6adc95eb9d8d66-Abstract-Conference.html">Video Diffusion Models</a></strong> <code>视频 diffusion</code><br><strong>表示/机制：</strong>将图像 diffusion 的 U-Net 扩展到时空域，联合图像与视频训练，并通过条件采样进行空间与时间延展。<br><strong>控制/任务：</strong>无条件视频、视频预测和扩展。<br><strong>意义/边界：</strong>系统证明 diffusion 可用于视频；像素空间训练和多步采样成本很高。<br><strong>资源：</strong><a href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/39235c56aef13fb05a6adc95eb9d8d66-Abstract-Conference.html">Paper</a> · <a href="https://video-diffusion.github.io/">Project</a> · Code：未公开 · Weights：未公开 · Demo：—</td>
 </tr>
 </table>
 

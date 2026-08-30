@@ -76,6 +76,8 @@ q_\phi(z_t\mid h_t,o_t) &\quad\text{（后验，用于观测校正）}.
 \end{aligned}
 \]
 
+这里的 posterior 在新观测到来时校正 belief，prior 在没有新观测时按动作想象；数学上与随机未来模型共享 variational state-space 接口。ELBO、prior–posterior gap、posterior collapse、aleatoric/epistemic 分账见[变分随机视频生成](generative-models/variational-generation.md)；reward/continue、planner、return 与 model exploitation 仍由本章负责。两种验收不能互相替代。
+
 ~~~mermaid
 flowchart LR
     accTitle: RSSM 的先验想象与后验观测校正
@@ -434,6 +436,7 @@ WorldGym 把 action-conditioned video model 当作 policy evaluation environment
 | DreamGen [[19]](#ref-19) | 级联式离线合成数据 | CoRL 2025 / PMLR | [Project](https://research.nvidia.com/labs/gear/dreamgen/) · [Code](https://github.com/NVIDIA/GR00T-Dreams) | A：正式论文 + 四阶段代码 |
 | World Action Verifier [[20]](#ref-20) | state plausibility + action reachability | arXiv v2 | [Project](https://world-action-verifier.github.io/) · [Code](https://github.com/world-action-verifier/wav_robot) | B：论文 + 代码；workshop 荣誉，不是主会 |
 | ViPRA [[21]](#ref-21) | latent action 与 future feature 联合预训练 | ICLR 2026 OpenReview | [Project](https://vipra-project.github.io/) · [Code](https://github.com/sroutray/vipra) | A：官方会议记录 + code/weights |
+| LPWM | object-particle + latent-action 的相邻变分桥接支线 | [ICLR 2026 Oral](https://openreview.net/forum?id=lTaPtGiUUc) | [Project](https://taldatech.github.io/lpwm-web/) · [Code](https://github.com/taldatech/lpwm) | A：正式会议记录 + code/data/weights；对象化场景与相机运动仍是边界 |
 | DreamZero [[22]](#ref-22) | joint video–action 闭环 policy | arXiv | [Project](https://dreamzero0.github.io/) · [Code](https://github.com/dreamzero0/dreamzero) | B：论文 + 项目 + 代码 |
 | WorldPack [[23]](#ref-23) | 动态帧压缩与几何检索 | arXiv v3 | 论文入口 | B：论文；开放面需逐项核对 |
 | Infinite-World [[24]](#ref-24) | pose-free hierarchical memory | arXiv v2 | [Project](https://rq-wu.github.io/projects/infinite-world/) | B/C：论文 + demo；未见等价完整代码 |
@@ -486,7 +489,7 @@ WorldGym 把 action-conditioned video model 当作 policy evaluation environment
 
 <a id="ref-7"></a>[7] [Mastering Atari, Go, Chess and Shogi by Planning with a Learned Model](https://doi.org/10.1038/s41586-020-03051-4). Nature. 2020.
 
-<a id="ref-8"></a>[8] [Mastering Diverse Domains through World Models](https://arxiv.org/abs/2301.04104). arXiv:2301.04104. 2023.
+<a id="ref-8"></a>[8] [Mastering Diverse Control Tasks through World Models](https://www.nature.com/articles/s41586-025-08744-2). Nature 640:647–653. First public as arXiv:2301.04104 in 2023; formally published in 2025.
 
 <a id="ref-9"></a>[9] [TD-MPC2: Scalable, Robust World Models for Continuous Control](https://openreview.net/forum?id=Oxh5CstDJU). ICLR. 2024.
 

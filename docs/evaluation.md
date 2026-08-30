@@ -125,6 +125,8 @@ $$
 
 它能检验模型是否有机会覆盖真实未来，但分数会随 $N$ 单调改善，且可能奖励“撒网式”生成。如果不同时报告样本预算、平均质量、样本间多样性和异常样本率，就无法公平比较。Stochastic Video Generation with a Learned Prior 等工作使“质量—多样性”权衡成为视频预测评测的核心问题 [[5]](#ref-5)。
 
+最低协议应把 single sample、sample-average、best-of-$N$、posterior oracle 和完整样本集的 distributional score 分栏；测试只能从不看隐藏未来的 prior 采样。对可枚举事件，还应报告 Brier/NLL、reliability/ECE、rare-mode recall 和 spurious-mode rate。若同一历史只有一个记录未来，则真实条件分布本身不可充分识别，需要多标注或有已知分支概率的 simulator。可执行协议与建议预注册阈值见[变分随机视频生成的 `LatentFork-1`](generative-models/variational-generation.md)。
+
 ### 3.4 这一阶段留下的正确用法
 
 像素/感知误差没有过时。对于视频插帧、预测未来 100 ms、已知相机轨迹重建或给定参考的视频编辑，它们仍是重要证据。关键是不要把“与某个参考像素接近”解释为“生成分布真实”，也不要把 best-of-N 当作单次生成质量。
@@ -500,6 +502,7 @@ WorldModelBench 在 2025 年开始专门用指令遵循、物理违规和大规�
 | 样本质量 | 清晰度、美学、伪影 | no-reference VQA + 盲测人评 | 多设备/编码条件下的人类 MOS |
 | 时间质量 | 闪烁、平滑、运动幅度 | motion/flow/track 指标 + 人评 | 合成时间破坏的 sensitivity 验证 |
 | 分布 | fidelity、coverage、多样性 | 同协议 FVD + precision/recall | 多个评价特征编码器、bootstrap CI、分层结果 |
+| 随机未来 | deployment-valid sampling、mode 频率、校准 | 固定 $N$ 的 single/average/best + event Brier/NLL/ECE + 非法 mode；变分模型另列 prior-only 与 posterior oracle（若定义） | 多未来 ground truth/simulator、latent intervention、prior–posterior gap、horizon 曲线与 paired CI |
 | 条件 | 文本/图像/姿态/轨迹遵循 | 原子事实与约束核验 | 检测、跟踪、VQA、人评交叉验证 |
 | 退化修复 | fidelity、时间稳定、感知细节、幻觉 | paired 指标 + 未见退化 + OCR/身份/闪烁 | 真实设备/codec shift、重退化一致性、多 seed 与高风险人工审计 |
 | 编辑 | edit success、源保留、局部性 | source/instruction 双条件 + mask/track 可选 | 真实长序列上的对象级与时间级副作用审计 |
@@ -720,6 +723,7 @@ safety:
 - reference-based:
 - no-reference quality:
 - distributional metrics and exact implementation:
+- stochastic future, if claimed: deployment-valid sampling / K / single-average-best / event calibration / invalid modes; variational model prior-only and posterior oracle if defined:
 - condition / fact verification:
 - human evaluation protocol:
 - controlled-corruption meta-evaluation:

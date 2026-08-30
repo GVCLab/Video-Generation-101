@@ -128,6 +128,8 @@ $$
 
 SV2P 与 SVG-LP 的关键不是“加一点噪声”，而是让未来不可约的不确定性拥有可训练的 prior/posterior 接口。SAVP 再叠加 adversarial objective，常能提高感知锐度；它没有让 best-of-$N$ 结果变成公平的典型样本。VideoFlow 则用可逆变换避免 VAE 的近似 likelihood，但受可逆结构与表示选择约束。
 
+2019 之后，direct 变分随机未来支线继续沿 deep latent hierarchy、fully latent residual dynamics、slow/event clocks 与 object/module state 演化。categorical RSSM 是共享变分数学、但按 action/reward/return 验收的相邻控制支线；2026 的对象粒子 + latent action 接口是二者的桥接点。这里保留 recurrent factorization 的职责，完整路线、正式状态和 proper-score 验收统一放在[变分随机视频生成](variational-generation.md)。
+
 ### 5.1 Posterior collapse 不是看一眼 KL 就能结案
 
 当强递归 decoder 无视 $z_t$ 也能预测训练数据时，可能出现

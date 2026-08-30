@@ -246,12 +246,13 @@
 
 1. [生成模型路线](generative-models.md)：先分清 representation、factorization、objective、backbone 与 deployment 五个正交层，不把 VAE、Transformer、Diffusion 和 Flow 当成互斥整机标签。
 2. [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)：理解连续 latent、离散 token、量化、时空预算与真实 bitstream 的边界。
-3. [Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)：从 latent token 数推到 full/factorized/window/sparse/linear attention，再分开核算 MoE、量化、并行、cache 与 NFE。
-4. [大模型路线](foundation-models.md)：理解 tokenizer、generator、Transformer、后训练与基础模型系统怎样组合。
-5. [视频后训练与对齐](generative-models/video-post-training-alignment.md)：区分 SFT、reward、DPO/RL、推理 guidance 与少步蒸馏。
-6. [开放模型与代码](../resources/open-models.md)：选择可以实际运行的模型。
-7. [数据集索引](../resources/datasets.md)：了解训练与评测数据。
-8. [评测指南](evaluation.md)：设计可重复的比较实验。
+3. [变分随机视频生成](generative-models/variational-generation.md)：分清 future-aware posterior、history-only prior、tokenizer VAE 与 diffusion noise，并理解多未来校准。
+4. [Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)：从 latent token 数推到 full/factorized/window/sparse/linear attention，再分开核算 MoE、量化、并行、cache 与 NFE。
+5. [大模型路线](foundation-models.md)：理解 tokenizer、generator、Transformer、后训练与基础模型系统怎样组合。
+6. [视频后训练与对齐](generative-models/video-post-training-alignment.md)：区分 SFT、reward、DPO/RL、推理 guidance 与少步蒸馏。
+7. [开放模型与代码](../resources/open-models.md)：选择可以实际运行的模型。
+8. [数据集索引](../resources/datasets.md)：了解训练与评测数据。
+9. [评测指南](evaluation.md)：设计可重复的比较实验。
 
 建议先理解每种方法解决了什么问题，再进入公式和代码。
 
@@ -259,8 +260,8 @@
 
 1. [技术时间线](timeline.md)：理解这个领域为什么从运动预测走向 Diffusion 和 world model。
 2. [精选阅读列表](reading-list.md)：从最小阅读集开始，不要一开始追求读完所有论文。
-3. 选择一个具体轴：视频表示/tokenizer、backbone/attention scaling、长时一致性、退化逆问题、控制、多视角/4D、物理、效率、评测或交互。
-4. 阅读对应专题，例如 [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)、[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)、[视频预测](tasks/video-prediction.md)、[视频退化修复](tasks/video-restoration.md)、[视频后训练与对齐](generative-models/video-post-training-alignment.md)、[细粒度可控生成](tasks/controllable-video-generation.md)、[多视角与 4D](tasks/multiview-4d-generation.md)、[原生音视频](tasks/native-audio-video-generation.md)、[物理一致性](physical-consistency.md)或 [World Model](world-models.md)。
+3. 选择一个具体轴：视频表示/tokenizer、backbone/attention scaling、长时一致性、随机未来/不确定性、退化逆问题、控制、多视角/4D、物理、效率、评测或交互。
+4. 阅读对应专题，例如 [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)、[变分随机视频生成](generative-models/variational-generation.md)、[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)、[视频预测](tasks/video-prediction.md)、[视频退化修复](tasks/video-restoration.md)、[视频后训练与对齐](generative-models/video-post-training-alignment.md)、[细粒度可控生成](tasks/controllable-video-generation.md)、[多视角与 4D](tasks/multiview-4d-generation.md)、[原生音视频](tasks/native-audio-video-generation.md)、[物理一致性](physical-consistency.md)或 [World Model](world-models.md)。
 5. 用 [引用与代码索引](bibliography.md) 找论文、官方代码和可复现 baseline。
 
 研究时不要只收集“最新模型”。更重要的是明确任务、比较对象、失败条件和验证证据。

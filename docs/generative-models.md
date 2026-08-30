@@ -190,7 +190,9 @@ D_{\mathrm{KL}}
 \left(q_\phi(z\mid x)\Vert p(z)\right).
 $$
 
-它显式平衡重建与 latent prior，但会面对 posterior collapse、模糊重建和时间 latent 未被利用。SVG-LP 用 learned prior 建模多模态未来，是 stochastic video prediction 的重要里程碑 [[1]](#ref-1) [[4]](#ref-4)。
+用于未知未来时，信息合同变成 $q_\phi(z\mid h,y,c)$ 在训练可见真实未来 $y$，而部署 $p_\psi(z\mid h,c)$ 只能见历史与合法条件；固定 prior 是后者的特例。若测试仍使用 posterior，结果只能算 oracle，不能代表部署生成。
+
+它显式平衡重建与 latent prior，但会面对 posterior collapse、近似/摊销误差、prior–posterior gap 和时间 latent 未被利用。SVG-LP 用 history-conditioned learned prior 建模多模态未来，是 stochastic video prediction 的重要里程碑 [[1]](#ref-1) [[4]](#ref-4)。之后的路线分别增加 deep/clockwork hierarchy、fully latent residual dynamics、object/module structure 与 categorical RSSM；到 2026 又出现对象粒子 + latent action 的显式变分 world-model 接口。完整的 2015–2026 谱系、best-of-K 反例与 `LatentFork-1` 见[变分生成专章](generative-models/variational-generation.md)。
 
 ### 5.2 Adversarial objective
 
@@ -385,7 +387,7 @@ evidence:
 |---|---|---|
 | 本总览 | 五轴 taxonomy、跨轴组合、历史与选型 | 每个 SDE/ODE 的完整推导 |
 | [递归预测](generative-models/recurrent-prediction.md) | 逐步状态、teacher forcing、rollout | 把所有递归模型归成 objective |
-| [变分生成](generative-models/variational-generation.md) | stochastic latent、ELBO、多未来 | 把现代 codec 等同完整 VAE generator |
+| [变分生成](generative-models/variational-generation.md) | future-aware posterior、history-only prior、ELBO/collapse、层级/对象 latent、多未来 proper score | 把现代 codec、diffusion noise、确定性 latent 或 posterior oracle 等同完整 stochastic future generator |
 | [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md) | 表示接口、连续/离散/混合 latent、压缩账本、causal codec、重建与下游生成 | 把 latent shape 当实际码率；替代上层 factorization/objective 章节 |
 | [对抗生成](generative-models/adversarial-generation.md) | 时空判别器、mode collapse、现代辅助角色 | 把 GAN 与 content/motion representation 混写 |
 | [自回归生成](generative-models/autoregressive-generation.md) | strict frame/token/chunk factorization、continuous head | 把 AR 限定为 VQ+CE |

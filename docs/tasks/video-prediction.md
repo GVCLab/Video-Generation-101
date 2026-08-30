@@ -211,6 +211,8 @@ $$
 
 训练 posterior 看见真实未来，部署 prior 看不见；二者错配、posterior collapse 与 best-of-$K$ 挑样都会让“多样”看起来比实际分布校准更好。至少同时报告 sample-average、best-of-$K$、$K$ 值、样本内/样本间多样性，以及覆盖与准确的权衡。
 
+这条 direct stochastic-future 路线在 2019–2026 又分成 deep hierarchy、fully latent residual dynamics、clockwork/event temporal abstraction 与 object/module latent。categorical RSSM 是共享变分 state-space 数学、但以 action/reward/return 验收的相邻控制支线；LPWM 的 object-particle + latent-action ELBO 是二者的桥接点。严格纳入门、论文协议和 `Forking-Squares-v1` 反证实验见[变分随机视频生成](../generative-models/variational-generation.md)。名字里只有 VAE/latent、但没有 future-aware posterior + 不看未来的 deployment prior + KL/ELBO 的系统，不应并入 direct 主线。
+
 ### 3.3 Diffusion / score：高保真条件分布与高昂 rollout
 
 Video Diffusion Models 把 image diffusion 扩展到时空生成并包含 conditional video prediction，正式发表于 NeurIPS 2022 [[13]](#ref-13)。其标准噪声目标是
