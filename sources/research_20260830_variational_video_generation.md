@@ -53,7 +53,7 @@
 
 顺序模型的统一目标可写为
 
-$$
+```math
 \mathcal L
 =
 \sum_t
@@ -62,7 +62,7 @@ $$
 \sum_t\beta_t
 \mathbb E_{q_\phi(z_{<t}\mid x_{<t},c)}D_{\mathrm{KL}}
 \left[q_\phi(z_t\mid z_{<t},x_{\le t},c)\Vert p_\psi(z_t\mid z_{<t},x_{<t},c)\right].
-$$
+```
 
 只有在 $\beta_t=1$ 且其余项保持概率模型一致时，它才是原始模型对数似然的标准 ELBO；调低 $\beta$、free bits、额外 GAN/感知/对比目标都会改变 rate–distortion 取舍，不能再把目标值无条件解释成可比 likelihood。
 
@@ -182,7 +182,7 @@ $$
 
 ### 7.1 机制数据 `Forking-Squares-v1`
 
-- 64×64，8 帧历史、24 帧未来；同一 prefix 的重复未来共享前 8 帧。prefix 中可见 cue $g\in\{\text{cyan},\text{amber},\text{violet}\}$，对应 left/right/stop 真分布分别为 $(0.6,0.3,0.1)$、$(0.2,0.7,0.1)$、$(0.1,0.2,0.7)$；三种 cue 在 split 内平衡，模型不得读取未来随机数。
+- 64×64，8 帧历史、24 帧未来；同一 prefix 的重复未来共享前 8 帧。prefix 中可见 cue $`g\in\lbrace\text{cyan},\text{amber},\text{violet}\rbrace`$，对应 left/right/stop 真分布分别为 $(0.6,0.3,0.1)$、$(0.2,0.7,0.1)$、$(0.1,0.2,0.7)$；三种 cue 在 split 内平衡，模型不得读取未来随机数。
 - 按初始状态分组切分 10,000/2,000/2,000，避免同一轨迹参数泄漏。
 - 每个测试前缀由 simulator 固定生成 64 个真实未来，保存真实 mode label、概率、轨迹和 identity。
 - 这是本教材提出的机制基准，不冒充已发表 benchmark；实验运行前须提交 generator、manifest 与 hash。
@@ -210,7 +210,7 @@ $$
 - C 相对 B 的 Brier 改善至少 0.02，paired-bootstrap 95% CI 下界大于 0；
 - 0.1 rare mode 的 recall@64 ≥ 0.80，spurious mode ≤1%；
 - 条件违规相对 A/B 增幅 ≤1 个百分点，expected state/perceptual error 劣化 ≤3%；
-- per-prefix $\operatorname{JS}(p_{\mathrm{prior}}(m\mid h),p_{\mathrm{sim}}(m\mid h))\le0.05$；聚合 posterior–prior JS 只作诊断，不对单样本 posterior 设混合分布阈值；
+- per-prefix $\mathrm{JS}(p_{\mathrm{prior}}(m\mid h),p_{\mathrm{sim}}(m\mid h))\le0.05$；聚合 posterior–prior JS 只作诊断，不对单样本 posterior 设混合分布阈值；
 - 重采样 $z$ 至少在 30% 测试历史中改变持续事件分支；同 $(h,z)$ 重跑一致率 ≥99%；
 - D 只有在 horizon-24 coverage 比 C 提高 ≥5 个百分点且质量/违规通过非劣界时，才保留“层级改善长期覆盖”；
 - VP² 的“有助规划”声明要求成功率至少 +5 个百分点且 95% CI 排除 0。

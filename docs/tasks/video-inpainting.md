@@ -19,19 +19,19 @@
 
 设视频
 
-$$
+```math
 x\in[0,1]^{T\times H\times W\times 3},
 \qquad
 m\in\{0,1\}^{T\times H\times W\times 1},
-$$
+```
 
 并约定 $m_{tij}=1$ 表示允许补全的洞，$\bar m=1-m$ 表示必须保护的已知区域。模型看到的是
 
-$$
+```math
 \tilde x=\bar m\odot x,
 \qquad
 y\sim p_\theta(y_m\mid x_{\bar m},m,c),
-$$
+```
 
 其中 $c$ 可以是文字、参考图、对象 ID、深度或轨迹。若目标只是还原被人工遮住的原视频，$x_m$ 有唯一可观测 ground truth；若删除真实对象后补出从未被相机看到的背景，任务是一对多条件生成，原视频并不存在唯一正确答案。
 
@@ -47,14 +47,14 @@ $$
 
 对象 mask $m_{\text{obj}}$ 常常小于真正需要修改的支持集：
 
-$$
+```math
 m_{\text{edit}}
 \supseteq
 m_{\text{obj}}
 \cup m_{\text{shadow}}
 \cup m_{\text{reflection}}
 \cup m_{\text{interaction}}.
-$$
+```
 
 2025–2026 年对象移除研究的关键进展，正是从“补对象轮廓里的像素”走向“发现并消除对象造成的环境效应” [[28]](#ref-28), [[29]](#ref-29), [[30]](#ref-30), [[31]](#ref-31), [[32]](#ref-32), [[34]](#ref-34)。
 
@@ -101,17 +101,17 @@ flowchart TD
 
 设 $F_{s\rightarrow t}$ 把参考帧 $s$ warp 到目标帧 $t$，$W(\cdot,F)$ 是可微采样器。参考像素是否可用不能只由 mask 决定，还要乘上遮挡、越界、forward–backward consistency 和 flow confidence：
 
-$$
+```math
 v_{s\rightarrow t}
 =
 W(\bar m_s,F_{s\rightarrow t})
 \odot q_{s\rightarrow t},
 \qquad 0\le q\le1.
-$$
+```
 
 多个参考帧可以按置信度归一化聚合：
 
-$$
+```math
 b_t
 =
 \frac{\sum_{s\in\mathcal R(t)}
@@ -120,7 +120,7 @@ W(x_s,F_{s\rightarrow t})}
 {\sum_{s\in\mathcal R(t)}w_{s\rightarrow t}+\epsilon},
 \qquad
 w=v.
-$$
+```
 
 这里 $q$ 已包含在 $v$ 中，不再重复相乘；$b_t$ 是有证据的 propagated background，不是网络凭空生成的背景。Deep Flow-Guided Video Inpainting 先补全时空 flow 再传播像素 [[3]](#ref-3)；FGVC 先完成 motion edge，再构造保边的分段平滑 flow，并通过 non-local flow connection 越过局部运动边界 [[8]](#ref-8)。
 
@@ -128,9 +128,9 @@ $$
 
 传播可覆盖度可以写成 $a_t=\max_s v_{s\rightarrow t}$，剩余缺失区为
 
-$$
+```math
 r_t=m_t\odot(1-a_t).
-$$
+```
 
 若 $r_t\approx0$，复制/warp 比重新绘制更容易保持纹理与身份；若一个区域在所有帧都被遮挡，flow 没有信息可搬运，必须用 learned prior 生成。STTN 用全视频 joint spatial–temporal attention 同时补多帧 [[7]](#ref-7)；FuseFormer 用重叠的 Soft Split / Soft Composition 把 patch 边界以内的细粒度信息带进 Transformer 和 feed-forward block [[9]](#ref-9)。二者都扩大了搜索与合成能力，但 attention 找到“相似 token”不等于找到了几何上正确、可见且未被污染的来源。
 
@@ -148,25 +148,25 @@ ProPainter 把图像域传播、特征域传播和 mask-guided sparse Transforme
 
 最强的像素级保护是解码后的硬合成：
 
-$$
+```math
 \hat x
 =
 \bar m\odot x
 +
 m\odot y_\theta.
-$$
+```
 
 它能令最终 RGB 的 mask 外误差在理想算术下为零，但不能自动解决四个问题：mask 边界颜色不连续、压缩/色彩空间 round-trip、mask 误标、以及生成区域对影子/反射的真实影响。若在 latent diffusion 中仅把下采样后的 $m_z$ 拼给模型，causal VAE 的时空压缩还可能把洞与已知区混在同一 latent cell。VideoRepainter 明确把直接 mask 下采样造成的歧义作为问题，并使用 symmetric condition 处理 [[19]](#ref-19)。
 
 扩散推理还可在每个去噪步重新锚定已知 latent：
 
-$$
+```math
 z_{k-1}
 \leftarrow
 m_z\odot z^{\text{gen}}_{k-1}
 +
 (1-m_z)\odot z^{\text{src}}_{k-1}.
-$$
+```
 
 但最终验收仍要回到 decoded RGB；“latent 被锁住”不等于用户看到的像素没有被 decoder 改动。
 
@@ -174,7 +174,7 @@ $$
 
 不同论文不会同时使用下列全部项，但可用这张账本检查监督落在哪里：
 
-$$
+```math
 \mathcal L
 =
 \lambda_h\mathcal L_{\text{hole}}
@@ -183,7 +183,7 @@ $$
 +\lambda_w\mathcal L_{\text{warp}}
 +\lambda_p\mathcal L_{\text{perc}}
 +\lambda_a\mathcal L_{\text{adv/diff}}.
-$$
+```
 
 | 项 | 直接约束 | 典型盲点 |
 |---|---|---|
@@ -269,7 +269,7 @@ VideoCanvas 将任意时刻、任意空间 patch 作为 in-context condition，�
 
 ## ⏳ 6. 长视频不是把短窗口循环调用
 
-设基础模型窗口长 $L$、步长 $S<L$。第 $k$ 个窗口覆盖 $[kS,kS+L)$。最简单的 output blending 是对已完成 RGB 做加权平均；更强的 co-denoising 是让重叠 latent 在每个 solver step 共享或协调噪声轨迹。两者都叫 overlap 时，实际含义完全不同，必须报告。
+设基础模型窗口长 $L$、步长 $`S\lt L`$。第 $k$ 个窗口覆盖 $[kS,kS+L)$。最简单的 output blending 是对已完成 RGB 做加权平均；更强的 co-denoising 是让重叠 latent 在每个 solver step 共享或协调噪声轨迹。两者都叫 overlap 时，实际含义完全不同，必须报告。
 
 | 风险 | 表面现象 | 最小处理 | 必须记录 |
 |---|---|---|---|
@@ -370,12 +370,12 @@ DEVIL 专门把 camera motion、background motion、mask displacement、pose mot
 
 推荐显式计算 mask 外误差：
 
-$$
+```math
 E_{\text{out}}
 =
 \frac{\lVert\bar m\odot(\hat x-x)\rVert_1}
 {3\sum\bar m+\epsilon},
-$$
+```
 
 并另取 mask 边缘内外各 $d$ 像素的 ring，检查边缘漏色。全帧 PSNR 会被大量不变背景主导；全局 temporal score 同样可能看不见只发生在洞内的一帧闪烁。
 

@@ -48,37 +48,37 @@ Movie Gen 更说明产品族与单模型不能混写：技术报告披露独立�
 
 批大小为 $B$，视频帧数为 $F$、帧率为 $f_v$，音频声道数为 $C_a$、采样点数为 $S$、采样率为 $f_a$：
 
-$$
+```math
 V\in[-1,1]^{B\times F\times3\times H\times W},\qquad
 A\in[-1,1]^{B\times C_a\times S}.
-$$
+```
 
 文本 token、可选图像、参考视频和参考音频分别写为
 
-$$
+```math
 C_t\in\mathbb N^{B\times L_t},\quad
 C_i\in[-1,1]^{B\times N_i\times3\times H_i\times W_i},
-$$
+```
 
-$$
+```math
 C_v\in[-1,1]^{B\times F_r\times3\times H_r\times W_r},\quad
 C_a^{\mathrm{ref}}\in[-1,1]^{B\times C_r\times S_r}.
-$$
+```
 
 视频 VAE 与音频 VAE/codec 通常给出不同形状与 token 速率：
 
-$$
+```math
 z_v=E_v(V)\in\mathbb R^{B\times T_v\times H'\times W'\times D_v},
 \qquad
 z_a=E_a(A)\in\mathbb R^{B\times T_a\times D_a}.
-$$
+```
 
 真正的同步坐标必须用秒而不是 token 下标。若视频 VAE 时间压缩率为 $r_v$，音频 codec hop 为 $h_a$，则可写
 
-$$
+```math
 \tau_v(i)=\delta_v+\frac{i\,r_v}{f_v},\qquad
 \tau_a(j)=\delta_a+\frac{j\,h_a}{f_a}.
-$$
+```
 
 实现还需声明首帧的非均匀覆盖、center/causal window、padding、裁切、重采样、声道布局，以及封装时的 mux 偏移 $\delta_{mux}$。LTX-2 的论文例子使用约 25 Hz、128 维音频 latent，并由 16 kHz stereo mel 表示经 vocoder 输出 24 kHz stereo；NAVA 则复用 LTX-2.3 音频 VAE 与 Wan2.2 视频 VAE；MiniMax H3 官方模型卡披露 32 kHz stereo、每声道 40 Hz 音频 latent 和 $4\times16\times16$ 视觉压缩 [[13]](#ref-13) [[16]](#ref-16) [[26]](#ref-26)。跨论文分数若忽略这些 codec 与采样合同，不能直接解释为 backbone 优劣。
 
@@ -86,23 +86,23 @@ $$
 
 对独立噪声 $\epsilon_v,\epsilon_a$ 与共享连续时间 $t\in[0,1]$，可构造
 
-$$
+```math
 z_v(t)=(1-t)\epsilon_v+t z_v,
 \qquad
 z_a(t)=(1-t)\epsilon_a+t z_a.
-$$
+```
 
 联合 denoiser 同时预测两个速度场，并允许每一侧读取另一侧的当前状态：
 
-$$
+```math
 (\hat u_v,\hat u_a)=f_\theta(z_v(t),z_a(t),C,t),
-$$
+```
 
-$$
+```math
 \mathcal L_{AV}=
 \lambda_v\lVert \hat u_v-u_v\rVert_2^2+
 \lambda_a\lVert \hat u_a-u_a\rVert_2^2.
-$$
+```
 
 Ovi 的作者稿即以共享 $t$、独立噪声和加权 AV flow-matching loss 训练双塔；Harmony 则把 clean-audio→video 与 clean-video→audio 两个辅助任务加入联合损失，试图缓解两个高噪 latent 同时学习对应关系时的 correspondence drift [[11]](#ref-11) [[15]](#ref-15)。这些是作者提出并在其协议中验证的机制，不是跨模型已独立确认的普遍定律。
 
@@ -201,13 +201,13 @@ Ovi 按 $T_v/T_a$ 缩放音频 RoPE，LTX-2 在跨模态 attention 中只使用�
 
 双塔模型可写成
 
-$$
-h_v^{l+1}=F_v^l(h_v^l,\operatorname{Attn}(h_v^l,h_a^l),C,t),
-$$
+```math
+h_v^{l+1}=F_v^l(h_v^l,\mathrm{Attn}(h_v^l,h_a^l),C,t),
+```
 
-$$
-h_a^{l+1}=F_a^l(h_a^l,\operatorname{Attn}(h_a^l,h_v^l),C,t).
-$$
+```math
+h_a^{l+1}=F_a^l(h_a^l,\mathrm{Attn}(h_a^l,h_v^l),C,t).
+```
 
 Ovi 的对称 twin fusion 与 LTX-2 的非对称双流都满足这类合同 [[11]](#ref-11) [[13]](#ref-13)。判据是交换发生在生成轨迹内部并影响两侧更新，不是“模型图里画了两条线”。
 
@@ -248,9 +248,9 @@ NAVA 的作者附录披露 OCR/字幕过滤、视觉与音频分标签、AV 对�
 
 生成模型之前必须单独测
 
-$$
+```math
 (\hat V,\hat A)=(D_v(E_v(V)),D_a(E_a(A))).
-$$
+```
 
 视频侧检查 PSNR/LPIPS/rFVD、运动模糊、文字和首帧覆盖；音频侧检查频响、瞬态、语音可懂度、音乐谐波、stereo 相位与声像。若 codec 已抹掉 20 ms 撞击瞬态、立体声相位或口型细节，backbone 不可能恢复可靠同步。OmniVAE 的消融也显示加入 AV 对比对齐会轻微改变音频重建质量，说明“更易联合建模”和“逐模态重建无损”需要同时报告 [[19]](#ref-19)。
 
@@ -297,7 +297,7 @@ VABench 在 CVPR 2026 覆盖 T2AV、I2AV 与 stereo，含 15 个维度和动物�
 1. 把“敲一次”改成“敲三次”，检查画面次数与声音 onset 是否一起改变；
 2. 交换两名说话者的台词/参考音色，检查口型、turn-taking 和声源归属；
 3. 将音频描述改为静音或不可见画外声，检查视频是否不应被无关同步器强迫运动；
-4. 人工将输出音轨平移 $\{-1,-0.5,0.5,1\}$ 秒，验证同步指标在正确偏移处有唯一最优。
+4. 人工将输出音轨平移 $`\lbrace-1,-0.5,0.5,1\rbrace`$ 秒，验证同步指标在正确偏移处有唯一最优。
 
 若修改音频条件只改变最终音轨、视频在所有 seed 下不变，系统可能是 staged V2A；若两侧都变，却只因 prompt 同时改写，则还不能证明 AV 内部双向交换。应进一步对 cross-modal block 做 mask/ablation，并记录两侧变化。
 
@@ -430,31 +430,31 @@ ITS 论文在其协议中发现：只用文本—视频 verifier 会提高文本
 
 <a id="ref-9"></a>[9] Liu et al. [JavisDiT: Joint Audio-Video Diffusion Transformer with Hierarchical Spatio-Temporal Prior Synchronization](https://proceedings.iclr.cc/paper_files/paper/2026/hash/e11afe29671baa67c9f15fa77fc97357-Abstract-Conference.html). ICLR, 2026.
 
-<a id="ref-10"></a>[10] JavisVerse. [JavisDiT official repository](https://github.com/JavisVerse/JavisDiT). Accessed 2026-08-30.
+<a id="ref-10"></a>[10] JavisVerse. JavisDiT official repository [![GitHub: JavisVerse/JavisDiT](https://img.shields.io/badge/GitHub-JavisVerse%2FJavisDiT-181717?logo=github&logoColor=white)](https://github.com/JavisVerse/JavisDiT). Accessed 2026-08-30.
 
 <a id="ref-11"></a>[11] Low et al. [Ovi: Twin Backbone Cross-Modal Fusion for Audio-Video Generation](https://arxiv.org/abs/2510.01284). arXiv preprint, 2025.
 
-<a id="ref-12"></a>[12] Character.AI. [Ovi official repository and Ovi 1.1 release](https://github.com/character-ai/Ovi). Accessed 2026-08-30.
+<a id="ref-12"></a>[12] Character.AI. Ovi official repository and Ovi 1.1 release [![GitHub: character-ai/Ovi](https://img.shields.io/badge/GitHub-character-ai%2FOvi-181717?logo=github&logoColor=white)](https://github.com/character-ai/Ovi). Accessed 2026-08-30.
 
 <a id="ref-13"></a>[13] HaCohen et al. [LTX-2: Efficient Joint Audio-Visual Foundation Model](https://arxiv.org/abs/2601.03233). arXiv preprint, 2026.
 
-<a id="ref-14"></a>[14] Lightricks. [LTX-2 official repository](https://github.com/Lightricks/LTX-2). Accessed 2026-08-30.
+<a id="ref-14"></a>[14] Lightricks. LTX-2 official repository [![GitHub: Lightricks/LTX-2](https://img.shields.io/badge/GitHub-Lightricks%2FLTX-2-181717?logo=github&logoColor=white)](https://github.com/Lightricks/LTX-2). Accessed 2026-08-30.
 
 <a id="ref-15"></a>[15] Hu et al. [Harmony: Harmonizing Audio and Video Generation through Cross-Task Synergy](https://openaccess.thecvf.com/content/CVPR2026/papers/Hu_Harmony_Harmonizing_Audio_and_Video_Generation_through_Cross-Task_Synergy_CVPR_2026_paper.pdf). CVPR, 2026.
 
 <a id="ref-16"></a>[16] Ji et al. [Native Audio-Visual Alignment for Generation](https://arxiv.org/abs/2605.30073). arXiv preprint, 2026.
 
-<a id="ref-17"></a>[17] ERNIE Research. [NAVA official repository](https://github.com/ernie-research/NAVA). Accessed 2026-08-30.
+<a id="ref-17"></a>[17] ERNIE Research. NAVA official repository [![GitHub: ernie-research/NAVA](https://img.shields.io/badge/GitHub-ernie-research%2FNAVA-181717?logo=github&logoColor=white)](https://github.com/ernie-research/NAVA). Accessed 2026-08-30.
 
 <a id="ref-18"></a>[18] Baidu. [NAVA model card](https://huggingface.co/baidu/NAVA). Accessed 2026-08-30.
 
 <a id="ref-19"></a>[19] Zhan et al. [OmniVAE: An Audio-Video VAE with Cross-Modal Alignment for Joint Generation](https://arxiv.org/abs/2607.23855). arXiv preprint, 2026.
 
-<a id="ref-20"></a>[20] OpenMOSS. [OmniVAE official repository](https://github.com/OpenMOSS/OmniVAE). Accessed 2026-08-30.
+<a id="ref-20"></a>[20] OpenMOSS. OmniVAE official repository [![GitHub: OpenMOSS/OmniVAE](https://img.shields.io/badge/GitHub-OpenMOSS%2FOmniVAE-181717?logo=github&logoColor=white)](https://github.com/OpenMOSS/OmniVAE). Accessed 2026-08-30.
 
 <a id="ref-21"></a>[21] Jung et al. [Inference-Time Scaling for Joint Audio-Video Generation](https://openreview.net/forum?id=MHNFjjm5nO). TMLR, 2026.
 
-<a id="ref-22"></a>[22] KAIST Multimodal AI Lab. [ITS-AVGen official repository](https://github.com/kaistmm/ITS-AVGen). Accessed 2026-08-30.
+<a id="ref-22"></a>[22] KAIST Multimodal AI Lab. ITS-AVGen official repository [![GitHub: kaistmm/ITS-AVGen](https://img.shields.io/badge/GitHub-kaistmm%2FITS-AVGen-181717?logo=github&logoColor=white)](https://github.com/kaistmm/ITS-AVGen). Accessed 2026-08-30.
 
 <a id="ref-23"></a>[23] Ding et al. [Ripple: Real-Time Streaming Audio-Video Generation With Cross-Modal Recurrent Memory](https://arxiv.org/abs/2607.26818). arXiv preprint, 2026.
 
@@ -470,10 +470,10 @@ ITS 论文在其协议中发现：只用文本—视频 verifier 会提高文本
 
 <a id="ref-29"></a>[29] Seedance Team et al. [Seedance 2.0: Advancing Video Generation for World Complexity](https://arxiv.org/abs/2604.14148). Official preprint, 2026.
 
-<a id="ref-30"></a>[30] ResearchMM. [MM-Diffusion official repository](https://github.com/researchmm/MM-Diffusion). Accessed 2026-08-30.
+<a id="ref-30"></a>[30] ResearchMM. MM-Diffusion official repository [![GitHub: researchmm/MM-Diffusion](https://img.shields.io/badge/GitHub-researchmm%2FMM-Diffusion-181717?logo=github&logoColor=white)](https://github.com/researchmm/MM-Diffusion). Accessed 2026-08-30.
 
-<a id="ref-31"></a>[31] Xing et al. [Seeing and Hearing official repository](https://github.com/yzxing87/Seeing-and-Hearing). Accessed 2026-08-30.
+<a id="ref-31"></a>[31] Xing et al. Seeing and Hearing official repository [![GitHub: yzxing87/Seeing-and-Hearing](https://img.shields.io/badge/GitHub-yzxing87%2FSeeing-and-Hearing-181717?logo=github&logoColor=white)](https://github.com/yzxing87/Seeing-and-Hearing). Accessed 2026-08-30.
 
-<a id="ref-32"></a>[32] Cheng et al. [MMAudio official repository](https://github.com/hkchengrex/MMAudio). Accessed 2026-08-30.
+<a id="ref-32"></a>[32] Cheng et al. MMAudio official repository [![GitHub: hkchengrex/MMAudio](https://img.shields.io/badge/GitHub-hkchengrex%2FMMAudio-181717?logo=github&logoColor=white)](https://github.com/hkchengrex/MMAudio). Accessed 2026-08-30.
 
 <a id="ref-33"></a>[33] Wang et al. [JointDiT project page](https://anonymoushub4ai.github.io/JointDiT/). Accessed 2026-08-30.

@@ -20,9 +20,9 @@
 
 本章把**细粒度可控视频生成**定义为：给定文本、可选图像锚点与一个或多个显式时空控制信号 $C$，学习或采样
 
-$$
+```math
 Y\sim p_\theta(Y\mid c_{\mathrm{text}},R,C),
-$$
+```
 
 其中 $C$ 必须能映射到可观测的相机、对象、姿态、结构或外观属性，并允许对“信号是否生效”做独立测量。只有文本 prompt 的 T2V 也是条件生成，但通常不属于本章所说的细粒度控制。
 
@@ -43,9 +43,9 @@ EgoControl 虽以 3D 全身姿态控制第一人称未来视频，但输入仍�
 
 对第 $k$ 类条件，用一个八元组保存它的真实语义：
 
-$$
+```math
 C_k=(s_k,\tau_k,\mathcal F_k,v_k,m_k,q_k,w_k,\pi_k).
-$$
+```
 
 - $s_k$：原始信号；
 - $\tau_k$：帧时间或世界时间；
@@ -122,10 +122,10 @@ flowchart LR
 
 一条最小相机合同包含
 
-$$
+```math
 K_t=\begin{bmatrix}f_x&0&c_x\\0&f_y&c_y\\0&0&1\end{bmatrix},
 \qquad T_{w\rightarrow c,t}=[R_t\mid t_t]\in SE(3),
-$$
+```
 
 并声明 $T$ 是 world-to-camera 还是 camera-to-world、右手还是左手系、平移是 metric 还是 scale-ambiguous，以及 $K_t$ 是真实焦距、视场角还是 crop 后的有效内参。只用 `pan/zoom/orbit` 文本标签可以做弱控制，却不能与 metric camera path 横排误差。
 
@@ -139,11 +139,11 @@ CameraCtrl 将相机轨迹参数化并通过 plug-and-play pose module 注入冻
 
 用户画的一条线至少需要展开为
 
-$$
+```math
 P\in\mathbb R^{B\times F\times N\times d},
 \quad V\in\{0,1\}^{B\times F\times N},
 \quad A\in\{0,\ldots,M\}^{B\times N},
-$$
+```
 
 其中 $d=2$ 或 $3$，$V$ 表示可见/遮挡，$A$ 表示点属于哪个对象。如果不有效编码 $V$ 与 $A$，点出画后往往被错误解释为“物体缩小/消失”，两条轨迹交叉时也容易发生身份交换。
 
@@ -177,9 +177,9 @@ MOFA-Video 先把人工轨迹、人脸 landmark 或 driving video 转成生成�
 
 参考集应写成
 
-$$
+```math
 R=\{(I_j,a_j,r_j)\}_{j=1}^{J},
-$$
+```
 
 其中 $a_j$ 表示身份/服饰/材质/局部属性，$r_j$ 声明它是时间锚点、纯外观参考，还是驱动帧。Animate Anyone 使用 ReferenceNet 保留外观细节，Pose Guider 给姿态，temporal layers 处理时序；这正是将 identity 与 pose 拆开的代表 [[11]](#ref-11)。
 
@@ -191,9 +191,9 @@ $$
 
 对多条件模型，最小消融不是 `all controls on/off`，而是
 
-$$
+```math
 \{\varnothing,C_i,C_j,C_i+C_j,C_i+\widetilde C_j\},
-$$
+```
 
 其中 $\widetilde C_j$ 是与 $C_i$ 刻意冲突的条件。例如相机要向右平移，而背景点轨迹要向右运动；若不声明点位于世界还是画面坐标，两个条件可能物理上互相抵消。
 
@@ -333,9 +333,9 @@ FlashMotion 的正式 CVPR 2026 证据支持“few-step trajectory control 需�
 
 对固定输入 $x$ 与条件 $C$，不应最大化一个神秘总分，而应保存向量
 
-$$
+```math
 S(x,C)=\big(A_C,F_R,N_M,D_{Y\mid x,C}\big),
-$$
+```
 
 其中 $A_C$ 是控制遵循，$F_R$ 是参考/未变属性保真，$N_M$ 是运动自然性，$D_{Y\mid x,C}$ 是在**同一条件**下的合理多样性。
 
@@ -509,16 +509,16 @@ $$
 
 <a id="ref-38"></a>[38] [Gen-4 Video Prompting Guide](https://help.runwayml.com/hc/en-us/articles/39789879462419-Gen-4-Video-Prompting-Guide). Runway. Accessed 2026-08-30.
 
-<a id="ref-39"></a>[39] [MotionCtrl official repository](https://github.com/TencentARC/MotionCtrl). Tencent ARC. Repository snapshot accessed 2026-08-30.
+<a id="ref-39"></a>[39] MotionCtrl official repository [![GitHub: TencentARC/MotionCtrl](https://img.shields.io/badge/GitHub-TencentARC%2FMotionCtrl-181717?logo=github&logoColor=white)](https://github.com/TencentARC/MotionCtrl). Tencent ARC. Repository snapshot accessed 2026-08-30.
 
-<a id="ref-40"></a>[40] [Tora official repository](https://github.com/alibaba/Tora). Alibaba. Repository snapshot accessed 2026-08-30.
+<a id="ref-40"></a>[40] Tora official repository [![GitHub: alibaba/Tora](https://img.shields.io/badge/GitHub-alibaba%2FTora-181717?logo=github&logoColor=white)](https://github.com/alibaba/Tora). Alibaba. Repository snapshot accessed 2026-08-30.
 
-<a id="ref-41"></a>[41] [BulletTime official repository](https://github.com/19reborn/BulletTime). Repository snapshot accessed 2026-08-30.
+<a id="ref-41"></a>[41] BulletTime official repository [![GitHub: 19reborn/BulletTime](https://img.shields.io/badge/GitHub-19reborn%2FBulletTime-181717?logo=github&logoColor=white)](https://github.com/19reborn/BulletTime). Repository snapshot accessed 2026-08-30.
 
-<a id="ref-42"></a>[42] [FlexTraj official repository](https://github.com/bestzzhang/FlexTraj_code). Repository snapshot accessed 2026-08-30.
+<a id="ref-42"></a>[42] FlexTraj official repository [![GitHub: bestzzhang/FlexTraj_code](https://img.shields.io/badge/GitHub-bestzzhang%2FFlexTraj_code-181717?logo=github&logoColor=white)](https://github.com/bestzzhang/FlexTraj_code). Repository snapshot accessed 2026-08-30.
 
-<a id="ref-43"></a>[43] [FlashMotion official repository](https://github.com/quanhaol/FlashMotion). Repository snapshot accessed 2026-08-30.
+<a id="ref-43"></a>[43] FlashMotion official repository [![GitHub: quanhaol/FlashMotion](https://img.shields.io/badge/GitHub-quanhaol%2FFlashMotion-181717?logo=github&logoColor=white)](https://github.com/quanhaol/FlashMotion). Repository snapshot accessed 2026-08-30.
 
-<a id="ref-44"></a>[44] [WorldStereo official repository](https://github.com/FuchengSu/WorldStereo). Repository snapshot accessed 2026-08-30.
+<a id="ref-44"></a>[44] WorldStereo official repository [![GitHub: FuchengSu/WorldStereo](https://img.shields.io/badge/GitHub-FuchengSu%2FWorldStereo-181717?logo=github&logoColor=white)](https://github.com/FuchengSu/WorldStereo). Repository snapshot accessed 2026-08-30.
 
 <a id="ref-45"></a>[45] [4DStreamCtrl project page](https://4dstreamctrl.github.io/). Project snapshot accessed 2026-08-30.

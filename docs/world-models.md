@@ -17,9 +17,9 @@
 
 先固定符号。观测为 $o_t$，不可直接观测的环境状态为 $s_t$，动作或动作块为 $a_t$，目标为 $g$，内部记忆为 $m_t$。一个动作条件预测器近似：
 
-$$
+```math
 p(o_{t+1:t+H},s_{t+1:t+H}\mid o_{\leq t},a_{t:t+H-1},g,m_t).
-$$
+```
 
 这条式子仍不足以说明系统会规划、会执行或能在现实中安全工作。
 
@@ -46,10 +46,10 @@ $$
 
 最简单的 latent world model 用一个确定性状态递推：
 
-$$
+```math
 h_{t+1}=f_\theta(h_t,a_t),\qquad
 \hat{o}_{t+1}=g_\theta(h_{t+1}).
-$$
+```
 
 优点是 rollout 快、缓存简单、同一动作序列可复现；缺点是把所有不确定性压进单一路径。当门后是否有人、遮挡物如何运动或接触结果本来就有多种可能时，均方误差会产生模糊平均，离散 token 则可能过早锁定一个未来。
 
@@ -57,10 +57,10 @@ $$
 
 随机状态显式表示“一段历史之后仍不能确定”的部分：
 
-$$
+```math
 z_{t+1}\sim p_\theta(z_{t+1}\mid h_{t+1}),\qquad
 \hat{o}_{t+1}\sim p_\theta(o_{t+1}\mid h_{t+1},z_{t+1}).
-$$
+```
 
 模型可以采样多个 future rollouts，估计任务收益分布和失败概率。但“样本不同”不必然等于“概率校准”：若训练数据没有覆盖某类动作或接触，模型可能对错误未来非常自信。
 
@@ -68,13 +68,13 @@ $$
 
 PlaNet 的 recurrent state-space model（RSSM）把 deterministic recurrent state $h_t$ 与 stochastic state $z_t$ 组合 [[5]](#ref-5)：
 
-$$
+```math
 \begin{aligned}
 h_t &= f_\theta(h_{t-1},z_{t-1},a_{t-1}),\\
 p_\theta(z_t\mid h_t) &\quad\text{（先验，用于想象）},\\
 q_\phi(z_t\mid h_t,o_t) &\quad\text{（后验，用于观测校正）}.
 \end{aligned}
-$$
+```
 
 这里的 posterior 在新观测到来时校正 belief，prior 在没有新观测时按动作想象；数学上与随机未来模型共享 variational state-space 接口。ELBO、prior–posterior gap、posterior collapse、aleatoric/epistemic 分账见[变分随机视频生成](generative-models/variational-generation.md)；reward/continue、planner、return 与 model exploitation 仍由本章负责。两种验收不能互相替代。
 
@@ -185,11 +185,11 @@ _图 2：World–Action Modeling 的两条系统路线。AI-generated scientific
 
 World Action Verifier（WAV）提供了一个可插入这两种级联系统的验证器 [[20]](#ref-20)。其核心不是问整段视频“像不像”，而是把转移检查拆成：
 
-$$
+```math
 \underbrace{p(s'\mid s)}_{\text{state plausibility}}
 \quad\text{与}\quad
 \underbrace{p(a\mid s,s')}_{\text{action reachability}}.
-$$
+```
 
 论文用 action-free video 产生多样 subgoal、稀疏 inverse model 恢复动作，并通过 forward rollout cycle 检查可达性。作者在 9 个 MiniGrid、RoboMimic 与 ManiSkill 任务上报告约 2 倍 sample efficiency 和超过 22% 的下游提升。这里的正确结论是“分解 verifier 可改善指定任务的数据筛选/学习”，不是“WAV 已成为通用实时安全证书”；它的 ICLR 2026 证据来自 World Models workshop 与 Recursive Self-Improvement workshop，而不是 ICLR 主会录用。
 
@@ -236,11 +236,11 @@ $$
 
 动作条件模型必须通过配对干预测试。给定同一初态与随机种子，比较 no-op、左移、右移、抓取、释放等动作：
 
-$$
+```math
 \Delta_{\text{cf}}
 =d\!\left(\hat{s}_{t+H}^{\,a},s_{t+H}^{\,a}\right)
 -d\!\left(\hat{s}_{t+H}^{\,a'},s_{t+H}^{\,a'}\right),
-$$
+```
 
 并检查三类变量：
 
@@ -303,10 +303,10 @@ _图 3：带 verifier、不确定性和 persistent state 的 receding-horizon �
 
 长期交互需要至少三种状态：
 
-$$
-m_{t+1}=\operatorname{Update}\!\left(m_t,o_{t+1},a_t,
+```math
+m_{t+1}=\mathrm{Update}\!\left(m_t,o_{t+1},a_t,
 \epsilon_{t+1}\right),
-$$
+```
 
 其中 $\epsilon_{t+1}$ 是预测与真实观测的 innovation。可操作的 memory 需要“写入、覆盖、检索、遗忘和置信度”，而不只是缓存更多帧。
 
@@ -433,14 +433,14 @@ WorldGym 把 action-conditioned video model 当作 policy evaluation environment
 |---|---|---|---|---|
 | WAM concise tutorial [[1]](#ref-1) | 定义与四范式 | arXiv v7 | 作者论文页 | B：最新教程，非基准结论 |
 | World Model for Robot Learning survey [[2]](#ref-2) | policy-centric taxonomy | arXiv | 论文入口 | B：最新综述，非原始实验 |
-| DreamGen [[19]](#ref-19) | 级联式离线合成数据 | CoRL 2025 / PMLR | [Project](https://research.nvidia.com/labs/gear/dreamgen/) · [Code](https://github.com/NVIDIA/GR00T-Dreams) | A：正式论文 + 四阶段代码 |
-| World Action Verifier [[20]](#ref-20) | state plausibility + action reachability | arXiv v2 | [Project](https://world-action-verifier.github.io/) · [Code](https://github.com/world-action-verifier/wav_robot) | B：论文 + 代码；workshop 荣誉，不是主会 |
-| ViPRA [[21]](#ref-21) | latent action 与 future feature 联合预训练 | ICLR 2026 OpenReview | [Project](https://vipra-project.github.io/) · [Code](https://github.com/sroutray/vipra) | A：官方会议记录 + code/weights |
-| LPWM | object-particle + latent-action 的相邻变分桥接支线 | [ICLR 2026 Oral](https://openreview.net/forum?id=lTaPtGiUUc) | [Project](https://taldatech.github.io/lpwm-web/) · [Code](https://github.com/taldatech/lpwm) | A：正式会议记录 + code/data/weights；对象化场景与相机运动仍是边界 |
-| DreamZero [[22]](#ref-22) | joint video–action 闭环 policy | arXiv | [Project](https://dreamzero0.github.io/) · [Code](https://github.com/dreamzero0/dreamzero) | B：论文 + 项目 + 代码 |
+| DreamGen [[19]](#ref-19) | 级联式离线合成数据 | CoRL 2025 / PMLR | [Project](https://research.nvidia.com/labs/gear/dreamgen/) · Code [![GitHub: NVIDIA/GR00T-Dreams](https://img.shields.io/badge/GitHub-NVIDIA%2FGR00T-Dreams-181717?logo=github&logoColor=white)](https://github.com/NVIDIA/GR00T-Dreams) | A：正式论文 + 四阶段代码 |
+| World Action Verifier [[20]](#ref-20) | state plausibility + action reachability | arXiv v2 | [Project](https://world-action-verifier.github.io/) · Code [![GitHub: world-action-verifier/wav_robot](https://img.shields.io/badge/GitHub-world-action-verifier%2Fwav_robot-181717?logo=github&logoColor=white)](https://github.com/world-action-verifier/wav_robot) | B：论文 + 代码；workshop 荣誉，不是主会 |
+| ViPRA [[21]](#ref-21) | latent action 与 future feature 联合预训练 | ICLR 2026 OpenReview | [Project](https://vipra-project.github.io/) · Code [![GitHub: sroutray/vipra](https://img.shields.io/badge/GitHub-sroutray%2Fvipra-181717?logo=github&logoColor=white)](https://github.com/sroutray/vipra) | A：官方会议记录 + code/weights |
+| LPWM | object-particle + latent-action 的相邻变分桥接支线 | [ICLR 2026 Oral](https://openreview.net/forum?id=lTaPtGiUUc) | [Project](https://taldatech.github.io/lpwm-web/) · Code [![GitHub: taldatech/lpwm](https://img.shields.io/badge/GitHub-taldatech%2Flpwm-181717?logo=github&logoColor=white)](https://github.com/taldatech/lpwm) | A：正式会议记录 + code/data/weights；对象化场景与相机运动仍是边界 |
+| DreamZero [[22]](#ref-22) | joint video–action 闭环 policy | arXiv | [Project](https://dreamzero0.github.io/) · Code [![GitHub: dreamzero0/dreamzero](https://img.shields.io/badge/GitHub-dreamzero0%2Fdreamzero-181717?logo=github&logoColor=white)](https://github.com/dreamzero0/dreamzero) | B：论文 + 项目 + 代码 |
 | WorldPack [[23]](#ref-23) | 动态帧压缩与几何检索 | arXiv v3 | 论文入口 | B：论文；开放面需逐项核对 |
 | Infinite-World [[24]](#ref-24) | pose-free hierarchical memory | arXiv v2 | [Project](https://rq-wu.github.io/projects/infinite-world/) | B/C：论文 + demo；未见等价完整代码 |
-| ReWorld—long-horizon memory [[25]](#ref-25) | 固定 KV + landmark bank | arXiv v1 | [Code](https://github.com/zhifeichen097/ReWorld) | B-：inference code，weights 未发布 |
+| ReWorld—long-horizon memory [[25]](#ref-25) | 固定 KV + landmark bank | arXiv v1 | Code [![GitHub: zhifeichen097/ReWorld](https://img.shields.io/badge/GitHub-zhifeichen097%2FReWorld-181717?logo=github&logoColor=white)](https://github.com/zhifeichen097/ReWorld) | B-：inference code，weights 未发布 |
 | ReWorld—reward modeling [[26]](#ref-26) | 多维 embodied reward | arXiv | 论文入口 | B：同名不同工作 |
 
 等级定义：A = 正式同行评审入口 + 可定位的一手 artifact；B = arXiv + 作者项目或代码；C = 机构发布/demo；D = 二手发现线索。等级描述的是**可核查面**，不是模型质量排名。

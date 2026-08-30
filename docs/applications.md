@@ -6,7 +6,7 @@
 
 因此，本章采用下面的链条：
 
-$$
+```math
 \text{use-case contract}
 \rightarrow
 \text{capability workflow}
@@ -16,7 +16,7 @@ $$
 \text{deployment gate}
 \rightarrow
 \text{monitoring and rollback}.
-$$
+```
 
 本章关注系统落地；若要追踪能力来自哪里，行为偏好与奖励优化见[视频后训练与对齐](generative-models/video-post-training-alignment.md)，相机、对象轨迹、姿态与几何条件见[细粒度可控生成](tasks/controllable-video-generation.md)，声画在生成过程中的耦合与同步见[原生音视频生成](tasks/native-audio-video-generation.md)。三者都必须回到本章的任务合同和部署门槛验收。
 
@@ -144,11 +144,11 @@ OmniHuman-1.5 用结构化语义条件和 Multimodal DiT 推进“语义表演�
 
 交互系统第 $k$ 轮接收动作 $a_k$ 与当前状态/观测 $s_k,o_k$，在 deadline $d$ 内返回：
 
-$$
+```math
 (\hat{o}_{k+1},\hat{s}_{k+1})
 \sim
 p_\theta(\cdot\mid o_{\le k},a_{\le k},m_k).
-$$
+```
 
 其中 $m_k$ 是压缩记忆。验收至少拆成：
 
@@ -164,7 +164,7 @@ Genie 在 ICML 2024 通过无标签互联网视频学习 latent action space，�
 
 机器人或驾驶中的典型链路是：
 
-$$
+```math
 \text{observation}
 \rightarrow
 \text{candidate actions}
@@ -176,7 +176,7 @@ $$
 \text{action}
 \rightarrow
 \text{new observation}.
-$$
+```
 
 每一箭头都会引入误差。漂亮视频可能遗漏碰撞、小物体、接触、交通参与者意图或机器人坐标；策略还可能主动利用模型的系统性错误。因此验收层级必须从 open-loop 画面、状态与动作一致、反事实正确，推进到 closed-loop 任务、真实转移和安全边界。
 
@@ -207,12 +207,12 @@ DreamGen 把适配后的 I2V 世界模型、latent action / inverse dynamics 和
 
 对应用 $u$，把门槛写成布尔合取而不是平均：
 
-$$
-\operatorname{PASS}(u)
+```math
+\mathrm{PASS}(u)
 =
 G_q \land G_c \land G_p \land G_{\text{SLO}}
 \land G_s \land G_g,
-$$
+```
 
 其中 $G_q$ 是质量，$G_c$ 是控制，$G_p$ 是保留/状态，$G_{\text{SLO}}$ 是系统服务等级，$G_s$ 是安全，$G_g$ 是权利与治理。某一项特别高不能抵消另一项硬失败。
 
@@ -231,12 +231,12 @@ ITU-T P.910 (07/2026) 是当前有效的多媒体主观视频质量评测建议�
 
 离线创作至少报告每个**被采用输出**的成本，而不是单次推理成本：
 
-$$
+```math
 C_{\text{accepted}}
 =
 \frac{C_{\text{generation}}+C_{\text{selection}}+C_{\text{editing}}+C_{\text{review}}}
 {N_{\text{accepted}}}.
-$$
+```
 
 流式/交互系统至少报告：
 

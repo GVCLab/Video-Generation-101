@@ -10,10 +10,10 @@
 
 建议重写时以如下五元组作为每个系统的最小描述：
 
-$$
+```math
 \text{system}=\text{representation}\times\text{factorization}\times
 \text{objective}\times\text{backbone}\times\text{deployment}.
-$$
+```
 
 截至 2026 年，最重要的变化不是某一种家族完全替代另一种，而是组合边界变清楚了：连续 latent 可以做 autoregressive，autoregressive 条件分布可以用 diffusion loss，flow matching 可以配 temporal-pyramid autoregression，DMD/consistency 可以把双向教师蒸馏成少步 causal student，streaming 系统还必须在模型之外满足首帧与逐帧 SLO。
 
@@ -116,15 +116,15 @@ $$
 
 - **Strict autoregressive**：存在固定或动态全序，每次条件在已生成前缀上，典型形式为
 
-  $$
+  ```math
   p(x_{1:K}\mid c)=\prod_{k=1}^{K}p(x_k\mid x_{<k},c).
-  $$
+  ```
 
 - **Masked/block iterative**：每轮并行预测一组未知变量，之后按置信度或预设 schedule 重新 mask/commit。给定具体顺序时可写成 block factorization
 
-  $$
+  ```math
   p(X_{1:J}\mid c)=\prod_{j=1}^{J}p(X_j\mid X_{<j},c),
-  $$
+  ```
 
   但 $X_j$ 内部通常并行，attention 也可为双向；因此应与逐 token causal AR 分栏。
 - **Temporal causal chunking**：视频帧或 chunk 只能看过去，chunk 内部可以双向联合生成。它是 data-time factorization，不是 noise-time sampler。
@@ -145,18 +145,18 @@ $$
 
 前向链可写为
 
-$$
+```math
 q(x_\tau\mid x_{\tau-1})=
 \mathcal N(\sqrt{1-\beta_\tau}x_{\tau-1},\beta_\tau I).
-$$
+```
 
 原始 DDPM 学习的反向转移是
 
-$$
+```math
 p_\theta(x_{\tau-1}\mid x_\tau,c)=
 \mathcal N\!\left(\mu_\theta(x_\tau,\tau,c),
 \Sigma_\theta(x_\tau,\tau,c)\right),
-$$
+```
 
 所以一次反向更新通常包含随机项。DDPM 将变分界与 denoising score matching 联系起来；简化的噪声预测 MSE 是一种训练参数化，不是反向采样器的完整定义。[DDPM，NeurIPS 2020](https://proceedings.neurips.cc/paper/2020/hash/4c5bcfec8584af0d967f1ab10179ca4b-Abstract.html)
 
@@ -164,17 +164,17 @@ $$
 
 若常见高斯扰动写成
 
-$$
+```math
 x_\tau=\alpha_\tau x_0+\sigma_\tau\epsilon,
 \qquad \epsilon\sim\mathcal N(0,I),
-$$
+```
 
 则条件扰动核的 score 为 $-\epsilon/\sigma_\tau$；在最优 denoising score matching 条件下，噪声预测网络给出边缘 score 的估计
 
-$$
+```math
 s_\theta(x_\tau,\tau)\approx
 -\frac{\epsilon_\theta(x_\tau,\tau)}{\sigma_\tau}.
-$$
+```
 
 $x_0$ prediction、$\epsilon$ prediction、score prediction 与常见 $v$ prediction 可在已定义的 schedule 下线性换算。它们会改变数值条件、loss weighting 和实现接口，但不应在 taxonomy 中被列为四种独立生成家族。[Score-SDE，ICLR 2021 Oral](https://arxiv.org/abs/2011.13456) 与 [EDM，NeurIPS 2022](https://proceedings.neurips.cc/paper_files/paper/2022/hash/a98846e9d9cc01cfb87eb694d946ce6b-Abstract-Conference.html) 支撑这种模块化区分。
 
@@ -182,24 +182,24 @@ $x_0$ prediction、$\epsilon$ prediction、score prediction 与常见 $v$ predic
 
 从数据到噪声的前向 Itô SDE 为
 
-$$
+```math
 \mathrm dx=f(x,\tau)\,\mathrm d\tau+g(\tau)\,\mathrm dW.
-$$
+```
 
 沿 $T\rightarrow0$ 反向积分时，reverse-time SDE 为
 
-$$
+```math
 \mathrm dx=\left[f(x,\tau)-g(\tau)^2
 \nabla_x\log p_\tau(x)\right]\mathrm d\tau
 +g(\tau)\,\mathrm d\bar W,
-$$
+```
 
 其中仍有随机 Wiener 项。与它共享每个时刻边缘分布的 probability-flow ODE 为
 
-$$
+```math
 \mathrm dx=\left[f(x,\tau)-\frac{1}{2}g(\tau)^2
 \nabla_x\log p_\tau(x)\right]\mathrm d\tau.
-$$
+```
 
 因此：
 
@@ -213,12 +213,12 @@ $$
 
 Flow Matching 在 Continuous Normalizing Flow 上定义无需训练时模拟轨迹的回归目标。令噪声到数据方向为 $s:0\rightarrow1$，
 
-$$
+```math
 \frac{\mathrm dx_s}{\mathrm ds}=v_\theta(x_s,s),
 \qquad
 \mathcal L_{\mathrm{FM}}=
 \mathbb E\left\|v_\theta(x_s,s)-u_s(x_s\mid z)\right\|_2^2.
-$$
+```
 
 条件路径可选 diffusion path、OT displacement path 或其他路径。训练“simulation-free”只表示 loss 估计不需要先完整求解 ODE；推理仍需数值积分。FM 不自动保证少 NFE，也不自动保证 learned field 的轨迹很直。[Flow Matching，ICLR 2023](https://openreview.net/forum?id=PqvMRDCJT9t)
 
@@ -226,10 +226,10 @@ $$
 
 经典 RF 用配对 $(x_0,x_1)$ 构造直线条件插值
 
-$$
+```math
 x_s=(1-s)x_0+s x_1,
 \qquad \dot x_s=x_1-x_0.
-$$
+```
 
 要区分三件事：训练样本的 conditional interpolation 是直线；最优回归得到的是给定 $x_s$ 后条件速度的平均；由近似网络积分出的 marginal ODE trajectory 未必逐样本沿原线段。Reflow 使用当前模型生成的新 coupling 再训练，以降低运输成本并进一步拉直。因而“linear interpolation”“rectified flow”“one-step”不是同义词。[Rectified Flow，ICLR 2023](https://openreview.net/forum?id=XVjTT1nw5z)
 
@@ -237,10 +237,10 @@ $$
 
 Consistency Model 学习把同一 PF-ODE 轨迹上的不同点映射到共同端点：
 
-$$
+```math
 f_\theta(x_\tau,\tau)\approx f_\theta(x_\sigma,\sigma)
 \quad\text{if }x_\tau,x_\sigma\text{ are on the same trajectory}.
-$$
+```
 
 原始 CM 支持从预训练 diffusion 蒸馏，也支持 standalone consistency training；设计目标是一步生成，同时保留多步 refinement 的质量—计算折中。Consistency 不等于严格单步，也不等于 distribution matching。[Consistency Models，ICML 2023](https://proceedings.mlr.press/v202/song23a.html)
 

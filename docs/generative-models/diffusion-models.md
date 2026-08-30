@@ -8,11 +8,11 @@
 
 设一段含 $K$ 帧的干净视频为
 
-$$
+```math
 X_0=\left(x_0^{(1)},x_0^{(2)},\ldots,x_0^{(K)}\right).
-$$
+```
 
-上标 $k\in\{1,\ldots,K\}$ 表示第几帧，即现实画面怎样随时间演化；下标 $\tau\in[0,T]$ 表示这整段视频处在多强的噪声下。于是 $x_\tau^{(k)}$ 是“第 $k$ 帧在噪声等级 $\tau$ 的状态”，$X_0$ 是整段干净视频而不是第一帧，$X_T$ 则接近先验噪声。条件 $c$ 可以是文本、首帧、参考视频、深度、姿态、相机轨迹或动作。
+上标 $`k\in\lbrace1,\ldots,K\rbrace`$ 表示第几帧，即现实画面怎样随时间演化；下标 $\tau\in[0,T]$ 表示这整段视频处在多强的噪声下。于是 $x_\tau^{(k)}$ 是“第 $k$ 帧在噪声等级 $\tau$ 的状态”，$X_0$ 是整段干净视频而不是第一帧，$X_T$ 则接近先验噪声。条件 $c$ 可以是文本、首帧、参考视频、深度、姿态、相机轨迹或动作。
 
 ```mermaid
 flowchart LR
@@ -47,26 +47,26 @@ flowchart LR
 
 离散 DDPM 在噪声时间 $\tau=1,\ldots,T$ 上定义固定的前向马尔可夫链：
 
-$$
+```math
 q(X_\tau\mid X_{\tau-1})=
 \mathcal N\!\left(\sqrt{1-\beta_\tau}X_{\tau-1},\beta_\tau I\right).
-$$
+```
 
 记 $\alpha_\tau=1-\beta_\tau$、$\bar\alpha_\tau=\prod_{s=1}^{\tau}\alpha_s$，则无需逐步执行前向链，就能直接构造任意噪声等级的训练样本：
 
-$$
+```math
 X_\tau=\sqrt{\bar\alpha_\tau}X_0+
 \sqrt{1-\bar\alpha_\tau}\,\epsilon,
 \qquad \epsilon\sim\mathcal N(0,I).
-$$
+```
 
 原始 DDPM 学习的反向转移不是一个确定函数，而是高斯条件分布：
 
-$$
+```math
 p_\theta(X_{\tau-1}\mid X_\tau,c)=
 \mathcal N\!\left(\mu_\theta(X_\tau,\tau,c),
 \Sigma_\theta(X_\tau,\tau,c)\right).
-$$
+```
 
 因此，ancestral DDPM 的一次反向更新通常还要采样随机项。把反向过程写成 $X_{\tau-1}=g_\theta(X_\tau)$ 会漏掉这一点；只有在明确采用确定性 DDIM、PF-ODE 或其他确定性 sampler 时，这种简写才不误导。DDPM 原论文从变分界出发，并展示了它与 denoising score matching 的联系 [[1]](#ref-1)。
 
@@ -74,26 +74,26 @@ $$
 
 用更一般的连续高斯扰动写法，令
 
-$$
+```math
 X_\tau=\alpha(\tau)X_0+\sigma(\tau)\epsilon,
 \qquad \epsilon\sim\mathcal N(0,I).
-$$
+```
 
 给定干净样本时，扰动核的 score 是
 
-$$
+```math
 \nabla_{X_\tau}\log q(X_\tau\mid X_0)
 =-\frac{X_\tau-\alpha(\tau)X_0}{\sigma(\tau)^2}
 =-\frac{\epsilon}{\sigma(\tau)}.
-$$
+```
 
 若网络以均方误差预测噪声，其最优输出是条件均值 $\mathbb E[\epsilon\mid X_\tau,c]$。因此可将网络换算为扰动后条件分布 $p_\tau(X_\tau\mid c)$ 的边缘 score 估计：
 
-$$
+```math
 s_\theta(X_\tau,\tau,c)
 \approx -\frac{\epsilon_\theta(X_\tau,\tau,c)}{\sigma(\tau)}
 \approx \nabla_{X_\tau}\log p_\tau(X_\tau\mid c).
-$$
+```
 
 这里的关键不是“噪声模型变成了另一类 score 模型”，而是给定同一噪声 schedule 后，两者是同一个统计场的不同参数化。有限数据、有限容量与不同 loss weighting 会让训练结果不再完全等价，但分类时不应把它们列成互斥家族。
 
@@ -101,19 +101,19 @@ $$
 
 Score-SDE 把离散加噪链写成前向 Itô 随机微分方程 [[2]](#ref-2)：
 
-$$
+```math
 \mathrm dX=f(X,\tau)\,\mathrm d\tau+g(\tau)\,\mathrm dW_\tau,
 \qquad \tau:0\rightarrow T.
-$$
+```
 
 生成时从 $T$ 向 $0$ 积分。对应的 reverse-time SDE 为
 
-$$
+```math
 \mathrm dX=\left[f(X,\tau)-g(\tau)^2
 s_\theta(X,\tau,c)\right]\mathrm d\tau
 +g(\tau)\,\mathrm d\bar W_\tau,
 \qquad \tau:T\rightarrow0.
-$$
+```
 
 $\bar W_\tau$ 是反向时间的 Wiener 过程，所以这条生成路径仍是随机的。公式中的 $\mathrm d\tau$ 按 $T\rightarrow0$ 的方向积分；若改用正向增长的新时间变量，漂移项符号也要随变量变换调整，不能只抄公式而忽略方向约定。
 
@@ -121,11 +121,11 @@ $\bar W_\tau$ 是反向时间的 Wiener 过程，所以这条生成路径仍是�
 
 同一组前向 SDE 与 score 还定义 probability-flow ODE：
 
-$$
+```math
 \mathrm dX=\left[f(X,\tau)-\frac{1}{2}g(\tau)^2
 s_\theta(X,\tau,c)\right]\mathrm d\tau,
 \qquad \tau:T\rightarrow0.
-$$
+```
 
 PF-ODE 没有 Wiener 随机项，因此给定初始噪声和确定性求解器后，轨迹是确定的。在 score 精确、初始分布正确且连续方程被精确求解的理想条件下，reverse SDE 与 PF-ODE 在每个 $\tau$ 上具有相同边缘分布；这不表示它们对同一个初始噪声产生相同样本，也不表示粗离散、近似 score 下仍完全等价 [[2]](#ref-2)。由此可见，“diffusion 等于随机链、flow 等于确定 ODE”不是可靠分界：score-based diffusion 自身就同时拥有随机 SDE 和确定 ODE。
 
@@ -149,28 +149,28 @@ $X_\tau=\alpha_\tau X_0+\sigma_\tau\epsilon$，并暂时省略条件 $c$。
 
 一个统一的回归目标可写为
 
-$$
+```math
 \mathcal L=
 \mathbb E_{X_0,c,\tau,\epsilon}
 \left[w(\tau)\left\|y_\tau-
 y_\theta(X_\tau,\tau,c)\right\|_2^2\right],
-$$
+```
 
 其中 $y_\tau$ 可以是 $\epsilon$、$X_0$、$v$ 或经过预条件的等价目标。训练时至少有三个独立选择：
 
 1. **Noise schedule** $\alpha(\tau),\sigma(\tau)$ 决定每个噪声时刻的信噪比
-   $\operatorname{SNR}(\tau)=\alpha(\tau)^2/\sigma(\tau)^2$，也决定数据怎样被扰动。
+   $\mathrm{SNR}(\tau)=\alpha(\tau)^2/\sigma(\tau)^2$，也决定数据怎样被扰动。
 2. **Noise-time sampling** $p_{\mathrm{train}}(\tau)$ 决定优化器多频繁看到各噪声区间。
 3. **Loss weighting** $w(\tau)$ 决定相同出现频率下，各区间的误差对参数更新贡献多大。
 
 参数化可代数换算，不等于优化问题相同。例如由 $\epsilon$ 与 $X_0$ 的换算可得
 
-$$
+```math
 \|\epsilon-\hat\epsilon\|_2^2
 =\frac{\alpha_\tau^2}{\sigma_\tau^2}
 \|X_0-\hat X_0\|_2^2
-=\operatorname{SNR}(\tau)\|X_0-\hat X_0\|_2^2.
-$$
+=\mathrm{SNR}(\tau)\|X_0-\hat X_0\|_2^2.
+```
 
 所以“不加权的 $\epsilon$ MSE”在 $X_0$ 误差坐标中已经隐含 SNR 权重。EDM 将噪声尺度、网络预条件、训练权重、采样 schedule 与数值求解器拆成模块，说明高质量系统不能只报告“用了哪一种预测头” [[5]](#ref-5)。实践复现至少要记录 $\alpha/\sigma$ 定义、$\tau$ 的采样分布、loss weight、数据归一化和推理噪声网格。
 
@@ -206,9 +206,9 @@ Pixel diffusion 直接在 RGB 视频张量上学习 $p(X)$。它没有独立 cod
 
 Latent diffusion 先训练编码器 $E$ 与解码器 $D$：
 
-$$
+```math
 Z_0=E(X_0),\qquad X_{\mathrm{rec}}=D(Z_0),
-$$
+```
 
 再在低维连续表示 $Z_\tau$ 上执行扩散。Latent Diffusion Models 将这一思路系统化，Video LDM 则把预训练图像 LDM 加入时间层并用于高分辨率视频 [[8]](#ref-8) [[12]](#ref-12)。压缩降低了 denoiser 的时空成本，却把最终误差拆成两部分：生成器能否拟合 latent 分布，以及 decoder 能否把 latent 恢复成连续视频。
 
@@ -244,16 +244,16 @@ DiT 是 backbone，不是与 diffusion、flow matching 并列的生成目标。�
 
 Classifier-free guidance（CFG）在训练时随机丢弃条件，使一个网络同时学习 conditional 与 unconditional 预测；推理时按本章约定组合为 [[7]](#ref-7)：
 
-$$
+```math
 \epsilon_{\mathrm{cfg}}
 =\epsilon_\theta(X_\tau,\tau,\varnothing)
 +s\left[
 \epsilon_\theta(X_\tau,\tau,c)
 -\epsilon_\theta(X_\tau,\tau,\varnothing)
 \right].
-$$
+```
 
-这里 $s=1$ 恢复 conditional 预测，$s>1$ 是向条件方向外推。另一种常见写法 $(1+w)\epsilon_c-w\epsilon_u$ 与本式对应 $s=1+w$；比较配置时不能混用两个 scale。CFG 提供质量/条件强度与覆盖度之间的可调折中，不会免费提升所有维度。对视频还要检查条件是否贯穿整个 $k=1\ldots K$，而不是只在首帧或少量关键帧上成立。
+这里 $s=1$ 恢复 conditional 预测，$`s\gt1`$ 是向条件方向外推。另一种常见写法 $(1+w)\epsilon_c-w\epsilon_u$ 与本式对应 $s=1+w$；比较配置时不能混用两个 scale。CFG 提供质量/条件强度与覆盖度之间的可调折中，不会免费提升所有维度。对视频还要检查条件是否贯穿整个 $k=1\ldots K$，而不是只在首帧或少量关键帧上成立。
 
 ## 7. 训练难点与三类加速路线
 
@@ -302,10 +302,10 @@ DDIM、PF-ODE solver 和 DPM-Solver 复用已经学到的场，不训练新 stud
 
 Consistency Model 学习函数 $F_\theta(X_\tau,\tau)$，使同一 PF-ODE 轨迹上不同噪声点映射到一致的数据端：
 
-$$
+```math
 F_\theta(X_\tau,\tau)\approx F_\theta(X_\rho,\rho),
 \quad X_\tau,X_\rho\text{ 位于同一 PF-ODE 轨迹}.
-$$
+```
 
 它可以从预训练 diffusion 蒸馏，也可以 standalone training；一步是设计目标，多步 refinement 仍可换取质量 [[17]](#ref-17)。Progressive Distillation 则更早地把一个 $N$ 步确定性 teacher sampler 逐轮压缩为 $N/2$ 步 student [[4]](#ref-4)。二者都利用轨迹监督，但 loss 和训练程序不是同义词。
 

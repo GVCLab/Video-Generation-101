@@ -10,12 +10,12 @@
 
 给定条件 $c$，把待生成视频表示成有序变量 $y_{1:N}$。严格自回归分解为
 
-$$
+```math
 p(y_{1:N}\mid c)
 =
 \prod_{i=1}^{N}
 p(y_i\mid y_{<i},c).
-$$
+```
 
 这里的 $y_i$ 可以是一个像素通道、一个离散码或一个连续 latent token。定义只规定“第 $i$ 个变量不能读取未来变量”，没有规定：
 
@@ -31,12 +31,12 @@ $$
 
 许多论文把变量划分成按顺序提交的集合 $Y_1,\ldots,Y_K$：
 
-$$
+```math
 p(Y_{1:K}\mid c)
 =
 \prod_{k=1}^{K}
 p(Y_k\mid Y_{<k},c).
-$$
+```
 
 这是一种有效的 block factorization，但 $Y_k$ 内部可能用双向注意力、并行独立 head、masked refinement 或联合 diffusion。为避免命名冲突，本章采用以下约定：
 
@@ -118,14 +118,14 @@ flowchart LR
 
 PixelRNN 将图像像素按固定扫描顺序分解，证明深度网络可以直接学习离散像素通道的条件分布 [[1]](#ref-1)。Video Pixel Networks 把这种思路扩展到视频，在时间、高度、宽度与颜色通道上建立四维依赖链 [[2]](#ref-2)。
 
-若视频 $v\in\{0,\ldots,255\}^{T\times H\times W\times C}$ 被展平为 $v_{1:N}$，其中 $N=THWC$，则
+若视频 $`v\in\lbrace0,\ldots,255\rbrace^{T\times H\times W\times C}`$ 被展平为 $v_{1:N}$，其中 $N=THWC$，则
 
-$$
+```math
 p(v\mid c)
 =
 \prod_{i=1}^{THWC}
 p(v_i\mid v_{<i},c).
-$$
+```
 
 它不需要学习 tokenizer，因此没有量化误差；但代价是把局部纹理、颜色相关性和跨帧运动都交给同一条极长序列。即使只是 $16\times64\times64$ 的 RGB clip，也有 196,608 个通道级决策。历史 pixel AR 的价值主要是给出清晰 likelihood 与因果依赖基线，而不是证明高分辨率视频应继续逐通道采样。
 
@@ -137,31 +137,31 @@ Pixel AR 还暴露了一个通用事实：**表示长度与提交粒度共同决
 
 VQ-VAE 把连续 encoder 输出量化到有限 codebook，再由 decoder 重建像素 [[3]](#ref-3)。对视频 $v$，可写成
 
-$$
+```math
 z=Q(E(v)),\qquad
 \hat v=D(z),
-$$
+```
 
 而严格离散 token 生成器学习
 
-$$
+```math
 p(z_{1:N}\mid c)
 =
 \prod_{i=1}^{N}
-\operatorname{Cat}\!\left(
+\mathrm{Cat}\!\left(
 z_i;\pi_\theta(z_{<i},c)
 \right).
-$$
+```
 
 训练目标通常是 token cross-entropy，但整体系统至少有两个误差源：
 
-$$
+```math
 \text{最终误差}
 \approx
 \text{tokenizer 重建误差}
 +
 \text{token prior 建模误差}.
-$$
+```
 
 因此，生成结果的模糊、文字损坏或闪烁不能一律归因于 Transformer；tokenizer 已经删除的信息，后续 prior 无法恢复。反过来，重建指标更好也不保证 token prior 更容易学：词表过大、序列过长或码分布严重失衡都可能增加生成难度。
 
@@ -212,25 +212,25 @@ InfinityStar 在统一离散时空表示上把 next-scale prediction 扩展为 s
 
 1. AR Transformer 根据已知前缀产生条件表示
 
-   $$
+   ```math
    h_i=F_\theta(x_{<i},c);
-   $$
+   ```
 
 2. 一个小型 denoising MLP 用 Diffusion Loss 建模 $p(x_i\mid h_i)$。
 
 令
 
-$$
+```math
 x_i^\tau
 =
 \alpha_\tau x_i+\sigma_\tau\epsilon,
 \qquad
 \epsilon\sim\mathcal N(0,I),
-$$
+```
 
 典型噪声预测目标可写为
 
-$$
+```math
 \mathcal L_{\mathrm{head}}
 =
 \mathbb E_{i,\tau,\epsilon}
@@ -240,7 +240,7 @@ $$
 D_\phi(x_i^\tau,\tau,h_i)
 \right\|_2^2
 \right].
-$$
+```
 
 训练时可对许多位置并行采样噪声时间；推理时，每个待提交 token 或 token set 内部还要运行 $D$ 次小 head evaluation。这里存在两个独立时钟：
 
@@ -253,37 +253,37 @@ $$
 
 条件分布也可以由 flow head 生成。给定 $h_i$，从先验 $u_{i,0}$ 出发积分
 
-$$
+```math
 \frac{\mathrm d u_{i,s}}{\mathrm ds}
 =
 v_\phi(u_{i,s},s,h_i),
 \qquad
 u_{i,1}=x_i.
-$$
+```
 
-外层仍满足 $p(x_{1:N}\mid c)=\prod_i p(x_i\mid x_{<i},c)$；变化的只是每个 $p(x_i\mid\cdot)$ 的学习目标和采样器。MAR 与 NOVA 给出的直接一手证据是 **diffusion head**，不是 flow head。若某实现改用 flow matching，必须另报其条件路径、solver 与真实 NFE，不能仅凭连续输出就把它写成 flow。
+外层仍满足 $`p(x_{1:N}\mid c)=\prod_i p(x_i\mid x_{\lt i},c)`$；变化的只是每个 $p(x_i\mid\cdot)$ 的学习目标和采样器。MAR 与 NOVA 给出的直接一手证据是 **diffusion head**，不是 flow head。若某实现改用 flow matching，必须另报其条件路径、solver 与真实 NFE，不能仅凭连续输出就把它写成 flow。
 
 ### 4.3 NOVA：frame-by-frame 与 set-by-set 的嵌套分解
 
 NOVA 将 MAR 的连续 token 思路扩展到视频，使用非量化连续 latent，并把时间与空间分成两层 [[10]](#ref-10)。令 $\mathbf S_f$ 表示第 $f$ 帧的空间 latent 集合，$\mathbf P,\mathbf m,\mathbf B$ 表示文本、mask 与其他条件，则外层可写为
 
-$$
+```math
 p(\mathbf S_{1:F}\mid\mathbf P,\mathbf m,\mathbf B)
 =
 \prod_{f=1}^{F}
 p(\mathbf S_f\mid
 \mathbf P,\mathbf m,\mathbf B,\mathbf S_{<f}).
-$$
+```
 
 帧内再把 token 分成 $K$ 个集合：
 
-$$
+```math
 p(\mathbf S_f\mid\cdot)
 =
 \prod_{k=1}^{K}
 p(\mathbf S_{f,k}\mid
 \mathbf S_{<f},\mathbf S_{f,<k},\cdot).
-$$
+```
 
 关键边界是：
 
@@ -311,13 +311,13 @@ $$
 
 Lumos-1 使用 inter-frame causal、intra-frame bidirectional 的 attention mask，并在帧内采用并行 mask-based discrete diffusion；其 Autoregressive Discrete Diffusion Forcing 还引入 temporal tube masking [[15]](#ref-15)。准确分类是：
 
-$$
+```math
 \text{离散表示}
 \times
 \text{frame-level outer AR}
 \times
 \text{intra-frame discrete diffusion}.
-$$
+```
 
 它不是 strict next-token AR。论文正是为避免 next-token latency 而让一帧内多个离散 token 并行 refinement。
 
@@ -329,11 +329,11 @@ MAGI 把帧间 causal prediction 与帧内 masked modeling 组合，并重点研
 
 CausVid 把双向视频 diffusion teacher 蒸馏成 causal autoregressive student，并把多步 teacher 压缩为 few-step student [[12]](#ref-12)。Self Forcing 进一步让训练 rollout 条件于模型自身生成的历史 [[13]](#ref-13)。二者的典型计算结构不是“小 diffusion MLP 逐 token采样”，而是：
 
-$$
+```math
 \text{frame/chunk commits}
 \times
 \text{每个 commit 的 full-backbone denoising NFE}.
-$$
+```
 
 因此，MAR/NOVA 的 per-token diffusion head 与 CausVid/Self Forcing 的 video diffusion backbone 必须分栏；仅凭 “autoregressive diffusion” 四个字无法判断成本。
 
@@ -343,23 +343,23 @@ $$
 
 标准 teacher forcing 在真实样本 $x\sim p_{\mathrm{data}}$ 的前缀上训练：
 
-$$
+```math
 \mathcal L_{\mathrm{TF}}
 =
 \mathbb E_{x\sim p_{\mathrm{data}}}
 \sum_{k=1}^{K}
 \ell_\theta(x_k;x_{<k},c).
-$$
+```
 
 推理却递归使用模型样本：
 
-$$
+```math
 \hat x_k
 \sim
 p_\theta(\cdot\mid\hat x_{<k},c).
-$$
+```
 
-训练看到的是 $x_{<k}$，部署看到的是 $\hat x_{<k}$。后者可能包含前面生成造成的身份偏移、色调漂移、几何错误、运动冻结与 chunk 接缝；这些状态在纯 teacher-forced 训练中概率很低。这一 history-distribution gap 才是 exposure bias 的核心。
+训练看到的是 $`x_{\lt k}`$，部署看到的是 $`\hat x_{\lt k}`$。后者可能包含前面生成造成的身份偏移、色调漂移、几何错误、运动冻结与 chunk 接缝；这些状态在纯 teacher-forced 训练中概率很低。这一 history-distribution gap 才是 exposure bias 的核心。
 
 ### 6.2 MAGI 的 CTF 修正的是哪一层
 
@@ -431,29 +431,29 @@ sequenceDiagram
 
 设一共生成 $N$ 个 token。若每一步都把长度 $i$ 的完整前缀重新送入 causal Transformer，仅 self-attention 的累计工作近似
 
-$$
+```math
 \sum_{i=1}^{N}O(i^2)
 =
 O(N^3).
-$$
+```
 
 KV cache 保存历史层的 key/value，使第 $i$ 步只为新 query 与历史 key 计算注意力：
 
-$$
+```math
 \sum_{i=1}^{N}O(i)
 =
 O(N^2).
-$$
+```
 
 这是累计 attention work 的渐近比较，不是完整墙钟公式；projection、MLP、kernel、batch 与 memory bandwidth 仍会影响实测。最重要的是，缓存后依然有 $N$ 次依赖相连的 commit，不能变成一次全序列并行采样。
 
 保存全部历史时，KV 内存近似为
 
-$$
+```math
 M_{\mathrm{KV}}
 \propto
 L\,N_{\mathrm{hist}}\,d_{\mathrm{KV}}\,b,
-$$
+```
 
 其中 $L$ 是层数，$N_{\mathrm{hist}}$ 是保留的历史 token 数，$d_{\mathrm{KV}}$ 是每层 KV 宽度，$b$ 是每元素字节数。长视频若无限保留历史，内存仍随时长线性增长。
 

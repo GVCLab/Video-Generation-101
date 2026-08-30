@@ -58,7 +58,7 @@
 
 ### 4.1 Stochastic latent future model
 
-这一角色的对象是条件分布 $p(x_{C+1:K}\mid x_{1:C})$。随机潜变量用来表达给定同一历史时仍可能出现的多个合理未来。训练时的近似后验 $q_\phi(z_k\mid x_{\le k})$ 可看到目标帧；部署时只能从 learned prior $p_\psi(z_k\mid x_{<k})$ 采样。SVG-LP 于 ICML 2018 对这一 posterior–prior 分工给出了经典实例。
+这一角色的对象是条件分布 $p(x_{C+1:K}\mid x_{1:C})$。随机潜变量用来表达给定同一历史时仍可能出现的多个合理未来。训练时的近似后验 $q_\phi(z_k\mid x_{\le k})$ 可看到目标帧；部署时只能从 learned prior $`p_\psi(z_k\mid x_{\lt k})`$ 采样。SVG-LP 于 ICML 2018 对这一 posterior–prior 分工给出了经典实例。
 
 验收对象是未来分布：条件一致性、多样性、覆盖、校准与长期 rollout。单个最好样本或重建分数不能验证这一角色。
 
@@ -98,7 +98,7 @@ Divot 的 diffusion de-tokenizer 证明 continuous representation 可由生成�
 | 表示 | 存储的数学对象 | 常见上层模型 | 主要瓶颈 |
 |---|---|---|---|
 | Continuous | $z\in\mathbb R^{B\times C_z\times T'\times H'\times W'}$ | Gaussian diffusion、flow matching、DMD、continuous AR head | 通道数、潜分布尺度、float 精度、decoder 忠实性 |
-| Discrete | $i\in\{1,\ldots,K_c\}^{B\times T'\times H'\times W'}$ 或 bit/scalar groups | categorical AR、masked prediction、discrete diffusion | 量化误差、code usage/dead codes、词表/序列长度 |
+| Discrete | $`i\in\lbrace1,\ldots,K_c\rbrace^{B\times T'\times H'\times W'}`$ 或 bit/scalar groups | categorical AR、masked prediction、discrete diffusion | 量化误差、code usage/dead codes、词表/序列长度 |
 | Hybrid | 离散粗语义 $i$ 加连续残差 $r$，或两条互补流 | 离散 AR 加 residual diffusion，或双流解码器 | 两流的传输成本、对齐、融合与分别验收 |
 
 HART 在 ICLR 2025 对“离散粗表示 + 连续残差”给出清晰定义，但它的主要证据是图像生成，不能直接当作视频运动结论。TVC 在 2025 的视频压缩设定中实例化了 discrete/continuous 双流，但它的目标是超低码率 codec，不等于所有上层生成器都应使用双流。
@@ -109,33 +109,33 @@ HART 在 ICLR 2025 对“离散粗表示 + 连续残差”给出清晰定义，�
 
 设输入为
 
-$$
+```math
 x\in\mathbb R^{B\times C\times T\times H\times W},
-$$
+```
 
 连续 latent 为
 
-$$
+```math
 z\in\mathbb R^{B\times C_z\times T'\times H'\times W'},
-$$
+```
 
 离散 token map 为
 
-$$
+```math
 i\in\{1,\ldots,K_c\}^{B\times T'\times H'\times W'}.
-$$
+```
 
 必须分别报告：
 
-$$
+```math
 r_t=\frac{T}{T'},\qquad
 r_{hw}=\frac{HW}{H'W'},\qquad
 r_{grid}=\frac{THW}{T'H'W'},
-$$
+```
 
-$$
+```math
 r_{elem}=\frac{CTHW}{C_zT'H'W'}.
-$$
+```
 
 - $r_t$ 是有限 clip 的实际时间网格比，不一定等于配置里的 nominal factor。
 - $r_{grid}$ 只计时空位置数，常被写成 $f_t\times f_h\times f_w$。
@@ -164,10 +164,10 @@ BS0–BS3 **只是本 source 文件内的位流成熟度标尺，不是全书的
 
 “causal”在 codec 中表示输出时刻 $k$ 不使用 $k$ 之后的输入帧。3D 时间卷积因此使用左侧填充或等价 cache；block-causal Transformer 则让当前时间块只读当前与过去块。一种常见的首帧保留映射是
 
-$$
+```math
 T'=1+\left\lfloor\frac{T-1}{f_t}\right\rfloor
 =\left\lceil\frac{T}{f_t}\right\rceil,
-$$
+```
 
 但不同实现的 pad/crop 约定可不同，必须以实际 API 形状为准。Cosmos 官方页明确说第一个 temporal token 表示第一帧，用同一 latent 空间处理图像和视频。
 

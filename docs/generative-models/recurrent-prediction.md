@@ -8,18 +8,18 @@
 
 给定已观测历史 $x_{1:C}$、条件 $c$ 与可选动作 $a_t$，典型递归预测器写成
 
-$$
+```math
 h_t=U_\theta(h_{t-1},\phi(x_t),a_t,c),
 \qquad
 \hat y_{t+1}\sim G_\theta(\cdot\mid h_t,a_t,c).
-$$
+```
 
 $h_t$ 可以是 LSTM feature map、Transformer KV、deterministic–stochastic state，或压缩后的帧集合；$y_{t+1}$ 可以是一帧、一个 latent block 或一个视频 chunk。公式描述的是**状态怎样推进**，不自动说明联合分布、未来可见性或运行速度。
 
 | 问题 | 最小判据 | 常见实现 | 不能由它推出 |
 |---|---|---|---|
 | **递归状态更新** | 同一更新器反复把旧状态与新输入变成新状态 | ConvLSTM、RSSM、rolling KV、压缩历史 | 不必显式给出概率分解，也不保证因果正确 |
-| **自回归概率分解** | $p(y_{1:K}\mid c)=\prod_k p(y_k\mid y_{<k},c)$ | token、frame、set 或 chunk AR | 不要求 RNN；当前单元内部仍可双向联合去噪 |
+| **自回归概率分解** | $`p(y_{1:K}\mid c)=\prod_k p(y_k\mid y_{\lt k},c)`$ | token、frame、set 或 chunk AR | 不要求 RNN；当前单元内部仍可双向联合去噪 |
 | **因果访问** | 提交第 $k$ 个单元前不读取未来的干净单元 | causal mask、只保留已提交 KV | 只是信息约束，不等于因果推断、可干预动力学或流式服务 |
 | **流式与 deadline** | 全片结束前持续发出结果；每个 deadline 前完成生成、解码与传输 | rolling window、KV cache、异步 VAE | 平均 FPS、论文中的 causal 或“无限长”都不能单独证明 |
 
@@ -76,14 +76,14 @@ flowchart LR
 
 Finn、Goodfellow 与 Levine 不要求网络重绘整帧，而让 action-conditioned recurrent network 预测局部动态卷积核、多个共享卷积核或 spatial transformer 参数，再用 mask 合成变换后的历史像素 [[2]](#ref-2)。概念上可写成
 
-$$
+```math
 \hat x_{t+1}
 =
 \sum_{m=1}^{M} M_t^{(m)}\odot
 \mathcal T_{\theta_t^{(m)}}(x_t),
 \qquad
 \sum_m M_t^{(m)}=1.
-$$
+```
 
 - **DNA** 为不同输出位置预测局部像素搬运核；
 - **CDNA** 预测若干共享动态核，再由 mask 选择；
@@ -111,11 +111,11 @@ PredRNN 的 Spatiotemporal LSTM 同时维护沿时间传播的 cell state 与跨
 
 观测历史通常不能唯一决定未来。随机递归模型在第 $t$ 步引入潜变量：
 
-$$
+```math
 z_t\sim p_\theta(z_t\mid x_{<t}),
 \qquad
 x_t\sim p_\theta(x_t\mid x_{<t},z_{\le t}).
-$$
+```
 
 训练后验 $q_\phi(z_t\mid x_{\le t})$ 可以看见待解释的真实未来；部署时只能从历史先验 $p_\theta$ 采样。把训练后验样本误当成测试能力，会泄漏未来信息。随机未来 latent、learned prior 与 ELBO 的完整推导见[变分生成](variational-generation.md)；仅负责压缩/重建接口的 latent、离散 token 与 codec 边界见[视频 Tokenizer 与生成式压缩](video-tokenizers.md)。
 
@@ -134,11 +134,11 @@ SV2P 与 SVG-LP 的关键不是“加一点噪声”，而是让未来不可约�
 
 当强递归 decoder 无视 $z_t$ 也能预测训练数据时，可能出现
 
-$$
+```math
 q_\phi(z_t\mid x_{\le t})\approx p_\theta(z_t\mid x_{<t}),
 \qquad
 I_q(z_t;x_t\mid x_{<t})\approx 0.
-$$
+```
 
 这就是视频随机预测中的 latent under-use / posterior collapse 风险 [[23]](#ref-23)。最低限度应同时报告：逐时间步 KL 与 active units；固定历史时重采样 $z$ 的输出变化；prior 与 posterior rollout 的差距；屏蔽或置换 $z$ 后的退化；必要时估计条件互信息。KL 非零也可能只编码无关细节，视觉多样性也可能只是闪烁，因此 latent intervention 必须与语义事件和时间一致性一起看。
 
@@ -146,13 +146,13 @@ $$
 
 状态空间路线把确定性记忆与随机状态分开。例如 PlaNet 的 recurrent state-space model 可抽象为
 
-$$
+```math
 h_t=f_\theta(h_{t-1},z_{t-1},a_{t-1}),
 \qquad
 z_t\sim p_\theta(z_t\mid h_t),
 \qquad
 x_t\sim p_\theta(x_t\mid h_t,z_t).
-$$
+```
 
 训练时 posterior 用新观测修正 $z_t$；规划时从当前 belief 对候选动作序列 rollout，并只执行第一步，再读取真实观测 [[12]](#ref-12)。这种模型的“好”首先是状态是否足以支持 reward/terminal prediction 与控制，而不是每个像素是否最锐利。
 
@@ -168,11 +168,11 @@ MCVD 用统一的 masked conditional diffusion 处理预测、生成与插帧；
 
 Diffusion Forcing 为序列中各 token 独立采样噪声等级，把 next-token prediction 与 full-sequence diffusion 放进同一训练框架 [[14]](#ref-14)：
 
-$$
+```math
 \tilde z_i=\alpha(\tau_i)z_i+\sigma(\tau_i)\epsilon_i,
 \qquad
 \tau_i\ \text{可随位置独立变化}.
-$$
+```
 
 选择“历史近乎干净、近未来逐渐变干净、远未来较噪”的 schedule，可以实现 rolling generation；但 Diffusion Forcing 首先是**噪声与条件训练框架**。它不自动意味着：训练历史来自模型自身、每个单元只需少量 NFE、使用 causal attention、持续满足播放 deadline，或无限 rollout 不漂移。
 
@@ -355,15 +355,15 @@ Closed-loop 应与 open-loop action script、model-free/无模型 baseline、ora
 
 <a id="ref-16"></a>[16] [Self Forcing: Bridging the Train-Test Gap in Autoregressive Video Diffusion](https://proceedings.neurips.cc/paper_files/paper/2025/hash/f4823f831af67a3ef15e41a85434422a-Abstract-Conference.html). Xun Huang, Zhengqi Li, Guande He, Mingyuan Zhou, Eli Shechtman. NeurIPS. 2025.
 
-<a id="ref-17"></a>[17] [Causal Forcing: Autoregressive Diffusion Distillation Done Right for High-Quality Real-Time Interactive Video Generation](https://arxiv.org/abs/2602.02214). Hongzhou Zhu, Min Zhao, Guande He, Hang Su, Chongxuan Li, Jun Zhu. ICML. 2026. [ICML 2026 official listing](https://icml.cc/Downloads/2026). [Official code](https://github.com/thu-ml/Causal-Forcing).
+<a id="ref-17"></a>[17] [Causal Forcing: Autoregressive Diffusion Distillation Done Right for High-Quality Real-Time Interactive Video Generation](https://arxiv.org/abs/2602.02214). Hongzhou Zhu, Min Zhao, Guande He, Hang Su, Chongxuan Li, Jun Zhu. ICML. 2026. [ICML 2026 official listing](https://icml.cc/Downloads/2026). Official code [![GitHub: thu-ml/Causal-Forcing](https://img.shields.io/badge/GitHub-thu-ml%2FCausal-Forcing-181717?logo=github&logoColor=white)](https://github.com/thu-ml/Causal-Forcing).
 
 <a id="ref-18"></a>[18] [Frame Context Packing and Drift Prevention in Next-Frame-Prediction Video Diffusion Models](https://proceedings.neurips.cc/paper_files/paper/2025/hash/2bde8fef08f7ebe42b584266cbcfc909-Abstract-Conference.html). Lvmin Zhang, Shengqu Cai, Muyang Li, Gordon Wetzstein, Maneesh Agrawala. NeurIPS. 2025.
 
-<a id="ref-19"></a>[19] [SkyReels-V2: Infinite-Length Film Generative Model](https://arxiv.org/abs/2504.13074). Guibin Chen et al. arXiv technical report. 2025. [Official code](https://github.com/SkyworkAI/SkyReels-V2).
+<a id="ref-19"></a>[19] [SkyReels-V2: Infinite-Length Film Generative Model](https://arxiv.org/abs/2504.13074). Guibin Chen et al. arXiv technical report. 2025. Official code [![GitHub: SkyworkAI/SkyReels-V2](https://img.shields.io/badge/GitHub-SkyworkAI%2FSkyReels-V2-181717?logo=github&logoColor=white)](https://github.com/SkyworkAI/SkyReels-V2).
 
-<a id="ref-20"></a>[20] [MAGI-1: Autoregressive Video Generation at Scale](https://arxiv.org/abs/2505.13211). Sand.ai et al. arXiv technical report. 2025. [Official code](https://github.com/SandAI-org/MAGI-1).
+<a id="ref-20"></a>[20] [MAGI-1: Autoregressive Video Generation at Scale](https://arxiv.org/abs/2505.13211). Sand.ai et al. arXiv technical report. 2025. Official code [![GitHub: SandAI-org/MAGI-1](https://img.shields.io/badge/GitHub-SandAI-org%2FMAGI-1-181717?logo=github&logoColor=white)](https://github.com/SandAI-org/MAGI-1).
 
-<a id="ref-21"></a>[21] [LongLive: Real-Time Interactive Long Video Generation](https://openreview.net/forum?id=nCAODkpsPJ). Shuai Yang, Wei Huang, Ruihang Chu, Yicheng Xiao, Yuyang Zhao, Xianbang Wang, Muyang Li, Enze Xie, Yingcong Chen, Yao Lu, Song Han, Yukang Chen. ICLR. 2026. [Official code](https://github.com/NVlabs/LongLive).
+<a id="ref-21"></a>[21] [LongLive: Real-Time Interactive Long Video Generation](https://openreview.net/forum?id=nCAODkpsPJ). Shuai Yang, Wei Huang, Ruihang Chu, Yicheng Xiao, Yuyang Zhao, Xianbang Wang, Muyang Li, Enze Xie, Yingcong Chen, Yao Lu, Song Han, Yukang Chen. ICLR. 2026. Official code [![GitHub: NVlabs/LongLive](https://img.shields.io/badge/GitHub-NVlabs%2FLongLive-181717?logo=github&logoColor=white)](https://github.com/NVlabs/LongLive).
 
 <a id="ref-22"></a>[22] [Self-Supervised Visual Planning with Temporal Skip Connections](https://proceedings.mlr.press/v78/frederik-ebert17a.html). Frederik Ebert, Chelsea Finn, Alex X. Lee, Sergey Levine. CoRL. 2017.
 

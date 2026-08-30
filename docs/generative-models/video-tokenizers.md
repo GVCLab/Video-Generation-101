@@ -6,9 +6,9 @@
 
 视频 tokenizer 的最小接口是
 
-$$
+```math
 z=E(x),\qquad \hat x=D(z),
-$$
+```
 
 其中 $x$ 是已知视频，$z$ 是供重建或上层 generator 使用的表示。这个定义没有自动包含未来分布、熵编码或实时服务。
 
@@ -42,9 +42,9 @@ $$
 
 连续 tokenizer 输出
 
-$$
+```math
 z\in\mathbb R^{B\times C_z\times T'\times H'\times W'}.
-$$
+```
 
 Gaussian diffusion 或 flow 通常直接在该欧氏空间建模。优点是无最近邻量化误差、梯度路径直接；代价是 latent 尺度、通道数、dtype 和分布几何都会影响上层学习。没有量化精度与 entropy coder，就不能从 shape 推出 bitrate。
 
@@ -54,19 +54,19 @@ CV-VAE 以连续 3D VAE 对齐已有 image-VAE latent，核心是兼容现有 la
 
 VQ-VAE 将 encoder 输出映射到最近的 codebook 向量 [[1]](#ref-1)：
 
-$$
+```math
 j^*=\arg\min_j\lVert z_e(x)-e_j\rVert_2^2,
 \qquad z_q(x)=e_{j^*}.
-$$
+```
 
 典型目标是
 
-$$
+```math
 \mathcal L_{\mathrm{VQ}}
 =\mathcal L_{\mathrm{rec}}
-+\lVert \operatorname{sg}[z_e]-e_{j^*}\rVert_2^2
-+\beta\lVert z_e-\operatorname{sg}[e_{j^*}]\rVert_2^2,
-$$
++\lVert \mathrm{sg}[z_e]-e_{j^*}\rVert_2^2
++\beta\lVert z_e-\mathrm{sg}[e_{j^*}]\rVert_2^2,
+```
 
 其中 stop-gradient 与 straight-through estimator 让 decoder 梯度回到 encoder。VQ 的主要风险是量化误差、dead codes、usage 不均和序列过长。TATS 把 3D-VQGAN 与 time-sensitive Transformer 结合 [[3]](#ref-3)，MAGVIT 则把 3D tokenizer 接到 masked parallel generator [[4]](#ref-4)；两者都说明 tokenizer 与 generator 应拆开归因。
 
@@ -93,24 +93,24 @@ VidTok、OmniTokenizer、Cosmos 或 VideoRAE 各自提供 continuous/discrete �
 
 设 RGB 视频、连续 latent 和离散 code map 分别为
 
-$$
+```math
 x\in\mathbb R^{B\times C\times T\times H\times W},\quad
 z\in\mathbb R^{B\times C_z\times T'\times H'\times W'},\quad
 i\in\{1,\ldots,K_c\}^{B\times T'\times H'\times W'}.
-$$
+```
 
 必须分别报告
 
-$$
+```math
 r_t=\frac{T}{T'},\qquad
 r_{hw}=\frac{HW}{H'W'},\qquad
 r_{grid}=\frac{THW}{T'H'W'},
-$$
+```
 
-$$
+```math
 r_{elem}=\frac{CTHW}{C_zT'H'W'},\qquad
 N_{token}=T'H'W'.
-$$
+```
 
 ```mermaid
 flowchart TB
@@ -176,10 +176,10 @@ InfoTok 的 $\mathrm{BPP}_{16}$ 是 token 数乘 nominal bits 并加 mask cost�
 
 一种常见首帧锚定规则是
 
-$$
+```math
 T'=1+\left\lfloor\frac{T-1}{f_t}\right\rfloor
 =\left\lceil\frac{T}{f_t}\right\rceil,
-$$
+```
 
 但不同实现有不同 padding、stride、chunk 和 crop，**实际 API 输出 shape 优先于公式或型号名**。Cosmos 明确第一个 temporal token 锚定第一帧 [[20]](#ref-20)；HunyuanVideo 公开 CausalConv3D、名义 $t4s8s8$ 与 16 latent channels，这足以核 shape，不足以推 bitrate [[21]](#ref-21)。
 
@@ -219,10 +219,10 @@ flowchart TB
 
 构造 $x,x'$，让二者在时间块 $b$ 之前完全相同、未来任意不同。frame-causal 合同要求
 
-$$
+```math
 E(x)_{\le b}=E(x')_{\le b},\qquad
 D(E(x))_{\le b}=D(E(x'))_{\le b}.
-$$
+```
 
 block-causal 只在块边界验收。还要比较 full-clip 与不同 chunk size/cache 策略的输出；任何前缀变化或 full/chunk 不一致，都否定对应 causal/streaming 合同。
 
@@ -298,12 +298,12 @@ VidTwin 的 backbone temporal attention 有 causal mask，但 structure Q-Former
 
 | 实现 | 截止日状态 | 可核验内容 | 不应据此推断 |
 |---|---|---|---|
-| [CV-VAE](https://github.com/AILab-CVC/CV-VAE) | NeurIPS 2024；官方代码与权重 | continuous video VAE；仓库列出与若干 image-VAE latent 兼容型号 | 任意未公开 image VAE 都可无损替换 |
-| [OmniTokenizer](https://github.com/FoundationVision/OmniTokenizer) | NeurIPS 2024；官方仓库 | joint image-video；VQVAE 与 VAE 配置 | 两种 checkpoint 自动构成 hybrid |
-| [Cosmos Tokenizer](https://github.com/NVIDIA/Cosmos-Tokenizer) | 官方仓库与模型；代码/模型 license 分开 | continuous/discrete、temporal 4/8、spatial 8/16、API shape | README 性能宣传已被独立复现 |
-| [HunyuanVideo](https://github.com/Tencent-Hunyuan/HunyuanVideo) | 作者报告；官方代码与权重 | CausalConv3D VAE、$t4s8s8$、16 channels | 256× 元素压缩或实际 bitrate |
+| CV-VAE [![GitHub: AILab-CVC/CV-VAE](https://img.shields.io/badge/GitHub-AILab-CVC%2FCV-VAE-181717?logo=github&logoColor=white)](https://github.com/AILab-CVC/CV-VAE) | NeurIPS 2024；官方代码与权重 | continuous video VAE；仓库列出与若干 image-VAE latent 兼容型号 | 任意未公开 image VAE 都可无损替换 |
+| OmniTokenizer [![GitHub: FoundationVision/OmniTokenizer](https://img.shields.io/badge/GitHub-FoundationVision%2FOmniTokenizer-181717?logo=github&logoColor=white)](https://github.com/FoundationVision/OmniTokenizer) | NeurIPS 2024；官方仓库 | joint image-video；VQVAE 与 VAE 配置 | 两种 checkpoint 自动构成 hybrid |
+| Cosmos Tokenizer [![GitHub: NVIDIA/Cosmos-Tokenizer](https://img.shields.io/badge/GitHub-NVIDIA%2FCosmos-Tokenizer-181717?logo=github&logoColor=white)](https://github.com/NVIDIA/Cosmos-Tokenizer) | 官方仓库与模型；代码/模型 license 分开 | continuous/discrete、temporal 4/8、spatial 8/16、API shape | README 性能宣传已被独立复现 |
+| HunyuanVideo [![GitHub: Tencent-Hunyuan/HunyuanVideo](https://img.shields.io/badge/GitHub-Tencent-Hunyuan%2FHunyuanVideo-181717?logo=github&logoColor=white)](https://github.com/Tencent-Hunyuan/HunyuanVideo) | 作者报告；官方代码与权重 | CausalConv3D VAE、$t4s8s8$、16 channels | 256× 元素压缩或实际 bitrate |
 | [VidTok](https://huggingface.co/microsoft/VidTok) | arXiv 2412.13061；项目与模型公开 | continuous-KL 与 discrete-FSQ 型号、causal/noncausal 配置 [[23]](#ref-23) | 截止日已有正式 venue；VCR 就是 bpp |
-| [KVAE](https://github.com/kandinskylab/kvae) | arXiv 2608.05798；代码与权重 | video 2.0 的 $t4s8$、$t4s16$、causal cache/chunk 接口 | 已同行评审；公开 cache 即端到端实时 |
+| KVAE [![GitHub: kandinskylab/kvae](https://img.shields.io/badge/GitHub-kandinskylab%2Fkvae-181717?logo=github&logoColor=white)](https://github.com/kandinskylab/kvae) | arXiv 2608.05798；代码与权重 | video 2.0 的 $t4s8$、$t4s16$、causal cache/chunk 接口 | 已同行评审；公开 cache 即端到端实时 |
 
 有推理代码不等于有训练代码；有权重不等于训练数据与配方公开；代码许可证、模型许可证和依赖许可证也可能不同。
 
@@ -405,7 +405,7 @@ codec 分支必须额外交付：
 
 <a id="ref-20"></a>[20] [Cosmos Tokenizer](https://research.nvidia.com/labs/cosmos-lab/cosmos-tokenizer/). NVIDIA Research. Official project and repository documentation, accessed 2026-08-30.
 
-<a id="ref-21"></a>[21] [HunyuanVideo: A Systematic Framework For Large Video Generation Model](https://github.com/Tencent-Hunyuan/HunyuanVideo). Tencent Hunyuan. Author technical report and official repository, accessed 2026-08-30.
+<a id="ref-21"></a>[21] HunyuanVideo: A Systematic Framework For Large Video Generation Model [![GitHub: Tencent-Hunyuan/HunyuanVideo](https://img.shields.io/badge/GitHub-Tencent-Hunyuan%2FHunyuanVideo-181717?logo=github&logoColor=white)](https://github.com/Tencent-Hunyuan/HunyuanVideo). Tencent Hunyuan. Author technical report and official repository, accessed 2026-08-30.
 
 <a id="ref-22"></a>[22] [KVAE: Family of Tokenizers for Multimodal Generative Models](https://arxiv.org/abs/2608.05798). arXiv:2608.05798, preprint, 2026.
 

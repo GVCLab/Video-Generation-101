@@ -66,18 +66,18 @@ flowchart TB
 
 设视频经 tokenizer 得到 $N$ 个离散 token：
 
-$$
+```math
 y^0=(y_1^0,\ldots,y_N^0)\in\{1,\ldots,K\}^N,
-$$
+```
 
-$c$ 是文本、首帧、动作等条件，$M\subseteq\{1,\ldots,N\}$ 是被遮挡位置。最常见的目标是
+$c$ 是文本、首帧、动作等条件，$`M\subseteq\lbrace1,\ldots,N\rbrace`$ 是被遮挡位置。最常见的目标是
 
-$$
+```math
 \mathcal L_{\mathrm{mask}}
 =\mathbb E_{y^0,M}
 \left[-\sum_{i\in M}
 \log p_\theta\!\left(y_i^0\mid y^0_{\bar M},c,M\right)\right].
-$$
+```
 
 它训练“给定可见位置，恢复缺失位置”的条件预测器。$M$ 可以来自随机 token、tube、整帧、时空块或任务特定分布。这个损失本身没有指定：
 
@@ -94,23 +94,23 @@ $$
 
 令 $m$ 是额外的 `[MASK]` 吸收态，$\tau\in[0,1]$ 是**噪声时间**，不是视频帧索引。由吸收态马尔可夫链导出的单位置前向边缘可写为
 
-$$
+```math
 q_\tau(y_i^\tau\mid y_i^0)
 =\alpha_\tau\,\mathbf 1[y_i^\tau=y_i^0]
 +(1-\alpha_\tau)\,\mathbf 1[y_i^\tau=m],
-$$
+```
 
 其中 $\alpha_0=1$，并随 $\tau$ 增大而下降。一旦进入 $m$，继续向前只保持在 $m$，这才是“吸收态”的含义。D3PM 将这种转移矩阵作为离散扩散的一种选择，并建立它与 mask-based 模型的联系；**均匀类别噪声、邻接转移和 absorbing mask 都属于离散扩散，但彼此不是同一前向过程** [[1]](#ref-1)。
 
 在特定 $x_0$ 参数化和连续时间推导下，吸收态模型的变分目标可写成一族 masked 交叉熵的加权积分：
 
-$$
+```math
 \mathcal L_{\mathrm{absorb}}
 =\int_0^1 \lambda(\tau)\,
 \mathbb E_{y^0,y^\tau}
 \left[-\sum_{i:y_i^\tau=m}
 \log p_\theta(y_i^0\mid y^\tau,c)\right]\,\mathrm d\tau,
-$$
+```
 
 其中权重 $\lambda(\tau)$ 由前向 schedule 与所选目标决定。NeurIPS 2024 的 *Simplified and Generalized Masked Diffusion for Discrete Data* 明确给出这一“加权交叉熵积分”桥，并允许状态相关 masking schedule [[9]](#ref-9)；同年的 MDLM 把 Rao–Blackwellized 目标写成经典 masked-language-modeling losses 的混合 [[8]](#ref-8)。这些结果主要来自离散文本与像素建模，支持的是**目标层关系**，不是视频质量的外推。
 
@@ -167,24 +167,24 @@ flowchart LR
 
 设共有 $J$ 轮，$\gamma:[0,1]\rightarrow[0,1]$ 单调下降，可用
 
-$$
+```math
 n_j=\left\lceil \gamma(j/J)N\right\rceil
-$$
+```
 
 指定第 $j$ 轮后仍保持 mask 的总数。这里要区分两个分布：
 
 - **训练 mask-ratio 分布** $\rho\sim\pi_{\mathrm{train}}(\rho)$ 决定训练样本看见哪些缺失率；
 - **推理 remaining-mask schedule** $\gamma(j/J)$ 决定每轮保留多少未知位置。
 
-二者可以采用同一函数族，但角色不同。训练覆盖 $5\%$–$95\%$ 的随机 mask，不保证模型见过“由自己错误且按置信度筛选”的上下文。
+二者可以采用同一函数族，但角色不同。训练覆盖 $`5\%`$–$`95\%`$ 的随机 mask，不保证模型见过“由自己错误且按置信度筛选”的上下文。
 
 ### 4.1 Confidence 不是 correctness
 
 常用候选分数
 
-$$
+```math
 c_i=p_\theta(\tilde y_i\mid y^{(j)},c)
-$$
+```
 
 只是当前条件分布对已采样类别的局部信心。它可能因位置熵、纹理难度、temperature、guidance 或 token 频率而不可横向比较。一个高置信错误被早早提交后，冻结策略会让后续轮次围绕它自洽，而不是纠正它。
 
@@ -219,17 +219,17 @@ Lumos-1 针对另一种问题：它采用帧内双向、帧间因果的 mask-bas
 
 令 $S_1,\ldots,S_J$ 是位置集合的一个有序分区，则
 
-$$
+```math
 p(y\mid c)=\prod_{j=1}^{J}
 p\!\left(y_{S_j}\mid y_{S_{<j}},c\right).
-$$
+```
 
 若进一步把同一集合内各位置条件独立化，才得到
 
-$$
+```math
 p\!\left(y_{S_j}\mid y_{S_{<j}},c\right)
 \approx\prod_{i\in S_j}p(y_i\mid y_{S_{<j}},c).
-$$
+```
 
 这与 MaskGIT 的一轮并行分类很像，但有两处缺口：MaskGIT 的 $S_j$ 常由本轮样本置信度动态决定；随机-mask 训练也没有显式最大化这条自适应选择策略的联合似然。可以称作“动态 next-set 视角”，不能无条件称为等价概率分解。
 

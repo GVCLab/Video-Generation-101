@@ -43,12 +43,12 @@ flowchart LR
 
 一个任务可以同时使用多类条件。令条件集合为
 
-$$
+```math
 C \subseteq \{
 \text{text},\text{image},\text{video},\text{audio},
 \text{mask},\text{camera},\text{trajectory},\text{state},\text{action}
 \}.
-$$
+```
 
 | 条件类别 | 典型信息 | 不能自动推出的能力 |
 |---|---|---|
@@ -174,9 +174,9 @@ Video Diffusion Models 曾在同一研究框架里覆盖无条件生成、文本
 
 建议为每个实验写六元组：
 
-$$
+```math
 \mathcal T=(I,O,K,\Delta,H,E),
-$$
+```
 
 其中：
 
@@ -206,7 +206,7 @@ flowchart TD
 
 对每个属性 $j$，先声明它属于必须保持集合 $K$ 还是允许改变集合 $\Delta$。编辑任务可把综合损失写成：
 
-$$
+```math
 L_{\text{task}}
 =
 \lambda_{\Delta}L_{\text{requested change}}
@@ -216,7 +216,7 @@ L_{\text{task}}
 \lambda_t L_{\text{temporal}}
 +
 \lambda_s L_{\text{safety}}.
-$$
+```
 
 该式不是统一训练配方，而是验收账本：某个平均分上升不能抵消身份泄漏、mask 外变化或动作无效等硬失败。
 
@@ -301,4 +301,4 @@ DreamGen 的价值不在“生成了机器人视频”本身，而在把生成�
 
 <a id="ref-11"></a>[11] [MotionCtrl: A Unified and Flexible Motion Controller for Video Generation](https://arxiv.org/abs/2312.03641). Zhouxia Wang, Ziyang Yuan, Xintao Wang, Yaowei Li, Tianshui Chen, Menghan Xia, et al. First preprint 2023; SIGGRAPH Conference Papers. 2024. [Official project and release surface](https://wzhouxiff.github.io/projects/MotionCtrl/).
 
-<a id="ref-12"></a>[12] [Ovi: Twin Backbone Cross-Modal Fusion for Audio-Video Generation](https://arxiv.org/abs/2510.01284). Ovi team. arXiv preprint. 2025. [Official code and weights](https://github.com/character-ai/Ovi).
+<a id="ref-12"></a>[12] [Ovi: Twin Backbone Cross-Modal Fusion for Audio-Video Generation](https://arxiv.org/abs/2510.01284). Ovi team. arXiv preprint. 2025. Official code and weights [![GitHub: character-ai/Ovi](https://img.shields.io/badge/GitHub-character-ai%2FOvi-181717?logo=github&logoColor=white)](https://github.com/character-ai/Ovi).

@@ -173,10 +173,10 @@ arXiv API 快照更新时间为 `2026-08-29T18:40:39Z`。最新 `video generatio
 
 应用 PASS 被写成硬门槛合取：
 
-$$
+```math
 G_q \land G_c \land G_p \land G_{\mathrm{SLO}}
 \land G_s \land G_g.
-$$
+```
 
 这是 S 级框架，不是某篇论文的统一公式。设计理由是：
 

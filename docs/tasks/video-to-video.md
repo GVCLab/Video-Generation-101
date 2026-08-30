@@ -12,29 +12,29 @@
 
 一次可审计的 V2V 请求写成
 
-$$
+```math
 T_{\mathrm{V2V}}=(X,U,M,R,C,H)\rightarrow(Y,\Delta,D),
-$$
+```
 
 其中：
 
-- $X=\{x_t\}_{t=1}^{T}$ 是完整源视频，决定输出的时间轴；
+- $`X=\lbrace x_t\rbrace_{t=1}^{T}`$ 是完整源视频，决定输出的时间轴；
 - $U$ 是自然语言编辑指令，可为空；
-- $M=\{m_t\}$ 是可选时空掩码，需声明是**硬边界**还是**软提示**；
+- $`M=\lbrace m_t\rbrace`$ 是可选时空掩码，需声明是**硬边界**还是**软提示**；
 - $R$ 是外观、身份、材质或风格参考，可为多图、多视频或前一轮结果；
 - $C$ 是轨迹、点、框、姿态、深度、法线、相机、音频等显式控制；
 - $H$ 是多轮历史或流式状态，必须区分“已接受状态”和临时预览；
-- $Y=\{y_t\}_{t=1}^{T'}$ 是编辑视频；$\Delta$ 是机器可读的改动范围；$D$ 是种子、模型、条件、轮次和撤销信息。
+- $`Y=\lbrace y_t\rbrace_{t=1}^{T'}`$ 是编辑视频；$\Delta$ 是机器可读的改动范围；$D$ 是种子、模型、条件、轮次和撤销信息。
 
 对时间重映射、插帧或变速，$T'$ 可以不同于 $T$，但必须给出源—目标时间映射。否则默认 $T'=T$ 且逐帧对齐。令 $E_t$ 为允许编辑区，$P_t=\Omega\setminus E_t$ 为保留区：
 
-$$
+```math
 \mathcal L=\mathcal L_{\mathrm{edit}}(Y,U,R,C,E)
 +\lambda_p\mathcal L_{\mathrm{preserve}}(Y,X,P)
 +\lambda_t\mathcal L_{\mathrm{temporal}}(Y,X).
-$$
+```
 
-硬掩码表示 $y_t(p)=x_t(p),\ p\in P_t$，应在解码后再做一次已知像素合成；软掩码只表示“主要改这里”，允许影子、反射、遮挡和接触区域随对象一起变化。只给对象轮廓而不说明环境效应，无法判断 mask 外变化是错误还是必要编辑。
+硬掩码表示 $`y_t(p)=x_t(p),\ p\in P_t`$，应在解码后再做一次已知像素合成；软掩码只表示“主要改这里”，允许影子、反射、遮挡和接触区域随对象一起变化。只给对象轮廓而不说明环境效应，无法判断 mask 外变化是错误还是必要编辑。
 
 ### 1.2 四个正交轴，不把任务名混成方法名
 
@@ -236,22 +236,22 @@ VE-Bench 收集 8 个模型、24 位标注者和 28,080 个主观分数，用于
 
 至少分别报告
 
-$$
+```math
 E_{\mathrm{out}}=d(Y\odot(1-M),X\odot(1-M)),
-$$
+```
 
-$$
+```math
 S_{\mathrm{edit}}=s(Y\odot M,U,R,C),
-$$
+```
 
-以及时序边界误差 $E_{\partial M}$。若软 mask 允许影子或反射外溢，应另给扩张环 $\operatorname{dilate}(M)-M$，不能悄悄把它并入背景平均值。全局编辑也要定义锚点集合，例如脸部身份、对象轨迹、相机或场景布局。
+以及时序边界误差 $E_{\partial M}$。若软 mask 允许影子或反射外溢，应另给扩张环 $\mathrm{dilate}(M)-M$，不能悄悄把它并入背景平均值。全局编辑也要定义锚点集合，例如脸部身份、对象轨迹、相机或场景布局。
 
 ### 6.2 多轮非破坏性协议
 
 设第 $k$ 轮的已接受状态为 $S_k=(Y_k,\Delta_k,D_k)$。新编辑从 $S_k$ 派生临时分支 $\tilde S_{k+1}$；用户接受后才写入 $S_{k+1}$。撤销是恢复 $S_k$ 或重新应用可逆 delta，而不是再输入一句“改回去”。建议测试：
 
 1. **顺序交换：** 对互不相交的编辑 $a,b$，比较 $a\rightarrow b$ 与 $b\rightarrow a$；
-2. **循环撤销：** $a\rightarrow b\rightarrow\operatorname{undo}(b)$ 与 $a$ 的差异；
+2. **循环撤销：** $a\rightarrow b\rightarrow\mathrm{undo}(b)$ 与 $a$ 的差异；
 3. **区域隔离：** 第 $k$ 轮只重测新区域，也重测所有已接受区域；
 4. **长程重现：** 对象遮挡后再出现时，身份和前轮属性是否回来；
 5. **状态压缩：** 固定历史 token / memory 预算，画出质量—内存—轮数曲线。
@@ -424,24 +424,24 @@ $$
 
 <a id="ref-36"></a>[36] [IVEBench: Modern Benchmark Suite for Instruction-Guided Video Editing Assessment](https://arxiv.org/abs/2510.11647). ICLR, 2026.
 
-<a id="ref-37"></a>[37] [VACE official repository](https://github.com/ali-vilab/VACE). GitHub, accessed 2026-08-30.
+<a id="ref-37"></a>[37] VACE official repository [![GitHub: ali-vilab/VACE](https://img.shields.io/badge/GitHub-ali-vilab%2FVACE-181717?logo=github&logoColor=white)](https://github.com/ali-vilab/VACE). GitHub, accessed 2026-08-30.
 
-<a id="ref-38"></a>[38] [AnyV2V official repository](https://github.com/TIGER-AI-Lab/AnyV2V). GitHub, accessed 2026-08-30.
+<a id="ref-38"></a>[38] AnyV2V official repository [![GitHub: TIGER-AI-Lab/AnyV2V](https://img.shields.io/badge/GitHub-TIGER-AI-Lab%2FAnyV2V-181717?logo=github&logoColor=white)](https://github.com/TIGER-AI-Lab/AnyV2V). GitHub, accessed 2026-08-30.
 
-<a id="ref-39"></a>[39] [StableV2V official repository](https://github.com/AlonzoLeeeooo/StableV2V). GitHub, accessed 2026-08-30.
+<a id="ref-39"></a>[39] StableV2V official repository [![GitHub: AlonzoLeeeooo/StableV2V](https://img.shields.io/badge/GitHub-AlonzoLeeeooo%2FStableV2V-181717?logo=github&logoColor=white)](https://github.com/AlonzoLeeeooo/StableV2V). GitHub, accessed 2026-08-30.
 
-<a id="ref-40"></a>[40] [Ditto official repository](https://github.com/EzioBy/Ditto). GitHub, accessed 2026-08-30.
+<a id="ref-40"></a>[40] Ditto official repository [![GitHub: EzioBy/Ditto](https://img.shields.io/badge/GitHub-EzioBy%2FDitto-181717?logo=github&logoColor=white)](https://github.com/EzioBy/Ditto). GitHub, accessed 2026-08-30.
 
-<a id="ref-41"></a>[41] [Memory-V2V official repository](https://github.com/DoHunLee1/Memory-V2V). GitHub, accessed 2026-08-30.
+<a id="ref-41"></a>[41] Memory-V2V official repository [![GitHub: DoHunLee1/Memory-V2V](https://img.shields.io/badge/GitHub-DoHunLee1%2FMemory-V2V-181717?logo=github&logoColor=white)](https://github.com/DoHunLee1/Memory-V2V). GitHub, accessed 2026-08-30.
 
-<a id="ref-42"></a>[42] [EgoEdit official repository](https://github.com/snap-research/EgoEdit). GitHub, accessed 2026-08-30.
+<a id="ref-42"></a>[42] EgoEdit official repository [![GitHub: snap-research/EgoEdit](https://img.shields.io/badge/GitHub-snap-research%2FEgoEdit-181717?logo=github&logoColor=white)](https://github.com/snap-research/EgoEdit). GitHub, accessed 2026-08-30.
 
-<a id="ref-43"></a>[43] [JoyAI-Video-Edit official repository](https://github.com/jd-opensource/JoyAI-Video-Edit). GitHub, accessed 2026-08-30.
+<a id="ref-43"></a>[43] JoyAI-Video-Edit official repository [![GitHub: jd-opensource/JoyAI-Video-Edit](https://img.shields.io/badge/GitHub-jd-opensource%2FJoyAI-Video-Edit-181717?logo=github&logoColor=white)](https://github.com/jd-opensource/JoyAI-Video-Edit). GitHub, accessed 2026-08-30.
 
-<a id="ref-44"></a>[44] [MotionV2V official repository](https://github.com/RyannDaGreat/MotionV2V). GitHub, accessed 2026-08-30.
+<a id="ref-44"></a>[44] MotionV2V official repository [![GitHub: RyannDaGreat/MotionV2V](https://img.shields.io/badge/GitHub-RyannDaGreat%2FMotionV2V-181717?logo=github&logoColor=white)](https://github.com/RyannDaGreat/MotionV2V). GitHub, accessed 2026-08-30.
 
-<a id="ref-45"></a>[45] [EditCtrl paper](https://arxiv.org/abs/2602.15031) and [public reimplementation](https://github.com/yehonathanlitman/EditCtrl). CVPR / GitHub, 2026.
+<a id="ref-45"></a>[45] [EditCtrl paper](https://arxiv.org/abs/2602.15031) and public reimplementation [![GitHub: yehonathanlitman/EditCtrl](https://img.shields.io/badge/GitHub-yehonathanlitman%2FEditCtrl-181717?logo=github&logoColor=white)](https://github.com/yehonathanlitman/EditCtrl). CVPR / GitHub, 2026.
 
-<a id="ref-46"></a>[46] [LiveEdit official repository](https://github.com/cp-cp/LiveEdit). GitHub, accessed 2026-08-30.
+<a id="ref-46"></a>[46] LiveEdit official repository [![GitHub: cp-cp/LiveEdit](https://img.shields.io/badge/GitHub-cp-cp%2FLiveEdit-181717?logo=github&logoColor=white)](https://github.com/cp-cp/LiveEdit). GitHub, accessed 2026-08-30.
 
 <a id="ref-47"></a>[47] [EditStream official project page](https://real-time-video-research.github.io/editstream/). Accessed 2026-08-30.

@@ -19,21 +19,21 @@
 
 设一段 RGB 视频为
 
-$$
+```math
 X=x_{1:T}\in[0,1]^{B\times T\times3\times H\times W}.
-$$
+```
 
 严格的纯无条件目标是学习边际分布
 
-$$
+```math
 p_\theta(X)\approx p_{\mathrm{data}}^{\Pi}(X),
-$$
+```
 
 其中 $\Pi$ 是完整数据策略：数据版本、划分、去重、帧率、片段长度、裁切和分辨率。部署时只允许从预先声明、与某个目标样本无关的随机源采样
 
-$$
+```math
 z\sim p(z),\qquad \hat X=S_\theta(z;T,H,W,\mathrm{fps}).
-$$
+```
 
 $T,H,W,\mathrm{fps}$ 是全局采样规格，不是样本语义条件。若用户挑选某个类别、首帧、文本、动作或参考视频，分布已变成条件分布。
 
@@ -44,7 +44,7 @@ $T,H,W,\mathrm{fps}$ 是全局采样规格，不是样本语义条件。若用�
 | **Pure unconditional** | 独立噪声/随机 token；固定 BOS；全局长度和分辨率 | $p_\theta(X)$ | 核心任务 |
 | **Domain-restricted generation** | 运行时可不再输入域名，但训练集已固定为域 $D=d$ | $p_\theta(X\mid D=d)$ | 可称“该域内操作无条件”，不可外推为开放世界 $p(X)$ |
 | **Class conditional** | 类别 $c$ 或可选择的域 token | $p_\theta(X\mid c)$ | 相邻任务；指标不得冒充纯无条件结果 |
-| **Self-conditioned generation** | 仅模型先前生成的帧/token/state | $p(X)=\prod_t p(x_t\mid x_{<t})$ | 若历史也源自同一随机采样，仍是联合分布的一种分解 |
+| **Self-conditioned generation** | 仅模型先前生成的帧/token/state | $`p(X)=\prod_t p(x_t\mid x_{\lt t})`$ | 若历史也源自同一随机采样，仍是联合分布的一种分解 |
 | **Learned-token conditional** | 从参考样本、身份、轨迹或检索结果推得的 token | $p_\theta(X\mid u)$ | token 名字再抽象，也仍是外生条件 |
 | **Text-to-video** | 文本、语言 embedding | $p_\theta(X\mid y_{\text{text}})$ | T2V，不是无条件 |
 | **Image-to-video / prediction** | 首帧、视频前缀或未来边界 | $p_\theta(x_{2:T}\mid x_1)$ 或 $p_\theta(Y\mid X_{\text{past}})$ | I2V/预测；除非另有可独立采样的 $p(x_1)$ 并联合报告 |
@@ -108,47 +108,47 @@ Sora 的官方技术报告把系统描述为接受文本以及图像/视频条�
 
 GAN 直接把固定 prior 映射到视频，并通过判别器匹配数据分布：
 
-$$
+```math
 \min_G\max_D\;
 \mathbb E_{X\sim p_{\mathrm{data}}^\Pi}\log D(X)
 +\mathbb E_{z\sim p(z)}\log\bigl(1-D(G(z))\bigr).
-$$
+```
 
 VQ/token 路线先学习离散表示 $u=Q(E(X))$，再建模 token 联合分布：
 
-$$
+```math
 p_\theta(u)=\prod_{i=1}^{N}p_\theta(u_i\mid u_{<i}),
 \qquad \hat X=D(u).
-$$
+```
 
 其中排序 $i$ 必须说明是时间优先、空间优先还是分块；decoder 重建误差是生成上限的一部分。VQ-VAE 给出了离散 codebook 与 learned prior 的基础 [[12]](#ref-12)。
 
 Masked token 模型学习被遮位置的条件分布：
 
-$$
+```math
 \mathcal L_{\mathrm{mask}}
 =\mathbb E_{u,M}\left[-\sum_{i\in M}
 \log p_\theta(u_i\mid u_{\bar M},M)\right].
-$$
+```
 
 部署时通过多轮 mask schedule 逐步填满所有位置；若某些可见 token 来自真实首帧，它就是 I2V/预测，而非 pure $p(X)$。
 
 Diffusion 对加噪视频或 latent 去噪。以常见 $\epsilon$ 参数化为例：
 
-$$
+```math
 x_\tau=\alpha_\tau X+\sigma_\tau\epsilon,\qquad
 \mathcal L_{\mathrm{diff}}
 =\mathbb E\|\epsilon-\epsilon_\theta(x_\tau,\tau)\|_2^2.
-$$
+```
 
 DDPM 奠定了该训练/采样框架 [[18]](#ref-18)；视频实现还必须说明时间卷积/注意力、噪声是否跨帧相关，以及 sampler 的实际 function evaluations。
 
 Flow matching 则回归概率路径上的速度场。对直线插值
 
-$$
+```math
 x_\tau=(1-\tau)\epsilon+\tau X,
 \qquad u^*(x_\tau,\tau)=X-\epsilon,
-$$
+```
 
 学习 $v_\theta\approx u^*$，再积分 $\mathrm d x/\mathrm d\tau=v_\theta(x,\tau)$。Flow Matching 提供了通用连续归一化流训练框架 [[24]](#ref-24)；它减少到多少步、是否仍需首帧，必须由具体视频系统证明。
 
@@ -243,11 +243,11 @@ Generative Video Bi-flow 用双向 ODE 学帧间流，正式论文展示从首�
 
 FVD 在视频 feature 空间拟合真实/生成高斯分布并计算 Fréchet 距离 [[27]](#ref-27)：
 
-$$
+```math
 \mathrm{FVD}=\|\mu_r-\mu_g\|_2^2+
-\operatorname{Tr}\left(\Sigma_r+\Sigma_g-
+\mathrm{Tr}\left(\Sigma_r+\Sigma_g-
 2(\Sigma_r\Sigma_g)^{1/2}\right).
-$$
+```
 
 它至少要绑定：I3D/其他 encoder 的实现和 checkpoint、输入值域、clip 长度、FPS、分辨率/crop、生成/真实样本数、真实 split、是否有 source 重复，以及 seeds/置信区间。同一模型仅改变这些字段，就可能得到不同数字。CVPR 2024 的系统研究还表明，常用 FVD 对单帧内容质量可能比对某些时间扰动更敏感；因此应配合 temporal corruption stress test 和更适合动作的自监督视频 feature，而不是直接弃用 FVD [[32]](#ref-32)。
 
@@ -255,12 +255,12 @@ $$
 
 Inception Score 为
 
-$$
+```math
 \mathrm{IS}=\exp\left(
-\mathbb E_X\operatorname{KL}
+\mathbb E_X\mathrm{KL}
 \bigl(p(y\mid X)\,\|\,p(y)\bigr)
 \right),
-$$
+```
 
 奖励单样本分类器置信度与样本集类别分散度 [[28]](#ref-28)。它不直接读取真实视频分布，依赖分类器标签空间；生成器复制清晰训练视频也可能得高分。DVD-GAN 对 UCF-101 的记忆化观察正是反例 [[6]](#ref-6)。
 
@@ -391,7 +391,7 @@ artifacts: [config, environment, checkpoint_hash, clip_manifest, seed_manifest, 
 
 <a id="ref-3"></a>[3] [Generating Videos with Scene Dynamics](https://proceedings.neurips.cc/paper_files/paper/2016/hash/04025959b191f8f9de3f924f0940515f-Abstract.html). Carl Vondrick, Hamed Pirsiavash, Antonio Torralba. NeurIPS. 2016.
 
-<a id="ref-4"></a>[4] [Temporal Generative Adversarial Nets with Singular Value Clipping](https://openaccess.thecvf.com/content_iccv_2017/html/Saito_Temporal_Generative_Adversarial_ICCV_2017_paper.html). Masaki Saito, Eiichi Matsumoto, Shunta Saito. ICCV. 2017. [Official code](https://github.com/pfnet-research/tgan).
+<a id="ref-4"></a>[4] [Temporal Generative Adversarial Nets with Singular Value Clipping](https://openaccess.thecvf.com/content_iccv_2017/html/Saito_Temporal_Generative_Adversarial_ICCV_2017_paper.html). Masaki Saito, Eiichi Matsumoto, Shunta Saito. ICCV. 2017. Official code [![GitHub: pfnet-research/tgan](https://img.shields.io/badge/GitHub-pfnet-research%2Ftgan-181717?logo=github&logoColor=white)](https://github.com/pfnet-research/tgan).
 
 <a id="ref-5"></a>[5] [MoCoGAN: Decomposing Motion and Content for Video Generation](https://openaccess.thecvf.com/content_cvpr_2018/html/Tulyakov_MoCoGAN_Decomposing_Motion_CVPR_2018_paper.html). Sergey Tulyakov, Ming-Yu Liu, Xiaodong Yang, Jan Kautz. CVPR. 2018.
 
@@ -409,11 +409,11 @@ artifacts: [config, environment, checkpoint_hash, clip_manifest, seed_manifest, 
 
 <a id="ref-12"></a>[12] [Neural Discrete Representation Learning](https://proceedings.neurips.cc/paper/2017/hash/7a98af17e63a0ac09ce2e96d03992fbc-Abstract.html). Aaron van den Oord, Oriol Vinyals, Koray Kavukcuoglu. NeurIPS. 2017.
 
-<a id="ref-13"></a>[13] [VideoGPT: Video Generation using VQ-VAE and Transformers](https://arxiv.org/abs/2104.10157). Wilson Yan, Yunzhi Zhang, Pieter Abbeel, Aravind Srinivas. arXiv preprint. 2021. [Official code](https://github.com/wilson1yan/VideoGPT).
+<a id="ref-13"></a>[13] [VideoGPT: Video Generation using VQ-VAE and Transformers](https://arxiv.org/abs/2104.10157). Wilson Yan, Yunzhi Zhang, Pieter Abbeel, Aravind Srinivas. arXiv preprint. 2021. Official code [![GitHub: wilson1yan/VideoGPT](https://img.shields.io/badge/GitHub-wilson1yan%2FVideoGPT-181717?logo=github&logoColor=white)](https://github.com/wilson1yan/VideoGPT).
 
 <a id="ref-14"></a>[14] [Long Video Generation with Time-Agnostic VQGAN and Time-Sensitive Transformer](https://www.ecva.net/papers/eccv_2022/papers_ECCV/html/5950_ECCV_2022_paper.php). Songwei Ge et al. ECCV. 2022.
 
-<a id="ref-15"></a>[15] [MAGVIT: Masked Generative Video Transformer](https://openaccess.thecvf.com/content/CVPR2023/html/Yu_MAGVIT_Masked_Generative_Video_Transformer_CVPR_2023_paper.html). Lijun Yu et al. CVPR. 2023. [Official code](https://github.com/google-research/magvit).
+<a id="ref-15"></a>[15] [MAGVIT: Masked Generative Video Transformer](https://openaccess.thecvf.com/content/CVPR2023/html/Yu_MAGVIT_Masked_Generative_Video_Transformer_CVPR_2023_paper.html). Lijun Yu et al. CVPR. 2023. Official code [![GitHub: google-research/magvit](https://img.shields.io/badge/GitHub-google-research%2Fmagvit-181717?logo=github&logoColor=white)](https://github.com/google-research/magvit).
 
 <a id="ref-16"></a>[16] [Language Model Beats Diffusion — Tokenizer is Key to Visual Generation](https://research.google/pubs/language-model-beats-diffusion-tokenizer-is-key-to-visual-generation/). Lijun Yu et al. ICLR. 2024.
 
@@ -429,13 +429,13 @@ artifacts: [config, environment, checkpoint_hash, clip_manifest, seed_manifest, 
 
 <a id="ref-22"></a>[22] [Scalable Diffusion Models with Transformers](https://openaccess.thecvf.com/content/ICCV2023/html/Peebles_Scalable_Diffusion_Models_with_Transformers_ICCV_2023_paper.html). William Peebles, Saining Xie. ICCV. 2023.
 
-<a id="ref-23"></a>[23] [Latte: Latent Diffusion Transformer for Video Generation](https://openreview.net/forum?id=ntGPYNUF3t). Xin Ma et al. *Transactions on Machine Learning Research*. 2025. [Official code](https://github.com/Vchitect/Latte).
+<a id="ref-23"></a>[23] [Latte: Latent Diffusion Transformer for Video Generation](https://openreview.net/forum?id=ntGPYNUF3t). Xin Ma et al. *Transactions on Machine Learning Research*. 2025. Official code [![GitHub: Vchitect/Latte](https://img.shields.io/badge/GitHub-Vchitect%2FLatte-181717?logo=github&logoColor=white)](https://github.com/Vchitect/Latte).
 
 <a id="ref-24"></a>[24] [Flow Matching for Generative Modeling](https://openreview.net/forum?id=PqvMRDCJT9t). Yaron Lipman et al. ICLR. 2023.
 
-<a id="ref-25"></a>[25] [Generative Video Bi-flow](https://openaccess.thecvf.com/content/ICCV2025/html/Liu_Generative_Video_Bi-flow_ICCV_2025_paper.html). Bo Liu et al. ICCV. 2025. [Official code](https://github.com/ryushinn/ode-video).
+<a id="ref-25"></a>[25] [Generative Video Bi-flow](https://openaccess.thecvf.com/content/ICCV2025/html/Liu_Generative_Video_Bi-flow_ICCV_2025_paper.html). Bo Liu et al. ICCV. 2025. Official code [![GitHub: ryushinn/ode-video](https://img.shields.io/badge/GitHub-ryushinn%2Fode-video-181717?logo=github&logoColor=white)](https://github.com/ryushinn/ode-video).
 
-<a id="ref-26"></a>[26] [SSM Meets Video Diffusion Models: Efficient Long-Term Video Generation with Structured State Spaces](https://doi.org/10.1007/s00354-026-00326-8). Yuta Oshima, Shohei Taniguchi, Masahiro Suzuki, Yutaka Matsuo. *New Generation Computing*. 2026. [Official code](https://github.com/shim0114/SSM-Meets-Video-Diffusion-Models).
+<a id="ref-26"></a>[26] [SSM Meets Video Diffusion Models: Efficient Long-Term Video Generation with Structured State Spaces](https://doi.org/10.1007/s00354-026-00326-8). Yuta Oshima, Shohei Taniguchi, Masahiro Suzuki, Yutaka Matsuo. *New Generation Computing*. 2026. Official code [![GitHub: shim0114/SSM-Meets-Video-Diffusion-Models](https://img.shields.io/badge/GitHub-shim0114%2FSSM-Meets-Video-Diffusion-Models-181717?logo=github&logoColor=white)](https://github.com/shim0114/SSM-Meets-Video-Diffusion-Models).
 
 <a id="ref-27"></a>[27] [Towards Accurate Generative Models of Video: A New Metric & Challenges](https://arxiv.org/abs/1812.01717). Thomas Unterthiner et al. arXiv preprint. 2018.
 

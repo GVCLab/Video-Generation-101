@@ -18,19 +18,19 @@
 
 给定 $N$ 个主体，每个主体有至多 $K$ 张参考图：
 
-$$
+```math
 R\in[0,1]^{B\times N\times K\times3\times H_r\times W_r},
 \qquad
 M_R\in\{0,1\}^{B\times N\times K},
-$$
+```
 
-对应实体描述 $E=\{e_n\}_{n=1}^{N}$、文本 prompt $y$，以及可选的动作、相机、关系或时间窗条件 $c$，目标是生成：
+对应实体描述 $`E=\lbrace e_n\rbrace_{n=1}^{N}`$、文本 prompt $y$，以及可选的动作、相机、关系或时间窗条件 $c$，目标是生成：
 
-$$
+```math
 X\in[0,1]^{B\times F\times3\times H\times W},
 \qquad
 p_\theta\!\left(X\mid y,\{R_n,e_n\}_{n=1}^{N},c,a\right).
-$$
+```
 
 $a$ 是**适配预算**。若方法需要每个主体微调，它至少包含：参考数据量、可训练参数、步数、wall time、峰值显存和保存状态大小。若不需要个案优化，则 $a=0$，但共享模型的训练数据和训练成本仍不能省略。
 
@@ -86,7 +86,7 @@ flowchart TD
 
 一个可执行的主体状态至少包括：
 
-$$
+```math
 s_n=
 \bigl(
 z_n^{\mathrm{global}},
@@ -96,7 +96,7 @@ b_n,
 \tau_n,
 q_n
 \bigr),
-$$
+```
 
 其中：
 
@@ -138,11 +138,11 @@ $$
 
 最容易构造的训练对是：从目标视频抽一帧作为 reference，再让模型重建同一视频。此时条件里不仅有身份，还有姿态、背景、构图、光照、遮挡和相机距离。模型可以学习：
 
-$$
+```math
 \text{reference pixels}
 \rightarrow
 \text{copy pose/background/crop},
-$$
+```
 
 而不必学习跨姿态身份。Video Alchemist 明确记录了高分辨率参考导致近景大主体、遮挡参考复刻遮挡、裁切参考导致输出边缘裁切、相似姿态多参考导致低运动等 shortcut，并用模糊、缩放、色彩、亮度、翻转、剪切和旋转缓解 [[14]](#ref-14)。这证明增强是**反泄漏正则**，不证明泄漏已消失。
 
@@ -229,11 +229,11 @@ ID-Crafter 把 post-training 推向多主体：先以层级 attention 汇聚单�
 
 reward 路线的核心风险是 Goodhart：
 
-$$
+```math
 \max_\theta r_{\mathrm{id}}(X,R)
 \not\Rightarrow
 \text{人类认为身份、动作和视频都正确}.
-$$
+```
 
 因此训练 reward、model selection evaluator 与最终 evaluator 必须尽量独立，并检查静态视频、脸部放大、过度锐化、重复帧和对抗纹理是否骗分。
 
@@ -350,17 +350,17 @@ Vera 构建 1,001,891 个跨片段 identity-aligned human image–video pairs，
 
 令生成视频在时间 $t$ 检测出 $M_t$ 个主体 crop，reference 槽为 $N$。使用未参与训练 reward 的 evaluator 得到：
 
-$$
+```math
 S_{n,m,t}
 =
-\operatorname{sim}
+\mathrm{sim}
 \bigl(g_{\mathrm{eval}}(R_n),
 g_{\mathrm{eval}}(\hat X_{m,t})\bigr).
-$$
+```
 
 只取 $\max_m S_{n,m,t}$ 会忽略两个 reference 同时匹配到一个混合主体。应先做一一匹配，再报告正确槽相对其他槽的 margin：
 
-$$
+```math
 \Delta_{\mathrm{bind}}
 =
 \frac{1}{|\mathcal T|}
@@ -371,9 +371,9 @@ S_{n,\pi_t(n),t}
 -
 \max_{j\ne n}S_{j,\pi_t(n),t}
 \right].
-$$
+```
 
-$\Delta_{\mathrm{bind}}>0$ 仍不够：还要验证 $\pi_t$ 随时间稳定、主体出画重现后回到同一槽，并且正确主体执行正确动作。
+$`\Delta_{\mathrm{bind}}\gt0`$ 仍不够：还要验证 $\pi_t$ 随时间稳定、主体出画重现后回到同一槽，并且正确主体执行正确动作。
 
 ~~~mermaid
 flowchart LR
@@ -447,7 +447,7 @@ VGBE 2026 Challenge 从单张参考图和文本生成视频，联合考察身份
 
 对每个 route 和 guidance 配置画：
 
-$$
+```math
 \bigl(
 \text{identity},
 \text{role/action},
@@ -456,7 +456,7 @@ $$
 \text{leakage},
 \text{cost}
 \bigr).
-$$
+```
 
 只有在另一个配置六个维度都不差时，才可称为被支配。Movie Weaver 的 reference domination、Video Alchemist 的 reference-count/text trade-off、PersonalVideo 的 identity/dynamics reward、AlcheMinT 的 time/CLIP trade-off，都说明单一 “best” 会隐藏真实选择。
 
@@ -464,7 +464,7 @@ $$
 
 最小采样单元是：
 
-$$
+```math
 \text{subject set}
 \times
 \text{prompt/control}
@@ -472,7 +472,7 @@ $$
 \text{seed}
 \times
 \text{adaptation budget}.
-$$
+```
 
 同一 subject 的不同 reference/prompt 不是独立身份样本。bootstrap 应以 subject set 为 cluster；多方法比较使用相同 prompt/seed 并报告 paired interval。split 至少按 identity、原视频、捕获源和 near-duplicate group 隔离。若底座预训练不可审计，明确写“无法排除 foundation-model memorization”。
 

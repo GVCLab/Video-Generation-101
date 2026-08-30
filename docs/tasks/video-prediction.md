@@ -19,29 +19,29 @@
 
 设 RGB 观测前缀和未来目标分别为
 
-$$
+```math
 X=x_{1:T_c}\in[0,1]^{B\times T_c\times3\times H\times W},\qquad
 Y=x_{T_c+1:T_c+T_h}.
-$$
+```
 
 确定性预测器输出一个点估计
 
-$$
+```math
 \hat Y=f_\theta(X),
-$$
+```
 
 随机预测器则学习条件分布 $p_\theta(Y\mid X)$，测试时应报告
 $K$ 个独立或有设计的样本
-$\{\hat Y^{(k)}\}_{k=1}^{K}$。严格限制针对的是**部署推理**：真实未来 $Y$
+$`\lbrace\hat Y^{(k)}\rbrace_{k=1}^{K}`$。严格限制针对的是**部署推理**：真实未来 $Y$
 或其编码不得作为部署路径的模型输入。训练期可以把 $Y$ 用于损失目标、扩散加噪/腐蚀输入、变分 posterior、teacher forcing，或构造 stop-gradient foresight teacher/target，但这些都必须标为 **train-only** 并在部署时移除。离线评价可以用 $Y$ 比较预测，也不得回流到当次推理。
 
 “预测一帧”和“预测一块”还需显式写出块长 $b$：
 
-$$
+```math
 \hat x_{t+1:t+b}\sim
 p_\theta(\cdot\mid c_t),\qquad
 c_{t+b}=U(c_t,\hat x_{t+1:t+b}).
-$$
+```
 
 $U$ 可以把生成帧追加到滑动窗口、更新递归状态，或把历史压缩进固定预算的 memory。若训练时 $U$ 接收真实帧、测试时却接收生成帧，就存在 forcing gap；若论文没有写清 $b$、窗口长度、状态是否重置和采样随机性，所谓“长 rollout”不可复现。
 
@@ -61,10 +61,10 @@ $U$ 可以把生成帧追加到滑动窗口、更新递归状态，或把历史�
 
 若提供未来动作，合同变为
 
-$$
+```math
 p_\theta(Y\mid X,A),\qquad
 A=a_{T_c:T_c+T_h-1}\in\mathbb R^{B\times T_h\times d_a}.
-$$
+```
 
 这允许比较不同动作的反事实后果，但仍不保证因果可识别：行为策略覆盖不足、动作与隐藏状态混杂、观测缺失，都可能让模型只记住数据相关性。PlaNet 把 stochastic/deterministic latent dynamics 接到 online planning，是“预测如何成为决策模型”的早期正式范例；它不是被动视频预测 benchmark 的同义词 [[9]](#ref-9)。
 
@@ -131,16 +131,16 @@ flowchart TB
 |---|---|---|---|---|
 | **Direct / one-shot** | 一次输出全部 $T_h$ 帧 | 无自回灌 | $T_h$ 是否固定、时间位置编码 | 训练视野之外无法自然延长 |
 | **Frame autoregression** | 下一帧 $b=1$ | 生成帧或 recurrent state | warm-up、窗口、状态 reset、sampling | 误差逐帧复合，吞吐低 |
-| **Block autoregression** | 下一块 $b>1$ | 生成块与压缩历史 | 块重叠、边界融合、block FPS | 块内一致但块间跳变 |
+| **Block autoregression** | 下一块 $`b\gt1`$ | 生成块与压缩历史 | 块重叠、边界融合、block FPS | 块内一致但块间跳变 |
 | **Latent/token rollout** | $z$ 或离散/连续 token | latent KV cache 或 state | encoder 是否冻结、decoder、token 顺序 | latent 好但像素/物理不可读 |
 
 Latent 合同至少应写成
 
-$$
+```math
 z_t=E(x_t),\quad
 \hat z_{T_c+1:T_c+T_h}=g_\theta(z_{1:T_c}),\quad
 \hat x_t=D(\hat z_t)\ \text{（若声称像素预测）}.
-$$
+```
 
 如果 $E$ 在训练中同时看见未来或是非因果序列编码器，必须说明未来信息只构造 stop-gradient target，还是进入了 predictor 的输入。Video-Mirai 的做法属于训练期 foresight distillation：冻结的非因果 encoder 读取完整 rollout 构造目标，但部署 predictor 仍只看因果历史；这是一种训练监督，不是测试时预知未来 [[24]](#ref-24)。
 
@@ -203,11 +203,11 @@ Transform 路线不直接从零画下一帧，而是预测如何搬运已观测�
 
 Deep Kalman Filters 先把变分推断与非线性 stochastic state transition 接到序列观测，提供了 latent state-space 的通用概率模板 [[8]](#ref-8)。SV2P 把随机 latent variable 加入多帧真实视频预测，同时研究 action-free 与 action-conditioned 设置 [[5]](#ref-5)。SVG 的 learned prior 进一步令每时刻 latent prior 依赖历史，并把 deterministic dynamics 与 stochastic residual 分开 [[6]](#ref-6)。一般目标可写成
 
-$$
+```math
 \mathbb E_{q_\phi(Z\mid X,Y)}[\log p_\theta(Y\mid X,Z)]
 -\sum_t\mathrm{KL}\!\left(q_\phi(z_t\mid X,Y_{\le t})\,\|\,
 p_\theta(z_t\mid X,\hat Y_{<t})\right).
-$$
+```
 
 训练 posterior 看见真实未来，部署 prior 看不见；二者错配、posterior collapse 与 best-of-$K$ 挑样都会让“多样”看起来比实际分布校准更好。至少同时报告 sample-average、best-of-$K$、$K$ 值、样本内/样本间多样性，以及覆盖与准确的权衡。
 
@@ -217,10 +217,10 @@ $$
 
 Video Diffusion Models 把 image diffusion 扩展到时空生成并包含 conditional video prediction，正式发表于 NeurIPS 2022 [[13]](#ref-13)。其标准噪声目标是
 
-$$
+```math
 y^{(\tau)}=\alpha_\tau y+\sigma_\tau\epsilon,\qquad
 \mathcal L=\mathbb E\|\epsilon-\epsilon_\theta(y^{(\tau)},\tau,X)\|_2^2.
-$$
+```
 
 这里的 diffusion time $\tau$ 与视频时间 $t$ 不同。推理时每个未来帧/块需要多次去噪；长视频再乘以 autoregressive block 数，延迟与误差都会增长。
 
@@ -247,11 +247,11 @@ FramePack 更具体地处理固定 context budget。它按帧重要性压缩输�
 
 决策合同至少包含
 
-$$
+```math
 z_{t+1}\sim p_\theta(z_{t+1}\mid z_t,a_t),\qquad
 \hat r_t=r_\theta(z_t,a_t),\qquad
 a_{t:t+H-1}^*=\arg\max_A\mathbb E\sum_h\gamma^h\hat r_{t+h}.
-$$
+```
 
 只有当 action intervention 会在 latent rollout 中产生正确、可区分的后果，并在真实环境提升 success/return 或降低 planning regret，才到达“world model utility”。
 

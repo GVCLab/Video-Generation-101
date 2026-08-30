@@ -4,7 +4,7 @@
 
 视频生成模型不是只能贴一个“VAE”“自回归”“Diffusion”“Flow”或“Streaming”标签。一个真实系统通常同时回答五个不同问题：
 
-$$
+```math
 \text{system configuration}
 =
 (\text{representation},
@@ -12,7 +12,7 @@ $$
 \text{objective},
 \text{backbone},
 \text{deployment}).
-$$
+```
 
 这五个轴在分析上可分，却不表示统计独立或任意笛卡尔积都可实现：离散 token 通常对应分类式目标，连续状态才适合直接学习 score/velocity；因果分解还会约束可用骨干、缓存方式与流式部署。五轴的用途是拆开问题、显式写出兼容约束，而不是宣称所有取值可以自由拼装。
 
@@ -89,26 +89,26 @@ VAE 还容易同时指两件事：一是用 ELBO 学整个生成分布的潜变�
 
 连续 AE/VAE 将视频
 
-$$
+```math
 x\in\mathbb{R}^{T\times H\times W\times C}
-$$
+```
 
 编码成
 
-$$
+```math
 z=E(x)\in
 \mathbb{R}^{T'\times H'\times W'\times C_z},
 \qquad
 \hat{x}=D(z).
-$$
+```
 
 表示预算应分别报告时间、空间和通道：
 
-$$
+```math
 r_t=\frac{T}{T'},\qquad
 r_s=\frac{HW}{H'W'},\qquad
 r_{\mathrm{elem}}=\frac{THWC}{T'H'W'C_z}.
-$$
+```
 
 只写“$8\times$ VAE”可能把空间网格比、总元素比和 bitrate 混为一谈。没有量化、熵模型和实际 bitstream 时，只能报告 shape、dtype、网格或元素预算，不能报告 bpp/bitrate。tokenizer 验收至少要包含文字、小物体、快速运动、闪烁、首尾 causal 边界和长段落漂移；完整四本账与生成式 decoder 的幻觉边界见[视频 Tokenizer 专章](generative-models/video-tokenizers.md)。生成器分数再高，也不能可靠恢复 tokenizer 已系统性删除的信息。
 
@@ -138,12 +138,12 @@ Sora 报告在压缩 latent 上切 spacetime patches，再由 Transformer diffus
 
 窄义自回归写成：
 
-$$
+```math
 p(x_{1:K}\mid c)
 =
 \prod_{k=1}^{K}
 p(x_k\mid x_{<k},c).
-$$
+```
 
 $x_k$ 可以是像素、离散 token、连续 latent、帧或 chunk。每个条件分布也不必使用 categorical CE；它可以由 diffusion 或 flow head 表示。VideoPoet 展示 decoder-only multimodal token AR，MAR/NOVA 则说明连续 token 与 diffusion loss 也能进入广义 AR 系统 [[7]](#ref-7) [[8]](#ref-8) [[21]](#ref-21)。
 
@@ -153,12 +153,12 @@ $x_k$ 可以是像素、离散 token、连续 latent、帧或 chunk。每个条�
 
 Masked generation 每轮并行预测一组未知变量，再按置信度或 schedule 提交、重 mask。若第 $j$ 轮提交集合 $X_j$，可写成：
 
-$$
+```math
 p(X_{1:J}\mid c)
 =
 \prod_{j=1}^{J}
 p(X_j\mid X_{<j},c),
-$$
+```
 
 但 $X_j$ 内部通常并行，attention 也可能双向。因此它与逐 token causal AR 在窄义上不同。MaskGIT 将 masked iterative decoding 与 raster AR 对照；MAR 又把 next-set prediction 称为广义 masked autoregression。教材必须声明采用哪一种定义 [[5]](#ref-5) [[8]](#ref-8)。
 
@@ -180,7 +180,7 @@ CausVid、Self Forcing 与 Separable Causal Diffusion 分别从蒸馏、自生�
 
 VAE 最大化 evidence lower bound：
 
-$$
+```math
 \log p_\theta(x)
 \ge
 \mathbb{E}_{q_\phi(z\mid x)}
@@ -188,7 +188,7 @@ $$
 -
 D_{\mathrm{KL}}
 \left(q_\phi(z\mid x)\Vert p(z)\right).
-$$
+```
 
 用于未知未来时，信息合同变成 $q_\phi(z\mid h,y,c)$ 在训练可见真实未来 $y$，而部署 $p_\psi(z\mid h,c)$ 只能见历史与合法条件；固定 prior 是后者的特例。若测试仍使用 posterior，结果只能算 oracle，不能代表部署生成。
 
@@ -198,13 +198,13 @@ $$
 
 GAN 通过判别器比较真实与生成分布 [[32]](#ref-32)：
 
-$$
+```math
 \min_G\max_D
 \mathbb{E}_{x\sim p_{data}}\log D(x)
 +
 \mathbb{E}_{z\sim p(z)}
 \log(1-D(G(z))).
-$$
+```
 
 视频判别器可看单帧、短片段或完整时空体。MoCoGAN 的内容/运动 latent 解耦属于表示设计，但它的训练 objective 是 adversarial；不能把它当成 VAE 的代表 [[2]](#ref-2)。
 

@@ -62,7 +62,7 @@ Wiedemer 等人的核心问题是：大语言模型从任务专用系统演变�
 
 1. **系统级零样本不等于视频模型本体零样本。** Vertex API 使用 LLM prompt rewriter；作者明确把 rewriter 与视频生成器当作一个黑盒系统，并认为简单 Sudoku 的解法很可能来自 LLM 而非视频模型。独立 Gemini 2.5 Pro 在若干关键视觉任务上不能稳定求解，是有价值的对照，但它既没有识别隐藏 rewriter，也没有复现实际的重写提示，因而不能完全分离系统组件。
 2. **这里的 zero-shot 是任务协议，不是训练数据证明。** 它指没有任务专用微调或新任务 head；Veo 的训练数据与后训练流程闭源，无法审计训练集中是否存在相似视觉模式、任务演示或提示模板。
-3. **pass@$k$ / best-of-$k$ 的定义随任务而变。** 迷宫的 pass@10 是 10 次中至少一次二值成功；边缘检测和分割是在 $k$ 个候选上取最佳指标，其中还包含逐视频选帧；视觉类比在 $k>1$ 时采用多数投票。共同点只是额外采样引入了额外计算，不能把这些数字等同于 pass@1、平均可靠性或同预算下优于搜索算法；best frame 也是事后才知道的性能上限，不是免费可用的读出规则。
+3. **pass@$k$ / best-of-$k$ 的定义随任务而变。** 迷宫的 pass@10 是 10 次中至少一次二值成功；边缘检测和分割是在 $k$ 个候选上取最佳指标，其中还包含逐视频选帧；视觉类比在 $`k\gt1`$ 时采用多数投票。共同点只是额外采样引入了额外计算，不能把这些数字等同于 pass@1、平均可靠性或同预算下优于搜索算法；best frame 也是事后才知道的性能上限，不是免费可用的读出规则。
 4. **定性广度不等于定量稳定性。** 62 个定性任务通常每项生成 12 次并由作者判断，用于发现现象，而非建立窄置信区间。
 5. **提示方式本身是强变量。** 对称任务中，最佳与最差 prompt 的 pass@1 相差 40 个百分点（shape split）和 64 个百分点（random split）；分割的绿色背景也明显优于白色背景。模型可能利用训练分布中的呈现捷径。
 6. **部分评测仍依赖模型裁判。** 视觉类比由 Gemini 2.5 Pro autorater 辅助判分，并向裁判提供变换类型和值；作者在每种 condition 的 25 个样本上报告与专家超过 88% 一致。这支持近似可用性，但不是完全确定性的任务 scorer。
@@ -128,15 +128,15 @@ VChain 用外部多模态模型生成关键视觉思维，再适配视频生成�
 
 给定任务描述 $q$、初始视觉状态 $x_0$ 和随机变量 $\epsilon$，视频生成器产生：
 
-$$
+```math
 V_\theta(q,x_0,\epsilon)=(x_1,x_2,\ldots,x_T).
-$$
+```
 
 评测不能只有一个“好不好看”的总分。至少应分为：
 
-$$
+```math
 R=\alpha R_{\text{answer}}+\beta R_{\text{process}}+\gamma R_{\text{generalization}}+\delta R_{\text{robustness}},
-$$
+```
 
 其中：
 
@@ -340,9 +340,9 @@ VideoRLVR 将 Maze、FlowFree、Sokoban 的程序正确性分解为 dense reward
 
 若系统 A 生成一次，系统 B 生成 16 次并调用一个更强的 VLM 选择，两者不能只比较最终准确率。至少应报告：
 
-$$
+```math
 \text{success per compute},\quad \text{success per generated frame},\quad \text{latency},\quad \text{external-token cost}.
-$$
+```
 
 第 1 节讨论的 5×5 迷宫结果就是典型例子：78% 的 pass@10 是候选覆盖上界，不是单次可靠性 [[3]](#ref-3)。因此，任何“self-consistency 提升”都应与同预算的随机重采样、早停、规则搜索和外部规划基线比较。
 
@@ -487,7 +487,7 @@ VBVR v3（2026-08-27）正文报告 [[19]](#ref-19)：
 | Abstraction | 是否发现并应用隐含规律 | 只模仿外观，不迁移规则 |
 | Knowledge | 是否调用常识或给定符号知识 | 事实调用正确但视觉执行失败 |
 
-每个任务配有确定性 0–1 scorer；论文报告规则 scorer 与人类判断的 Spearman 相关系数 $\rho>0.9$。不过该相关系数是在 9 个模型级 win-ratio 点上计算，并非 4,500 个视频级判断点；它支持模型排序大体一致，不证明每个 scorer 的每条过程规则都完整。附录中不同任务的 scorer 覆盖也不相同：有的检查动作顺序，有的主要检查终态、颜色和跳变。它比单一 VLM judge 更可重复，但还不是“全过程已被完全验证”。
+每个任务配有确定性 0–1 scorer；论文报告规则 scorer 与人类判断的 Spearman 相关系数 $`\rho\gt0.9`$。不过该相关系数是在 9 个模型级 win-ratio 点上计算，并非 4,500 个视频级判断点；它支持模型排序大体一致，不证明每个 scorer 的每条过程规则都完整。附录中不同任务的 scorer 覆盖也不相同：有的检查动作顺序，有的主要检查终态、颜色和跳变。它比单一 VLM judge 更可重复，但还不是“全过程已被完全验证”。
 
 ### 11.3 关键结果与应有解释
 
@@ -627,7 +627,7 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 
 近期最可复现的方向是扩展程序化任务，但把完整状态图、合法操作、必要步骤和守恒量一起发布。目标不是再造一个更大的总分，而是让每个错误能归因到 perception、planning、execution、memory 或 rendering。
 
-**验收标准**：scorer 与多人判断 $\rho>0.9$；终态正确但过程错误可以单独识别；未见规则与未见渲染风格分别报告。
+**验收标准**：scorer 与多人判断 $`\rho\gt0.9`$；终态正确但过程错误可以单独识别；未见规则与未见渲染风格分别报告。
 
 ### 路线 B：建立多时间尺度的机制模型
 
@@ -678,7 +678,7 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 11. **OpenCoF 与 Hierarchical Denoising**：看统一 token 和层级搜索的架构方向 [[33]](#ref-33) [[34]](#ref-34)。
 12. **VGI-Bench 与 VBVR-Pro**：用最新综合评测和多任务扩展回看原始愿景 [[36]](#ref-36) [[48]](#ref-48)。
 
-完整检索、版本核验和前后向引用审计见 [video reasoning 文献与引用审计](../sources/research_20260829_video_reasoning_vbvr.md)。持续更新的社区目录可参考 [Awesome Video Reasoning](https://github.com/Video-Reason/Awesome-Video-Reasoning)，但目录用于发现文献，具体数字仍应回到论文正文和官方代码核验 [[38]](#ref-38)。
+完整检索、版本核验和前后向引用审计见 [video reasoning 文献与引用审计](../sources/research_20260829_video_reasoning_vbvr.md)。持续更新的社区目录可参考 Awesome Video Reasoning [![GitHub: Video-Reason/Awesome-Video-Reasoning](https://img.shields.io/badge/GitHub-Video-Reason%2FAwesome-Video-Reasoning-181717?logo=github&logoColor=white)](https://github.com/Video-Reason/Awesome-Video-Reasoning)，但目录用于发现文献，具体数字仍应回到论文正文和官方代码核验 [[38]](#ref-38)。
 
 ---
 
@@ -730,7 +730,7 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 
 <a id="ref-18"></a>[18] [RISE-Video: Can Video Generators Decode Implicit World Rules?](https://arxiv.org/abs/2602.05986). Mingxin Liu, Shuran Ma, Shibei Meng, Xiangyu Zhao, Zicheng Zhang, Shaofeng Zhang, et al. arXiv preprint. 2026.
 
-<a id="ref-19"></a>[19] [A Very Big Video Reasoning Suite](https://arxiv.org/abs/2602.20159). Maijunxian Wang, Ruisi Wang, Juyi Lin, Ran Ji, Thaddäus Wiedemer, Qingying Gao, et al. arXiv preprint. 2026. See also the [official benchmark](https://video-reason.com/bench/) and [EvalKit](https://github.com/Video-Reason/VBVR-EvalKit).
+<a id="ref-19"></a>[19] [A Very Big Video Reasoning Suite](https://arxiv.org/abs/2602.20159). Maijunxian Wang, Ruisi Wang, Juyi Lin, Ran Ji, Thaddäus Wiedemer, Qingying Gao, et al. arXiv preprint. 2026. See also the [official benchmark](https://video-reason.com/bench/) and EvalKit [![GitHub: Video-Reason/VBVR-EvalKit](https://img.shields.io/badge/GitHub-Video-Reason%2FVBVR-EvalKit-181717?logo=github&logoColor=white)](https://github.com/Video-Reason/VBVR-EvalKit).
 
 <a id="ref-20"></a>[20] [From Perception to Action: An Interactive Benchmark for Vision Reasoning](https://arxiv.org/abs/2602.21015). Yuhao Wu, Maojia Song, Yihuai Lan, Lei Wang, Zhiqiang Hu, Yao Xiao, et al. arXiv preprint. 2026.
 
@@ -768,7 +768,7 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 
 <a id="ref-37"></a>[37] [Video Generation Models are General-Purpose Vision Learners](https://arxiv.org/abs/2607.09024). Letian Wang, Chuhan Zhang, Rishabh Kabra, Jasper Uijlings, Steven Waslander, Andrew Zisserman, et al. ECCV. 2026.
 
-<a id="ref-38"></a>[38] [Awesome Video Reasoning](https://github.com/Video-Reason/Awesome-Video-Reasoning). Video-Reason community curation (VBVR team). GitHub repository, accessed 2026-08-29.
+<a id="ref-38"></a>[38] Awesome Video Reasoning [![GitHub: Video-Reason/Awesome-Video-Reasoning](https://img.shields.io/badge/GitHub-Video-Reason%2FAwesome-Video-Reasoning-181717?logo=github&logoColor=white)](https://github.com/Video-Reason/Awesome-Video-Reasoning). Video-Reason community curation (VBVR team). GitHub repository, accessed 2026-08-29.
 
 <a id="ref-39"></a>[39] [How Far is Video Generation from World Model: A Physical Law Perspective](https://arxiv.org/abs/2411.02385). Bingyi Kang, Yang Yue, Rui Lu, Zhijie Lin, Yang Zhao, Kaixin Wang, et al. ICML. 2025.
 
@@ -804,8 +804,8 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 
 <a id="ref-55"></a>[55] [Wan-R1: Verifiable-Reinforcement Learning for Video Reasoning](https://arxiv.org/abs/2603.27866). Ming Liu, Yunbei Zhang, Shilong Liu, Liwen Wang, Wensheng Zhang. arXiv preprint. 2026.
 
-<a id="ref-56"></a>[56] [UniVR: Thinking in Visual Space for Unified Visual Reasoning](https://arxiv.org/abs/2607.12800). Zhongwei Ren, Yunchao Wei, Yao Zhao, Weibo Gong, Xiao Liu, Anran Wang, Xiangtai Li, Xiaojie Jin. arXiv preprint. 2026. See also the [official repository](https://github.com/bytedance/UniVR).
+<a id="ref-56"></a>[56] [UniVR: Thinking in Visual Space for Unified Visual Reasoning](https://arxiv.org/abs/2607.12800). Zhongwei Ren, Yunchao Wei, Yao Zhao, Weibo Gong, Xiao Liu, Anran Wang, Xiangtai Li, Xiaojie Jin. arXiv preprint. 2026. See also the official repository [![GitHub: bytedance/UniVR](https://img.shields.io/badge/GitHub-bytedance%2FUniVR-181717?logo=github&logoColor=white)](https://github.com/bytedance/UniVR).
 
-<a id="ref-57"></a>[57] [Thinking in Video: Can Video Generators Really Reason About the Real World?](https://arxiv.org/abs/2607.17523). Yongheng Zhang, Guang Yang, Ruihan Hou, Qiguang Chen, Ziang Liu, Xiaolong Liu, et al. arXiv preprint. 2026. See also the [official repository](https://github.com/BRZ911/Thinking-in-Video).
+<a id="ref-57"></a>[57] [Thinking in Video: Can Video Generators Really Reason About the Real World?](https://arxiv.org/abs/2607.17523). Yongheng Zhang, Guang Yang, Ruihan Hou, Qiguang Chen, Ziang Liu, Xiaolong Liu, et al. arXiv preprint. 2026. See also the official repository [![GitHub: BRZ911/Thinking-in-Video](https://img.shields.io/badge/GitHub-BRZ911%2FThinking-in-Video-181717?logo=github&logoColor=white)](https://github.com/BRZ911/Thinking-in-Video).
 
-<a id="ref-58"></a>[58] [Rule-Compliant Visual Spatial Planning for Multimodal Large Language Models](https://arxiv.org/abs/2608.20237). Yu Chen, Ting Lei, Yaoyi Li, Jia Cai, Zhecen Wu, Yang Liu. arXiv preprint. 2026. See also the [official repository](https://github.com/oceanflowlab/RuleMaze) and [dataset card](https://huggingface.co/datasets/Fish-03/RuleMaze).
+<a id="ref-58"></a>[58] [Rule-Compliant Visual Spatial Planning for Multimodal Large Language Models](https://arxiv.org/abs/2608.20237). Yu Chen, Ting Lei, Yaoyi Li, Jia Cai, Zhecen Wu, Yang Liu. arXiv preprint. 2026. See also the official repository [![GitHub: oceanflowlab/RuleMaze](https://img.shields.io/badge/GitHub-oceanflowlab%2FRuleMaze-181717?logo=github&logoColor=white)](https://github.com/oceanflowlab/RuleMaze) and [dataset card](https://huggingface.co/datasets/Fish-03/RuleMaze).

@@ -20,27 +20,27 @@
 
 令 $o_t$ 是当前观测，$A_t=(a_t,\ldots,a_{t+K-1})$ 是与未来 $K$ 个 observation steps 对齐的动作 schedule，$g_t$ 是可选目标或世界事件，$m_t$ 是跨窗口记忆。原始动作事件先在独立的动作时钟上被系统**接受**，再按明示规则对齐到 schedule；因此相邻 $a$ 可以是同一 accepted action 的 hold，而不是 $K$ 次独立输入。交互式世界生成器至少实现
 
-$$
+```math
 (\hat o_{t+1:t+K},\hat s_{t+1:t+K},\hat r_{t:t+K-1},
 \hat d_{t:t+K-1},u_t)
 \sim
 p_\theta(\cdot\mid h_t,A_t,g_t,m_t),
-$$
+```
 
-其中 $h_t=(o_0,a_0,\ldots,o_t)$，$\hat s$、$\hat r$、$\hat d$ 可以缺省，但若系统声称可作为环境训练或评估策略，就应说明状态、奖励、终止与约束来自哪里；$u_t$ 表示不确定性或拒绝信号。若接口每个 model chunk 只接收一次动作，必须显式声明 hold semantics，例如 $a_{t+j}=a_t,\ 0\le j<K$，并给出 hold 时长；不能用单个 $a_t$ 默认代表一段未定义的未来。
+其中 $h_t=(o_0,a_0,\ldots,o_t)$，$\hat s$、$\hat r$、$\hat d$ 可以缺省，但若系统声称可作为环境训练或评估策略，就应说明状态、奖励、终止与约束来自哪里；$u_t$ 表示不确定性或拒绝信号。若接口每个 model chunk 只接收一次动作，必须显式声明 hold semantics，例如 $`a_{t+j}=a_t,\ 0\le j\lt K`$，并给出 hold 时长；不能用单个 $a_t$ 默认代表一段未定义的未来。
 
 预测分支与真实分支的记忆权限也必须拆开：
 
-$$
+```math
 m^{\mathrm{pred}}_{t+K}
 =U_{\mathrm{pred}}(m^{\mathrm{pred}}_t,h_t,A_t,\hat o_{t+1:t+K},q_t),
-$$
+```
 
-$$
+```math
 m^{\mathrm{auth}}_{t+K}
 =U_{\mathrm{auth}}(m^{\mathrm{auth}}_t,o^{\mathrm{real}}_{t+1:t+K},
 s^{\mathrm{auth}}_{t+1:t+K},A_t).
-$$
+```
 
 $m^{\mathrm{pred}}$ 只是可回滚、带 provenance 的 speculative memory，$q_t$ 记录置信度、事件重要度或位置索引；$m^{\mathrm{auth}}$ 只能由真实观测或权威引擎状态确认。没有真实/权威分支时，就没有 $m^{\mathrm{auth}}$，不应把生成器自写的记忆改名为 ground truth。关键不是公式长短，而是四条系统不变量：
 
@@ -309,11 +309,11 @@ iWorld-Bench 的 ICML 2026 正式论文用 330K clips、2.1K 高质量样本和�
 
 若每次模型生成 $K$ 个显示帧耗时 $\Delta t$，平均 render throughput 可写成 $K/\Delta t$ FPS；但用户可能只能在整个 chunk 结束后提交一次新动作，此时 action rate 至多约为 $1/\Delta t$。端到端 latency 还包括输入采集、编码、排队、采样、解码、网络与显示：
 
-$$
+```math
 L_{\mathrm{e2e}}
 =L_{\mathrm{capture}}+L_{\mathrm{queue}}+L_{\mathrm{encode}}
 +L_{\mathrm{model}}+L_{\mathrm{decode}}+L_{\mathrm{display}}.
-$$
+```
 
 因此 24 FPS 不代表 24 Hz 动作响应，更不代表 p95 latency 小于 42 ms。**Accepted-action Hz** 只统计经过排队/限流后真正进入模型或环境的动作，不用 UI 点击率充当；**p95 input-to-first-affected-frame latency** 从动作被接受计时，到首个可归因于该动作的显示帧。公平报告还必须给出动作何时可插入、chunk 内是长按、逐帧采样还是最新值覆盖，过载时是丢弃还是合并、动作影响从哪一帧开始、是否 speculative/丢帧，以及长 rollout 中显存是否增长。
 
@@ -400,7 +400,7 @@ UniSim、DIAMOND、DreamZero、GeniWorld、WorldGym 与 World-In-World 分别从
 
 <a id="ref-8"></a>[8] [Oasis: A Universe in a Transformer](https://oasis-model.github.io/). Decart, Etched, et al. Official project report. 2024.
 
-<a id="ref-9"></a>[9] [open-oasis: Inference Script for Oasis 500M](https://github.com/etched-ai/open-oasis). Etched AI. Official code repository.
+<a id="ref-9"></a>[9] open-oasis: Inference Script for Oasis 500M [![GitHub: etched-ai/open-oasis](https://img.shields.io/badge/GitHub-etched-ai%2Fopen-oasis-181717?logo=github&logoColor=white)](https://github.com/etched-ai/open-oasis). Etched AI. Official code repository.
 
 <a id="ref-10"></a>[10] [Etched/oasis-500m](https://huggingface.co/Etched/oasis-500m). Etched. Official model repository.
 
@@ -414,7 +414,7 @@ UniSim、DIAMOND、DreamZero、GeniWorld、WorldGym 与 World-In-World 分别从
 
 <a id="ref-15"></a>[15] [Astra: General Interactive World Model with Autoregressive Denoising](https://proceedings.iclr.cc/paper_files/paper/2026/hash/7fc516909e0b90c96bcc75a16ebee6a2-Abstract-Conference.html). Yixuan Zhu, Jiaqi Feng, Wenzhao Zheng, et al. ICLR 2026.
 
-<a id="ref-16"></a>[16] [Astra](https://github.com/EternalEvan/Astra). EternalEvan et al. Official code and checkpoint repository.
+<a id="ref-16"></a>[16] Astra [![GitHub: EternalEvan/Astra](https://img.shields.io/badge/GitHub-EternalEvan%2FAstra-181717?logo=github&logoColor=white)](https://github.com/EternalEvan/Astra). EternalEvan et al. Official code and checkpoint repository.
 
 <a id="ref-17"></a>[17] [WorldPack: Dynamic Frame Compression for Long-context Video World Modeling](https://arxiv.org/abs/2512.02473). Yuta Oshima, Yusuke Iwasawa, Masahiro Suzuki, Yutaka Matsuo, Hiroki Furuta. arXiv v3. 2026.
 
@@ -428,7 +428,7 @@ UniSim、DIAMOND、DreamZero、GeniWorld、WorldGym 与 World-In-World 分别从
 
 <a id="ref-22"></a>[22] [ReWorld: An Interactive World Model with Long-Horizon Memory](https://arxiv.org/abs/2608.23565). Zhifei Chen, Luozhou Wang, Guibao Shen, et al. arXiv v1. 2026.
 
-<a id="ref-23"></a>[23] [ReWorld](https://github.com/zhifeichen097/ReWorld). Zhifei Chen et al. Official inference-code repository; core checkpoints pending at freeze date.
+<a id="ref-23"></a>[23] ReWorld [![GitHub: zhifeichen097/ReWorld](https://img.shields.io/badge/GitHub-zhifeichen097%2FReWorld-181717?logo=github&logoColor=white)](https://github.com/zhifeichen097/ReWorld). Zhifei Chen et al. Official inference-code repository; core checkpoints pending at freeze date.
 
 <a id="ref-24"></a>[24] [iWorld-Bench: A Benchmark for Interactive World Models with a Unified Action Generation Framework](https://icml.cc/virtual/2026/poster/63894). Jianjie Fang, Yingshan Lei, Qin Wan, et al. ICML 2026.
 
@@ -458,6 +458,6 @@ UniSim、DIAMOND、DreamZero、GeniWorld、WorldGym 与 World-In-World 分别从
 
 <a id="ref-37"></a>[37] [Get started with Project Genie](https://support.google.com/labs/answer/16875695). Google Labs Help. Current official access and policy page.
 
-<a id="ref-38"></a>[38] [Matrix-Game 3.0 code and checkpoints](https://github.com/SkyworkAI/Matrix-Game/tree/main/Matrix-Game-3). Skywork AI. Official repository and release surface. 2026.
+<a id="ref-38"></a>[38] Matrix-Game 3.0 code and checkpoints [![GitHub: SkyworkAI/Matrix-Game](https://img.shields.io/badge/GitHub-SkyworkAI%2FMatrix-Game-181717?logo=github&logoColor=white)](https://github.com/SkyworkAI/Matrix-Game/tree/main/Matrix-Game-3). Skywork AI. Official repository and release surface. 2026.
 
-<a id="ref-39"></a>[39] [Matrix-Game 3.5: Enhancing Real-Time Streaming Interactive World Models with Patch Memory](https://github.com/Riemann-Dynamics/Matrix-Game-3.5). Riemann Dynamics. Official code, checkpoints and project/technical-report repository. 2026.
+<a id="ref-39"></a>[39] Matrix-Game 3.5: Enhancing Real-Time Streaming Interactive World Models with Patch Memory [![GitHub: Riemann-Dynamics/Matrix-Game-3.5](https://img.shields.io/badge/GitHub-Riemann-Dynamics%2FMatrix-Game-3.5-181717?logo=github&logoColor=white)](https://github.com/Riemann-Dynamics/Matrix-Game-3.5). Riemann Dynamics. Official code, checkpoints and project/technical-report repository. 2026.

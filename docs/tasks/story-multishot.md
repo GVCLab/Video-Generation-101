@@ -65,28 +65,28 @@ Stable Video Diffusion（SVD）论文讨论的是从图像预训练到 image-to-
 
 设批大小为 $B$，计划镜头数为 $K$。全局故事输入为 token
 
-$$
+```math
 S\in\mathbb N^{B\times L_s},
-$$
+```
 
 故事 bible 为初始状态 $Z_0$，至少包含实体账本、场景账本、叙事事实和风格约束。第 $i$ 个镜头计划可写为
 
-$$
+```math
 p_i=(y_i,n_i,f_i,h_i,w_i,\tau_i,c_i,R_i,Q_i),
-$$
+```
 
 其中 $y_i$ 是镜头文本，$n_i$ 是帧数，$f_i$ 是帧率，$h_i,w_i$ 是分辨率，$\tau_i$ 是切镜/转场类型，$c_i$ 是景别、角度、运镜等控制，$R_i$ 是人物/场景/道具参考，$Q_i=(q_i^{start},q_i^{end})$ 是可选 storyboard 首尾帧对。参考图可表示为
 
-$$
+```math
 R_i\in[0,1]^{B\times N_i^r\times3\times H_r\times W_r}.
-$$
+```
 
 输出镜头与最终编辑时间线分别为
 
-$$
+```math
 X_i\in[-1,1]^{B\times n_i\times3\times h_i\times w_i},\qquad
-X=\operatorname{Edit}(X_{1:K},\tau_{2:K}).
-$$
+X=\mathrm{Edit}(X_{1:K},\tau_{2:K}).
+```
 
 若方法同时生成音频，还必须另写 $A_i\in\mathbb R^{B\times C_a\times L_i^a}$、采样率与音画对齐规则；不能把“后配音”与联合音视频生成混成同一个输出合同。UnityShots 把 opening-shot 长期记忆与前一镜头 tail 短期记忆用于多镜头音视频生成，但截至冻结日其训练代码、权重和 agent 系统仍标为待发布 [[26]](#ref-26)。
 
@@ -96,9 +96,9 @@ $$
 
 一个实用的已接受状态可以写成
 
-$$
+```math
 Z_i=(E_i,G_i,O_i,F_i,M_i,D_i,v_i),
-$$
+```
 
 其中：
 
@@ -112,10 +112,10 @@ $$
 
 部署时的逐镜头因果合同是
 
-$$
+```math
 X_i\sim p_\theta(\cdot\mid S,p_{1:K},R_{\le i},Z_{i-1}),\qquad
 Z_i=U(Z_{i-1},X_i,p_i,V_i),
-$$
+```
 
 其中验证结果 $V_i$ 必须为“接受”后才允许更新 $Z_i$。真实未来镜头像素不得进入因果系统；holistic 方法可以同时读取所有镜头 prompt 和参考，但不能把测试集未来真值当条件。论文若只说“用了 memory”而不报告存什么、保留多少、何时清除、是否 stop-gradient、拒绝样本是否写入，长程结果就无法复现。
 
@@ -291,7 +291,7 @@ flowchart TB
 - 4 个双人物故事：所有权交换、座位互换、情绪改变；
 - 4 个场景故事：开/关门、昼夜/天气变化、物体移动。
 
-每个故事都提供角色正面/侧面参考、场景参考、8 条镜头 prompt、硬切/溶解标记、景别与相机意图。把关键实体在间隔 $g\in\{1,3,6\}$ 后重新召回；每个条件运行 4 个固定 seeds。原始 prompt、编译后 prompt、负面条件、模型 commit、权重哈希和随机种子全部保存。
+每个故事都提供角色正面/侧面参考、场景参考、8 条镜头 prompt、硬切/溶解标记、景别与相机意图。把关键实体在间隔 $`g\in\lbrace1,3,6\rbrace`$ 后重新召回；每个条件运行 4 个固定 seeds。原始 prompt、编译后 prompt、负面条件、模型 commit、权重哈希和随机种子全部保存。
 
 ### 8.3 分轨比较，不强行伪装成同合同排行榜
 
@@ -341,25 +341,25 @@ flowchart TB
 
 <a id="ref-8"></a>[8] [Generating Multi-Event Videos with Text-to-Video Models](https://www.ecva.net/papers/eccv_2024/papers_ECCV/papers/06012.pdf). Weijia Wu et al. ECCV. 2024.
 
-<a id="ref-9"></a>[9] [VideoGen-of-Thought: Step-by-step Generating Multi-shot Video with Minimal Manual Intervention](https://arxiv.org/abs/2412.02259); [official repository](https://github.com/DuNGEOnmassster/VideoGen-of-Thought); [NextVid workshop oral](https://neurips.cc/virtual/2025/131787). Mingzhe Zheng et al. arXiv / NeurIPS NextVid Workshop. 2024–2025.
+<a id="ref-9"></a>[9] [VideoGen-of-Thought: Step-by-step Generating Multi-shot Video with Minimal Manual Intervention](https://arxiv.org/abs/2412.02259); official repository [![GitHub: DuNGEOnmassster/VideoGen-of-Thought](https://img.shields.io/badge/GitHub-DuNGEOnmassster%2FVideoGen-of-Thought-181717?logo=github&logoColor=white)](https://github.com/DuNGEOnmassster/VideoGen-of-Thought); [NextVid workshop oral](https://neurips.cc/virtual/2025/131787). Mingzhe Zheng et al. arXiv / NeurIPS NextVid Workshop. 2024–2025.
 
 <a id="ref-10"></a>[10] [ShotAdapter: Text-to-Multi-Shot Video Generation with Diffusion Models](https://openaccess.thecvf.com/content/CVPR2025/html/Kara_ShotAdapter_Text-to-Multi-Shot_Video_Generation_with_Diffusion_Models_CVPR_2025_paper.html); [project page](https://shotadapter.github.io/). Ozgur Kara et al. CVPR. 2025.
 
 <a id="ref-11"></a>[11] [Corgi: Cached Memory Guided Video Generation for Multi-Scene Long Video](https://openaccess.thecvf.com/content/WACV2025/html/Wu_Corgi_Cached_Memory_Guided_Video_Generation_WACV_2025_paper.html). Jianzong Wu et al. WACV. 2025.
 
-<a id="ref-12"></a>[12] [EchoShot: Multi-Shot Portrait Video Generation](https://proceedings.neurips.cc/paper_files/paper/2025/hash/1fe6f635fe265292aba3987b5123ae3d-Abstract-Conference.html); [official repository](https://github.com/D2I-ai/EchoShot). NeurIPS. 2025.
+<a id="ref-12"></a>[12] [EchoShot: Multi-Shot Portrait Video Generation](https://proceedings.neurips.cc/paper_files/paper/2025/hash/1fe6f635fe265292aba3987b5123ae3d-Abstract-Conference.html); official repository [![GitHub: D2I-ai/EchoShot](https://img.shields.io/badge/GitHub-D2I-ai%2FEchoShot-181717?logo=github&logoColor=white)](https://github.com/D2I-ai/EchoShot). NeurIPS. 2025.
 
 <a id="ref-13"></a>[13] [CineTrans: Towards Cinematic Text-to-Video Generation via Multi-Shot Transition](https://arxiv.org/abs/2508.11484). arXiv. 2025.
 
 <a id="ref-14"></a>[14] [AnimeShooter: A Unified Framework for Story-to-Anime Video Generation](https://arxiv.org/abs/2506.03126). arXiv. 2025.
 
-<a id="ref-15"></a>[15] [HoloCine: Holistic Generation of Cinematic Multi-Shot Long Video Narratives](https://openaccess.thecvf.com/content/CVPR2026/html/Meng_HoloCine_Holistic_Generation_of_Cinematic_Multi-Shot_Long_Video_Narratives_CVPR_2026_paper.html); [official repository](https://github.com/yihao-meng/HoloCine). Yihao Meng et al. CVPR. 2026.
+<a id="ref-15"></a>[15] [HoloCine: Holistic Generation of Cinematic Multi-Shot Long Video Narratives](https://openaccess.thecvf.com/content/CVPR2026/html/Meng_HoloCine_Holistic_Generation_of_Cinematic_Multi-Shot_Long_Video_Narratives_CVPR_2026_paper.html); official repository [![GitHub: yihao-meng/HoloCine](https://img.shields.io/badge/GitHub-yihao-meng%2FHoloCine-181717?logo=github&logoColor=white)](https://github.com/yihao-meng/HoloCine). Yihao Meng et al. CVPR. 2026.
 
 <a id="ref-16"></a>[16] [OneStory: Coherent Multi-Shot Video Generation with Adaptive Memory](https://openaccess.thecvf.com/content/CVPR2026/html/An_OneStory_Coherent_Multi-Shot_Video_Generation_with_Adaptive_Memory_CVPR_2026_paper.html); [project page](https://zhaochongan.github.io/projects/OneStory/). Chongan An et al. CVPR. 2026.
 
-<a id="ref-17"></a>[17] [MultiShotMaster: A Controllable Multi-Shot Video Generation Framework](https://openaccess.thecvf.com/content/CVPR2026/html/Wang_MultiShotMaster_A_Controllable_Multi-Shot_Video_Generation_Framework_CVPR_2026_paper.html); [official repository](https://github.com/KlingAIResearch/MultiShotMaster); [official weights](https://huggingface.co/KlingTeam/MultiShotMaster). Xiaoyan Wang et al. CVPR. 2026.
+<a id="ref-17"></a>[17] [MultiShotMaster: A Controllable Multi-Shot Video Generation Framework](https://openaccess.thecvf.com/content/CVPR2026/html/Wang_MultiShotMaster_A_Controllable_Multi-Shot_Video_Generation_Framework_CVPR_2026_paper.html); official repository [![GitHub: KlingAIResearch/MultiShotMaster](https://img.shields.io/badge/GitHub-KlingAIResearch%2FMultiShotMaster-181717?logo=github&logoColor=white)](https://github.com/KlingAIResearch/MultiShotMaster); [official weights](https://huggingface.co/KlingTeam/MultiShotMaster). Xiaoyan Wang et al. CVPR. 2026.
 
-<a id="ref-18"></a>[18] [STAGE: Storyboard-Anchored Generation for Cinematic Multi-shot Narrative](https://openaccess.thecvf.com/content/CVPR2026/html/Zhang_STAGE_Storyboard-Anchored_Generation_for_Cinematic_Multi-shot_Narrative_CVPR_2026_paper.html); [official repository](https://github.com/escapistmost/Storyboard-Anchored-Generation). Peixuan Zhang et al. CVPR. 2026.
+<a id="ref-18"></a>[18] [STAGE: Storyboard-Anchored Generation for Cinematic Multi-shot Narrative](https://openaccess.thecvf.com/content/CVPR2026/html/Zhang_STAGE_Storyboard-Anchored_Generation_for_Cinematic_Multi-shot_Narrative_CVPR_2026_paper.html); official repository [![GitHub: escapistmost/Storyboard-Anchored-Generation](https://img.shields.io/badge/GitHub-escapistmost%2FStoryboard-Anchored-Generation-181717?logo=github&logoColor=white)](https://github.com/escapistmost/Storyboard-Anchored-Generation). Peixuan Zhang et al. CVPR. 2026.
 
 <a id="ref-19"></a>[19] [ConStoryBoard official dataset](https://huggingface.co/datasets/escapist413/ConStoryBoard); [STAGE official model](https://huggingface.co/escapist413/STAGE). STAGE authors. 2026.
 
@@ -367,21 +367,21 @@ flowchart TB
 
 <a id="ref-21"></a>[21] [DreamShot: Personalized Storyboard Synthesis with Video Diffusion Prior](https://openaccess.thecvf.com/content/CVPR2026/html/Huang_DreamShot_Personalized_Storyboard_Synthesis_with_Video_Diffusion_Prior_CVPR_2026_paper.html). CVPR. 2026.
 
-<a id="ref-22"></a>[22] [StoryMem: Multi-shot Long Video Storytelling with Memory](https://arxiv.org/abs/2512.19539); [official repository](https://github.com/Kevin-thu/StoryMem); [official weights](https://huggingface.co/Kevin-thu/StoryMem). Kaiwen Zhang et al. arXiv. 2025.
+<a id="ref-22"></a>[22] [StoryMem: Multi-shot Long Video Storytelling with Memory](https://arxiv.org/abs/2512.19539); official repository [![GitHub: Kevin-thu/StoryMem](https://img.shields.io/badge/GitHub-Kevin-thu%2FStoryMem-181717?logo=github&logoColor=white)](https://github.com/Kevin-thu/StoryMem); [official weights](https://huggingface.co/Kevin-thu/StoryMem). Kaiwen Zhang et al. arXiv. 2025.
 
-<a id="ref-23"></a>[23] [ShotStream: Streaming Multi-Shot Video Generation for Interactive Storytelling](https://arxiv.org/abs/2603.25746); [official repository](https://github.com/KlingAIResearch/ShotStream); [official weights](https://huggingface.co/KlingTeam/ShotStream). Yawen Luo et al. ECCV 2026 accepted / arXiv. 2026.
+<a id="ref-23"></a>[23] [ShotStream: Streaming Multi-Shot Video Generation for Interactive Storytelling](https://arxiv.org/abs/2603.25746); official repository [![GitHub: KlingAIResearch/ShotStream](https://img.shields.io/badge/GitHub-KlingAIResearch%2FShotStream-181717?logo=github&logoColor=white)](https://github.com/KlingAIResearch/ShotStream); [official weights](https://huggingface.co/KlingTeam/ShotStream). Yawen Luo et al. ECCV 2026 accepted / arXiv. 2026.
 
 <a id="ref-24"></a>[24] [CausalCine: Causal Streaming Multi-Shot Video Generation via In-Context Directing](https://arxiv.org/abs/2605.12496); [project page](https://yihao-meng.github.io/CausalCine/). arXiv. 2026.
 
 <a id="ref-25"></a>[25] [CineWeaver: Cinematic Narrative Synthesis via Training-Free Multi-Shot Video Generation](https://arxiv.org/abs/2607.26529); [project page](https://cineweaver.github.io/). arXiv. 2026.
 
-<a id="ref-26"></a>[26] [UnityShots: Unified Multi-shot Audio-Video Generation](https://arxiv.org/abs/2606.21661); [official repository](https://github.com/JIA-Lab-research/UnityShots). arXiv. 2026.
+<a id="ref-26"></a>[26] [UnityShots: Unified Multi-shot Audio-Video Generation](https://arxiv.org/abs/2606.21661); official repository [![GitHub: JIA-Lab-research/UnityShots](https://img.shields.io/badge/GitHub-JIA-Lab-research%2FUnityShots-181717?logo=github&logoColor=white)](https://github.com/JIA-Lab-research/UnityShots). arXiv. 2026.
 
-<a id="ref-27"></a>[27] [MuSS: A Large-Scale Dataset and Cinematic Narrative Benchmark for Multi-Shot Subject-to-Video Generation](https://arxiv.org/abs/2604.23789); [official repository](https://github.com/zhang-haojie/MuSS). Haojie Zhang et al. arXiv. 2026.
+<a id="ref-27"></a>[27] [MuSS: A Large-Scale Dataset and Cinematic Narrative Benchmark for Multi-Shot Subject-to-Video Generation](https://arxiv.org/abs/2604.23789); official repository [![GitHub: zhang-haojie/MuSS](https://img.shields.io/badge/GitHub-zhang-haojie%2FMuSS-181717?logo=github&logoColor=white)](https://github.com/zhang-haojie/MuSS). Haojie Zhang et al. arXiv. 2026.
 
 <a id="ref-28"></a>[28] [MSVBench: Benchmarking Multi-Shot Video Generation](https://arxiv.org/abs/2602.23969). arXiv. 2026.
 
-<a id="ref-29"></a>[29] [EntityBench: Benchmarking Long-Horizon Entity Consistency in Multi-Shot Video Generation](https://arxiv.org/abs/2605.15199); [official repository](https://github.com/Catherine-R-He/EntityBench/). arXiv. 2026.
+<a id="ref-29"></a>[29] [EntityBench: Benchmarking Long-Horizon Entity Consistency in Multi-Shot Video Generation](https://arxiv.org/abs/2605.15199); official repository [![GitHub: Catherine-R-He/EntityBench](https://img.shields.io/badge/GitHub-Catherine-R-He%2FEntityBench-181717?logo=github&logoColor=white)](https://github.com/Catherine-R-He/EntityBench/). arXiv. 2026.
 
 <a id="ref-30"></a>[30] [PersonaShot: Evaluating Physical, Affective, and Cinematic Continuity in Multi-Shot Character-Centric Video](https://arxiv.org/abs/2608.16717). arXiv. 2026.
 

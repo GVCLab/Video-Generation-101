@@ -16,19 +16,19 @@
 
 把动态场景写成可查询函数：
 
-$$
+```math
 I_{v,t}=\mathcal R(S_t,K_v),
-$$
+```
 
 其中 $S_t$ 是世界在时间 $t$ 的状态，$K_v$ 是相机内外参，$\mathcal R$ 是成像或渲染过程。观测集合与目标集合分别是：
 
-$$
+```math
 \mathcal Q_{\mathrm{obs}}
 =\{(I_i,K_i,t_i)\}_{i=1}^{M},
 \qquad
 \mathcal Q_{\mathrm{tar}}
 =\{(K_j,t_j)\}_{j=1}^{N}.
-$$
+```
 
 系统可以直接预测目标像素，也可以先构建可渲染状态 $\hat S_t$ 再查询。二者的输出外观可能相似，证据强度却不同。
 
@@ -68,11 +68,11 @@ $$
 
 对一个像素轨迹，模型可以解释为相机移动、物体移动、深度变化，或几者组合。若相机外参未知，成像约束近似为：
 
-$$
+```math
 \tilde p_{i,t}
 \sim
 K_i[R_{i,t}\mid T_{i,t}]X_t.
-$$
+```
 
 只看 2D 重建误差，错误的相机和错误的物体运动可能互相抵消。4DiM 通过 metric-scale pose conditioning 明确相机接口；GenXD 则用空间与时间模块分离相机和对象运动 [[8]](#ref-8), [[10]](#ref-10)。
 
@@ -141,7 +141,7 @@ D-NeRF 把时间映射到 canonical NeRF 的形变，Nerfies 用弹性正则稳�
 
 典型管线是：
 
-$$
+```math
 \text{monocular input}
 \rightarrow
 \text{novel-view / novel-time samples}
@@ -149,7 +149,7 @@ $$
 \hat S_{1:T}
 \rightarrow
 \mathcal R(\hat S_t,K_v).
-$$
+```
 
 Consistent4D 从单目视频优化 cascade DyNeRF，并用插值一致性约束时间；CAT4D 则训练 multi-view video diffusion，先补出 $V\times T$ 观测，再优化 deformable 3D Gaussian [[4]](#ref-4), [[13]](#ref-13)。Free4D、DimensionX 与 GenMOJO 分别探索免微调单图场景、空间/时间解耦生成和多物体遮挡分解 [[18]](#ref-18), [[19]](#ref-19), [[16]](#ref-16)。
 
@@ -159,14 +159,14 @@ Consistent4D 从单目视频优化 cascade DyNeRF，并用插值一致性约束�
 
 这一路线直接学习：
 
-$$
+```math
 p_\theta\!\left(
 I^{\mathrm{tar}}
 \mid
 I^{\mathrm{cond}},K^{\mathrm{cond}},t^{\mathrm{cond}},
 K^{\mathrm{tar}},t^{\mathrm{tar}}
 \right).
-$$
+```
 
 4DiM 混合使用带 pose 的 3D 数据、带 pose+time 的 4D 数据和无 pose 视频；GenXD 以 masked latent conditions 支持可变数量条件视图；SV4D 与 SV4D 2.0 在 view attention 和 frame attention 之间建立联合生成 [[8]](#ref-8)–[[10]](#ref-10), [[17]](#ref-17)。4Real-Video 把目标进一步推进到 generalizable photorealistic 4D video diffusion，而不是每个场景都从头优化 [[14]](#ref-14)。
 
@@ -197,11 +197,11 @@ MAV3D 首次把 text-to-video diffusion 的 score distillation 用于 dynamic Ne
 
 令 canonical 状态为 $S_c$，形变为 $D_t$：
 
-$$
+```math
 X_t=D_t(X_c),
 \qquad
 I_{v,t}=\mathcal R(D_t(S_c),K_v).
-$$
+```
 
 优点是身份与几何可跨时间复用；缺点是 topology change、显隐和大形变会使一一对应失效。分段 canonical、lifespan/opacity 和 residual birth/death 变量是在放松同一假设，不应被隐藏在“4DGS”总称里。
 
@@ -209,10 +209,10 @@ $$
 
 也可以直接表示 $F(x,y,z,t)$，或让 Gaussian 参数随时间变化：
 
-$$
+```math
 g_i(t)=
 \{\mu_i(t),\Sigma_i(t),\alpha_i(t),c_i(t)\}.
-$$
+```
 
 这允许时间依赖的空间、形状、透明度与外观。4D-GS 使用 4D neural voxels 生成 Gaussian deformation；4C4D 在极稀疏四相机条件下针对 geometry/appearance 梯度失衡设计 opacity decay [[5]](#ref-5), [[21]](#ref-21)。表示可微、可渲染，不意味着表面是 watertight，也不意味着同一 Gaussian 对应真实物质点。
 
@@ -300,13 +300,13 @@ FV4D、FVD 或论文自定义 learned metric 可以做诊断，但必须给出 e
 
 ### 6.3 速度必须拆成构建与查询
 
-$$
+```math
 T_{\mathrm{end\mbox{-}to\mbox{-}end}}
 =T_{\mathrm{pose}}
 +T_{\mathrm{generation}}
 +T_{\mathrm{reconstruction}}
 +T_{\mathrm{render/query}}.
-$$
+```
 
 4D-GS 的实时结果是训练后渲染；4DStreamCtrl 的 20 FPS 是作者协议下的流式视频生成；二者不是同一 SLO [[5]](#ref-5), [[29]](#ref-29)。报告应同时给出首次可见结果、scene build time、单查询/批查询延迟、分辨率、硬件、包含/排除的解码步骤和长尾。
 

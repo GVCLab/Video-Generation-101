@@ -48,11 +48,11 @@
 如果来源或重复簇 $s$ 贡献 $m_s$ 个高度相关 clips，令
 $p_s=m_s/\sum_r m_r$。可用“有效来源 / 重复簇数”诊断集中度：
 
-$$
+```math
 N_{\mathrm{eff,source}}
 =\frac{1}{\sum_s p_s^2}
 =\frac{\left(\sum_s m_s\right)^2}{\sum_s m_s^2}.
-$$
+```
 
 这只是来源集中度诊断，不是对“独立训练样本数”的估计。报告它时还应同时给出唯一来源数、重复簇数，以及每个来源或簇贡献 clips 的分位数；否则 70M rows 仍可能主要来自少量长视频的重复切分。
 本页公式统一采用 [GitHub 支持的 dollar-delimited math syntax](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/writing-mathematical-expressions)。
@@ -299,9 +299,9 @@ VideoDPO [[21]](#ref-21)、VideoAlign [[22]](#ref-22) 与 MJ-VIDEO [[23]](#ref-2
 
 若缺 action timing 与坐标定义，视频最多支持被动预测，不能支持严谨的动作干预：
 
-$$
+```math
 p(s_{t+1}\mid s_{\le t}, a_t, e, \Delta t),
-$$
+```
 
 其中 $e$ 是 embodiment，$\Delta t$ 是真实控制间隔。把自然语言“向左移动”当成标定连续控制，会把 action fidelity 变成语义 plausibility。
 
@@ -418,11 +418,11 @@ source record
 
 对来源 $i$ 的采样概率可写成：
 
-$$
+```math
 p_i=\frac{w_iN_i^\alpha}{\sum_j w_jN_j^\alpha},\qquad 0\le\alpha\le1,
-$$
+```
 
-其中 $N_i$ 是符合条件的样本或 token 量，$\alpha<1$ 防止最大来源垄断，$w_i$ 表示任务覆盖、质量、权利完备度和失败反馈。不要把 $w_i$ 简化成审美分数。
+其中 $N_i$ 是符合条件的样本或 token 量，$`\alpha\lt1`$ 防止最大来源垄断，$w_i$ 表示任务覆盖、质量、权利完备度和失败反馈。不要把 $w_i$ 简化成审美分数。
 
 同时披露：
 

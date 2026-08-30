@@ -19,16 +19,16 @@
 
 给定参考图像
 
-$$
+```math
 I_{\mathrm{ref}}\in[0,1]^{B\times3\times H\times W},
-$$
+```
 
 可选文本 $c_{\mathrm{text}}$、运动控制 $c_{\mathrm{motion}}$、相机控制 $c_{\mathrm{cam}}$ 和音频 $c_{\mathrm{audio}}$，I2V 学习条件分布
 
-$$
+```math
 p_\theta(X_{0:F-1}\mid I_{\mathrm{ref}},c_{\mathrm{text}},
 c_{\mathrm{motion}},c_{\mathrm{cam}},c_{\mathrm{audio}}),
-$$
+```
 
 其中 $X\in[0,1]^{B\times F\times3\times H\times W}$，并且合同声明 $I_{\mathrm{ref}}$ 对应某个已知时间索引，最常见是 $X_0$。若输入图只提供人物外观、画风或产品身份，却不要求成为视频中的实际帧，则更准确的名字是 **reference-to-video**，而不是严格首帧 I2V；当参考用于定义测试时未见主体、输出使用新场景与新时间轴时，进入[开放集视频个性化](personalized-video-generation.md)的身份—运动合同。
 
@@ -89,26 +89,26 @@ flowchart TD
 
 训练样本通常是
 
-$$
+```math
 X\in[0,1]^{B\times F\times3\times H\times W},
 \qquad I_{\mathrm{ref}}=X_{:,a},
-$$
+```
 
 其中 $a$ 是锚点索引。时空 VAE 得到
 
-$$
+```math
 Z_0=E_v(X)\in\mathbb R^{B\times f\times C\times h\times w},
 \qquad Z_I=E_i(I_{\mathrm{ref}})\in\mathbb R^{B\times1\times C_I\times h\times w}.
-$$
+```
 
 $f$ 不一定等于 $F$：若 VAE 在时间上压缩，RGB 的“第一帧”可能影响一个 latent 时间块。模型文档必须写出时间压缩率、padding 和首帧对齐方式，否则所谓硬锚点可能在解码后扩散到数帧。
 
 扩散训练常构造
 
-$$
+```math
 Z_t=\alpha_tZ_0+\sigma_t\epsilon,
 \qquad \epsilon\sim\mathcal N(0,I),
-$$
+```
 
 并预测噪声、速度或 flow-matching velocity。核心不是损失名字，而是**哪个条件在什么噪声状态进入网络**。Step-Video-TI2V 把单帧条件编码成 $Z_c\in\mathbb R^{1\times C\times h\times w}$，在时间维补零后与视频 latent 通道拼接，得到送入 DiT 的 $f\times2C\times h\times w$ 条件输入；这是可复核的 tensor 合同，不等于所有 I2V 都必须如此 [[20]](#ref-20)。
 
@@ -118,9 +118,9 @@ $$
 
 | 条件 | 一个可执行的形状示例 | 必须冻结的语义 |
 |---|---|---|
-| 已知图像/关键帧 | $I\in[0,1]^{B\times K\times3\times H\times W}$，索引 $\tau\in\{0,\ldots,F-1\}^{B\times K}$，有效位 $M_I\in\{0,1\}^{B\times K}$ | $\tau$ 对应 RGB 还是 latent 时间；像素/latent/软锚定；多个锚点冲突规则 |
-| 文本 | $C_T\in\mathbb R^{B\times L\times D}$，token mask $M_T\in\{0,1\}^{B\times L}$ | encoder/tokenizer 版本、原 prompt 与改写 prompt、negative prompt |
-| 点轨迹 | $P\in\mathbb R^{B\times F\times N\times d}$，$d=2$ 或 $3$；可见位 $V\in\{0,1\}^{B\times F\times N}$ | pixel/归一化/相机/世界坐标；遮挡含义；插值与 FPS |
+| 已知图像/关键帧 | $I\in[0,1]^{B\times K\times3\times H\times W}$，索引 $`\tau\in\lbrace0,\ldots,F-1\rbrace^{B\times K}`$，有效位 $`M_I\in\lbrace0,1\rbrace^{B\times K}`$ | $\tau$ 对应 RGB 还是 latent 时间；像素/latent/软锚定；多个锚点冲突规则 |
+| 文本 | $C_T\in\mathbb R^{B\times L\times D}$，token mask $`M_T\in\lbrace0,1\rbrace^{B\times L}`$ | encoder/tokenizer 版本、原 prompt 与改写 prompt、negative prompt |
+| 点轨迹 | $P\in\mathbb R^{B\times F\times N\times d}$，$d=2$ 或 $3$；可见位 $`V\in\lbrace0,1\rbrace^{B\times F\times N}`$ | pixel/归一化/相机/世界坐标；遮挡含义；插值与 FPS |
 | 稠密 flow | $U\in\mathbb R^{B\times(F-1)\times2\times H\times W}$，遮挡 $O$ | $x_t\rightarrow x_{t+1}$ 还是反向；resize 后向量缩放；未知区域 |
 | 姿态/骨架 | $J\in\mathbb R^{B\times F\times N_J\times d}$，置信度 $Q_J$ | joint 定义、root/相机坐标、缺失点、驱动频率 |
 | 相机 | 外参 $T_{wc}\in SE(3)^{B\times F}$、内参 $K_c\in\mathbb R^{B\times F\times3\times3}$，或 Plücker rays $R\in\mathbb R^{B\times F\times6\times h\times w}$ | world-to-camera/camera-to-world、左右手系、长度单位、参考 pose、畸变 |
@@ -128,11 +128,11 @@ $$
 
 Audio-driven I2V 的合同是 $p(X\mid I,A_{\mathrm{in}},\ldots)$：音频已知，只驱动画面。原生联合音视频则生成新的 $A_{\mathrm{out}}$：
 
-$$
+```math
 p_\theta(X,A_{\mathrm{out}}\mid I,c_{\mathrm{text}},c_{\mathrm{motion}},c_{\mathrm{cam}}),
 \qquad
 A_{\mathrm{out}}\in\mathbb R^{B\times C_a\times S}.
-$$
+```
 
 两者不能都用一个含糊的 $c_{\mathrm{audio}}$ 表示。若视频 codec 有时间压缩，关键帧 mask、轨迹和音频时间戳还要先映射到 latent/chunk 时间轴，而不是按数组长度硬对齐。
 
@@ -186,11 +186,11 @@ flowchart TB
 
 一个常见的联合 guidance 写法是
 
-$$
+```math
 \tilde v = v(\varnothing,\varnothing)
 +s_I\big[v(I,\varnothing)-v(\varnothing,\varnothing)\big]
 +s_T\big[v(I,T)-v(I,\varnothing)\big].
-$$
+```
 
 这里三次预测的条件状态必须和训练 dropout 一致。把图像也从“无文本分支”中移除，会同时改变身份和文本 guidance 的语义；不同论文的 $s_I,s_T$ 不能只看数值横比。
 
@@ -464,4 +464,4 @@ HPSD 则不是新的输出任务，而是 2026 的训练策略：teacher 在 TI2
 
 <a id="ref-33"></a>[33] [I2V-Adapter: A General Image-to-Video Adapter for Diffusion Models](https://arxiv.org/abs/2312.16693). Xun Guo, Mingwu Zheng, Liang Hou, Yuan Gao, Yufan Deng, et al. arXiv preprint. 2023.
 
-<a id="ref-34"></a>[34] [LTX-2: Efficient Joint Audio-Visual Foundation Model](https://arxiv.org/abs/2601.03233). Yoav HaCohen, Benny Brazowski, Nisan Chiprut, et al. arXiv preprint. 2026. [Official versioned code and weight repository](https://github.com/Lightricks/LTX-2).
+<a id="ref-34"></a>[34] [LTX-2: Efficient Joint Audio-Visual Foundation Model](https://arxiv.org/abs/2601.03233). Yoav HaCohen, Benny Brazowski, Nisan Chiprut, et al. arXiv preprint. 2026. Official versioned code and weight repository [![GitHub: Lightricks/LTX-2](https://img.shields.io/badge/GitHub-Lightricks%2FLTX-2-181717?logo=github&logoColor=white)](https://github.com/Lightricks/LTX-2).

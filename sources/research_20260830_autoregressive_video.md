@@ -29,29 +29,29 @@
 
 本次采用以下局部术语：
 
-$$
+```math
 \text{strict AR}:
 \quad
 p(y_{1:N}\mid c)
 =
 \prod_{i=1}^{N}
 p(y_i\mid y_{<i},c),
-$$
+```
 
-$$
+```math
 \text{block / set AR}:
 \quad
 p(Y_{1:K}\mid c)
 =
 \prod_{k=1}^{K}
 p(Y_k\mid Y_{<k},c).
-$$
+```
 
 第二式不保证 $Y_k$ 内部也是 fixed-order next-token；它可能由双向 attention、masked refinement、discrete diffusion 或 continuous diffusion 联合/并行生成。
 
 本次把系统拆成五列：
 
-$$
+```math
 \text{representation}
 \times
 \text{factorization}
@@ -61,7 +61,7 @@ $$
 \text{backbone}
 \times
 \text{deployment}.
-$$
+```
 
 其中 commit unit 是 factorization 与 deployment 之间的关键接口：只有已经确定、不再被当前单元内部迭代改写的输出，才可安全成为下一单元的因果历史。
 
@@ -158,31 +158,31 @@ site:openaccess.thecvf.com "Taming Teacher Forcing" OR
 
 MAR/NOVA：
 
-$$
+```math
 h_i=F_\theta(x_{<i},c),
-$$
+```
 
-$$
+```math
 \mathcal L
 =
 \mathbb E
 \left\|
 \epsilon-D_\phi(x_i^\tau,\tau,h_i)
 \right\|^2.
-$$
+```
 
 这里 $D_\phi$ 是为一个连续 token 条件密度服务的小 denoising head。外层 Transformer 产生 $h_i$，内层做 $D$ 次小 head evaluation。
 
 CausVid/Self Forcing 类：
 
-$$
+```math
 \hat B_k
 =
-\operatorname{VideoDenoise}_\theta
+\mathrm{VideoDenoise}_\theta
 \left(
 z_k;\hat B_{<k},c
 \right),
-$$
+```
 
 每个 frame/chunk 内部调用的是完整或主要视频 denoising backbone。两者都有 data-time commit 与 noise-time NFE，但网络调用大小和 cache 行为不同。
 
@@ -190,20 +190,20 @@ $$
 
 NOVA 正式摘要明确使用 temporal frame-by-frame 与 spatial set-by-set。方法层可表示为：
 
-$$
+```math
 p(\mathbf S_{1:F}\mid c)
 =
 \prod_f
 p(\mathbf S_f\mid\mathbf S_{<f},c),
-$$
+```
 
-$$
+```math
 p(\mathbf S_f\mid\mathbf S_{<f},c)
 =
 \prod_k
 p(\mathbf S_{f,k}\mid
 \mathbf S_{f,<k},\mathbf S_{<f},c).
-$$
+```
 
 官方 repo 又分别暴露 num_inference_steps 与 num_diffusion_steps。前者是 AR/set 提交轮次，后者是 per-token diffusion head 的内部步数；不能合并为一个 NFE 数。
 
@@ -229,13 +229,13 @@ ICLR 2026 正式摘要同时给出：
 
 因此教材写为：
 
-$$
+```math
 \text{discrete representation}
 \times
 \text{frame-level outer AR}
 \times
 \text{within-frame discrete diffusion}.
-$$
+```
 
 “不是 strict next-token AR”不是贬义判断，而是对其并行化贡献的准确描述。
 
@@ -259,23 +259,23 @@ Self Forcing 同时使用 few-step model 与 stochastic gradient truncation；�
 
 strict token AR 若每一步重算长度 $i$ 的完整前缀，仅 attention 累计工作为
 
-$$
+```math
 \sum_{i=1}^{N}O(i^2)=O(N^3).
-$$
+```
 
 有 KV cache 时，每步新 query 对历史 key 的工作为
 
-$$
+```math
 \sum_{i=1}^{N}O(i)=O(N^2).
-$$
+```
 
 这是 attention 部分的渐近式，不含 MLP、projection、kernel launch 与 bandwidth。缓存没有消除 $N$ 次 commit 依赖。
 
 保存全部历史的 KV 内存近似
 
-$$
+```math
 O(LN_{\mathrm{hist}}d_{\mathrm{KV}}b).
-$$
+```
 
 block/frame/chunk AR 中，clean committed history 可缓存；当前 noisy 或 masked unit 在各 refinement/denoising round 中会变化，通常不能直接永久缓存。
 

@@ -8,12 +8,12 @@
 
 给定相同历史 $h=x_{1:C}$，真实世界可能出现多个合理未来 $y=x_{C+1:K}$。本章研究
 
-$$
+```math
 p_\theta(y\mid h,c)
 =
 \int p_\theta(y\mid h,c,z)
 p_\psi(z\mid h,c)\,\mathrm dz,
-$$
+```
 
 其中 $c$ 可包含合法动作、语言或目标，$z$ 表达历史和条件仍未唯一决定的未来因素。训练时可以用真实未来形成 posterior $q_\phi(z\mid h,y,c)$；部署时未来尚不存在，只能从 $p_\psi(z\mid h,c)$ 采样。固定标准先验是 $p_\psi$ 的特例；图 1 展示的是信息利用更充分的 learned-prior 版本。
 
@@ -71,21 +71,21 @@ flowchart LR
 
 VAE 用 $q_\phi(z\mid x)$ 近似通常不可直接计算的 $p_\theta(z\mid x)$ [[1]](#ref-1)：
 
-$$
+```math
 \log p_\theta(x)
 \ge
 \underbrace{\mathbb E_{q_\phi(z\mid x)}
 [\log p_\theta(x\mid z)]}_{\text{distortion / 解释观测}}
 -
 \underbrace{D_{\mathrm{KL}}[q_\phi(z\mid x)\Vert p(z)]}_{\text{rate / 使 prior 可采样}}.
-$$
+```
 
 对角 Gaussian 常用重参数化
 
-$$
+```math
 z=\mu_\phi(x)+\sigma_\phi(x)\odot\epsilon,
 \qquad \epsilon\sim\mathcal N(0,I).
-$$
+```
 
 这只是可微采样技巧。ELBO 不是视觉质量分数；Gaussian likelihood 的均值预测可能平均多个 mode；KL 非零也不证明 decoder 使用了对任务有意义的 $z$。
 
@@ -93,26 +93,26 @@ $$
 
 一种通用顺序模型写成
 
-$$
+```math
 p_\theta(y,z\mid h,c)
 =
 \prod_{t=C+1}^{K}
 p_\psi(z_t\mid z_{<t},x_{<t},c)
 p_\theta(x_t\mid x_{<t},z_{\le t},c),
-$$
+```
 
 训练 posterior 则是
 
-$$
+```math
 q_\phi(z\mid h,y,c)
 =
 \prod_{t=C+1}^{K}
 q_\phi(z_t\mid z_{<t},x_{\le t},c).
-$$
+```
 
 对应条件 ELBO：
 
-$$
+```math
 \mathcal L_{\mathrm{ELBO}}
 =
 \sum_{t=C+1}^{K}
@@ -125,7 +125,7 @@ D_{\mathrm{KL}}
 \Vert
 p_\psi(z_t\mid z_{<t},x_{<t},c)
 \right].
-$$
+```
 
 VRNN 给出逐步 latent 的通用序列框架 [[2]](#ref-2)；SV2P 将其用于多未来视频预测 [[3]](#ref-3)；SVG-LP 的关键推进是让部署 prior 显式随历史变化 [[4]](#ref-4)。
 
@@ -133,14 +133,14 @@ VRNN 给出逐步 latent 的通用序列框架 [[2]](#ref-2)；SV2P 将其用于
 
 实践常优化
 
-$$
+```math
 \mathcal J
 =
 \mathbb E_q\log p_\theta(y\mid h,z,c)
 -\beta D_{\mathrm{KL}}(q\Vert p)
 -\lambda_{\mathrm{adv}}\ell_{\mathrm{adv}}
 -\lambda_{\mathrm{aux}}\ell_{\mathrm{aux}},
-$$
+```
 
 其中 $\ell_{\mathrm{adv}}$ 与 $\ell_{\mathrm{aux}}$ 按“待最小化 loss”定义；若文献把它们定义成 reward，符号应相反。
 
@@ -332,7 +332,7 @@ flowchart TB
 
 **SV2P** 的价值是承认给定同一过去时未来多峰，并让 posterior 在训练解释实际未来；其 fixed $N(0,I)$ prior 简单，却容易与聚合 posterior 错配。论文图 6 从 100 个样本中按最高 PSNR 选择 oracle 样本，并报告该样本的 PSNR/SSIM；这只能回答“样本集合里是否有一个接近记录真值”，不能分别把两项都解释成校准指标。
 
-**SVG-LP** 将 $p(z_t)$ 改为 $p(z_t\mid x_{<t})$，让历史改变未来 latent 分布。它把 deterministic path 与 stochastic residual 接在逐步预测上，但 teacher-forced 对齐不保证 long open-loop prior 仍校准。
+**SVG-LP** 将 $p(z_t)$ 改为 $`p(z_t\mid x_{\lt t})`$，让历史改变未来 latent 分布。它把 deterministic path 与 stochastic residual 接在逐步预测上，但 teacher-forced 对齐不保证 long open-loop prior 仍校准。
 
 **SAVP** 为 prior sample 加 video discriminator，尝试同时保留 VAE coverage 与 GAN sharpness。论文还展示远超训练 future=10 的长 rollout；这类质性外推可用于发现失败，不能当作 500-step 定量保证。
 
@@ -384,21 +384,21 @@ LPWM 在 2026 重新把显式 stochastic ELBO、对象粒子和 latent action �
 
 设 $d(\hat y,y)$ 越小越好：
 
-$$
+```math
 \text{Avg}_K=\frac1K\sum_{k=1}^K d(\hat y^{(k)},y),
 \qquad
 \text{Best}_K=\min_{1\le k\le K}d(\hat y^{(k)},y).
-$$
+```
 
 $\text{Best}_K$ 随 $K$ 增大天然更容易改善；它不是 proper scoring rule，可能奖励过宽或带噪分布。最低限度同时报告：single sample、sample-average、best-of-$K$ 及 $K$、posterior oracle、完整样本集的 distributional score。
 
 ### 8.2 事件级 proper score
 
-对可枚举事件 $m\in\{1,\ldots,M\}$，模型概率为 $\pi$，真实 one-hot 为 $o$，Brier score：
+对可枚举事件 $`m\in\lbrace1,\ldots,M\rbrace`$，模型概率为 $\pi$，真实 one-hot 为 $o$，Brier score：
 
-$$
-\operatorname{Brier}(\pi,o)=\sum_{m=1}^{M}(\pi_m-o_m)^2.
-$$
+```math
+\mathrm{Brier}(\pi,o)=\sum_{m=1}^{M}(\pi_m-o_m)^2.
+```
 
 它同时惩罚漏掉真实 mode 和给虚假 mode 过高概率。应再报告 NLL、reliability diagram/ECE、rare-mode recall 与 spurious-mode rate。若真实数据每个历史只有一个未来，无法充分识别条件分布；需要多标注、受控 simulator 或明确承认不可识别边界。
 
@@ -406,13 +406,13 @@ $$
 
 sample-based energy score 可写成
 
-$$
-\operatorname{ES}
+```math
+\mathrm{ES}
 =
 \mathbb E\,d(X,y)
 -\frac12\mathbb E\,d(X,X'),
 \qquad X,X'\sim p_\theta(\cdot\mid h).
-$$
+```
 
 第一项约束准确，第二项奖励有根据的 spread。其 proper-score 保证要求 $d$ 是 negative-type semimetric；任意 learned embedding 距离不自动继承该保证。即使条件满足，若 $d$ 只是高维像素距离，语义事件仍可能被背景主导。更稳妥的是同时在 object/trajectory/event embedding 与 perceptual video embedding 中计算，并报告非法未来。
 
@@ -445,7 +445,7 @@ compute: params; active FLOPs; train FLOPs; wall-clock; hardware; memory
 ### 9.1 机制集 `Forking-Squares-v1`
 
 - 64×64；8 context + 24 future。
-- 同一 prefix 的 64 个重复未来完全共享前 8 帧；prefix 中有可见 cue $g\in\{\text{cyan},\text{amber},\text{violet}\}$，对应 **left/right/stop** 真分布分别为 $(0.6,0.3,0.1)$、$(0.2,0.7,0.1)$、$(0.1,0.2,0.7)$。三种 cue 在 split 内平衡，模型不得读取未来随机数。
+- 同一 prefix 的 64 个重复未来完全共享前 8 帧；prefix 中有可见 cue $`g\in\lbrace\text{cyan},\text{amber},\text{violet}\rbrace`$，对应 **left/right/stop** 真分布分别为 $(0.6,0.3,0.1)$、$(0.2,0.7,0.1)$、$(0.1,0.2,0.7)$。三种 cue 在 split 内平衡，模型不得读取未来随机数。
 - 按初始状态分组切分 10,000 train / 2,000 val / 2,000 test，禁止同一初始参数跨 split。
 - 每个 test prefix 由 simulator 生成 64 个真实 futures，并保存 mode、概率、轨迹、identity 和 validity。
 - generator、manifest、split 与输出 hash 在训练前冻结；隐藏未来被替换时，部署 prior 输出不得变化。
@@ -478,7 +478,7 @@ compute: params; active FLOPs; train FLOPs; wall-clock; hardware; memory
 - C 相对 B 的 Brier 至少改善 **0.02**，paired-bootstrap 95% CI 下界 (>0)。
 - 概率 0.1 的 rare mode：recall@64 ≥ **0.80**；spurious mode ≤ **1%**。
 - 条件违规相对 A/B 增幅 ≤ **1 个百分点**；expected state/perceptual error 劣化 ≤ **3%**。
-- per-prefix $\operatorname{JS}(p_{\mathrm{prior}}(m\mid h),p_{\mathrm{sim}}(m\mid h))\le\mathbf{0.05}$；聚合 posterior–prior event JS 作为诊断另报，不对单样本 posterior 设混合分布阈值。
+- per-prefix $\mathrm{JS}(p_{\mathrm{prior}}(m\mid h),p_{\mathrm{sim}}(m\mid h))\le\mathbf{0.05}$；聚合 posterior–prior event JS 作为诊断另报，不对单样本 posterior 设混合分布阈值。
 - 重采样 $z$ 至少在 **30%** test histories 中改变持续事件；相同 $(h,z)$ 重跑一致率 ≥ **99%**。
 - D 只有在 horizon-24 coverage 比 C 提高 ≥ **5 个百分点**，且质量/违规通过非劣界时，才能写“层级改善长期覆盖”。
 - VP² 的“有助规划”声明要求成功率至少 **+5 个百分点** 且 95% CI 排除 0。

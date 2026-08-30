@@ -18,18 +18,18 @@
 
 给定两帧
 
-$$
+```math
 I_0,I_1\in[0,1]^{B\times3\times H\times W}
-$$
+```
 
 以及查询时间 $\tau\in(0,1)$，标准双帧 VFI 学习
 
-$$
+```math
 \hat I_\tau=f_\theta(I_0,I_1,\tau).
-$$
+```
 
 若一次输出 $K$ 帧，则查询集合为
-$\mathcal T=\{\tau_1,\ldots,\tau_K\}$，模型可逐时刻运行，也可联合生成
+$`\mathcal T=\lbrace\tau_1,\ldots,\tau_K\rbrace`$，模型可逐时刻运行，也可联合生成
 $\hat I_{\mathcal T}$。这里的“前后”只是时间位置；两帧都已知，不存在测试时偷看未来的问题。
 
 ### 1.1 五个容易混淆的邻接任务
@@ -95,19 +95,19 @@ flowchart LR
 
 若网络预测目标网格到端点的流 $F_{\tau\rightarrow0}$，双线性 backward warp 为
 
-$$
+```math
 \widetilde I_{0\rightarrow\tau}(x)
 =I_0\!\left(x+F_{\tau\rightarrow0}(x)\right).
-$$
+```
 
 同理得到 $\widetilde I_{1\rightarrow\tau}$，再用可见性 $M_\tau$ 与残差 $R_\tau$ 合成
 
-$$
+```math
 \hat I_\tau
 =M_\tau\odot\widetilde I_{0\rightarrow\tau}
 +(1-M_\tau)\odot\widetilde I_{1\rightarrow\tau}
 +R_\tau.
-$$
+```
 
 优点是每个目标位置只读取有限源点，双线性采样稳定且可微。缺点是它要求先知道目标到源的对应；新显露区域在两端可能都没有可靠样本，$R_\tau$ 只能根据上下文补全。
 
@@ -118,11 +118,11 @@ $x+F_{0\rightarrow\tau}(x)$。它自然沿物体运动搬运内容，却产生�
 
 Softmax Splatting 用可学习的重要性 $Z(x)$ 对碰撞做指数归一化 [[7]](#ref-7)：
 
-$$
+```math
 \mathcal S(I,F,Z)(y)=
 \frac{\sum_x b\!\left(y-x-F(x)\right)e^{Z(x)}I(x)}
 {\sum_x b\!\left(y-x-F(x)\right)e^{Z(x)}+\epsilon},
-$$
+```
 
 其中 $b$ 是双线性 footprint。$Z$ 加上常数不会改变归一化结果；缩放 $Z$ 却会使操作从近似平均逐渐接近 z-buffer。它解决的是**碰撞聚合**，不是自动解决错误 flow、空洞或不可见内容。
 
@@ -235,11 +235,11 @@ MGMVFI 把 optical flow 用作 Motion-Guided Serialization：先把两端特征�
 
 当中间帧存在 disoccluded content、复杂非线性运动或多条同样合理的路径时，最小像素误差倾向于条件均值；diffusion 改为学习
 
-$$
+```math
 p_\theta(I_\tau\mid I_0,I_1,\tau)
 \quad\text{或}\quad
 p_\theta(I_{\mathcal T}\mid I_0,I_1,\mathcal T).
-$$
+```
 
 这并不意味着“幻觉越多越先进”。生成路线给出的是**中间路径的多解**，不是端点的多解：$I_0$ 与 $I_1$ 已被观测，因而是每个样本都必须满足的硬条件。训练中的 conditioning 或 classifier-free guidance 只是实现手段，验收时仍要检查端点身份、几何、文字、物体数量和时间顺序；若允许这些条件漂移，任务已变成 keyframe transition generation，而不是严格 VFI。
 
@@ -275,7 +275,7 @@ LDF-VFI 以自回归 diffusion transformer 处理完整插值序列，在 chunk 
 
 一套可能的组合写成
 
-$$
+```math
 \mathcal L
 =\lambda_r\mathcal L_{\text{rec}}
 +\lambda_p\mathcal L_{\text{perc}}
@@ -283,7 +283,7 @@ $$
 +\lambda_g\mathcal L_{\text{geom}}
 +\lambda_d\mathcal L_{\text{distill}}
 +\lambda_{\text{diff}}\mathcal L_{\text{diff}}.
-$$
+```
 
 这不是要求所有模型都使用六项，而是一张职责表。
 
@@ -433,7 +433,7 @@ FloLPIPS 用端点/插值视频的 flow distortion 对 LPIPS feature difference 
 
 <a id="ref-9"></a>[9] [IFRNet: Intermediate Feature Refine Network for Efficient Frame Interpolation](https://openaccess.thecvf.com/content/CVPR2022/html/Kong_IFRNet_Intermediate_Feature_Refine_Network_for_Efficient_Frame_Interpolation_CVPR_2022_paper.html). Lingtong Kong, Boyuan Jiang, Donghao Luo, Wenqing Chu, Xiaoming Huang, Ying Tai, Chengjie Wang, Jie Yang. CVPR. 2022. [arXiv](https://arxiv.org/abs/2205.14620).
 
-<a id="ref-10"></a>[10] [FILM: Frame Interpolation for Large Motion](https://arxiv.org/abs/2202.04901). Fitsum Reda, Janne Kontkanen, Eric Tabellion, Deqing Sun, Caroline Pantofaru, Brian Curless. ECCV. 2022. [官方代码](https://github.com/google-research/frame-interpolation).
+<a id="ref-10"></a>[10] [FILM: Frame Interpolation for Large Motion](https://arxiv.org/abs/2202.04901). Fitsum Reda, Janne Kontkanen, Eric Tabellion, Deqing Sun, Caroline Pantofaru, Brian Curless. ECCV. 2022. 官方代码 [![GitHub: google-research/frame-interpolation](https://img.shields.io/badge/GitHub-google-research%2Fframe-interpolation-181717?logo=github&logoColor=white)](https://github.com/google-research/frame-interpolation).
 
 <a id="ref-11"></a>[11] [Video Frame Interpolation with Transformer](https://openaccess.thecvf.com/content/CVPR2022/html/Lu_Video_Frame_Interpolation_With_Transformer_CVPR_2022_paper.html). Liying Lu, Ruizheng Wu, Huaijia Lin, Jiangbo Lu, Jiaya Jia. CVPR. 2022. [arXiv](https://arxiv.org/abs/2205.07230).
 
@@ -463,7 +463,7 @@ FloLPIPS 用端点/插值视频的 flow distortion 对 LPIPS feature difference 
 
 <a id="ref-24"></a>[24] [A Database and Evaluation Methodology for Optical Flow](https://vision.middlebury.edu/flow/floweval-ijcv2011.pdf). Simon Baker, Daniel Scharstein, J. P. Lewis, Stefan Roth, Michael J. Black, Richard Szeliski. *International Journal of Computer Vision*. 2011. [官方评测页](https://vision.middlebury.edu/flow/eval/).
 
-<a id="ref-25"></a>[25] [Channel Attention Is All You Need for Video Frame Interpolation](https://ojs.aaai.org/index.php/AAAI/article/view/6693). Myungsub Choi, Heewon Kim, Bohyung Han, Ning Xu, Kyoung Mu Lee. AAAI. 2020. [SNU-FILM 官方代码与下载说明](https://github.com/myungsub/CAIN).
+<a id="ref-25"></a>[25] [Channel Attention Is All You Need for Video Frame Interpolation](https://ojs.aaai.org/index.php/AAAI/article/view/6693). Myungsub Choi, Heewon Kim, Bohyung Han, Ning Xu, Kyoung Mu Lee. AAAI. 2020. SNU-FILM 官方代码与下载说明 [![GitHub: myungsub/CAIN](https://img.shields.io/badge/GitHub-myungsub%2FCAIN-181717?logo=github&logoColor=white)](https://github.com/myungsub/CAIN).
 
 <a id="ref-26"></a>[26] [XVFI: eXtreme Video Frame Interpolation](https://openaccess.thecvf.com/content/ICCV2021/html/Sim_XVFI_eXtreme_Video_Frame_Interpolation_ICCV_2021_paper.html). Hyeonjun Sim, Jihyong Oh, Munchurl Kim. ICCV. 2021.
 
@@ -475,6 +475,6 @@ FloLPIPS 用端点/插值视频的 flow distortion 对 LPIPS feature difference 
 
 <a id="ref-30"></a>[30] [FloLPIPS: A Bespoke Video Quality Metric for Frame Interpolation](https://arxiv.org/abs/2207.08119). Duolikun Danier, Fan Zhang, David Bull. Picture Coding Symposium. 2022. [DOI](https://doi.org/10.1109/PCS56426.2022.10018062).
 
-<a id="ref-31"></a>[31] [BVI-VFI: A Video Quality Database for Video Frame Interpolation](https://doi.org/10.1109/TIP.2023.3327912). Duolikun Danier, Fan Zhang, David Bull. *IEEE Transactions on Image Processing*. 2023. [官方数据库](https://github.com/danier97/BVI-VFI-database).
+<a id="ref-31"></a>[31] [BVI-VFI: A Video Quality Database for Video Frame Interpolation](https://doi.org/10.1109/TIP.2023.3327912). Duolikun Danier, Fan Zhang, David Bull. *IEEE Transactions on Image Processing*. 2023. 官方数据库 [![GitHub: danier97/BVI-VFI-database](https://img.shields.io/badge/GitHub-danier97%2FBVI-VFI-database-181717?logo=github&logoColor=white)](https://github.com/danier97/BVI-VFI-database).
 
 <a id="ref-32"></a>[32] [Benchmarking Video Frame Interpolation](https://arxiv.org/abs/2403.17128). Simon Kiefhaber, Simon Niklaus, Feng Liu, Simone Schaub-Meyer. arXiv preprint. 2024.

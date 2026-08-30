@@ -10,16 +10,16 @@
 
 普通条件视频生成通常建模：
 
-$$
+```math
 p(x_{1:T}\mid c),
-$$
+```
 
 其中 $c$ 可以是文本、图像或已有视频。物理一致性生成还希望输出满足某组物理约束 $\mathcal{C}$：
 
-$$
+```math
 x_{1:T}\sim p_\theta(x_{1:T}\mid c),\qquad
 \mathcal{C}(x_{1:T},z_{1:T},u_{1:T})\approx 0.
-$$
+```
 
 - $x_{1:T}$：最终可见的视频帧；
 - $z_{1:T}$：几何、质量、速度、材质等显式或隐式状态；
@@ -30,11 +30,11 @@ $$
 
 若目标提升到“物理忠实度”，还需要一个声明清楚的参照系统：
 
-$$
+```math
 s_{t+1}=F(s_t,u_t,\theta,b,\xi_t),
 \qquad
 y_t=H(s_t,v)+\epsilon_t,
-$$
+```
 
 - $s_t$：位置、速度、姿态、形变、温度或场变量；
 - $u_t$：力、机器人控制、车辆控制或其他干预；
@@ -45,11 +45,11 @@ $$
 
 视频模型输出 $\hat{x}_{1:T}$ 后，评测器通过测量算子 $M_k$ 提取轨迹、接触或场量。归一化误差可写成：
 
-$$
+```math
 E_k=
 \frac{d_k\!\left(M_k(\hat{x}_{1:T}),y^*_{k,1:T}\right)}
 {\sigma_k+\varepsilon},
-$$
+```
 
 其中 $y^*_{k,1:T}=M_k(x^*_{1:T})$ 表示从标定真实系统或高可信模拟参照中取得的第 $k$ 类观测量，$\sigma_k$ 是参照和测量链的不确定性。只有同时报告单位、时间尺度、相机标定、测量覆盖率和误差条带，结果才接近 **fidelity**，而不只是“看起来 plausible”。
 
@@ -164,12 +164,12 @@ flowchart TB
 
 使用模拟数据提供可控物性标签，或以物理检测器、VLM 裁判、可微模拟器和守恒残差作为训练奖励。其一般形式可以写为：
 
-$$
+```math
 \mathcal{L}=\mathcal{L}_{\text{video}}
 +\lambda_{s}\mathcal{L}_{\text{state}}
 +\lambda_{c}\mathcal{L}_{\text{constraint}}
 +\lambda_{r}\mathcal{L}_{\text{reward}}.
-$$
+```
 
 视觉损失维持画质，状态损失监督轨迹或物性，约束损失惩罚物理违规，奖励项则鼓励最终视频通过专项评测。2026 年的 PhyCo 进一步用系统变化的摩擦、恢复系数、形变和外力数据训练可控物理先验 [[9]](#ref-9)。这一路线可扩展，但必须防止模型投机自动裁判，并检查模拟到真实的迁移。
 
@@ -339,12 +339,12 @@ Physics-IQ 将流体、光学、固体、磁学和热学等原理纳入专项测
 
 固定初始状态、相机、外观和随机种子集合，只改变动作或一个物理参数。对干预 $u\rightarrow u'$，检查：
 
-$$
+```math
 \Delta^{\mathrm{model}}_{u\rightarrow u'}
 =M(\hat{x}\mid u')-M(\hat{x}\mid u)
 \approx
 M(x^*\mid u')-M(x^*\mid u).
-$$
+```
 
 除了目标变量的 effect-size error，还要测 **branch locality**：没有被干预的对象、背景和身份是否保持。每个参数点生成多个 seed，报告均值、标准差、测量缺失率和失败覆盖；不要静默删除 tracker 失败或生成失败。OOD 至少覆盖新材质、新尺度、新相机和超出训练范围的参数。
 
@@ -371,10 +371,10 @@ Physics-IQ Verified 说明 ground truth、prompt 和聚合方式的修订足以�
 
 “物理更好”无法被证伪，因此也不是合格实验声明。运行实验前应冻结一个 claim contract：
 
-$$
+```math
 \mathcal C=
 (\mathcal D,H,c,\mathcal O,M,\delta,\alpha,\ell),
-$$
+```
 
 其中 $\mathcal D$ 是对象、材料和场景域，$H$ 是预测或控制 horizon，$c=(s_0,u,\theta,b)$ 包含初态、动作、物性和边界，$\mathcal O$ 是可观察量，$M$ 是连同提取器版本一起冻结的测量程序，$\delta$ 是每个误差门槛，$\alpha$ 是不确定性或置信约定，$\ell$ 是声明不得超过的 L0–L7 证据级别。任何一项在看过 test 结果后才补写，都会把验证变成事后解释。
 
@@ -533,7 +533,7 @@ Physical AI 闭环系统
 
 <a id="ref-11"></a>[11] [How Far Is Video Generation from World Model: A Physical Law Perspective](https://arxiv.org/abs/2411.02385). arXiv preprint. 2024.
 
-<a id="ref-12"></a>[12] [Physics-IQ Verified](https://arxiv.org/abs/2606.18943). arXiv preprint. 2026. [Official benchmark repository](https://github.com/google-deepmind/physics-IQ-benchmark).
+<a id="ref-12"></a>[12] [Physics-IQ Verified](https://arxiv.org/abs/2606.18943). arXiv preprint. 2026. Official benchmark repository [![GitHub: google-deepmind/physics-IQ-benchmark](https://img.shields.io/badge/GitHub-google-deepmind%2Fphysics-IQ-benchmark-181717?logo=github&logoColor=white)](https://github.com/google-deepmind/physics-IQ-benchmark).
 
 <a id="ref-13"></a>[13] [PAI-Bench: A Comprehensive Benchmark For Physical AI](https://openaccess.thecvf.com/content/CVPR2026/html/Zhou_PAI-Bench_A_Comprehensive_Benchmark_For_Physical_AI_CVPR_2026_paper.html). CVPR. 2026.
 

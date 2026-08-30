@@ -185,9 +185,9 @@ The central evaluation protocol should require final-answer accuracy, intermedia
 
 Inception Score is
 
-$$
-\operatorname{IS}=\exp\left(\mathbb{E}_{x}\operatorname{KL}(p(y\mid x)\|p(y))\right).
-$$
+```math
+\mathrm{IS}=\exp\left(\mathbb{E}_{x}\mathrm{KL}(p(y\mid x)\|p(y))\right).
+```
 
 It rewards confident classifier predictions for individual samples and a broad marginal class distribution. It has no real-data reference, inherits the classifier's taxonomy and domain bias, does not directly measure within-class diversity and can be distorted by classifier artifacts. Its finite-sample estimate is biased.
 
@@ -306,9 +306,9 @@ ITU-T P.910 provides the current general anchor for subjective video quality met
 
 For a basic Bradley-Terry model,
 
-$$
+```math
 P(i \succ j)=\sigma(\theta_i-\theta_j).
-$$
+```
 
 Use Bradley-Terry, Thurstone or a documented tie-aware extension rather than raw win rate alone. The comparison graph must be connected, each matchup needs enough repeated prompts, and uncertainty should be obtained by clustering/bootstrap at the prompt level. If the same raters score many clips, a mixed-effects logistic or ordinal model can include prompt and rater effects.
 

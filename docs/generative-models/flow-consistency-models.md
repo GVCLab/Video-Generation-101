@@ -33,49 +33,49 @@ Flow matching（FM）、rectified flow（RF）、consistency model（CM）、Mea
 
 DDPM 先定义逐步加噪的前向马尔可夫链，再学习反向条件分布 [[1]](#ref-1)。连续写法常把任意时刻的扰动核记为
 
-$$
+```math
 q_\tau(x_\tau\mid x_0)
 =
 \mathcal N\!\left(
 x_\tau;\alpha_\tau x_0,\sigma_\tau^2 I
 \right).
-$$
+```
 
 若网络预测噪声 $\epsilon_\theta$，则它与条件 score 的典型关系为
 
-$$
+```math
 \nabla_{x_\tau}\log q_\tau(x_\tau\mid x_0)
 =
 -\frac{\epsilon}{\sigma_\tau}.
-$$
+```
 
 边缘 score 是 $s_\tau(x)=\nabla_x\log p_\tau(x)$。Score-SDE 把加噪过程写成 [[2]](#ref-2)
 
-$$
+```math
 \mathrm d x
 =
 f(x,\tau)\,\mathrm d\tau
 +
 g(\tau)\,\mathrm dW_\tau.
-$$
+```
 
 在精确 score 下，可以沿两种动力学返回数据：
 
-$$
+```math
 \mathrm d x
 =
 \left[f(x,\tau)-g(\tau)^2s_\tau(x)\right]\mathrm d\tau
 +
 g(\tau)\,\mathrm d\bar W_\tau,
-$$
+```
 
 这是反向时间 SDE；或者使用 probability-flow ODE（PF-ODE）
 
-$$
+```math
 \frac{\mathrm d x}{\mathrm d\tau}
 =
 f(x,\tau)-\frac{1}{2}g(\tau)^2s_\tau(x).
-$$
+```
 
 两者在 score 精确、方程求解精确的理想条件下共享各时刻边缘分布，但样本路径不同：前者随机，后者确定。DDIM [[3]](#ref-3) 与 DPM-Solver [[4]](#ref-4) 主要改变**已有 diffusion/score 模型的采样器**；它们本身不是 FM 训练目标。
 
@@ -134,30 +134,30 @@ flowchart TB
 
 设条件变量 $Z$ 包含端点或数据条件。第一层是人为选择、且通常可采样的**条件路径**
 
-$$
+```math
 p_s(x\mid Z),\qquad
 p_s(x)=\int p_s(x\mid z)q(z)\,\mathrm dz.
-$$
+```
 
 第二层是边缘分布真正遵循的**边缘速度场**
 
-$$
+```math
 u_s(x)
 =
 \mathbb E\!\left[
 u_s(X_s\mid Z)\mid X_s=x
 \right].
-$$
+```
 
 第三层才是网络近似和数值求解产生的**学习 ODE 轨迹**
 
-$$
+```math
 \frac{\mathrm d\hat X_s}{\mathrm ds}
 =
 v_\theta(\hat X_s,s),
 \qquad
 \hat X_0\sim p_{\mathrm{prior}}.
-$$
+```
 
 这三层不能混写。即使每个端点对的条件路径是直线，不同条件路径在同一位置会发生平均，边缘场未必是常向量；有限数据、有限模型与有限 NFE 又会使学习轨迹偏离理想边缘流。因此，“直线插值”不推出“所有生成轨迹都是直线”，更不推出“一步无损”。
 
@@ -257,7 +257,7 @@ flowchart TB
 
 FM 通过条件路径绕开不可直接获得的边缘速度。其 conditional flow matching 目标可写为 [[5]](#ref-5)
 
-$$
+```math
 \mathcal L_{\mathrm{CFM}}
 =
 \mathbb E_{s,Z,X_s}
@@ -266,7 +266,7 @@ $$
 v_\theta(X_s,s)-u_s(X_s\mid Z)
 \right\|_2^2
 \right].
-$$
+```
 
 在合适的可积条件下，平方损失的最优解就是上一节的条件期望 $u_s(x)$。这里“simulation-free training”只表示训练每个样本时无需先解完整 ODE；生成时仍要积分学习场，通常需要多次 NFE。
 
@@ -274,11 +274,11 @@ $$
 
 RF 选择先验样本 $A$ 与数据样本 $B$ 的耦合，并用直线条件路径 [[6]](#ref-6)
 
-$$
+```math
 X_s=(1-s)A+sB,
 \qquad
 u_s(X_s\mid A,B)=B-A.
-$$
+```
 
 网络仍学的是在给定 $X_s$ 后对许多端点速度的条件平均。RF 的优势是目标简单、可与常规回归结合，并倾向于形成更易积分的运输；它不保证真实数据语义沿像素或 latent 直线变化。
 
@@ -303,13 +303,13 @@ $$
 
 CM 学习 $f_\theta(x_\tau,\tau)$，把参考 PF-ODE 轨迹上的任一点映射到接近数据端的 $x_\varepsilon$ [[7]](#ref-7)：
 
-$$
+```math
 f_\theta(x_\tau,\tau)
 \approx
 f_\theta(x_{\tau'},\tau'),
 \qquad
 f_\theta(x_\varepsilon,\varepsilon)=x_\varepsilon.
-$$
+```
 
 需要区分两条训练路线：
 
@@ -343,21 +343,21 @@ Score-regularized continuous-time consistency model（rCM）从预训练 diffusi
 
 Shortcut Models 把期望步长 $d$ 也作为网络输入，并学习可组合的有限步更新 [[11]](#ref-11)。令
 
-$$
+```math
 \Phi_\theta(x,t,d)
 =
 x+d\,s_\theta(x,t,d),
-$$
+```
 
 其自一致性约束近似为
 
-$$
+```math
 \Phi_\theta(x,t,2d)
 \approx
 \Phi_\theta(
 \Phi_\theta(x,t,d),t+d,d
 ).
-$$
+```
 
 训练同时使用 flow 目标与由小步组合产生的 bootstrap 目标，因此不需要外部生成教师，但会依赖自身或 EMA 目标。部署时同一网络可按预算选择不同步数；这与只能固定在单一 NFE 的蒸馏器不同。正式论文的核心证据主要来自图像生成。
 
@@ -365,21 +365,21 @@ $$
 
 MeanFlow 不把瞬时速度近似为一次大 Euler 步，而是学习区间 $[r,t]$ 的平均速度 [[12]](#ref-12)：
 
-$$
+```math
 u(z_t,r,t)=\frac{1}{t-r}\int_r^t v(z_\tau,\tau)\,\mathrm d\tau.
-$$
+```
 
 沿轨迹对时间求全导数可得到连接平均速度与瞬时速度的恒等式，论文据此构造训练目标：
 
-$$
+```math
 u=v-(t-r)\frac{\mathrm d u}{\mathrm dt}.
-$$
+```
 
 一次区间更新为
 
-$$
+```math
 z_r=z_t-(t-r)u_\theta(z_t,r,t).
-$$
+```
 
 MeanFlow 的正式 NeurIPS 2025 论文强调无需预训练、蒸馏或课程学习，并在 ImageNet 256×256 上给出 1-NFE 证据；这是图像证据，不能直接改写成视频一步生成结论。
 
@@ -395,7 +395,7 @@ AlphaFlow 则分析 MeanFlow 训练中轨迹 FM 与轨迹 consistency 两部分�
 
 DMD 令一步生成器 $G_\theta(z)$ 的分布 $p_\theta$ 逼近预训练 diffusion 教师的分布 $p_{\mathrm T}$ [[8]](#ref-8)。其分布匹配梯度可概念化为
 
-$$
+```math
 \nabla_\theta D_{\mathrm{KL}}
 \!\left(p_\theta\|p_{\mathrm T}\right)
 \propto
@@ -408,7 +408,7 @@ s_\theta(x_\tau,\tau)
 \right)
 \frac{\partial G_\theta(z)}{\partial\theta}
 \right],
-$$
+```
 
 其中 $s_{\mathrm T}$ 是教师 score，$s_\theta$ 是在线估计学生当前假样本分布的 fake score。原始 DMD 还使用真实数据与教师确定性采样得到的回归配对，以稳定训练。
 
@@ -481,7 +481,7 @@ CausVid 把 50-step 双向视频 diffusion 教师蒸馏为 4-step 因果自回�
 “少步”“因果”“流式”“实时”回答四个不同问题：
 
 - **Few-step**：一个样本或 chunk 在噪声/运输时间上需要多少次网络评估？
-- **Causal**：第 $k$ 帧能否只依赖过去帧 $x_{<k}$，而不访问未来？
+- **Causal**：第 $k$ 帧能否只依赖过去帧 $`x_{\lt k}`$，而不访问未来？
 - **Streaming**：系统能否边接收条件、边生成、边交付，并维持跨 chunk 状态？
 - **Real-time**：在明确硬件与服务级目标（SLO）下，首帧、截止期与抖动是否达标？
 

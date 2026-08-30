@@ -21,23 +21,23 @@
 
 给定人物源视频、一个或多个目标服装参考，以及可选条件：
 
-$$
+```math
 X_s\in[0,1]^{B\times T\times3\times H\times W},
 \qquad
 G\in[0,1]^{B\times K\times3\times H_g\times W_g},
-$$
+```
 
-$$
+```math
 C=\{M^{body},M^{garment},P,D,S,I,Q\},
-$$
+```
 
 其中 $M$ 是可选人物/服装/编辑 mask，$P$ 是骨架，$D$ 是 DensePose 或其他几何，$S$ 是 parsing/结构线，$I$ 是自然语言指令，$Q$ 是质量、许可和来源元数据。目标是：
 
-$$
+```math
 Y\in[0,1]^{B\times T\times3\times H\times W},
 \qquad
 p_\theta(Y\mid X_s,G,C),
-$$
+```
 
 并满足：
 
@@ -52,9 +52,9 @@ $$
 
 历史上的 FW-GAN 接口更接近：
 
-$$
+```math
 Y\sim p_\theta(Y\mid x_{person},G,P_{1:T}),
-$$
+```
 
 即人物图 + 目标服装 + 驱动姿态序列。它仍是视频虚拟试衣，因为要让同一件目标服装跨时间变形；但没有完整源 RGB 视频需要逐像素守住，所以不是严格 V2V [[1]](#ref-1)。
 
@@ -115,11 +115,11 @@ flowchart TD
 
 对源视频的非编辑支持域 $\bar E_t=1-E_t$，可定义：
 
-$$
+```math
 L_{preserve}
 =\frac{\sum_t\|\bar E_t\odot(Y_t-X_{s,t})\|_1}
 {\sum_t\|\bar E_t\|_1+\epsilon},
-$$
+```
 
 但这个量依赖 $E_t$ 是否准确，只能作为区域诊断，不能替代脸、体型、皮肤/头发和手的独立检查。
 
@@ -129,9 +129,9 @@ $$
 
 对可见服装 crop $R_t$ 和参考视图 $G_k$，可以用校准后的 embedding 做检索：
 
-$$
+```math
 s_t^{garment}=\max_k\cos\bigl(\phi(R_t\odot Y_t),\phi(G_k)\bigr),
-$$
+```
 
 但 CLIP/DINO 只是一层证据；logo/文字还需 OCR/字符级比较，线条、纹理、面料和前后视图需要专门标注与人工复核 [[33]](#ref-33), [[34]](#ref-34)。
 
@@ -154,10 +154,10 @@ $$
 
 离线总耗时、第一可见结果（TTFF）、持续吞吐、每次更新抖动、P50/P95、峰值显存和状态大小要分开报告：
 
-$$
+```math
 TTFF=t_{decode\ input}+t_{parse/pose/mask}+t_{lookahead}
 +t_{first\ denoise}+t_{decode\ output}+t_{I/O}.
-$$
+```
 
 只报 denoiser FPS，会漏掉解析、DensePose、mask smoothing、关键帧试衣、前视缓冲和视频编解码。
 
@@ -173,9 +173,9 @@ $$
 
 逐帧模型优化的是：
 
-$$
+```math
 \hat Y_t=f_\theta(X_{s,t},G,C_t),
-$$
+```
 
 却没有约束 $\hat Y_t$ 与 $\hat Y_{t-1}$ 共享同一件“动态服装状态”。即使每帧都像一张好图，也会出现：
 
@@ -195,9 +195,9 @@ WildVidFit 说明图像网络可以借助 VideoMAE、相邻 latent 对齐和 co-
 
 参考服装到视频帧的映射可写成：
 
-$$
+```math
 \Pi_t:(u_g,v_g,k)\mapsto(x_t,y_t,v_t),
-$$
+```
 
 其中 $(u_g,v_g)$ 是参考/UV 坐标，$k$ 是参考视图，$(x_t,y_t)$ 是输出像素，$v_t\in[0,1]$ 是可见性。真实系统通常只近似其中一部分：
 
@@ -212,13 +212,13 @@ $$
 
 在一个像素邻域内，可能存在：
 
-$$
+```math
 \text{hand}\succ\text{sleeve}\succ\text{torso},
 \qquad
 \text{hair}\succ\text{collar},
 \qquad
 \text{bag strap}\succ\text{coat},
-$$
+```
 
 其中 $a\succ b$ 表示 $a$ 应显示在 $b$ 前面。只给 garment mask 不能告诉模型顺序；手臂交叉、头发扫过领口和抓衣动作需要 pose、深度、分层表示或足够的时空先验。评测必须故意翻转遮挡顺序，而不是只看无遮挡正面。
 
@@ -384,9 +384,9 @@ VITON-HD 与 DressCode 是高分辨率 image VTON 数据祖先，适合学习单
 
 不能按 frame 随机拆分。至少以联合键分组：
 
-$$
+```math
 group=(person\ identity, capture\ session, garment/SKU).
-$$
+```
 
 否则同一视频的相邻帧、同一电商 SKU 的近重复图或同一人物同一拍摄会同时落入 train/test。对互联网预训练底座，还要做近重复检索并承认无法完全审计的污染边界。
 

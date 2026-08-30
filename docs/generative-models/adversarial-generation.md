@@ -64,25 +64,25 @@ flowchart LR
 
 本章采用可复核的操作性定义：训练中存在参数为 $\phi$ 的 critic，它在对抗分类或评分目标下，根据参考正分布 $q_+$ 的样本 $x^+$ 与 student/generated distribution $q_\theta$ 的样本 $\hat x=G_\theta(z,c)$ 改善区分能力；student 则反向更新 $\theta$ 以迎合该 critic。$q_+$ 可以是真实数据，也可以是 teacher 或 self-teacher 的输出；必须在方法记录中明说正样本来源。经典 GAN 取 $q_+=p_{\mathrm{data}}$，其原始 minimax 概念目标是 [[1]](#ref-1)：
 
-$$
+```math
 \min_G\max_D\;
 \mathbb E_{x\sim p_{\mathrm{data}}}\log D(x,c)
 +\mathbb E_{z\sim p(z)}\log(1-D(G(z,c),c)).
-$$
+```
 
 实践中常用 non-saturating softplus 形式。以输出未归一化 logit 的 $D_\phi$ 为例：
 
-$$
+```math
 \begin{aligned}
 \mathcal L_D={}&
-\mathbb E_x\!\left[\operatorname{softplus}(-D_\phi(x,c))\right]
-+\mathbb E_z\!\left[\operatorname{softplus}(D_\phi(G_\theta(z,c),c))\right]\\
+\mathbb E_x\!\left[\mathrm{softplus}(-D_\phi(x,c))\right]
++\mathbb E_z\!\left[\mathrm{softplus}(D_\phi(G_\theta(z,c),c))\right]\\
 &+\frac{\gamma}{2}\mathbb E_x
 \left\|\nabla_xD_\phi(x,c)\right\|_2^2,\\
 \mathcal L_G^{\mathrm{adv}}={}&
-\mathbb E_z\!\left[\operatorname{softplus}(-D_\phi(G_\theta(z,c),c))\right].
+\mathbb E_z\!\left[\mathrm{softplus}(-D_\phi(G_\theta(z,c),c))\right].
 \end{aligned}
-$$
+```
 
 最后一项是只在真实样本上计算的 R1 梯度正则，它与在真假插值上约束梯度的 gradient penalty 不是同一件事 [[15]](#ref-15)。Hinge GAN 则对真样本惩罚 $\max(0,1-D(x))$，对假样本惩罚 $\max(0,1+D(\hat x))$，生成器最小化 $-D(\hat x)$。报告“使用 GAN loss”时必须同时说明具体形式、每个 critic 的权重、正则与更新比。
 
@@ -169,13 +169,13 @@ StyleGAN-V 另一种做法是在连续时间生成器中抽取稀疏帧集合，
 
 视频 tokenizer 常用组合损失训练编解码器：
 
-$$
+```math
 \mathcal L_{\mathrm{codec}}=
 \lambda_{\mathrm{pix}}\lVert x-D_{\mathrm{dec}}(E(x))\rVert_1
 +\lambda_{\mathrm{perc}}\mathcal L_{\mathrm{perc}}
 +\lambda_{\mathrm{adv}}\mathcal L_{\mathrm{adv}}
 +\lambda_{\mathrm{reg}}\mathcal R(E(x)).
-$$
+```
 
 $\mathcal L_{\mathrm{perc}}$ 比较固定特征，$\mathcal L_{\mathrm{adv}}$ 由可学习判别器提供，$\mathcal R$ 可以是 KL、量化/codebook 约束或其他 latent 正则。TATS 把 3D-VQGAN tokenizer 与长序列 Transformer 结合；MAGVIT 在 3D video tokenizer 中使用帧级感知损失和时空对抗信号，随后另行训练 masked token generator [[13]](#ref-13) [[14]](#ref-14)。
 
@@ -234,13 +234,13 @@ $\mathcal L_{\mathrm{perc}}$ 比较固定特征，$\mathcal L_{\mathrm{adv}}$ �
 
 FVD 将真实与生成 clip 送入视频特征提取器，用两个高斯近似的 Fréchet 距离比较分布 [[16]](#ref-16)：
 
-$$
-\operatorname{FVD}=
+```math
+\mathrm{FVD}=
 \lVert\mu_r-\mu_g\rVert_2^2+
-\operatorname{Tr}\!\left(
+\mathrm{Tr}\!\left(
 \Sigma_r+\Sigma_g-2(\Sigma_r\Sigma_g)^{1/2}
 \right).
-$$
+```
 
 “FVD 更低”只在协议完全一致时才可比。每个数字应附带下列账本：
 

@@ -60,11 +60,11 @@
 
 令真实或高可信参照系统满足：
 
-$$
+```math
 s_{t+1}=F(s_t,u_t,\theta,b,\xi_t),
 \qquad
 y_t=H(s_t,v)+\epsilon_t,
-$$
+```
 
 其中：
 
@@ -77,22 +77,22 @@ $$
 
 视频模型产生 $\hat x_{1:T}$ 后，评测器通过测量算子 $M_k$ 提取可观察量。物理忠实度不是简单要求像素相等，而是检查：
 
-$$
+```math
 E_k=
 \frac{d_k\!\left(M_k(\hat x_{1:T}),y^{*}_{k,1:T}\right)}
 {\sigma_k+\varepsilon},
-$$
+```
 
 其中 $y^*$ 是标定真实或高可信模拟参照，$\sigma_k$ 是参照与测量链的不确定性。一个结果只有在报告了单位、时间尺度、相机标定、测量覆盖率和误差条带时，才接近“fidelity”而不是“plausibility”。
 
 反事实忠实度还要求模型响应干预：
 
-$$
+```math
 \Delta^{\text{model}}_{u\rightarrow u'}
 =M(\hat x\mid u')-M(\hat x\mid u)
 \approx
 \Delta^{\text{ref}}_{u\rightarrow u'}.
-$$
+```
 
 只在一个默认参数点产生看似正确的结果，无法排除模板匹配或训练分布记忆。
 
@@ -171,7 +171,7 @@ flowchart TB
 | [PAI-Bench](https://openaccess.thecvf.com/content/CVPR2026/html/Zhou_PAI-Bench_A_Comprehensive_Benchmark_For_Physical_AI_CVPR_2026_paper.html) | CVPR 2026 | 2,808 个真实世界 cases，覆盖视频生成、条件视频生成和视频理解 | 把生成与理解纳入统一 Physical AI 诊断 | 主要仍是 perception/prediction，不等同于真实机器人闭环 |
 | [PhysInOne](https://openaccess.thecvf.com/content/CVPR2026/html/Zhou_PhysInOne_Visual_Physics_Learning_and_Reasoning_in_One_Suite_CVPR_2026_paper.html) | CVPR 2026 | 2M synthetic videos、153,810 dynamic 3D scenes、71 个基础现象；含 3D 几何、语义、运动、物性和文本标注 | 同一套数据支持生成、长/短期预测、物性估计、motion transfer | 合成数据和新视角泛化仍有 sim-to-real；规模不代表每种复杂动力学都被充分覆盖 |
 | [Physion-Eval](https://arxiv.org/abs/2603.19607) | 预印本 | 5 个生成模型；10,990 条专家 reasoning traces；22 个细粒度类别；ego/exo；每个生成视频有真实参考和时间定位 glitch | 从粗分数升级到逐时刻、逐原因的人类诊断 | 专家解释仍是观察性判断；论文报告 83.3% exocentric、93.5% egocentric 视频至少有一个可识别 glitch，不等于全部帧错误 |
-| [PhyGround](https://arxiv.org/abs/2605.10806) | 预印本 | 250 prompts、13 条定律、8 个模型；459 annotators、5,796 份完整标注、超过 37.4K 细粒度 labels | 逐定律 observable sub-question；发布 PhyJudge-9B | VLM judge 仍是裁判；论文报告 split-half 排名 Spearman $\rho>0.90$，是该采样设计的可靠性，不是绝对正确率 |
+| [PhyGround](https://arxiv.org/abs/2605.10806) | 预印本 | 250 prompts、13 条定律、8 个模型；459 annotators、5,796 份完整标注、超过 37.4K 细粒度 labels | 逐定律 observable sub-question；发布 PhyJudge-9B | VLM judge 仍是裁判；论文报告 split-half 排名 Spearman $`\rho\gt0.90`$，是该采样设计的可靠性，不是绝对正确率 |
 | [GAUGE](https://arxiv.org/abs/2608.05948) | 2026-08 新预印本 | 22 个受控任务族，覆盖刚体、柔性缆绳、织物和体积可变形体；3 个物理引擎评 14 族；6 个 I2V 模型评 5 个刚体任务 | 标定真实轨迹、物理元数据、不确定性、任务特定观测、generalized trajectory error 和参数稳定性 | 最新预印本，尚待独立复现；视频模型部分只覆盖 5 个刚体任务，但它最清楚地区分 plausibility 与 fidelity |
 | [RoboWM-Bench](https://openaccess.thecvf.com/content/CVPR2026W/GigaBrainChallenge/html/Jiang_RoboWM-Bench_A_Benchmark_for_Evaluating_World_Models_in_Robotic_Manipulation_CVPRW_2026_paper.html) | CVPR 2026 Workshop | 将人手或机器人生成视频经 inverse dynamics / pose retargeting 转成动作，在 real-to-sim 重建环境执行 | 从“看起来可行”升级到 step executability 和 task success | 逆动力学、retargeting 与重建仿真器是额外瓶颈；证明仿真可执行性，不自动证明现实可执行性 |
 | [Apple-PI](https://arxiv.org/abs/2607.16401) | 预印本 | Orchard 含 400 个视频、10 个经典力学任务；11 个模型；Perception--Formulation--Deduction 三阶段 | 混合 MLLM 主观分和定律客观测量，定位推理阶段 | 把生成视频当“可见思维轨迹”是评测假设，不等于内部因果机制；最佳视频模型 0.473 为当前论文快照 |
@@ -206,13 +206,13 @@ flowchart TB
 
 这一类方法的共同审计链应固定为：
 
-$$
+```math
 \text{geometry}
 \rightarrow \text{system identification}
 \rightarrow \text{solver}
 \rightarrow \text{render/generate}
 \rightarrow \text{measurement}.
-$$
+```
 
 每一箭头都必须有独立误差或消融。只报告最终视频偏好，无法知道改进来自更正确的物理、较好的纹理，还是更有利的相机视角。
 

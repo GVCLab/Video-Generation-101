@@ -6,11 +6,11 @@
 
 纯 T2V 接收文本 $y$、随机变量 $z$ 与生成配置 $s$，输出视频 $\hat{x}_{1:T}$；原生音视频模型还可以同时输出音频 $\hat{a}$：
 
-$$
+```math
 (\hat{x}_{1:T},\hat{a}) = G_\theta(y,z,s),
 \qquad
 s=(T,H,W,f,\rho,\gamma,\text{seed},\ldots)
-$$
+```
 
 这里 $T,H,W,f$ 分别是帧数、高、宽和帧率，$\rho$ 表示采样/求解配置，$\gamma$ 表示条件引导。**如果输入里出现首帧、参考图、姿态、深度或来源视频，就不再是纯 T2V，而是混合条件生成；如果模型还持续接收动作和新观测并影响下一步，则进入交互式 world model。**
 
@@ -70,7 +70,7 @@ flowchart TD
 | 路线 | 生成变量与分解 | 文本如何进入 | 代表工作 | 真正推进 | 主要瓶颈 |
 |---|---|---|---|---|---|
 | 直接条件 GAN | 一次生成短视频或时空特征 | 文本 embedding 与噪声拼接/调制 | Video Generation from Text [[1]](#ref-1)、TGANs-C [[2]](#ref-2) | 首次把开放 caption 与视频生成直接连接 | 低分辨率、训练不稳定、语义与运动容易模式坍塌 |
-| 离散 token 自回归 | $p(q_{1:N}\mid y)=\prod_i p(q_i\mid q_{<i},y)$ | 文本 token 与视频 token 统一序列或交叉注意力 | CogVideo [[3]](#ref-3)、VideoPoet [[9]](#ref-9) | 语言—视觉统一与多任务接口 | token 数与上下文成本高，误差会沿序列累积 |
+| 离散 token 自回归 | $`p(q_{1:N}\mid y)=\prod_i p(q_i\mid q_{\lt i},y)`$ | 文本 token 与视频 token 统一序列或交叉注意力 | CogVideo [[3]](#ref-3)、VideoPoet [[9]](#ref-9) | 语言—视觉统一与多任务接口 | token 数与上下文成本高，误差会沿序列累积 |
 | masked token | 反复并行预测被 mask 的视频 token | Phenaki 由文本控制 MaskGIT 式填充；MAGVIT 原论文只使用已知帧/部分视频/类别条件 | Phenaki [[7]](#ref-7)；MAGVIT（技术祖先）[[8]](#ref-8) | 变长文本视频与并行条件补全 | 置信度校准、迭代调度和长程一致性仍困难 |
 | 像素/级联 diffusion | 直接生成低分辨率 RGB，再做插帧/空间超分 | cross-attention、条件调制 | Video Diffusion Models [[4]](#ref-4)、Make-A-Video [[5]](#ref-5)、Imagen Video [[6]](#ref-6) | 高保真时空去噪、从图文/无文本视频迁移并扩大分辨率 | 多阶段接口复杂、采样慢、误差可能被插帧/超分放大 |
 | latent video diffusion | 压缩视频 latent 上去噪 | 文本编码器 + cross-attention | Align your Latents [[10]](#ref-10) | 显著降低时空计算并复用图像先验 | codec 损失细节；图像先验不等于运动与物理先验 |
@@ -436,7 +436,7 @@ T2V-CompBench 用 1,400 个 prompt 和七类组合性维度分析复杂属性、
 
 <a id="ref-27"></a>[27] [Ovi: Twin Backbone Cross-Modal Fusion for Audio-Video Generation](https://arxiv.org/abs/2510.01284). Ovi team. arXiv preprint. 2025.
 
-<a id="ref-28"></a>[28] [LTX-2: Efficient Joint Audio-Visual Foundation Model](https://arxiv.org/abs/2601.03233). Yoav HaCohen, Benny Brazowski, Nisan Chiprut, et al. arXiv preprint. 2026. [Official versioned code and weight repository](https://github.com/Lightricks/LTX-2).
+<a id="ref-28"></a>[28] [LTX-2: Efficient Joint Audio-Visual Foundation Model](https://arxiv.org/abs/2601.03233). Yoav HaCohen, Benny Brazowski, Nisan Chiprut, et al. arXiv preprint. 2026. Official versioned code and weight repository [![GitHub: Lightricks/LTX-2](https://img.shields.io/badge/GitHub-Lightricks%2FLTX-2-181717?logo=github&logoColor=white)](https://github.com/Lightricks/LTX-2).
 
 <a id="ref-29"></a>[29] [Sora 2](https://openai.com/index/sora-2/) and [Sora 2 System Card](https://openai.com/index/sora-2-system-card/). OpenAI. Official product/system evidence. 2025; availability page updated in 2026.
 

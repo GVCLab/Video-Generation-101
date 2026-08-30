@@ -31,9 +31,9 @@
 
 把视频分成 $K$ 个时间块 $b_1,\ldots,b_K$ 后，块级自回归写成：
 
-$$
+```math
 p(b_{1:K}\mid c)=\prod_{k=1}^{K}p(b_k\mid b_{<k},c_k).
-$$
+```
 
 $c_k$ 可以是固定文本，也可以是在生成过程中更新的 prompt、相机控制或智能体动作。若模型在块 $k$ 的 attention 中只能读取 $b_{\le k}$，它在块级是 causal；但 $b_k$ 内的多帧仍可互相注意和联合去噪。
 
@@ -52,7 +52,7 @@ $c_k$ 可以是固定文本，也可以是在生成过程中更新的 prompt、�
 
 因此正确的非蕴含链是：
 
-$$
+```math
 \text{causal codec}
 \not\Rightarrow
 \text{causal generator}
@@ -60,7 +60,7 @@ $$
 \text{streaming commit}
 \not\Rightarrow
 \text{real-time SLO}.
-$$
+```
 
 ### 1.2 四个时钟必须分别记账
 
@@ -77,9 +77,9 @@ $$
 
 因果 DiT 将视频数据时间 $k$ 上的访问限制到历史与当前块。对可增量执行的 softmax attention，已经发出的块可转成 data-time KV cache，下一块只需计算新的 query 与必要历史 key/value；recurrent/linear state 则可能保存固定维状态。两者都不同于跨噪声时间 $\tau$ 的 PAB/AdaCache 类 inter-step reuse。若 softmax cache 保存全部历史，缓存仍近似随时长线性增长：
 
-$$
+```math
 M_{KV}\propto L\,N_{history}\,d,
-$$
+```
 
 其中 $L$ 是带缓存的层数，$N_{history}$ 是历史 token 数，$d$ 是每层保存的 key/value 宽度。因此“能用 cache”只是起点；窗口、压缩、检索或递归状态决定系统能否在几分钟后继续运行。
 
@@ -117,10 +117,10 @@ flowchart TB
 
 设第 $i$ 个 token 的噪声等级为 $\tau_i$：
 
-$$
+```math
 z_i(\tau_i)=\alpha(\tau_i)z_i^0+\sigma(\tau_i)\epsilon_i,
 \qquad \tau_i\ \text{可彼此不同}.
-$$
+```
 
 ### 4.1 逐位置噪声怎样变成滚动提交
 
@@ -211,17 +211,17 @@ CausVid 的目标不是从头训练一个小模型，而是把已有高质量双
 
 Teacher Forcing 训练第 $k$ 块时使用真实历史：
 
-$$
+```math
 \hat b_k=f_\theta(b_{<k},\epsilon_k,c).
-$$
+```
 
 推理却只能使用模型历史：
 
-$$
+```math
 \hat b_k=f_\theta(\hat b_{<k},\epsilon_k,c).
-$$
+```
 
-即使每一步只产生很小误差，$b_{<k}$ 与 $\hat b_{<k}$ 的分布差异也会随 rollout 放大。这就是 exposure bias。它在视频里表现为身份渐变、背景漂移、色调累积、运动冻结或边界处突然跳变。
+即使每一步只产生很小误差，$`b_{\lt k}`$ 与 $`\hat b_{\lt k}`$ 的分布差异也会随 rollout 放大。这就是 exposure bias。它在视频里表现为身份渐变、背景漂移、色调累积、运动冻结或边界处突然跳变。
 
 ### 5.3 Self Forcing：训练时就活在自己的历史中
 
@@ -279,11 +279,11 @@ Causal Forcing 指出，用双向 teacher 的 PF-ODE 直接初始化逐帧因果
 
 把“显存固定”写成可审计合同，应同时记录 GPU working set 与外部存储：
 
-$$
+```math
 M_{recent}+M_{anchor}+M_{persistent}+M_{compressed}
 +M_{state}+M_{retrieved}
 \le M_{GPU\ budget},
-$$
+```
 
 而 $M_{ext}(k)$ 可以随已提交时长 $k$ 增长。把检索索引放到 CPU 或磁盘，只证明 resident GPU memory 有界，不能写成总系统成本恒定。
 
@@ -357,11 +357,11 @@ flowchart TB
 
 若 $H_j$ 是第 $j$ 个已提交单元的内容 hash，严格不可变前缀要求：
 
-$$
+```math
 H_j^{\text{before future perturbation}}
 =H_j^{\text{after future perturbation}},
 \qquad j\le h-R.
-$$
+```
 
 ```mermaid
 flowchart TB
@@ -403,11 +403,11 @@ flowchart TB
 
 模型论文常把每秒生成帧数当作实时性的代名词，但在线流媒体需要同时满足：
 
-$$
+```math
 \text{TTFF},\quad \text{condition-to-display},\quad
 \text{inter-frame latency}_{p50/p95/p99},\quad
 \text{jitter},\quad \text{deadline-miss rate},\quad \text{peak memory}.
-$$
+```
 
 原始 trace 至少记录 `arrival → queue → model → decode → commit → display` 六个时间点，并分开冷启动/热启动、单流/并发、batch 与请求到达过程。若目标播放率为 $f$，逐帧 deadline 间隔是 $\Delta=1/f$；平均吞吐超过 $f$ 但 p99 反复超过 $\Delta$，用户仍会看到卡顿。断流后恢复时间、60 秒以上 soak、GPU/CPU/外存斜率和条件到可见响应也必须进入同一报告。
 
@@ -439,16 +439,16 @@ StreamDiffusionV2 将问题明确写成 serving SLO：使用 SLO-aware batching�
 
 | 首次公开 → 正式状态 | 里程碑 | 技术转折 | 截至 2026-08-30 的 artifact surface | 仍不能推出 |
 |---|---|---|---|---|
-| 2024-07 → NeurIPS 2024 | Diffusion Forcing [[1]](#ref-1) | 独立 per-token noise，把 next-unit 与 full-sequence diffusion 放进统一训练接口 | [项目与代码](https://github.com/buoyancy99/diffusion-forcing)公开 | few-step、self-history、实时服务 |
-| 2024-12 → CVPR 2025 | CausVid [[2]](#ref-2) | 双向 teacher → 4-step causal student，建立蒸馏与 KV-cached streaming 主线 | [训练、推理与权重](https://github.com/tianweiy/CausVid)公开 | on-policy history 或开放时长稳定 |
-| 2025-06 → NeurIPS 2025 | Self Forcing [[3]](#ref-3) | 训练时进入自身 rollout 分布，显式处理 exposure bias | [代码、训练配置与 checkpoint](https://github.com/guandeh17/Self-Forcing)公开 | 历史 KV 可从未来损失端到端学习 |
-| 2025-09 → ICLR 2026 | Rolling Forcing [[4]](#ref-4) | 活动窗口联合去噪、sink 与 train-long-test-long；不再要求相邻帧严格串行完成 | [代码、训练与 checkpoint](https://github.com/TencentARC/RollingForcing)公开 | 0.76 s steady-state 是 TTFF，或窗口内严格 frame-causal |
-| 2025-09 → ICLR 2026 | LongLive [[5]](#ref-5) | frame sink、短窗口、self-history 长训与 prompt KV-recache 汇合 | [代码与权重](https://github.com/NVlabs/LongLive)公开；论文数字应对应 v1.0 | 240 s 展示全程稳定或任意时长无损 |
-| 2025-10/11 → MLSys 2026 | StreamDiffusionV2 [[6]](#ref-6) | 把 TTFF、deadline、jitter、batching 与多卡 pipeline 放到核心系统合同 | [推理代码、PyPI 与 checkpoint](https://github.com/chenfengxu714/StreamDiffusionV2)公开；训练与部分 scheduler 仍未齐 | 多卡 aggregate FPS 等于单流延迟 |
-| 2026-02 → ICML 2026 accepted | Causal Forcing [[7]](#ref-7) | 用 AR teacher 修正双向 teacher → 因果 student 的 flow-map 缝隙，再做 self-forcing DMD | [代码、配置与 checkpoint](https://github.com/thu-ml/Causal-Forcing)公开；截至冻结日未定位 PMLR 页面 | 原生 81-frame 配置自动支持开放长视频 |
+| 2024-07 → NeurIPS 2024 | Diffusion Forcing [[1]](#ref-1) | 独立 per-token noise，把 next-unit 与 full-sequence diffusion 放进统一训练接口 | 项目与代码 [![GitHub: buoyancy99/diffusion-forcing](https://img.shields.io/badge/GitHub-buoyancy99%2Fdiffusion-forcing-181717?logo=github&logoColor=white)](https://github.com/buoyancy99/diffusion-forcing)公开 | few-step、self-history、实时服务 |
+| 2024-12 → CVPR 2025 | CausVid [[2]](#ref-2) | 双向 teacher → 4-step causal student，建立蒸馏与 KV-cached streaming 主线 | 训练、推理与权重 [![GitHub: tianweiy/CausVid](https://img.shields.io/badge/GitHub-tianweiy%2FCausVid-181717?logo=github&logoColor=white)](https://github.com/tianweiy/CausVid)公开 | on-policy history 或开放时长稳定 |
+| 2025-06 → NeurIPS 2025 | Self Forcing [[3]](#ref-3) | 训练时进入自身 rollout 分布，显式处理 exposure bias | 代码、训练配置与 checkpoint [![GitHub: guandeh17/Self-Forcing](https://img.shields.io/badge/GitHub-guandeh17%2FSelf-Forcing-181717?logo=github&logoColor=white)](https://github.com/guandeh17/Self-Forcing)公开 | 历史 KV 可从未来损失端到端学习 |
+| 2025-09 → ICLR 2026 | Rolling Forcing [[4]](#ref-4) | 活动窗口联合去噪、sink 与 train-long-test-long；不再要求相邻帧严格串行完成 | 代码、训练与 checkpoint [![GitHub: TencentARC/RollingForcing](https://img.shields.io/badge/GitHub-TencentARC%2FRollingForcing-181717?logo=github&logoColor=white)](https://github.com/TencentARC/RollingForcing)公开 | 0.76 s steady-state 是 TTFF，或窗口内严格 frame-causal |
+| 2025-09 → ICLR 2026 | LongLive [[5]](#ref-5) | frame sink、短窗口、self-history 长训与 prompt KV-recache 汇合 | 代码与权重 [![GitHub: NVlabs/LongLive](https://img.shields.io/badge/GitHub-NVlabs%2FLongLive-181717?logo=github&logoColor=white)](https://github.com/NVlabs/LongLive)公开；论文数字应对应 v1.0 | 240 s 展示全程稳定或任意时长无损 |
+| 2025-10/11 → MLSys 2026 | StreamDiffusionV2 [[6]](#ref-6) | 把 TTFF、deadline、jitter、batching 与多卡 pipeline 放到核心系统合同 | 推理代码、PyPI 与 checkpoint [![GitHub: chenfengxu714/StreamDiffusionV2](https://img.shields.io/badge/GitHub-chenfengxu714%2FStreamDiffusionV2-181717?logo=github&logoColor=white)](https://github.com/chenfengxu714/StreamDiffusionV2)公开；训练与部分 scheduler 仍未齐 | 多卡 aggregate FPS 等于单流延迟 |
+| 2026-02 → ICML 2026 accepted | Causal Forcing [[7]](#ref-7) | 用 AR teacher 修正双向 teacher → 因果 student 的 flow-map 缝隙，再做 self-forcing DMD | 代码、配置与 checkpoint [![GitHub: thu-ml/Causal-Forcing](https://img.shields.io/badge/GitHub-thu-ml%2FCausal-Forcing-181717?logo=github&logoColor=white)](https://github.com/thu-ml/Causal-Forcing)公开；截至冻结日未定位 PMLR 页面 | 原生 81-frame 配置自动支持开放长视频 |
 | 2026-02 → CVPR 2026 | Separable Causal Diffusion [[26]](#ref-26) | once-per-frame causal encoder 与 multi-step frame renderer 解耦 | 正式论文、补充材料与项目页公开；未定位可核验官方代码/checkpoint | causal computation 可分离就等于 self-forcing 或 1-step |
-| 2026-02 → ICLR 2026 | FlowCache [[27]](#ref-27) | 每个 AR chunk 独立 feature-cache policy，并联合压缩 KV | [MAGI-1 / SkyReels-V2 代码](https://github.com/mikeallen39/FlowCache)公开 | 2.38×/6.7× 离线加速已达到实时 SLO |
-| 2025-11 → ICLR 2026 | MotionStream [[28]](#ref-28) | 在线轨迹/相机控制、Self Forcing、sink 与固定滑窗汇合 | [官方仓库](https://github.com/alex4727/motionstream)仍说明代码在内部审核；无可运行权重 | prompt/trajectory 遵循等于物理动作因果 |
+| 2026-02 → ICLR 2026 | FlowCache [[27]](#ref-27) | 每个 AR chunk 独立 feature-cache policy，并联合压缩 KV | MAGI-1 / SkyReels-V2 代码 [![GitHub: mikeallen39/FlowCache](https://img.shields.io/badge/GitHub-mikeallen39%2FFlowCache-181717?logo=github&logoColor=white)](https://github.com/mikeallen39/FlowCache)公开 | 2.38×/6.7× 离线加速已达到实时 SLO |
+| 2025-11 → ICLR 2026 | MotionStream [[28]](#ref-28) | 在线轨迹/相机控制、Self Forcing、sink 与固定滑窗汇合 | 官方仓库 [![GitHub: alex4727/motionstream](https://img.shields.io/badge/GitHub-alex4727%2Fmotionstream-181717?logo=github&logoColor=white)](https://github.com/alex4727/motionstream)仍说明代码在内部审核；无可运行权重 | prompt/trajectory 遵循等于物理动作因果 |
 | 2026-05/06 → 预印本/技术报告 | Causal Forcing++ / Causal-rCM [[8]](#ref-8), [[9]](#ref-9) | 相邻时间点 consistency 初始化与统一 TF→SF recipe，把 step/NFE 口径推到核心 | 共享仓库已有部分代码与 checkpoint；正式 venue 未核验 | 名义 1 step 等于 1 NFE 或端到端首帧 1 step |
 | 2026 → 混合正式接收与预印本 | memory / sparse / recurrent frontier [[10]](#ref-10)–[[21]](#ref-21), [[25]](#ref-25) | 从 recent window 扩展到量化、低秩、持久块、分层、检索、递归状态与未来表示监督 | release surface 必须逐项查，不能整体继承“开放” | fixed resident memory 等于完整长期记忆 |
 

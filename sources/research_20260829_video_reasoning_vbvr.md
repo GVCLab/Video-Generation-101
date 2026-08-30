@@ -25,7 +25,7 @@ The review used a layered search rather than treating one citation database as c
 - The tested object is a black-box system: closed-model Veo 2 or Veo 3 accessed through a publicly callable Google Vertex AI API, including its LLM prompt rewriter. Input is an initial image plus a text instruction; output is an 8-second, 16:9, 720p, 24 FPS video.
 - Chain-of-Frames is introduced with cautious analogy language: successive frames can apply changes through space and time, paralleling the visible role of language tokens in Chain-of-Thought. The paper does not causally establish that one output frame equals one internal reasoning step.
 - The authors explicitly judge that the simple Sudoku solution likely came from the LLM rather than the video model. Their standalone Gemini 2.5 Pro controls neither identify the hidden rewriter nor reproduce its actual rewritten prompts, so they reduce but do not eliminate the hidden-component attribution problem.
-- The paper's `pass@k` protocols are task-specific: maze success is binary best-of-$k$; edge and segmentation take the best metric over candidates after within-video frame selection; visual analogy uses majority voting for $k>1$. They share an added-sampling budget, but do not have one universal probabilistic interpretation.
+- The paper's `pass@k` protocols are task-specific: maze success is binary best-of-$k$; edge and segmentation take the best metric over candidates after within-video frame selection; visual analogy uses majority voting for $`k\gt1`$. They share an added-sampling budget, but do not have one universal probabilistic interpretation.
 - The Veo 2 identifier is internally inconsistent: the main methods text uses `veo-2.0-generate-001`, while several appendix passages use `veo-2.0-generate-preview-001`. Veo 2 versus Veo 3 is a product-version comparison, not a controlled scaling law.
 - The focal paper is therefore treated as a broad phenomenon-discovery and agenda-setting paper. MME-CoF converts breadth into a multidimensional benchmark; VR-Bench narrows CoF to programmable maze trajectories and training; VBVR scales to many tasks and rule scorers; Demystifying Video Reasoning challenges the frame-level mechanism with Chain-of-Steps.
 
@@ -70,7 +70,7 @@ The number is a dated snapshot, not a permanently closed citation set.
 
 ### 2.3 Scorer and human-alignment boundary
 
-- VBVR uses task-specific 0–1 rule scorers and reports Spearman $\rho>0.9$ against human judgments.
+- VBVR uses task-specific 0–1 rule scorers and reports Spearman $`\rho\gt0.9`$ against human judgments.
 - The reported correlation is computed on **nine model-level win-ratio points**, not on all 4,500 video-level judgments.
 - Scorer completeness differs by task. Some scorers verify action order and legal transitions; others mainly test final location, color retention, or absence of large jumps.
 - The result supports more repeatable, interpretable model ranking than a generic VLM judge. It does not prove every intermediate causal constraint is checked.

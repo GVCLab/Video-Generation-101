@@ -8,11 +8,11 @@
 
 ### 1.1 从干净视频到退化观测
 
-令高质量视频为 $X=\{x_t\}_{t=1}^{T}$，观测视频为 $Y=\{y_t\}_{t=1}^{T'}$。通用前向模型可写成
+令高质量视频为 $`X=\lbrace x_t\rbrace_{t=1}^{T}`$，观测视频为 $`Y=\lbrace y_t\rbrace_{t=1}^{T'}`$。通用前向模型可写成
 
-$$
+```math
 Y=\mathcal C_q\!\left(\mathcal S_r\!\left(\mathcal B_k(X)\right)+N;\,m\right),
-$$
+```
 
 其中：
 
@@ -24,9 +24,9 @@ $$
 
 restorer 接收 $(Y,\widehat\phi,C)$，输出
 
-$$
+```math
 (\widehat X,U,A)=f_\theta(Y,\widehat\phi,C),
-$$
+```
 
 其中 $U$ 是不确定性或风险图，$A$ 是退化估计、窗口边界、随机种子与后处理记录。若论文不报告它假定的 $\mathcal D_\phi$，那么“真实世界修复”无法被复现；若用生成先验补出高频细节却不标记不确定区域，也不能把结果当作历史或取证意义上的真实恢复。
 
@@ -88,12 +88,12 @@ flowchart LR
 
 相邻帧中的同一结构可能落在不同采样位置，并在某些帧更清晰、噪声更小或未被遮挡。若 $W_{s\rightarrow t}$ 将支持帧 $s$ 对齐到目标帧 $t$，一种抽象融合写法是
 
-$$
+```math
 h_t=\sum_{s\in\mathcal N(t)} a_{s,t}\odot
 W_{s\rightarrow t}(\psi(y_s)),
 \qquad
 \widehat x_t=g(h_t,y_t),
-$$
+```
 
 其中 $a_{s,t}$ 必须反映遮挡、匹配置信度和退化强度。若运动估计错了，融合会产生 ghosting；若所有支持帧都丢失同一高频，网络只能依赖先验，不能称为从观测中恢复。
 

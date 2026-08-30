@@ -19,16 +19,16 @@
 
 设部署时已观测的 RGB 历史为
 
-$$
+```math
 X=o_{1:T_c}\in[0,1]^{B\times T_c\times V\times C\times H\times W},
-$$
+```
 
 其中 $V$ 是相机数；未来观测为 $Y=o_{T_c+1:T_c+T_h}$。动作命令不是视频帧的附属标签，而是带执行时刻的序列
 
-$$
+```math
 A=\{(a_j,t_j^{\mathrm{cmd}},t_j^{\mathrm{exec}})\}_{j=1}^{H_a},
 \qquad a_j\in\mathbb R^{d_a}.
-$$
+```
 
 离散游戏可用 one-hot 或 token；机器人动作还必须声明绝对/增量、joint/Cartesian、位置/速度/力、坐标系、单位、夹爪编码、控制频率和裁剪范围。缺少这些字段时，$d_a$ 相同也不代表动作语义相同。
 
@@ -43,7 +43,7 @@ $$
 
 最小 world-model 分解可写为
 
-$$
+```math
 \begin{aligned}
 z_t &= E_\theta(o_{\le t},q_{\le t}),\\
 z_{t+1} &\sim p_\theta(z_{t+1}\mid z_t,a_t),\\
@@ -51,7 +51,7 @@ o_{t+1} &\sim p_\theta(o_{t+1}\mid z_{t+1}),\\
 r_t &\sim p_\theta(r_t\mid z_t,a_t),\\
 c_t &\sim p_\theta(c_t\mid z_t,a_t),\qquad c_t=1-d_t.
 \end{aligned}
-$$
+```
 
 $q_t$ 表示 proprioception，$r_t$ 是 reward，$d_t$ 是 termination，$c_t$ 是 continue。decoder 不是所有路线的必需项：MuZero 与 TD-MPC2 直接学习任务相关的 latent、reward/value 或 Q，而不以像素重建为唯一目标 [[6]](#ref-6), [[7]](#ref-7)。但若论文声称“预测的画面正确”，就必须提供 observation decoder 或独立可读的观测预测，不能用 latent control return 替代像素证据。
 
@@ -66,12 +66,12 @@ $q_t$ 表示 proprioception，$r_t$ 是 reward，$d_t$ 是 termination，$c_t$ �
 
 policy-conditioned 模型 rollout 是
 
-$$
+```math
 p_\theta^\pi(\tau\mid X,g)=
 \prod_{k=0}^{H-1}
 \pi(a_k\mid\hat h_k,g)
 p_\theta(\hat o_{k+1},\hat r_k,\hat c_k\mid\hat h_k,a_k),
-$$
+```
 
 其中 $\hat h_{k+1}=U(\hat h_k,a_k,\hat o_{k+1})$。真实闭环则把第二项换成未知的 $p_{\rm env}$，并在每次执行后以真实观测更新历史。PlaNet 已把 latent dynamics 接入在线规划；Dreamer 则在 latent imagination 中学习 actor/critic [[3]](#ref-3), [[4]](#ref-4)。DreamerV3 的统一配置进一步同时建模 observation、reward 和 continue flag，并在广泛控制任务上验证 [[5]](#ref-5)。这些是“预测进入决策”的证据，不等于生成逼真长视频。
 
@@ -79,15 +79,15 @@ $$
 
 动作条件视频最常见、也最隐蔽的错误是把“第 $j$ 个动作”和“第 $j$ 帧”按数组下标对齐。若相机以 $f_o$ Hz 采样、控制器以 $f_a$ Hz 更新，命令还有延迟
 
-$$
+```math
 \delta_j=t_j^{\mathrm{exec}}-t_j^{\mathrm{cmd}},
-$$
+```
 
 则未来帧 $o_i$ 应条件于在曝光区间内**实际生效**的动作，而不是刚发出的动作。用映射
 
-$$
+```math
 \alpha(i)=\max\{j:t_j^{\mathrm{exec}}\le t_i^{\mathrm{obs}}\}
-$$
+```
 
 指定帧 $i$ 对应的最近已执行命令；若控制器采用 zero-order hold，还要记录 $a_j$ 的保持区间。多相机不同步、rolling shutter、网络排队和执行器爬升都会使单一 $\delta$ 不够，此时应保存每个传感器与执行器的原始时间戳并重新采样。
 
@@ -154,11 +154,11 @@ flowchart LR
 
 离线机器人数据通常由行为策略 $\mu$ 采集。若隐藏变量 $u_t$ 同时影响动作与结果，例如操作员只在物体将滑落时收紧夹爪，则
 
-$$
+```math
 p(o_{t+1}\mid o_t,a_t)
 \neq
 p(o_{t+1}\mid o_t,\mathrm{do}(a_t)).
-$$
+```
 
 高容量模型可能只从场景、操作者或任务阶段猜出“常见动作之后常见的画面”。要把主张提升到可干预 dynamics，至少需要：
 
@@ -234,12 +234,12 @@ release surface 还要冻结精确 commit、license、权重是否真的可下�
 
 对候选动作序列 $A$，风险敏感规划可写为
 
-$$
+```math
 J(A)=
 \mathbb E_\theta\!\left[\sum_{k=0}^{H-1}\gamma^k r_k\right]
 -\beta\sqrt{\mathrm{Var}_\theta(R(A))}
 -\lambda U_{\mathrm{OOD}}(A),
-$$
+```
 
 或直接优化 return 的下分位数/CVaR。无论选择哪种形式，都要分别报告生成随机性、模型 ensemble 与 planner 随机性的 seed 和样本数；best-of-$K$ 视觉样本不能用来计算 policy 实际可获得的期望回报。
 
@@ -308,7 +308,7 @@ flowchart TD
 ### 9.1 环境与数据
 
 - 构造可精确 reset 的 $64\times64$ 俯视 2D puck-pushing 环境：一个 agent、一个可推动圆盘、一个目标区和一面障碍；保存内部状态仅用于评价，模型只看 RGB。
-- 相机 16 Hz，控制 4 Hz；每个动作 $a_t=(\Delta x,\Delta y)$ 保持 4 帧。人工加入固定 1 帧或随机 $\{0,1,2\}$ 帧执行延迟，并保存 `t_obs/t_cmd/t_exec`。
+- 相机 16 Hz，控制 4 Hz；每个动作 $a_t=(\Delta x,\Delta y)$ 保持 4 帧。人工加入固定 1 帧或随机 $`\lbrace0,1,2\rbrace`$ 帧执行延迟，并保存 `t_obs/t_cmd/t_exec`。
 - 每条轨迹观测前缀 $T_c=8$ 帧，预测 $T_h=16$ 帧；动作 horizon $H_a=4$。训练至少含随机、目标导向和避障三种行为策略。
 - 从 200 个完全相同的 reset state 各执行左/右、推/停等成对动作，形成独立 intervention test；另留出较大动作幅度、不同摩擦和未见障碍位置作为 OOD。
 - 按初始 state、场景 seed 和行为策略分组切分，不按帧随机切分；运行 5 个模型 seed，公开原始轨迹与时间对齐脚本。
@@ -396,13 +396,13 @@ flowchart TD
 
 <a id="ref-8"></a>[8] Gaoyue Zhou et al. [DINO-WM: World Models on Pre-trained Visual Features enable Zero-shot Planning](https://proceedings.mlr.press/v267/zhou25a.html). ICML. 2025.
 
-<a id="ref-9"></a>[9] DINO-WM authors. [Official DINO-WM repository](https://github.com/gaoyuezhou/dino_wm). GitHub. Accessed 2026-08-30.
+<a id="ref-9"></a>[9] DINO-WM authors. Official DINO-WM repository [![GitHub: gaoyuezhou/dino_wm](https://img.shields.io/badge/GitHub-gaoyuezhou%2Fdino_wm-181717?logo=github&logoColor=white)](https://github.com/gaoyuezhou/dino_wm). GitHub. Accessed 2026-08-30.
 
 <a id="ref-10"></a>[10] Jake Bruce et al. [Genie: Generative Interactive Environments](https://proceedings.mlr.press/v235/bruce24a.html). ICML. 2024.
 
 <a id="ref-11"></a>[11] Eloi Alonso, Adam Jelley, Vincent Micheli, Anssi Kanervisto, Amos Storkey, Tim Pearce, François Fleuret. [Diffusion for World Modeling: Visual Details Matter in Atari](https://proceedings.neurips.cc/paper_files/paper/2024/hash/6bdde0373d53d4a501249547084bed43-Abstract-Conference.html). NeurIPS. 2024.
 
-<a id="ref-12"></a>[12] DIAMOND authors. [Official DIAMOND repository](https://github.com/eloialonso/diamond). GitHub. Accessed 2026-08-30.
+<a id="ref-12"></a>[12] DIAMOND authors. Official DIAMOND repository [![GitHub: eloialonso/diamond](https://img.shields.io/badge/GitHub-eloialonso%2Fdiamond-181717?logo=github&logoColor=white)](https://github.com/eloialonso/diamond). GitHub. Accessed 2026-08-30.
 
 <a id="ref-13"></a>[13] Dani Valevski, Yaniv Leviathan, Moab Arar, Shlomi Fruchter. [Diffusion Models Are Real-Time Game Engines](https://openreview.net/forum?id=P8pqeEkn1H). ICLR. 2025.
 
@@ -410,7 +410,7 @@ flowchart TD
 
 <a id="ref-15"></a>[15] Mahmoud Assran et al. [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). arXiv:2506.09985. 2025.
 
-<a id="ref-16"></a>[16] Meta AI Research. [Official V-JEPA 2 repository](https://github.com/facebookresearch/vjepa2). GitHub. Accessed 2026-08-30.
+<a id="ref-16"></a>[16] Meta AI Research. Official V-JEPA 2 repository [![GitHub: facebookresearch/vjepa2](https://img.shields.io/badge/GitHub-facebookresearch%2Fvjepa2-181717?logo=github&logoColor=white)](https://github.com/facebookresearch/vjepa2). GitHub. Accessed 2026-08-30.
 
 <a id="ref-17"></a>[17] Joel Jang et al. [DreamGen: Unlocking Generalization in Robot Learning through Video World Models](https://proceedings.mlr.press/v305/jang25a.html). CoRL. 2025.
 
@@ -426,17 +426,17 @@ flowchart TD
 
 <a id="ref-23"></a>[23] Angen Ye et al. [GigaWorld-Policy: An Efficient Action-Centered World-Action Model](https://arxiv.org/abs/2603.17240). arXiv:2603.17240. 2026.
 
-<a id="ref-24"></a>[24] GigaAI team. [GigaWorld-Policy-0.5](https://arxiv.org/abs/2607.13960) and [official release repository](https://github.com/open-gigaai/giga-world-policy). 2026.
+<a id="ref-24"></a>[24] GigaAI team. [GigaWorld-Policy-0.5](https://arxiv.org/abs/2607.13960) and official release repository [![GitHub: open-gigaai/giga-world-policy](https://img.shields.io/badge/GitHub-open-gigaai%2Fgiga-world-policy-181717?logo=github&logoColor=white)](https://github.com/open-gigaai/giga-world-policy). 2026.
 
 <a id="ref-25"></a>[25] Ze Huang, Jiahui Zhang, Hairuo Liu, Chenxi Zhang, Ran Cheng, Li Zhang. [Learning Transferable Dynamics Priors from Action to World Modeling](https://arxiv.org/abs/2606.29501). arXiv:2606.29501. 2026.
 
-<a id="ref-26"></a>[26] A2World authors. [Official A2World repository](https://github.com/LogosRoboticsGroup/A2World) and [model card](https://huggingface.co/Fleurrr/A2World-World-Model). Accessed 2026-08-30.
+<a id="ref-26"></a>[26] A2World authors. Official A2World repository [![GitHub: LogosRoboticsGroup/A2World](https://img.shields.io/badge/GitHub-LogosRoboticsGroup%2FA2World-181717?logo=github&logoColor=white)](https://github.com/LogosRoboticsGroup/A2World) and [model card](https://huggingface.co/Fleurrr/A2World-World-Model). Accessed 2026-08-30.
 
 <a id="ref-27"></a>[27] Haoyu Wu, Jiwen Yu, Yingtian Zou, Xihui Liu. [MultiWorld: Scalable Multi-Agent Multi-View Video World Models](https://arxiv.org/abs/2604.18564). arXiv:2604.18564. 2026.
 
-<a id="ref-28"></a>[28] MultiWorld authors. [Official MultiWorld repository](https://github.com/CIntellifusion/MultiWorld). GitHub. Accessed 2026-08-30.
+<a id="ref-28"></a>[28] MultiWorld authors. Official MultiWorld repository [![GitHub: CIntellifusion/MultiWorld](https://img.shields.io/badge/GitHub-CIntellifusion%2FMultiWorld-181717?logo=github&logoColor=white)](https://github.com/CIntellifusion/MultiWorld). GitHub. Accessed 2026-08-30.
 
-<a id="ref-29"></a>[29] Lucas Maes, Quentin Le Lidec, Damien Scieur, Yann LeCun, Randall Balestriero. [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312) and [official repository](https://github.com/lucas-maes/le-wm). 2026.
+<a id="ref-29"></a>[29] Lucas Maes, Quentin Le Lidec, Damien Scieur, Yann LeCun, Randall Balestriero. [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312) and official repository [![GitHub: lucas-maes/le-wm](https://img.shields.io/badge/GitHub-lucas-maes%2Fle-wm-181717?logo=github&logoColor=white)](https://github.com/lucas-maes/le-wm). 2026.
 
 <a id="ref-30"></a>[30] WorldGym authors. [WorldGym: World Model as an Environment for Policy Evaluation](https://openreview.net/forum?id=hidBHy1CAw) and [official project page](https://world-model-eval.github.io/). ICLR. 2026.
 

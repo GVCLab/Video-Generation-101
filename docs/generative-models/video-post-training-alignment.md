@@ -120,10 +120,10 @@ VideoScore 的人工数据以多个维度训练自动评价器，并由作者在
 
 若一段视频经过 $K$ 个去噪/flow 时间步才得到终态 $x_0$，最粗的做法是把终态分数 $R(x_0)$ 广播给所有动作：
 
-$$
+```math
 \hat A_k = R(x_0)-b,
 \qquad k=1,\ldots,K.
-$$
+```
 
 它把“整段视频好/坏”归因给每一步，方差高且因果定位弱。视频还有第二条时间轴：帧或 segment 时间 $t_v$。所以 credit assignment 同时要回答：坏运动发生在哪一帧/段，以及哪段 denoising trajectory 导致它。
 
@@ -135,7 +135,7 @@ InstructVideo 把视频 reward 接入部分 DDIM 链，并用随时间衰减的 
 
 对离线 pair $(c,v^+,v^-)$，DPO 型目标比较 policy 与 reference 对 chosen/rejected 的对数似然差：
 
-$$
+```math
 \mathcal L_{\mathrm{DPO}}
 =
 -\mathbb E\log\sigma\!\left[
@@ -145,7 +145,7 @@ $$
 \log\frac{p_\theta(v^-\mid c)}{p_{\mathrm{ref}}(v^-\mid c)}
 \right)
 \right].
-$$
+```
 
 Diffusion-DPO 把该思想转写到扩散模型训练目标，并在文本到图像上给出奠基实证 [[5]](#ref-5)。VideoDPO 将其扩到视频多维 pair [[11]](#ref-11)，VideoAlign 则为 rectified-flow 视频模型给出 Flow-DPO [[13]](#ref-13)。离线 direct optimization 的优点是可复用固定数据、无需在每一步训练现场生成候选；缺点是 pair 支持域会逐渐落后于更新后的策略，而且 likelihood surrogate、reference 与时间权重的设计会改变真实优化强度。
 
@@ -161,7 +161,7 @@ Dual-IPO 进一步交替更新 reward model 与视频生成器，并用推理链
 
 RWR 仍回归已有训练目标，但用 reward 改变样本权重，例如
 
-$$
+```math
 w_i
 =
 \frac{\exp(r_i/\tau)}{\sum_j\exp(r_j/\tau)},
@@ -169,7 +169,7 @@ w_i
 \mathcal L_{\mathrm{RWR}}
 =
 \sum_i w_i\mathcal L_{\mathrm{flow/denoise}}(v_i,c_i).
-$$
+```
 
 VideoAlign 的 Flow-RWR 是正式的视频实证 [[13]](#ref-13)。它不需要把完整去噪链写成 policy-gradient 轨迹，但 reward 温度过低会让少数高分样本主导更新，造成有效样本量下降和模式收缩。
 
@@ -177,11 +177,11 @@ VideoAlign 的 Flow-RWR 是正式的视频实证 [[13]](#ref-13)。它不需要�
 
 DDPO 把扩散去噪视为多步决策过程，用 policy gradient 直接最大化最终 reward；其正式证据来自图像生成 [[4]](#ref-4)。在视频中，GRPO 类方法常对同一 prompt 采样一组 $G$ 个视频，以组内标准化 reward 形成优势：
 
-$$
+```math
 A_i
 =
 \frac{r_i-\bar r}{s_r+\epsilon}.
-$$
+```
 
 它省去单独 value network，却需要 $G$ 次长视频 rollout。若组内 reward 全相同，优势接近零；若 RM 有可利用漏洞，组内竞争会放大该方向。BranchGRPO 通过共享 prefix 和分支减少重复计算，并做深度 credit [[26]](#ref-26)；TempFlow-GRPO 还提出噪声感知时间权重与 seed 分组，但正式实验主要是图像，不能把它直接写成视频结果 [[27]](#ref-27)。
 
@@ -346,7 +346,7 @@ VideoDPO 使用多个视觉模型构造 OmniScore，论文补充材料也承认�
 
 <a id="ref-19"></a>[19] Wang et al. [Align-A-Video: Deterministic Reward Tuning of Image Diffusion Models for Consistent Video Editing](https://openaccess.thecvf.com/content/CVPR2025/html/Wang_Align-A-Video_Deterministic_Reward_Tuning_of_Image_Diffusion_Models_for_Consistent_CVPR_2025_paper.html). CVPR, 2025.
 
-<a id="ref-20"></a>[20] Li et al. [T2V-Turbo official code](https://github.com/Ji4chenLi/t2v-turbo). Official repository, accessed 2026-08-30.
+<a id="ref-20"></a>[20] Li et al. T2V-Turbo official code [![GitHub: Ji4chenLi/t2v-turbo](https://img.shields.io/badge/GitHub-Ji4chenLi%2Ft2v-turbo-181717?logo=github&logoColor=white)](https://github.com/Ji4chenLi/t2v-turbo). Official repository, accessed 2026-08-30.
 
 <a id="ref-21"></a>[21] Zhang et al. [Align Video Diffusion Model with Online Video-Centric Preference Optimization](https://openaccess.thecvf.com/content/WACV2026/html/Zhang_Align_Video_Diffusion_Model_with_Online_Video-Centric_Preference_Optimization_WACV_2026_paper.html). WACV, 2026.
 

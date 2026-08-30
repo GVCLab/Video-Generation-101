@@ -17,17 +17,17 @@
 
 令视频 tokenizer 输出连续 latent：
 
-$$
+```math
 z\in\mathbb{R}^{B\times C_z\times T'\times H'\times W'},
-$$
+```
 
 在噪声或运输时间 $\tau$ 上，骨干实现的是某个条件映射：
 
-$$
+```math
 f_\theta(z_\tau,\tau,c;m)
 \rightarrow
 \widehat y_\tau,
-$$
+```
 
 其中 $c$ 是文本、图像、音频、相机或其他条件，$m$ 是可选的 attention mask，$\widehat y_\tau$ 可以是 $\epsilon$、$x_0$、score、常见 $v$、flow velocity 或蒸馏目标。**输出头预测什么由 objective 决定；内部怎样混合 token 才由 backbone 决定。**
 
@@ -49,12 +49,12 @@ $$
 
 若在 latent 网格上使用 patch size $(p_t,p_h,p_w)$，序列长度是：
 
-$$
+```math
 N=
 \left\lceil\frac{T'}{p_t}\right\rceil
 \left\lceil\frac{H'}{p_h}\right\rceil
 \left\lceil\frac{W'}{p_w}\right\rceil.
-$$
+```
 
 这条式子把三个常被混用的词拆开：
 
@@ -68,20 +68,20 @@ $$
 
 对单层 dense self-attention，若 hidden width 为 $d$，head 数为 $h$，粗略主项包括：
 
-$$
+```math
 \underbrace{O(Nd^2)}_{QKV\text{ 与输出投影}}
 +
 \underbrace{O(N^2d)}_{QK^\top\text{ 与 }AV}
 +
 \underbrace{O(N^2)}_{\text{score/probability storage}}.
-$$
+```
 
 因此“attention 是二次复杂度”只描述 global dense attention 的一部分。在较短序列或很宽的模型上，$Nd^2$ 投影与 FFN 仍可能占主要时间；在多卡长序列上，all-to-all、all-gather 和 kernel launch 可能主导 wall time。一个可信的效率结论必须同时报告：
 
-$$
+```math
 (N,\ d,\ L,\ P_{total},\ P_{active},\ \text{FLOPs/forward},\ \text{NFE},\
 \text{peak VRAM},\ \text{latency},\ \text{throughput},\ \text{communication}).
-$$
+```
 
 ## 3. Video DiT block 到底做什么
 
@@ -120,13 +120,13 @@ flowchart LR
 
 标准 Transformer block 可抽象为：
 
-$$
-u_{\ell}=x_{\ell}+M_\ell(\operatorname{Norm}(x_{\ell});c,\tau,m),
-$$
+```math
+u_{\ell}=x_{\ell}+M_\ell(\mathrm{Norm}(x_{\ell});c,\tau,m),
+```
 
-$$
-x_{\ell+1}=u_{\ell}+F_\ell(\operatorname{Norm}(u_{\ell});c,\tau),
-$$
+```math
+x_{\ell+1}=u_{\ell}+F_\ell(\mathrm{Norm}(u_{\ell});c,\tau),
+```
 
 其中 $M_\ell$ 是 attention/linear mixer，$F_\ell$ 是 FFN 或 MoE。替换 mixer 不会自动减少 FFN 成本；路由 FFN 专家也不会自动改变 attention 连边。实现报告至少要拆出 mixer、FFN、condition modules 和 output head 的参数与耗时。
 
@@ -145,9 +145,9 @@ Wan2.2 的高噪声/低噪声 expert 是沿 $\tau$ 路由，不是把视频前�
 
 所有视频 token 在一层中两两交互，attention 主项为：
 
-$$
+```math
 O(N^2d)=O(T_p^2S^2d).
-$$
+```
 
 优点是单层 receptive field 全局，便于远距离身份、场景与事件通信；缺点是 score matrix 随时长和分辨率平方增长。Step-Video-T2V 的技术报告明确采用 3D full attention，HunyuanVideo 的双流到单流 block 也在统一 token 序列上做全注意力；这些设计证明“大模型可以采用 full attention”，却不能证明 full attention 在固定预算下总是最佳 [[8]](#ref-8) [[9]](#ref-9)。
 
@@ -155,9 +155,9 @@ $$
 
 先在每个时间切片内做空间 attention，再让同一空间位置跨时间交互，主项近似：
 
-$$
+```math
 O(T_pS^2d)+O(ST_p^2d).
-$$
+```
 
 相对 full attention，它删除了一层内任意时空位置的直接连边；多层交替后仍可传播到全局。Latte 系统比较了四种时空分解变体；早期 video diffusion 与大量图像模型视频化方法也常把 spatial 与 temporal block 分开 [[2]](#ref-2) [[5]](#ref-5)。公平比较必须匹配层数、宽度和计算，否则“分解更好”可能只是更深网络或更强图像初始化的收益。
 
@@ -179,9 +179,9 @@ RAPID 复用早期 denoising step 得到的 attention importance，并跨 step �
 
 线性 attention 通常利用特征映射或结合律，把
 
-$$
-\operatorname{softmax}(QK^\top)V
-$$
+```math
+\mathrm{softmax}(QK^\top)V
+```
 
 替换为可先聚合 $K,V$ 状态的形式。其复杂度可能写成 $O(Nrd)$ 或 $O(Nd^2)$，取决于 feature rank、head width 和 kernel；“linear”描述对序列长度的渐近关系，不表示常数小，也不保证有限精度下与 softmax 等价。
 
@@ -191,7 +191,7 @@ LinGen 以线性复杂度架构面向高分辨率分钟级视频；SANA-Video �
 
 Hybrid block 在部分层、head、token 或 chunk 上保留 dense softmax，其余走 linear/sparse 路径。若 dense 比例为 $\alpha$，粗略账本应写成：
 
-$$
+```math
 C_{mix}
 \approx
 \alpha C_{dense}
@@ -199,7 +199,7 @@ C_{mix}
 (1-\alpha)C_{efficient}
 +
 C_{routing/state}.
-$$
+```
 
 SANA-Video 2.0 的公开设计是 75% gated bidirectional linear attention 与 25% dense softmax anchor，并加入跨网络深度复用 completed-block feature 的 AttnRes；官方文档截至本章快照日公开的是 5B 720p checkpoint，而 14B 配置/权重仍标为 coming soon [[16]](#ref-16) [[17]](#ref-17)。因为四分之一层仍是 dense softmax，这一固定比例架构的**严格渐近复杂度仍含 $O(N^2)$ 项**；“以线性层为主”不能缩写成“整个模型严格 $O(N)$”。Attention Surgery、BLADE 与 ReHyAt 分别从 post-training linearization、block-sparse + step distillation 和 recurrent hybrid 方向说明：2026 年的前沿不再只是“把 softmax 全部换掉”，而是学习**哪些位置仍值得保留昂贵交互** [[25]](#ref-25)–[[27]](#ref-27)。
 
@@ -207,15 +207,15 @@ SANA-Video 2.0 的公开设计是 75% gated bidirectional linear attention 与 2
 
 Mask 与 mixer 类型正交：dense、window、sparse、linear 或 hybrid 都可以是双向、严格 causal 或有限 lookahead。对视频数据时间 $k$：
 
-$$
+```math
 m_{ij}=
 \begin{cases}
 0, & k_j\le k_i+\ell,\\
 -\infty, & k_j>k_i+\ell,
 \end{cases}
-$$
+```
 
-其中 $\ell=0$ 是严格 causal，$\ell>0$ 是有限 lookahead。这个 mask 只定义信息可见性；要声称 streaming，还必须给出 chunk 输入、state/cache 更新、revision window、commit frontier、backpressure 和真实 SLO。
+其中 $\ell=0$ 是严格 causal，$`\ell\gt0`$ 是有限 lookahead。这个 mask 只定义信息可见性；要声称 streaming，还必须给出 chunk 输入、state/cache 更新、revision window、commit frontier、backpressure 和真实 SLO。
 
 ## 5. 位置、packing 与条件融合
 
@@ -254,9 +254,9 @@ DiT 的图像实验建立了随模型 GFLOPs 增长而改善的 scaling 观察 [
 
 Wan2.2 官方实现沿 denoising timestep 切换 high-noise 与 low-noise expert：前者负责高噪声阶段的整体布局，后者负责低噪声阶段的细节；官方仓库将其描述为约 27B 总参数、每个 denoising step 激活约 14B [[18]](#ref-18) [[19]](#ref-19)。正确账本是：
 
-$$
+```math
 P_{total}\ne P_{active/step},
-$$
+```
 
 但这**不表示每个 active expert 内部 attention 已变便宜**。还要报告两个 expert 是否同时常驻显存、是否 CPU/offload、切换开销、每个 $\tau$ 区间的利用率，以及切换边界是否产生质量不连续。若路由只由预定 timestep 阈值决定，也不能写成 content-adaptive MoE。
 
@@ -287,13 +287,13 @@ ScaleFusion 针对视频 DiT 的时空 attention 做分布式切分与通信重�
 
 ViDiT-Q、QuantSparse 和 DeltaQuant 分别探索视频 DiT 量化、量化与稀疏协同、时空 delta smoothing [[32]](#ref-32) [[33]](#ref-33) [[34]](#ref-34)。量化改变算术精度、权重/activation bytes 和 kernel；减少 NFE 则减少 backbone 被调用的次数。端到端成本近似：
 
-$$
+```math
 C_{sample}
 \approx
 \sum_{i=1}^{\mathrm{NFE}}
 C_{backbone}(N_i,d,L,\rho_i,q_i,\text{hardware})
 +C_{codec}+C_{scheduler}+C_{I/O}.
-$$
+```
 
 这里 $\rho_i$ 是第 $i$ 步实际 attention density，$q_i$ 是精度。把一个 4-step sparse/quantized 系统与 50-step dense FP16 baseline 比较可以说明“整套系统更快”，却不能单独归因于 attention、quantization 或 distillation。
 
@@ -527,7 +527,7 @@ flowchart LR
 
 <a id="ref-10"></a>[10] [LTX-Video: Realtime Video Latent Diffusion](https://arxiv.org/abs/2501.00103). Lightricks team. Author preprint and official open implementation. First public 2024-12.
 
-<a id="ref-11"></a>[11] [Open-Sora 1.2 Report](https://github.com/hpcaitech/Open-Sora/blob/main/docs/report_02.md). HPC-AI Tech. Official technical report and code. 2024.
+<a id="ref-11"></a>[11] Open-Sora 1.2 Report [![GitHub: hpcaitech/Open-Sora](https://img.shields.io/badge/GitHub-hpcaitech%2FOpen-Sora-181717?logo=github&logoColor=white)](https://github.com/hpcaitech/Open-Sora/blob/main/docs/report_02.md). HPC-AI Tech. Official technical report and code. 2024.
 
 <a id="ref-12"></a>[12] [LinGen: Towards High-Resolution Minute-Length Text-to-Video Generation with Linear Computational Complexity](https://openaccess.thecvf.com/content/CVPR2025/papers/Wang_LinGen_Towards_High-Resolution_Minute-Length_Text-to-Video_Generation_with_Linear_Computational_Complexity_CVPR_2025_paper.pdf). Fu-Yun Wang et al. CVPR. 2025.
 
@@ -541,9 +541,9 @@ flowchart LR
 
 <a id="ref-17"></a>[17] [SANA-Video 2.0 Official Documentation](https://nvlabs.github.io/Sana/docs/sana_video2/). NVIDIA Research. Official documentation and release surface. 2026.
 
-<a id="ref-18"></a>[18] [Wan2.2 Official Repository](https://github.com/Wan-Video/Wan2.2). Wan Team. Official code, model cards and weights. 2025.
+<a id="ref-18"></a>[18] Wan2.2 Official Repository [![GitHub: Wan-Video/Wan2.2](https://img.shields.io/badge/GitHub-Wan-Video%2FWan2.2-181717?logo=github&logoColor=white)](https://github.com/Wan-Video/Wan2.2). Wan Team. Official code, model cards and weights. 2025.
 
-<a id="ref-19"></a>[19] [Wan2.2 timestep expert routing implementation](https://github.com/Wan-Video/Wan2.2/blob/main/wan/text2video.py). Wan Team. Official code. 2025.
+<a id="ref-19"></a>[19] Wan2.2 timestep expert routing implementation [![GitHub: Wan-Video/Wan2.2](https://img.shields.io/badge/GitHub-Wan-Video%2FWan2.2-181717?logo=github&logoColor=white)](https://github.com/Wan-Video/Wan2.2/blob/main/wan/text2video.py). Wan Team. Official code. 2025.
 
 <a id="ref-20"></a>[20] [RAPID: Reusing Attention Sparsity with Inter-step Adaptation for Efficient Video Generation](https://openaccess.thecvf.com/content/CVPR2026/papers/Lin_RAPID_Reusing_Attention_Sparsity_with_Inter-step_Adaptation_for_Efficient_Video_CVPR_2026_paper.pdf). CVPR. 2026.
 
@@ -565,7 +565,7 @@ flowchart LR
 
 <a id="ref-29"></a>[29] [ScaleFusion: Fusing Model and Parallelism for Efficient Video Diffusion Transformers](https://openreview.net/pdf?id=anZWBeWnWh). MLSys. 2025.
 
-<a id="ref-30"></a>[30] [Open-Sora official repository](https://github.com/hpcaitech/Open-Sora). HPC-AI Tech. Official code and reports.
+<a id="ref-30"></a>[30] Open-Sora official repository [![GitHub: hpcaitech/Open-Sora](https://img.shields.io/badge/GitHub-hpcaitech%2FOpen-Sora-181717?logo=github&logoColor=white)](https://github.com/hpcaitech/Open-Sora). HPC-AI Tech. Official code and reports.
 
 <a id="ref-31"></a>[31] [xDiT: an Inference Engine for Diffusion Transformers with Massive Parallelism](https://arxiv.org/abs/2411.01738). Author preprint and official implementation. 2024.
 

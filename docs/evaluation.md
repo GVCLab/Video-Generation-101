@@ -111,9 +111,9 @@ ITU-T P.910 至今仍给出多媒体视频主观质量实验的方法规范 [[2]
 
 2014—2016 年前后的深度视频预测通常从若干上下文帧预测未来帧。常见数据集包括 Moving MNIST、KTH、UCF-101 和机器人交互视频，输出常以 MSE、PSNR、SSIM 以及人工视觉比较评价。对像素范围为 $[0,L]$ 的帧，PSNR 为：
 
-$$
+```math
 \mathrm{PSNR}=10\log_{10}\frac{L^2}{\mathrm{MSE}}.
-$$
+```
 
 这类指标便于复现，也适合未来接近确定的场景；但它们把所有像素错位同等处理。轻微相机移动会导致低分，而一个把多种未来平均成模糊区域的模型反而可能获得较好的 MSE。2015 年以后，研究开始同时报告梯度差异、锐度和感知判断，并使用对抗损失减少模糊 [[1]](#ref-1)。
 
@@ -121,9 +121,9 @@ $$
 
 当模型显式引入随机 latent 后，评价从“预测是否等于唯一真值”变成“预测分布是否覆盖合理未来”。常见做法是对同一上下文采样 $N$ 个未来，再报告最接近真值的样本：
 
-$$
+```math
 d_{\text{best-of-}N}=\min_{i\in\{1,\dots,N\}}d(\hat{x}^{(i)}_{1:T},x_{1:T}).
-$$
+```
 
 它能检验模型是否有机会覆盖真实未来，但分数会随 $N$ 单调改善，且可能奖励“撒网式”生成。如果不同时报告样本预算、平均质量、样本间多样性和异常样本率，就无法公平比较。Stochastic Video Generation with a Learned Prior 等工作使“质量—多样性”权衡成为视频预测评测的核心问题 [[5]](#ref-5)。
 
@@ -141,16 +141,16 @@ VideoGAN、MoCoGAN 等生成模型不再承诺重建某个未来，而是学习�
 
 IS 通过分类器输出衡量单个样本类别分布是否尖锐、整个样本集合的边缘类别分布是否多样：
 
-$$
+```math
 \mathrm{IS}=\exp\left(\mathbb{E}_{x}\left[D_{KL}(p(y\mid x)\Vert p(y))\right]\right).
-$$
+```
 
 它不需要真实参考集，但严重依赖分类器和标签域；它可以被类内复制、分类器对抗样本或与视频质量无关的类别多样性误导。FID 则把真实与生成样本的特征近似为高斯分布：
 
-$$
+```math
 \mathrm{FID}=\lVert\mu_r-\mu_g\rVert_2^2+
 \mathrm{Tr}\left(\Sigma_r+\Sigma_g-2(\Sigma_r\Sigma_g)^{1/2}\right).
-$$
+```
 
 FID 同时对特征均值和协方差敏感，较 IS 更能检测生成分布与真实分布的偏移 [[8]](#ref-8) [[9]](#ref-9)。但若逐帧计算，它完全不知道帧的先后顺序。
 
@@ -423,9 +423,9 @@ must_persist:
 
 若模型 $i$ 与 $j$ 的潜在质量分别为 $\theta_i,\theta_j$，Bradley–Terry 模型写为：
 
-$$
+```math
 P(i \succ j)=\sigma(\theta_i-\theta_j).
-$$
+```
 
 也可用 Thurstone/probit 形式。协议必须允许平局、“都差”和“无法判断”，并说明它们是单独建模、丢弃还是拆分权重。模型比较图需要连通，否则不同连通分量的强度不可识别。置信区间应以 prompt 为 cluster bootstrap；若同一标注者反复评样本，再加入 annotator random effect。
 
@@ -458,9 +458,9 @@ $$
 
 Teacher forcing 下的一步预测使用真实历史作为输入，主要测局部拟合；自由 rollout 把模型自己的输出继续送回模型，会暴露误差积累和分布漂移。应绘制指标随 horizon $h$ 的曲线，而不是只给一个平均数：
 
-$$
+```math
 E(h)=\mathbb{E}\left[d\left(\hat{s}_{t+h},s_{t+h}\right)\right],\qquad h=1,2,\ldots,H.
-$$
+```
 
 同时报告首次不可恢复错误时间、状态变量误差、对象存活率、身份保持、几何回环一致性和 reward/value 误差。只在前几帧上评价无法证明长期 world model 能力。
 
@@ -468,13 +468,13 @@ $$
 
 固定相同初始状态和随机因素，只改变动作 $a$，比较生成后果。一个最小测试可以是：向左推、向右推、不接触。评测既要检查动作影响的目标变量是否按预期变化，也要检查背景、对象身份等不应变化的因素是否保持。可以定义动作效应误差：
 
-$$
+```math
 E_{\mathrm{effect}}=
 d\left(
 [f(\hat{s}^{a_1}_{t+h})-f(\hat{s}^{a_0}_{t+h})],
 [f(s^{a_1}_{t+h})-f(s^{a_0}_{t+h})]
 \right).
-$$
+```
 
 这里 $f$ 是可解释状态探针，例如物体位置、抽屉开合、车辆速度或接触状态。这比分别检查两段视频“看起来合理”更能隔离动作因果效应。
 
@@ -492,10 +492,10 @@ $$
 
 一个 world model 可以短期预测很准，却在决策关键的稀有状态上出错。最直接的验证是让多个候选策略在 learned model 中得到预测回报 $\hat{J}(\pi)$，再在真实环境或独立高保真 simulator 中测 $J(\pi)$。应报告：
 
-$$
+```math
 \rho_{\mathrm{policy}}=
 \mathrm{rankcorr}(\hat{J}(\pi),J(\pi)),
-$$
+```
 
 以及 top-k 策略选择准确率、planning regret、predicted-to-real return gap 和使用模型后的 optimization lift。若策略只在 learned simulator 中获得高分、到真实环境立即失败，就是 model exploitation。应主动用长规划 horizon、分布外动作和对抗性 planner 搜索这种漏洞。
 
@@ -573,11 +573,11 @@ WorldModelBench 在 2025 年开始专门用指令遵循、物理违规和大规�
 
 核心部署量不是最好一次的速度，而是：
 
-$$
+```math
 \text{time-to-usable-video},\qquad
 \text{energy-per-accepted-second},\qquad
 \text{cost-per-accepted-video}.
-$$
+```
 
 其中分母必须只计满足预设质量和安全门槛的输出，分子则包含拒绝、失败、超时和重试成本。SLO 可写成 `p95 latency ≤ T`，或等价地写“至少 95% 的合格请求在 $T$ 秒内完成”，避免混用比例与分位数，也避免把不可用视频算作吞吐。
 
@@ -787,7 +787,7 @@ safety:
 
 <a id="ref-3"></a>[3] [Image quality assessment: from error visibility to structural similarity](https://doi.org/10.1109/TIP.2003.819861). Zhou Wang, Alan C. Bovik, Hamid R. Sheikh, Eero P. Simoncelli. IEEE Transactions on Image Processing. 2004.
 
-<a id="ref-4"></a>[4] [VMAF: Video Multi-Method Assessment Fusion](https://github.com/Netflix/vmaf). Netflix. Official implementation and documentation.
+<a id="ref-4"></a>[4] VMAF: Video Multi-Method Assessment Fusion [![GitHub: Netflix/vmaf](https://img.shields.io/badge/GitHub-Netflix%2Fvmaf-181717?logo=github&logoColor=white)](https://github.com/Netflix/vmaf). Netflix. Official implementation and documentation.
 
 <a id="ref-5"></a>[5] [Stochastic Video Generation with a Learned Prior](https://arxiv.org/abs/1802.07687). Remi Denton, Rob Fergus. ICML. 2018.
 
