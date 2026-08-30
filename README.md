@@ -26,7 +26,7 @@ _Coding Agent 扩展研究覆盖面，研究者对结论与证据负责。_
 
 ## 🧭 从哪里开始
 
-不需要从头到尾阅读。选择与你当前目标最接近的入口即可。
+不需要从头到尾阅读。选择与你当前目标最接近的入口即可；如需按读者身份获得完整的阅读顺序、跳读原则与阶段性产出，请使用[分读者阅读指引](docs/reader-guides.md)。
 
 | 读者与目标 | 建议入口 | 你将获得什么 |
 |---|---|---|
@@ -92,6 +92,7 @@ _点击图片打开交互版技术地图。图中强调路线之间的继承、�
 | 掌握技术体系 | [生成模型](docs/generative-models.md) → [基础模型](docs/foundation-models.md) → [评测](docs/evaluation.md) |
 | 开展研究 | [任务地图](docs/taxonomy.md) → [技术时间线](docs/timeline.md) → [精选阅读](docs/reading-list.md) → 具体专题 |
 | 面向系统与应用 | 选择任务专题 → [开放模型](resources/open-models.md) → [数据集](resources/datasets.md) → [评测指南](docs/evaluation.md) |
+| 按身份获得完整路线 | [分读者阅读指引](docs/reader-guides.md) → 选择通识、创作/产品、工程、研究、世界模型或教学路线 → 完成对应阶段产出 |
 
 ## 🗂️ 仓库结构
 
@@ -104,6 +105,7 @@ Video-Generation-101/
 ├── README.md                    # 项目总览与学习入口
 ├── docs/
 │   ├── getting-started.md       # 零基础导览
+│   ├── reader-guides.md         # 分读者阅读顺序与阶段产出
 │   ├── generative-models.md     # 生成机制主线
 │   ├── foundation-models.md     # 视频基础模型
 │   ├── video-reasoning.md       # 视频推理
@@ -131,6 +133,22 @@ Video-Generation-101/
 ## 🤝 参与贡献
 
 欢迎补充论文、开放模型、数据集、复现结果和勘误。提交前请阅读 [贡献指南](CONTRIBUTING.md)。
+
+## 📚 Citation
+
+如果本仓库对您的研究、教学或项目有帮助，欢迎引用：
+
+```bibtex
+@software{video_generation_101_2026,
+  title = {Video Generation 101: From Motion Models to World Models},
+  author = {Cun, Xiaodong and Video Generation 101 contributors},
+  year = {2026},
+  version = {0.1.0},
+  url = {https://github.com/GVCLab/Video-Generation-101}
+}
+```
+
+完整引用元数据请参见 [CITATION.cff](CITATION.cff)。
 
 ## 📄 License
 
