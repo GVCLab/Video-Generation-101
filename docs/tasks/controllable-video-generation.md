@@ -509,16 +509,16 @@ S(x,C)=\big(A_C,F_R,N_M,D_{Y\mid x,C}\big),
 
 <a id="ref-38"></a>[38] [Gen-4 Video Prompting Guide](https://help.runwayml.com/hc/en-us/articles/39789879462419-Gen-4-Video-Prompting-Guide). Runway. Accessed 2026-08-30.
 
-<a id="ref-39"></a>[39] MotionCtrl official repository [![GitHub: TencentARC/MotionCtrl](https://img.shields.io/badge/GitHub-TencentARC%2FMotionCtrl-181717?logo=github&logoColor=white)](https://github.com/TencentARC/MotionCtrl). Tencent ARC. Repository snapshot accessed 2026-08-30.
+<a id="ref-39"></a>[39] MotionCtrl official repository [![GitHub: TencentARC/MotionCtrl](https://img.shields.io/github/stars/TencentARC/MotionCtrl?style=social)](https://github.com/TencentARC/MotionCtrl). Tencent ARC. Repository snapshot accessed 2026-08-30.
 
-<a id="ref-40"></a>[40] Tora official repository [![GitHub: alibaba/Tora](https://img.shields.io/badge/GitHub-alibaba%2FTora-181717?logo=github&logoColor=white)](https://github.com/alibaba/Tora). Alibaba. Repository snapshot accessed 2026-08-30.
+<a id="ref-40"></a>[40] Tora official repository [![GitHub: alibaba/Tora](https://img.shields.io/github/stars/alibaba/Tora?style=social)](https://github.com/alibaba/Tora). Alibaba. Repository snapshot accessed 2026-08-30.
 
-<a id="ref-41"></a>[41] BulletTime official repository [![GitHub: 19reborn/BulletTime](https://img.shields.io/badge/GitHub-19reborn%2FBulletTime-181717?logo=github&logoColor=white)](https://github.com/19reborn/BulletTime). Repository snapshot accessed 2026-08-30.
+<a id="ref-41"></a>[41] BulletTime official repository [![GitHub: 19reborn/BulletTime](https://img.shields.io/github/stars/19reborn/BulletTime?style=social)](https://github.com/19reborn/BulletTime). Repository snapshot accessed 2026-08-30.
 
-<a id="ref-42"></a>[42] FlexTraj official repository [![GitHub: bestzzhang/FlexTraj_code](https://img.shields.io/badge/GitHub-bestzzhang%2FFlexTraj_code-181717?logo=github&logoColor=white)](https://github.com/bestzzhang/FlexTraj_code). Repository snapshot accessed 2026-08-30.
+<a id="ref-42"></a>[42] FlexTraj official repository [![GitHub: bestzzhang/FlexTraj_code](https://img.shields.io/github/stars/bestzzhang/FlexTraj_code?style=social)](https://github.com/bestzzhang/FlexTraj_code). Repository snapshot accessed 2026-08-30.
 
-<a id="ref-43"></a>[43] FlashMotion official repository [![GitHub: quanhaol/FlashMotion](https://img.shields.io/badge/GitHub-quanhaol%2FFlashMotion-181717?logo=github&logoColor=white)](https://github.com/quanhaol/FlashMotion). Repository snapshot accessed 2026-08-30.
+<a id="ref-43"></a>[43] FlashMotion official repository [![GitHub: quanhaol/FlashMotion](https://img.shields.io/github/stars/quanhaol/FlashMotion?style=social)](https://github.com/quanhaol/FlashMotion). Repository snapshot accessed 2026-08-30.
 
-<a id="ref-44"></a>[44] WorldStereo official repository [![GitHub: FuchengSu/WorldStereo](https://img.shields.io/badge/GitHub-FuchengSu%2FWorldStereo-181717?logo=github&logoColor=white)](https://github.com/FuchengSu/WorldStereo). Repository snapshot accessed 2026-08-30.
+<a id="ref-44"></a>[44] WorldStereo official repository [![GitHub: FuchengSu/WorldStereo](https://img.shields.io/github/stars/FuchengSu/WorldStereo?style=social)](https://github.com/FuchengSu/WorldStereo). Repository snapshot accessed 2026-08-30.
 
 <a id="ref-45"></a>[45] [4DStreamCtrl project page](https://4dstreamctrl.github.io/). Project snapshot accessed 2026-08-30.

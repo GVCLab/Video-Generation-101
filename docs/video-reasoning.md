@@ -678,7 +678,7 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 11. **OpenCoF 与 Hierarchical Denoising**：看统一 token 和层级搜索的架构方向 [[33]](#ref-33) [[34]](#ref-34)。
 12. **VGI-Bench 与 VBVR-Pro**：用最新综合评测和多任务扩展回看原始愿景 [[36]](#ref-36) [[48]](#ref-48)。
 
-完整检索、版本核验和前后向引用审计见 [video reasoning 文献与引用审计](../sources/research_20260829_video_reasoning_vbvr.md)。持续更新的社区目录可参考 Awesome Video Reasoning [![GitHub: Video-Reason/Awesome-Video-Reasoning](https://img.shields.io/badge/GitHub-Video-Reason%2FAwesome-Video-Reasoning-181717?logo=github&logoColor=white)](https://github.com/Video-Reason/Awesome-Video-Reasoning)，但目录用于发现文献，具体数字仍应回到论文正文和官方代码核验 [[38]](#ref-38)。
+完整检索、版本核验和前后向引用审计见 [video reasoning 文献与引用审计](../sources/research_20260829_video_reasoning_vbvr.md)。持续更新的社区目录可参考 Awesome Video Reasoning [![GitHub: Video-Reason/Awesome-Video-Reasoning](https://img.shields.io/github/stars/Video-Reason/Awesome-Video-Reasoning?style=social)](https://github.com/Video-Reason/Awesome-Video-Reasoning)，但目录用于发现文献，具体数字仍应回到论文正文和官方代码核验 [[38]](#ref-38)。
 
 ---
 
@@ -730,7 +730,7 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 
 <a id="ref-18"></a>[18] [RISE-Video: Can Video Generators Decode Implicit World Rules?](https://arxiv.org/abs/2602.05986). Mingxin Liu, Shuran Ma, Shibei Meng, Xiangyu Zhao, Zicheng Zhang, Shaofeng Zhang, et al. arXiv preprint. 2026.
 
-<a id="ref-19"></a>[19] [A Very Big Video Reasoning Suite](https://arxiv.org/abs/2602.20159). Maijunxian Wang, Ruisi Wang, Juyi Lin, Ran Ji, Thaddäus Wiedemer, Qingying Gao, et al. arXiv preprint. 2026. See also the [official benchmark](https://video-reason.com/bench/) and EvalKit [![GitHub: Video-Reason/VBVR-EvalKit](https://img.shields.io/badge/GitHub-Video-Reason%2FVBVR-EvalKit-181717?logo=github&logoColor=white)](https://github.com/Video-Reason/VBVR-EvalKit).
+<a id="ref-19"></a>[19] [A Very Big Video Reasoning Suite](https://arxiv.org/abs/2602.20159). Maijunxian Wang, Ruisi Wang, Juyi Lin, Ran Ji, Thaddäus Wiedemer, Qingying Gao, et al. arXiv preprint. 2026. See also the [official benchmark](https://video-reason.com/bench/) and EvalKit [![GitHub: Video-Reason/VBVR-EvalKit](https://img.shields.io/github/stars/Video-Reason/VBVR-EvalKit?style=social)](https://github.com/Video-Reason/VBVR-EvalKit).
 
 <a id="ref-20"></a>[20] [From Perception to Action: An Interactive Benchmark for Vision Reasoning](https://arxiv.org/abs/2602.21015). Yuhao Wu, Maojia Song, Yihuai Lan, Lei Wang, Zhiqiang Hu, Yao Xiao, et al. arXiv preprint. 2026.
 
@@ -768,7 +768,7 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 
 <a id="ref-37"></a>[37] [Video Generation Models are General-Purpose Vision Learners](https://arxiv.org/abs/2607.09024). Letian Wang, Chuhan Zhang, Rishabh Kabra, Jasper Uijlings, Steven Waslander, Andrew Zisserman, et al. ECCV. 2026.
 
-<a id="ref-38"></a>[38] Awesome Video Reasoning [![GitHub: Video-Reason/Awesome-Video-Reasoning](https://img.shields.io/badge/GitHub-Video-Reason%2FAwesome-Video-Reasoning-181717?logo=github&logoColor=white)](https://github.com/Video-Reason/Awesome-Video-Reasoning). Video-Reason community curation (VBVR team). GitHub repository, accessed 2026-08-29.
+<a id="ref-38"></a>[38] Awesome Video Reasoning [![GitHub: Video-Reason/Awesome-Video-Reasoning](https://img.shields.io/github/stars/Video-Reason/Awesome-Video-Reasoning?style=social)](https://github.com/Video-Reason/Awesome-Video-Reasoning). Video-Reason community curation (VBVR team). GitHub repository, accessed 2026-08-29.
 
 <a id="ref-39"></a>[39] [How Far is Video Generation from World Model: A Physical Law Perspective](https://arxiv.org/abs/2411.02385). Bingyi Kang, Yang Yue, Rui Lu, Zhijie Lin, Yang Zhao, Kaixin Wang, et al. ICML. 2025.
 
@@ -804,8 +804,8 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 
 <a id="ref-55"></a>[55] [Wan-R1: Verifiable-Reinforcement Learning for Video Reasoning](https://arxiv.org/abs/2603.27866). Ming Liu, Yunbei Zhang, Shilong Liu, Liwen Wang, Wensheng Zhang. arXiv preprint. 2026.
 
-<a id="ref-56"></a>[56] [UniVR: Thinking in Visual Space for Unified Visual Reasoning](https://arxiv.org/abs/2607.12800). Zhongwei Ren, Yunchao Wei, Yao Zhao, Weibo Gong, Xiao Liu, Anran Wang, Xiangtai Li, Xiaojie Jin. arXiv preprint. 2026. See also the official repository [![GitHub: bytedance/UniVR](https://img.shields.io/badge/GitHub-bytedance%2FUniVR-181717?logo=github&logoColor=white)](https://github.com/bytedance/UniVR).
+<a id="ref-56"></a>[56] [UniVR: Thinking in Visual Space for Unified Visual Reasoning](https://arxiv.org/abs/2607.12800). Zhongwei Ren, Yunchao Wei, Yao Zhao, Weibo Gong, Xiao Liu, Anran Wang, Xiangtai Li, Xiaojie Jin. arXiv preprint. 2026. See also the official repository [![GitHub: bytedance/UniVR](https://img.shields.io/github/stars/bytedance/UniVR?style=social)](https://github.com/bytedance/UniVR).
 
-<a id="ref-57"></a>[57] [Thinking in Video: Can Video Generators Really Reason About the Real World?](https://arxiv.org/abs/2607.17523). Yongheng Zhang, Guang Yang, Ruihan Hou, Qiguang Chen, Ziang Liu, Xiaolong Liu, et al. arXiv preprint. 2026. See also the official repository [![GitHub: BRZ911/Thinking-in-Video](https://img.shields.io/badge/GitHub-BRZ911%2FThinking-in-Video-181717?logo=github&logoColor=white)](https://github.com/BRZ911/Thinking-in-Video).
+<a id="ref-57"></a>[57] [Thinking in Video: Can Video Generators Really Reason About the Real World?](https://arxiv.org/abs/2607.17523). Yongheng Zhang, Guang Yang, Ruihan Hou, Qiguang Chen, Ziang Liu, Xiaolong Liu, et al. arXiv preprint. 2026. See also the official repository [![GitHub: BRZ911/Thinking-in-Video](https://img.shields.io/github/stars/BRZ911/Thinking-in-Video?style=social)](https://github.com/BRZ911/Thinking-in-Video).
 
-<a id="ref-58"></a>[58] [Rule-Compliant Visual Spatial Planning for Multimodal Large Language Models](https://arxiv.org/abs/2608.20237). Yu Chen, Ting Lei, Yaoyi Li, Jia Cai, Zhecen Wu, Yang Liu. arXiv preprint. 2026. See also the official repository [![GitHub: oceanflowlab/RuleMaze](https://img.shields.io/badge/GitHub-oceanflowlab%2FRuleMaze-181717?logo=github&logoColor=white)](https://github.com/oceanflowlab/RuleMaze) and [dataset card](https://huggingface.co/datasets/Fish-03/RuleMaze).
+<a id="ref-58"></a>[58] [Rule-Compliant Visual Spatial Planning for Multimodal Large Language Models](https://arxiv.org/abs/2608.20237). Yu Chen, Ting Lei, Yaoyi Li, Jia Cai, Zhecen Wu, Yang Liu. arXiv preprint. 2026. See also the official repository [![GitHub: oceanflowlab/RuleMaze](https://img.shields.io/github/stars/oceanflowlab/RuleMaze?style=social)](https://github.com/oceanflowlab/RuleMaze) and [dataset card](https://huggingface.co/datasets/Fish-03/RuleMaze).

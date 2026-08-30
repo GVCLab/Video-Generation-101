@@ -309,27 +309,27 @@ probe 分数只说明某个有限容量读出器能恢复标签。它既可能�
 
 <a id="ref-4"></a>[4] Adrien Bardes et al. [Revisiting Feature Prediction for Learning Visual Representations from Video](https://openreview.net/forum?id=QaCCuDfBk2). TMLR, 2024. [arXiv:2404.08471](https://arxiv.org/abs/2404.08471).
 
-<a id="ref-5"></a>[5] Meta FAIR. I-JEPA official repository [![GitHub: facebookresearch/ijepa](https://img.shields.io/badge/GitHub-facebookresearch%2Fijepa-181717?logo=github&logoColor=white)](https://github.com/facebookresearch/ijepa); V-JEPA official repository [![GitHub: facebookresearch/jepa](https://img.shields.io/badge/GitHub-facebookresearch%2Fjepa-181717?logo=github&logoColor=white)](https://github.com/facebookresearch/jepa). Accessed 2026-08-30.
+<a id="ref-5"></a>[5] Meta FAIR. I-JEPA official repository [![GitHub: facebookresearch/ijepa](https://img.shields.io/github/stars/facebookresearch/ijepa?style=social)](https://github.com/facebookresearch/ijepa); V-JEPA official repository [![GitHub: facebookresearch/jepa](https://img.shields.io/github/stars/facebookresearch/jepa?style=social)](https://github.com/facebookresearch/jepa). Accessed 2026-08-30.
 
 <a id="ref-6"></a>[6] Mahmoud Assran et al. [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). arXiv, 2025. [Meta research page](https://ai.meta.com/research/publications/v-jepa-2-self-supervised-video-models-enable-understanding-prediction-and-planning/).
 
 <a id="ref-7"></a>[7] Meta AI. [V-JEPA 2: A world model for physical reasoning](https://ai.meta.com/blog/v-jepa-2-world-model-benchmarks/). Official project / release article, 2025.
 
-<a id="ref-8"></a>[8] Meta FAIR. V-JEPA 2, V-JEPA 2-AC and V-JEPA 2.1 official repository [![GitHub: facebookresearch/vjepa2](https://img.shields.io/badge/GitHub-facebookresearch%2Fvjepa2-181717?logo=github&logoColor=white)](https://github.com/facebookresearch/vjepa2). Accessed 2026-08-30.
+<a id="ref-8"></a>[8] Meta FAIR. V-JEPA 2, V-JEPA 2-AC and V-JEPA 2.1 official repository [![GitHub: facebookresearch/vjepa2](https://img.shields.io/github/stars/facebookresearch/vjepa2?style=social)](https://github.com/facebookresearch/vjepa2). Accessed 2026-08-30.
 
 <a id="ref-9"></a>[9] Lorenzo Mur-Labadia et al. [V-JEPA 2.1: Unlocking Dense Features in Video Self-Supervised Learning](https://arxiv.org/abs/2603.14482). arXiv, 2026.
 
-<a id="ref-10"></a>[10] Randall Balestriero, Yann LeCun. [LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics](https://arxiv.org/abs/2511.08544). arXiv, 2025. Official repository [![GitHub: galilai-group/lejepa](https://img.shields.io/badge/GitHub-galilai-group%2Flejepa-181717?logo=github&logoColor=white)](https://github.com/galilai-group/lejepa).
+<a id="ref-10"></a>[10] Randall Balestriero, Yann LeCun. [LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics](https://arxiv.org/abs/2511.08544). arXiv, 2025. Official repository [![GitHub: galilai-group/lejepa](https://img.shields.io/github/stars/galilai-group/lejepa?style=social)](https://github.com/galilai-group/lejepa).
 
-<a id="ref-11"></a>[11] Lucas Maes et al. [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312). arXiv, 2026. Official repository [![GitHub: lucas-maes/le-wm](https://img.shields.io/badge/GitHub-lucas-maes%2Fle-wm-181717?logo=github&logoColor=white)](https://github.com/lucas-maes/le-wm).
+<a id="ref-11"></a>[11] Lucas Maes et al. [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312). arXiv, 2026. Official repository [![GitHub: lucas-maes/le-wm](https://img.shields.io/github/stars/lucas-maes/le-wm?style=social)](https://github.com/lucas-maes/le-wm).
 
-<a id="ref-12"></a>[12] Basile Terver et al. [A Lightweight Library for Energy-Based Joint-Embedding Predictive Architectures](https://openreview.net/forum?id=ZVAMdXGCUC). ICLR 2026 Workshop on World Models. Official repository [![GitHub: facebookresearch/eb_jepa](https://img.shields.io/badge/GitHub-facebookresearch%2Feb_jepa-181717?logo=github&logoColor=white)](https://github.com/facebookresearch/eb_jepa).
+<a id="ref-12"></a>[12] Basile Terver et al. [A Lightweight Library for Energy-Based Joint-Embedding Predictive Architectures](https://openreview.net/forum?id=ZVAMdXGCUC). ICLR 2026 Workshop on World Models. Official repository [![GitHub: facebookresearch/eb_jepa](https://img.shields.io/github/stars/facebookresearch/eb_jepa?style=social)](https://github.com/facebookresearch/eb_jepa).
 
-<a id="ref-13"></a>[13] Marco Bagatella et al. [TD-JEPA: Latent-predictive Representations for Zero-Shot Reinforcement Learning](https://openreview.net/forum?id=SzXDuBN8M1). ICLR, 2026. Official repository [![GitHub: facebookresearch/td_jepa](https://img.shields.io/badge/GitHub-facebookresearch%2Ftd_jepa-181717?logo=github&logoColor=white)](https://github.com/facebookresearch/td_jepa).
+<a id="ref-13"></a>[13] Marco Bagatella et al. [TD-JEPA: Latent-predictive Representations for Zero-Shot Reinforcement Learning](https://openreview.net/forum?id=SzXDuBN8M1). ICLR, 2026. Official repository [![GitHub: facebookresearch/td_jepa](https://img.shields.io/github/stars/facebookresearch/td_jepa?style=social)](https://github.com/facebookresearch/td_jepa).
 
-<a id="ref-14"></a>[14] Philippe Hansen-Estruch et al. [DINO-WM: World Models on Pre-trained Visual Features Enable Zero-shot Planning](https://arxiv.org/abs/2411.04983). ICML, 2025. Official repository [![GitHub: gaoyuezhou/dino_wm](https://img.shields.io/badge/GitHub-gaoyuezhou%2Fdino_wm-181717?logo=github&logoColor=white)](https://github.com/gaoyuezhou/dino_wm).
+<a id="ref-14"></a>[14] Philippe Hansen-Estruch et al. [DINO-WM: World Models on Pre-trained Visual Features Enable Zero-shot Planning](https://arxiv.org/abs/2411.04983). ICML, 2025. Official repository [![GitHub: gaoyuezhou/dino_wm](https://img.shields.io/github/stars/gaoyuezhou/dino_wm?style=social)](https://github.com/gaoyuezhou/dino_wm).
 
-<a id="ref-15"></a>[15] Andreas Kuhn et al. [LeVJEPA: A Lean Video Joint-Embedding Predictive Architecture without the Heuristics](https://arxiv.org/abs/2608.27395). arXiv preprint, submitted 2026-08-27. Official repository [![GitHub: MLO-lab/LeVJEPA](https://img.shields.io/badge/GitHub-MLO-lab%2FLeVJEPA-181717?logo=github&logoColor=white)](https://github.com/MLO-lab/LeVJEPA); [official model card](https://huggingface.co/galilai-group/LeVJEPA-VideoMix-Large).
+<a id="ref-15"></a>[15] Andreas Kuhn et al. [LeVJEPA: A Lean Video Joint-Embedding Predictive Architecture without the Heuristics](https://arxiv.org/abs/2608.27395). arXiv preprint, submitted 2026-08-27. Official repository [![GitHub: MLO-lab/LeVJEPA](https://img.shields.io/github/stars/MLO-lab/LeVJEPA?style=social)](https://github.com/MLO-lab/LeVJEPA); [official model card](https://huggingface.co/galilai-group/LeVJEPA-VideoMix-Large).
 
 <a id="ref-16"></a>[16] [Branch-JEPA: Branching Joint-Embedding Predictive Architectures](https://arxiv.org/abs/2607.05238). arXiv preprint, v2, 2026.
 

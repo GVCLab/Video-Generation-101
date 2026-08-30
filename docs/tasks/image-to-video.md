@@ -464,4 +464,4 @@ HPSD 则不是新的输出任务，而是 2026 的训练策略：teacher 在 TI2
 
 <a id="ref-33"></a>[33] [I2V-Adapter: A General Image-to-Video Adapter for Diffusion Models](https://arxiv.org/abs/2312.16693). Xun Guo, Mingwu Zheng, Liang Hou, Yuan Gao, Yufan Deng, et al. arXiv preprint. 2023.
 
-<a id="ref-34"></a>[34] [LTX-2: Efficient Joint Audio-Visual Foundation Model](https://arxiv.org/abs/2601.03233). Yoav HaCohen, Benny Brazowski, Nisan Chiprut, et al. arXiv preprint. 2026. Official versioned code and weight repository [![GitHub: Lightricks/LTX-2](https://img.shields.io/badge/GitHub-Lightricks%2FLTX-2-181717?logo=github&logoColor=white)](https://github.com/Lightricks/LTX-2).
+<a id="ref-34"></a>[34] [LTX-2: Efficient Joint Audio-Visual Foundation Model](https://arxiv.org/abs/2601.03233). Yoav HaCohen, Benny Brazowski, Nisan Chiprut, et al. arXiv preprint. 2026. Official versioned code and weight repository [![GitHub: Lightricks/LTX-2](https://img.shields.io/github/stars/Lightricks/LTX-2?style=social)](https://github.com/Lightricks/LTX-2).

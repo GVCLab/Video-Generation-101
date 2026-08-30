@@ -787,7 +787,7 @@ safety:
 
 <a id="ref-3"></a>[3] [Image quality assessment: from error visibility to structural similarity](https://doi.org/10.1109/TIP.2003.819861). Zhou Wang, Alan C. Bovik, Hamid R. Sheikh, Eero P. Simoncelli. IEEE Transactions on Image Processing. 2004.
 
-<a id="ref-4"></a>[4] VMAF: Video Multi-Method Assessment Fusion [![GitHub: Netflix/vmaf](https://img.shields.io/badge/GitHub-Netflix%2Fvmaf-181717?logo=github&logoColor=white)](https://github.com/Netflix/vmaf). Netflix. Official implementation and documentation.
+<a id="ref-4"></a>[4] VMAF: Video Multi-Method Assessment Fusion [![GitHub: Netflix/vmaf](https://img.shields.io/github/stars/Netflix/vmaf?style=social)](https://github.com/Netflix/vmaf). Netflix. Official implementation and documentation.
 
 <a id="ref-5"></a>[5] [Stochastic Video Generation with a Learned Prior](https://arxiv.org/abs/1802.07687). Remi Denton, Rob Fergus. ICML. 2018.
 

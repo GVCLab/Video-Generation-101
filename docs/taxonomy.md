@@ -301,4 +301,4 @@ DreamGen 的价值不在“生成了机器人视频”本身，而在把生成�
 
 <a id="ref-11"></a>[11] [MotionCtrl: A Unified and Flexible Motion Controller for Video Generation](https://arxiv.org/abs/2312.03641). Zhouxia Wang, Ziyang Yuan, Xintao Wang, Yaowei Li, Tianshui Chen, Menghan Xia, et al. First preprint 2023; SIGGRAPH Conference Papers. 2024. [Official project and release surface](https://wzhouxiff.github.io/projects/MotionCtrl/).
 
-<a id="ref-12"></a>[12] [Ovi: Twin Backbone Cross-Modal Fusion for Audio-Video Generation](https://arxiv.org/abs/2510.01284). Ovi team. arXiv preprint. 2025. Official code and weights [![GitHub: character-ai/Ovi](https://img.shields.io/badge/GitHub-character-ai%2FOvi-181717?logo=github&logoColor=white)](https://github.com/character-ai/Ovi).
+<a id="ref-12"></a>[12] [Ovi: Twin Backbone Cross-Modal Fusion for Audio-Video Generation](https://arxiv.org/abs/2510.01284). Ovi team. arXiv preprint. 2025. Official code and weights [![GitHub: character-ai/Ovi](https://img.shields.io/github/stars/character-ai/Ovi?style=social)](https://github.com/character-ai/Ovi).

@@ -298,12 +298,12 @@ VidTwin 的 backbone temporal attention 有 causal mask，但 structure Q-Former
 
 | 实现 | 截止日状态 | 可核验内容 | 不应据此推断 |
 |---|---|---|---|
-| CV-VAE [![GitHub: AILab-CVC/CV-VAE](https://img.shields.io/badge/GitHub-AILab-CVC%2FCV-VAE-181717?logo=github&logoColor=white)](https://github.com/AILab-CVC/CV-VAE) | NeurIPS 2024；官方代码与权重 | continuous video VAE；仓库列出与若干 image-VAE latent 兼容型号 | 任意未公开 image VAE 都可无损替换 |
-| OmniTokenizer [![GitHub: FoundationVision/OmniTokenizer](https://img.shields.io/badge/GitHub-FoundationVision%2FOmniTokenizer-181717?logo=github&logoColor=white)](https://github.com/FoundationVision/OmniTokenizer) | NeurIPS 2024；官方仓库 | joint image-video；VQVAE 与 VAE 配置 | 两种 checkpoint 自动构成 hybrid |
-| Cosmos Tokenizer [![GitHub: NVIDIA/Cosmos-Tokenizer](https://img.shields.io/badge/GitHub-NVIDIA%2FCosmos-Tokenizer-181717?logo=github&logoColor=white)](https://github.com/NVIDIA/Cosmos-Tokenizer) | 官方仓库与模型；代码/模型 license 分开 | continuous/discrete、temporal 4/8、spatial 8/16、API shape | README 性能宣传已被独立复现 |
-| HunyuanVideo [![GitHub: Tencent-Hunyuan/HunyuanVideo](https://img.shields.io/badge/GitHub-Tencent-Hunyuan%2FHunyuanVideo-181717?logo=github&logoColor=white)](https://github.com/Tencent-Hunyuan/HunyuanVideo) | 作者报告；官方代码与权重 | CausalConv3D VAE、$t4s8s8$、16 channels | 256× 元素压缩或实际 bitrate |
+| CV-VAE [![GitHub: AILab-CVC/CV-VAE](https://img.shields.io/github/stars/AILab-CVC/CV-VAE?style=social)](https://github.com/AILab-CVC/CV-VAE) | NeurIPS 2024；官方代码与权重 | continuous video VAE；仓库列出与若干 image-VAE latent 兼容型号 | 任意未公开 image VAE 都可无损替换 |
+| OmniTokenizer [![GitHub: FoundationVision/OmniTokenizer](https://img.shields.io/github/stars/FoundationVision/OmniTokenizer?style=social)](https://github.com/FoundationVision/OmniTokenizer) | NeurIPS 2024；官方仓库 | joint image-video；VQVAE 与 VAE 配置 | 两种 checkpoint 自动构成 hybrid |
+| Cosmos Tokenizer [![GitHub: NVIDIA/Cosmos-Tokenizer](https://img.shields.io/github/stars/NVIDIA/Cosmos-Tokenizer?style=social)](https://github.com/NVIDIA/Cosmos-Tokenizer) | 官方仓库与模型；代码/模型 license 分开 | continuous/discrete、temporal 4/8、spatial 8/16、API shape | README 性能宣传已被独立复现 |
+| HunyuanVideo [![GitHub: Tencent-Hunyuan/HunyuanVideo](https://img.shields.io/github/stars/Tencent-Hunyuan/HunyuanVideo?style=social)](https://github.com/Tencent-Hunyuan/HunyuanVideo) | 作者报告；官方代码与权重 | CausalConv3D VAE、$t4s8s8$、16 channels | 256× 元素压缩或实际 bitrate |
 | [VidTok](https://huggingface.co/microsoft/VidTok) | arXiv 2412.13061；项目与模型公开 | continuous-KL 与 discrete-FSQ 型号、causal/noncausal 配置 [[23]](#ref-23) | 截止日已有正式 venue；VCR 就是 bpp |
-| KVAE [![GitHub: kandinskylab/kvae](https://img.shields.io/badge/GitHub-kandinskylab%2Fkvae-181717?logo=github&logoColor=white)](https://github.com/kandinskylab/kvae) | arXiv 2608.05798；代码与权重 | video 2.0 的 $t4s8$、$t4s16$、causal cache/chunk 接口 | 已同行评审；公开 cache 即端到端实时 |
+| KVAE [![GitHub: kandinskylab/kvae](https://img.shields.io/github/stars/kandinskylab/kvae?style=social)](https://github.com/kandinskylab/kvae) | arXiv 2608.05798；代码与权重 | video 2.0 的 $t4s8$、$t4s16$、causal cache/chunk 接口 | 已同行评审；公开 cache 即端到端实时 |
 
 有推理代码不等于有训练代码；有权重不等于训练数据与配方公开；代码许可证、模型许可证和依赖许可证也可能不同。
 
@@ -405,7 +405,7 @@ codec 分支必须额外交付：
 
 <a id="ref-20"></a>[20] [Cosmos Tokenizer](https://research.nvidia.com/labs/cosmos-lab/cosmos-tokenizer/). NVIDIA Research. Official project and repository documentation, accessed 2026-08-30.
 
-<a id="ref-21"></a>[21] HunyuanVideo: A Systematic Framework For Large Video Generation Model [![GitHub: Tencent-Hunyuan/HunyuanVideo](https://img.shields.io/badge/GitHub-Tencent-Hunyuan%2FHunyuanVideo-181717?logo=github&logoColor=white)](https://github.com/Tencent-Hunyuan/HunyuanVideo). Tencent Hunyuan. Author technical report and official repository, accessed 2026-08-30.
+<a id="ref-21"></a>[21] HunyuanVideo: A Systematic Framework For Large Video Generation Model [![GitHub: Tencent-Hunyuan/HunyuanVideo](https://img.shields.io/github/stars/Tencent-Hunyuan/HunyuanVideo?style=social)](https://github.com/Tencent-Hunyuan/HunyuanVideo). Tencent Hunyuan. Author technical report and official repository, accessed 2026-08-30.
 
 <a id="ref-22"></a>[22] [KVAE: Family of Tokenizers for Multimodal Generative Models](https://arxiv.org/abs/2608.05798). arXiv:2608.05798, preprint, 2026.
 

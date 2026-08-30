@@ -291,13 +291,13 @@ LRS3、VoxCeleb 与 HDTF 分别代表大规模视听语音、说话人身份和�
 
 <a id="ref-10"></a>[10] Zhang et al. [SadTalker: Learning Realistic 3D Motion Coefficients for Stylized Audio-Driven Single Image Talking Face Animation](https://openaccess.thecvf.com/content/CVPR2023/html/Zhang_SadTalker_Learning_Realistic_3D_Motion_Coefficients_for_Stylized_Audio-Driven_Single_Image_CVPR_2023_paper.html). CVPR, 2023; first arXiv version 2022-11-22.
 
-<a id="ref-11"></a>[11] OpenTalker. SadTalker official repository [![GitHub: OpenTalker/SadTalker](https://img.shields.io/badge/GitHub-OpenTalker%2FSadTalker-181717?logo=github&logoColor=white)](https://github.com/OpenTalker/SadTalker).
+<a id="ref-11"></a>[11] OpenTalker. SadTalker official repository [![GitHub: OpenTalker/SadTalker](https://img.shields.io/github/stars/OpenTalker/SadTalker?style=social)](https://github.com/OpenTalker/SadTalker).
 
 <a id="ref-12"></a>[12] Shen et al. [DiffTalk: Crafting Diffusion Models for Generalized Audio-Driven Portraits Animation](https://openaccess.thecvf.com/content/CVPR2023/html/Shen_DiffTalk_Crafting_Diffusion_Models_for_Generalized_Audio-Driven_Portraits_Animation_CVPR_2023_paper.html). CVPR, 2023.
 
 <a id="ref-13"></a>[13] Xu et al. [Hallo: Hierarchical Audio-Driven Visual Synthesis for Portrait Image Animation](https://arxiv.org/abs/2406.08801). arXiv:2406.08801, first submitted 2024-06-13.
 
-<a id="ref-14"></a>[14] Fudan Generative Vision. Hallo official repository [![GitHub: fudan-generative-vision/hallo](https://img.shields.io/badge/GitHub-fudan-generative-vision%2Fhallo-181717?logo=github&logoColor=white)](https://github.com/fudan-generative-vision/hallo).
+<a id="ref-14"></a>[14] Fudan Generative Vision. Hallo official repository [![GitHub: fudan-generative-vision/hallo](https://img.shields.io/github/stars/fudan-generative-vision/hallo?style=social)](https://github.com/fudan-generative-vision/hallo).
 
 <a id="ref-15"></a>[15] Xu et al. [VASA-1: Lifelike Audio-Driven Talking Faces Generated in Real Time](https://proceedings.neurips.cc/paper_files/paper/2024/hash/014fe398da515cd552fa6e1f33e0565e-Abstract-Conference.html). NeurIPS, 2024; first arXiv version 2024-04-16.
 
@@ -311,11 +311,11 @@ LRS3、VoxCeleb 与 HDTF 分别代表大规模视听语音、说话人身份和�
 
 <a id="ref-24"></a>[24] Chen et al. [OmniAvatar: Efficient Audio-Driven Avatar Video Generation with Adaptive Body Animation](https://arxiv.org/abs/2506.18866). arXiv:2506.18866, first submitted 2025-06-23.
 
-<a id="ref-25"></a>[25] Omni-Avatar. OmniAvatar official repository [![GitHub: Omni-Avatar/OmniAvatar](https://img.shields.io/badge/GitHub-Omni-Avatar%2FOmniAvatar-181717?logo=github&logoColor=white)](https://github.com/Omni-Avatar/OmniAvatar).
+<a id="ref-25"></a>[25] Omni-Avatar. OmniAvatar official repository [![GitHub: Omni-Avatar/OmniAvatar](https://img.shields.io/github/stars/Omni-Avatar/OmniAvatar?style=social)](https://github.com/Omni-Avatar/OmniAvatar).
 
 <a id="ref-26"></a>[26] Duan et al. [TalkCuts: A Large-Scale Dataset for Multi-Shot Talking-Head Video](https://openreview.net/forum?id=4a0w7AkrY7). NeurIPS 2025 Datasets and Benchmarks Track; first arXiv version 2025-10-08.
 
-<a id="ref-27"></a>[27] UMass Embodied AGI. TalkCuts official repository and data license [![GitHub: UMass-Embodied-AGI/TalkCuts](https://img.shields.io/badge/GitHub-UMass-Embodied-AGI%2FTalkCuts-181717?logo=github&logoColor=white)](https://github.com/UMass-Embodied-AGI/TalkCuts).
+<a id="ref-27"></a>[27] UMass Embodied AGI. TalkCuts official repository and data license [![GitHub: UMass-Embodied-AGI/TalkCuts](https://img.shields.io/github/stars/UMass-Embodied-AGI/TalkCuts?style=social)](https://github.com/UMass-Embodied-AGI/TalkCuts).
 
 <a id="ref-28"></a>[28] Lin et al. [Instilling an Active Mind in Avatars via Cognitive Simulation](https://proceedings.iclr.cc/paper_files/paper/2026/hash/be91eb86eb74efc055cff83e953f86ce-Abstract-Conference.html). ICLR, 2026 (OmniHuman-1.5; Oral); first arXiv version 2025-08-26.
 
@@ -329,19 +329,19 @@ LRS3、VoxCeleb 与 HDTF 分别代表大规模视听语音、说话人身份和�
 
 <a id="ref-33"></a>[33] Cui et al. [Hallo-Live: Real-Time and High-Fidelity Audio-Driven Portrait Image Animation](https://arxiv.org/abs/2604.23632). arXiv:2604.23632, first submitted 2026-04-26.
 
-<a id="ref-34"></a>[34] Fudan Generative Vision. Hallo-Live official repository [![GitHub: fudan-generative-vision/hallo-live](https://img.shields.io/badge/GitHub-fudan-generative-vision%2Fhallo-live-181717?logo=github&logoColor=white)](https://github.com/fudan-generative-vision/hallo-live).
+<a id="ref-34"></a>[34] Fudan Generative Vision. Hallo-Live official repository [![GitHub: fudan-generative-vision/hallo-live](https://img.shields.io/github/stars/fudan-generative-vision/hallo-live?style=social)](https://github.com/fudan-generative-vision/hallo-live).
 
 <a id="ref-35"></a>[35] TaoLive AIGC. [AptAvatar](https://arxiv.org/abs/2607.24013). arXiv:2607.24013, first submitted 2026-07-27.
 
-<a id="ref-36"></a>[36] TaoLive AIGC. AptAvatar official repository [![GitHub: TaoLiveAIGC/AptAvatar](https://img.shields.io/badge/GitHub-TaoLiveAIGC%2FAptAvatar-181717?logo=github&logoColor=white)](https://github.com/TaoLiveAIGC/AptAvatar).
+<a id="ref-36"></a>[36] TaoLive AIGC. AptAvatar official repository [![GitHub: TaoLiveAIGC/AptAvatar](https://img.shields.io/github/stars/TaoLiveAIGC/AptAvatar?style=social)](https://github.com/TaoLiveAIGC/AptAvatar).
 
 <a id="ref-37"></a>[37] Omni-LiveAvatar authors. [Omni-LiveAvatar](https://arxiv.org/abs/2608.13602). arXiv:2608.13602, first submitted 2026-08-07.
 
-<a id="ref-38"></a>[38] Omni-LiveAvatar authors. Omni-LiveAvatar official repository [![GitHub: Omni-LiveAvatar/Omni-LiveAvatar](https://img.shields.io/badge/GitHub-Omni-LiveAvatar%2FOmni-LiveAvatar-181717?logo=github&logoColor=white)](https://github.com/Omni-LiveAvatar/Omni-LiveAvatar).
+<a id="ref-38"></a>[38] Omni-LiveAvatar authors. Omni-LiveAvatar official repository [![GitHub: Omni-LiveAvatar/Omni-LiveAvatar](https://img.shields.io/github/stars/Omni-LiveAvatar/Omni-LiveAvatar?style=social)](https://github.com/Omni-LiveAvatar/Omni-LiveAvatar).
 
 <a id="ref-39"></a>[39] LongCat team. [LongCat-Video-Avatar 1.5](https://arxiv.org/abs/2605.26486). arXiv:2605.26486, 2026.
 
-<a id="ref-40"></a>[40] Meituan. LongCat-Video-Avatar official repository [![GitHub: meituan-longcat/LongCat-Video-Avatar](https://img.shields.io/badge/GitHub-meituan-longcat%2FLongCat-Video-Avatar-181717?logo=github&logoColor=white)](https://github.com/meituan-longcat/LongCat-Video-Avatar).
+<a id="ref-40"></a>[40] Meituan. LongCat-Video-Avatar official repository [![GitHub: meituan-longcat/LongCat-Video-Avatar](https://img.shields.io/github/stars/meituan-longcat/LongCat-Video-Avatar?style=social)](https://github.com/meituan-longcat/LongCat-Video-Avatar).
 
 <a id="ref-41"></a>[41] Wang et al. [MEAD: A Large-Scale Audio-Visual Dataset for Emotional Talking-Face Generation](https://wywu.github.io/projects/MEAD/MEAD.html). ECCV, 2020.
 

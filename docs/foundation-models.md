@@ -295,7 +295,7 @@ M0–M7 不是按年份自动升级：一个闭源产品可能先达到系统部
 
 <a id="ref-10"></a>[10] [VideoRAE: Taming Video Foundation Models for Generative Modeling via Representation Autoencoders](https://arxiv.org/abs/2607.14088). Zhihao Xie, Junfeng Wu, Xinting Hu, et al. arXiv preprint. 2026.
 
-<a id="ref-11"></a>[11] Wan2.2 Official Repository [![GitHub: Wan-Video/Wan2.2](https://img.shields.io/badge/GitHub-Wan-Video%2FWan2.2-181717?logo=github&logoColor=white)](https://github.com/Wan-Video/Wan2.2). Wan Team. Official code, weights, model cards, and release notes. 2025–2026.
+<a id="ref-11"></a>[11] Wan2.2 Official Repository [![GitHub: Wan-Video/Wan2.2](https://img.shields.io/github/stars/Wan-Video/Wan2.2?style=social)](https://github.com/Wan-Video/Wan2.2). Wan Team. Official code, weights, model cards, and release notes. 2025–2026.
 
 <a id="ref-12"></a>[12] [Step-Video-T2V Technical Report: The Practice, Challenges, and Future of Video Foundation Model](https://arxiv.org/abs/2502.10248). Guoqing Ma, Haoyang Huang, Kun Yan, et al. arXiv preprint. 2025.
 
@@ -303,9 +303,9 @@ M0–M7 不是按年份自动升级：一个闭源产品可能先达到系统部
 
 <a id="ref-14"></a>[14] [From Slow Bidirectional to Fast Autoregressive Video Diffusion Models](https://openaccess.thecvf.com/content/CVPR2025/html/Yin_From_Slow_Bidirectional_to_Fast_Autoregressive_Video_Diffusion_Models_CVPR_2025_paper.html). Tianwei Yin et al. CVPR. 2025.
 
-<a id="ref-15"></a>[15] LTX-2 Changelog [![GitHub: Lightricks/LTX-2](https://img.shields.io/badge/GitHub-Lightricks%2FLTX-2-181717?logo=github&logoColor=white)](https://github.com/Lightricks/LTX-2/blob/main/CHANGELOG.md). Lightricks. Official release log. Version 1.3.0, 2026-08-25.
+<a id="ref-15"></a>[15] LTX-2 Changelog [![GitHub: Lightricks/LTX-2](https://img.shields.io/github/stars/Lightricks/LTX-2?style=social)](https://github.com/Lightricks/LTX-2/blob/main/CHANGELOG.md). Lightricks. Official release log. Version 1.3.0, 2026-08-25.
 
-<a id="ref-16"></a>[16] HunyuanVideo-1.5 Official Repository [![GitHub: Tencent-Hunyuan/HunyuanVideo-1.5](https://img.shields.io/badge/GitHub-Tencent-Hunyuan%2FHunyuanVideo-1.5-181717?logo=github&logoColor=white)](https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5). Tencent Hunyuan. Official code, weights, training updates, and roadmap. 2025–2026.
+<a id="ref-16"></a>[16] HunyuanVideo-1.5 Official Repository [![GitHub: Tencent-Hunyuan/HunyuanVideo-1.5](https://img.shields.io/github/stars/Tencent-Hunyuan/HunyuanVideo-1.5?style=social)](https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5). Tencent Hunyuan. Official code, weights, training updates, and roadmap. 2025–2026.
 
 <a id="ref-17"></a>[17] [Movie Gen: A Cast of Media Foundation Models](https://arxiv.org/abs/2410.13720). Adam Polyak, Amit Zohar, Andrew Brown, et al. arXiv preprint. 2024.
 
@@ -313,21 +313,21 @@ M0–M7 不是按年份自动升级：一个闭源产品可能先达到系统部
 
 <a id="ref-19"></a>[19] [LTX-2: Efficient Joint Audio-Visual Foundation Model](https://arxiv.org/abs/2601.03233). Yoav HaCohen, Benny Brazowski, Nisan Chiprut, et al. arXiv preprint. 2026.
 
-<a id="ref-20"></a>[20] MiniMax H3 Official Repository [![GitHub: MiniMax-AI/MiniMax-H3](https://img.shields.io/badge/GitHub-MiniMax-AI%2FMiniMax-H3-181717?logo=github&logoColor=white)](https://github.com/MiniMax-AI/MiniMax-H3). MiniMax. Official code, open-weight model cards, system boundary, and community license. Verified 2026-08-30.
+<a id="ref-20"></a>[20] MiniMax H3 Official Repository [![GitHub: MiniMax-AI/MiniMax-H3](https://img.shields.io/github/stars/MiniMax-AI/MiniMax-H3?style=social)](https://github.com/MiniMax-AI/MiniMax-H3). MiniMax. Official code, open-weight model cards, system boundary, and community license. Verified 2026-08-30.
 
-<a id="ref-21"></a>[21] Step-Video-T2V Official Repository [![GitHub: stepfun-ai/Step-Video-T2V](https://img.shields.io/badge/GitHub-stepfun-ai%2FStep-Video-T2V-181717?logo=github&logoColor=white)](https://github.com/stepfun-ai/Step-Video-T2V). StepFun. Official code, weights, evaluation, and inference services. 2025.
+<a id="ref-21"></a>[21] Step-Video-T2V Official Repository [![GitHub: stepfun-ai/Step-Video-T2V](https://img.shields.io/github/stars/stepfun-ai/Step-Video-T2V?style=social)](https://github.com/stepfun-ai/Step-Video-T2V). StepFun. Official code, weights, evaluation, and inference services. 2025.
 
-<a id="ref-22"></a>[22] NVIDIA Cosmos Official Repository [![GitHub: NVIDIA/Cosmos](https://img.shields.io/badge/GitHub-NVIDIA%2FCosmos-181717?logo=github&logoColor=white)](https://github.com/NVIDIA/Cosmos). NVIDIA. Official code, model families, post-training, guardrails, and serving. Verified 2026-08-30.
+<a id="ref-22"></a>[22] NVIDIA Cosmos Official Repository [![GitHub: NVIDIA/Cosmos](https://img.shields.io/github/stars/NVIDIA/Cosmos?style=social)](https://github.com/NVIDIA/Cosmos). NVIDIA. Official code, model families, post-training, guardrails, and serving. Verified 2026-08-30.
 
 <a id="ref-23"></a>[23] [C2PA Technical Specification 2.4](https://spec.c2pa.org/specifications/specifications/2.4/specs/C2PA_Specification.html). Coalition for Content Provenance and Authenticity. Technical standard. 2026.
 
 <a id="ref-24"></a>[24] [LTX-Video: Realtime Video Latent Diffusion](https://arxiv.org/abs/2501.00103). Yoav HaCohen, Nisan Chiprut, Benny Brazowski, et al. arXiv preprint. 2025.
 
-<a id="ref-25"></a>[25] LTX-2 Official Repository [![GitHub: Lightricks/LTX-2](https://img.shields.io/badge/GitHub-Lightricks%2FLTX-2-181717?logo=github&logoColor=white)](https://github.com/Lightricks/LTX-2). Lightricks. Official code, weights, training packages, pipelines, and API links. Verified 2026-08-30.
+<a id="ref-25"></a>[25] LTX-2 Official Repository [![GitHub: Lightricks/LTX-2](https://img.shields.io/github/stars/Lightricks/LTX-2?style=social)](https://github.com/Lightricks/LTX-2). Lightricks. Official code, weights, training packages, pipelines, and API links. Verified 2026-08-30.
 
-<a id="ref-26"></a>[26] LTX-2.x Community License Agreement [![GitHub: Lightricks/LTX-2](https://img.shields.io/badge/GitHub-Lightricks%2FLTX-2-181717?logo=github&logoColor=white)](https://github.com/Lightricks/LTX-2/blob/main/LICENSE-2_x). Lightricks. Official license. Effective for LTX-2.5 versions released on or after 2026-08-11.
+<a id="ref-26"></a>[26] LTX-2.x Community License Agreement [![GitHub: Lightricks/LTX-2](https://img.shields.io/github/stars/Lightricks/LTX-2?style=social)](https://github.com/Lightricks/LTX-2/blob/main/LICENSE-2_x). Lightricks. Official license. Effective for LTX-2.5 versions released on or after 2026-08-11.
 
-<a id="ref-27"></a>[27] Mochi Official Repository [![GitHub: genmoai/mochi](https://img.shields.io/badge/GitHub-genmoai%2Fmochi-181717?logo=github&logoColor=white)](https://github.com/genmoai/mochi). Genmo. Official code, weights, model card, and LoRA trainer. Verified 2026-08-30.
+<a id="ref-27"></a>[27] Mochi Official Repository [![GitHub: genmoai/mochi](https://img.shields.io/github/stars/genmoai/mochi?style=social)](https://github.com/genmoai/mochi). Genmo. Official code, weights, model card, and LoRA trainer. Verified 2026-08-30.
 
 <a id="ref-28"></a>[28] [HunyuanVideo: A Systematic Framework For Large Video Generative Models](https://arxiv.org/abs/2412.03603). Weijie Kong, Qi Tian, Zijian Zhang, et al. arXiv preprint. 2024.
 
@@ -335,26 +335,26 @@ M0–M7 不是按年份自动升级：一个闭源产品可能先达到系统部
 
 <a id="ref-30"></a>[30] [Wan: Open and Advanced Large-Scale Video Generative Models](https://arxiv.org/abs/2503.20314). Team Wan, Ang Wang, Baole Ai, et al. arXiv preprint. 2025.
 
-<a id="ref-31"></a>[31] Open-Sora Official Repository [![GitHub: hpcaitech/Open-Sora](https://img.shields.io/badge/GitHub-hpcaitech%2FOpen-Sora-181717?logo=github&logoColor=white)](https://github.com/hpcaitech/Open-Sora). HPC-AI Tech. Official code, training scripts, and checkpoints. Verified 2026-08-30.
+<a id="ref-31"></a>[31] Open-Sora Official Repository [![GitHub: hpcaitech/Open-Sora](https://img.shields.io/github/stars/hpcaitech/Open-Sora?style=social)](https://github.com/hpcaitech/Open-Sora). HPC-AI Tech. Official code, training scripts, and checkpoints. Verified 2026-08-30.
 
-<a id="ref-32"></a>[32] SkyReels-V2 Official Repository [![GitHub: SkyworkAI/SkyReels-V2](https://img.shields.io/badge/GitHub-SkyworkAI%2FSkyReels-V2-181717?logo=github&logoColor=white)](https://github.com/SkyworkAI/SkyReels-V2). Skywork AI. Official code, weights, captioner, and release roadmap. Verified 2026-08-30.
+<a id="ref-32"></a>[32] SkyReels-V2 Official Repository [![GitHub: SkyworkAI/SkyReels-V2](https://img.shields.io/github/stars/SkyworkAI/SkyReels-V2?style=social)](https://github.com/SkyworkAI/SkyReels-V2). Skywork AI. Official code, weights, captioner, and release roadmap. Verified 2026-08-30.
 
 <a id="ref-33"></a>[33] [SkyReels-V3 Technique Report](https://arxiv.org/abs/2601.17323). Debang Li, Zhengcong Fei, Tuanhui Li, et al. arXiv preprint. 2026.
 
-<a id="ref-34"></a>[34] SkyReels-V3 Official Repository [![GitHub: SkyworkAI/SkyReels-V3](https://img.shields.io/badge/GitHub-SkyworkAI%2FSkyReels-V3-181717?logo=github&logoColor=white)](https://github.com/SkyworkAI/SkyReels-V3). Skywork AI. Official inference code, task-specific weights, and API links. 2026.
+<a id="ref-34"></a>[34] SkyReels-V3 Official Repository [![GitHub: SkyworkAI/SkyReels-V3](https://img.shields.io/github/stars/SkyworkAI/SkyReels-V3?style=social)](https://github.com/SkyworkAI/SkyReels-V3). Skywork AI. Official inference code, task-specific weights, and API links. 2026.
 
 <a id="ref-35"></a>[35] [MAGI-1: Autoregressive Video Generation at Scale](https://arxiv.org/abs/2505.13211). Sand.ai, Hansi Teng, Hongyu Jia, et al. arXiv preprint. 2025.
 
-<a id="ref-36"></a>[36] MAGI-1 Official Repository [![GitHub: SandAI-org/MAGI-1](https://img.shields.io/badge/GitHub-SandAI-org%2FMAGI-1-181717?logo=github&logoColor=white)](https://github.com/SandAI-org/MAGI-1). Sand.ai. Official code, weights, distilled and quantized variants. Verified 2026-08-30.
+<a id="ref-36"></a>[36] MAGI-1 Official Repository [![GitHub: SandAI-org/MAGI-1](https://img.shields.io/github/stars/SandAI-org/MAGI-1?style=social)](https://github.com/SandAI-org/MAGI-1). Sand.ai. Official code, weights, distilled and quantized variants. Verified 2026-08-30.
 
-<a id="ref-37"></a>[37] Ovi Official Repository [![GitHub: character-ai/Ovi](https://img.shields.io/badge/GitHub-character-ai%2FOvi-181717?logo=github&logoColor=white)](https://github.com/character-ai/Ovi). Character.AI. Official code and weights. 2025.
+<a id="ref-37"></a>[37] Ovi Official Repository [![GitHub: character-ai/Ovi](https://img.shields.io/github/stars/character-ai/Ovi?style=social)](https://github.com/character-ai/Ovi). Character.AI. Official code and weights. 2025.
 
 <a id="ref-38"></a>[38] [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800). NVIDIA et al. arXiv preprint. 2026.
 
 <a id="ref-39"></a>[39] [Seedance 2.0: Advancing Video Generation for World Complexity](https://arxiv.org/abs/2604.14148). Team Seedance, De Chen, Liyang Chen, et al. arXiv preprint. 2026.
 
-<a id="ref-40"></a>[40] LTX-Video Official Repository [![GitHub: Lightricks/LTX-Video](https://img.shields.io/badge/GitHub-Lightricks%2FLTX-Video-181717?logo=github&logoColor=white)](https://github.com/Lightricks/LTX-Video). Lightricks. Official code, weights, training tools, and migration notice. Verified 2026-08-30.
+<a id="ref-40"></a>[40] LTX-Video Official Repository [![GitHub: Lightricks/LTX-Video](https://img.shields.io/github/stars/Lightricks/LTX-Video?style=social)](https://github.com/Lightricks/LTX-Video). Lightricks. Official code, weights, training tools, and migration notice. Verified 2026-08-30.
 
-<a id="ref-41"></a>[41] HunyuanVideo Official Repository [![GitHub: Tencent-Hunyuan/HunyuanVideo](https://img.shields.io/badge/GitHub-Tencent-Hunyuan%2FHunyuanVideo-181717?logo=github&logoColor=white)](https://github.com/Tencent-Hunyuan/HunyuanVideo). Tencent Hunyuan. Official code and weights. Verified 2026-08-30.
+<a id="ref-41"></a>[41] HunyuanVideo Official Repository [![GitHub: Tencent-Hunyuan/HunyuanVideo](https://img.shields.io/github/stars/Tencent-Hunyuan/HunyuanVideo?style=social)](https://github.com/Tencent-Hunyuan/HunyuanVideo). Tencent Hunyuan. Official code and weights. Verified 2026-08-30.
 
 <a id="ref-42"></a>[42] [Seedance 2.0 Official Project](https://seed.bytedance.com/seedance2_0). ByteDance Seed. Official model and service page. Verified 2026-08-30.

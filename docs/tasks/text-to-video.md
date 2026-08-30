@@ -436,7 +436,7 @@ T2V-CompBench 用 1,400 个 prompt 和七类组合性维度分析复杂属性、
 
 <a id="ref-27"></a>[27] [Ovi: Twin Backbone Cross-Modal Fusion for Audio-Video Generation](https://arxiv.org/abs/2510.01284). Ovi team. arXiv preprint. 2025.
 
-<a id="ref-28"></a>[28] [LTX-2: Efficient Joint Audio-Visual Foundation Model](https://arxiv.org/abs/2601.03233). Yoav HaCohen, Benny Brazowski, Nisan Chiprut, et al. arXiv preprint. 2026. Official versioned code and weight repository [![GitHub: Lightricks/LTX-2](https://img.shields.io/badge/GitHub-Lightricks%2FLTX-2-181717?logo=github&logoColor=white)](https://github.com/Lightricks/LTX-2).
+<a id="ref-28"></a>[28] [LTX-2: Efficient Joint Audio-Visual Foundation Model](https://arxiv.org/abs/2601.03233). Yoav HaCohen, Benny Brazowski, Nisan Chiprut, et al. arXiv preprint. 2026. Official versioned code and weight repository [![GitHub: Lightricks/LTX-2](https://img.shields.io/github/stars/Lightricks/LTX-2?style=social)](https://github.com/Lightricks/LTX-2).
 
 <a id="ref-29"></a>[29] [Sora 2](https://openai.com/index/sora-2/) and [Sora 2 System Card](https://openai.com/index/sora-2-system-card/). OpenAI. Official product/system evidence. 2025; availability page updated in 2026.
 

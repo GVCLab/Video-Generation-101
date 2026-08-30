@@ -527,7 +527,7 @@ flowchart LR
 
 <a id="ref-10"></a>[10] [LTX-Video: Realtime Video Latent Diffusion](https://arxiv.org/abs/2501.00103). Lightricks team. Author preprint and official open implementation. First public 2024-12.
 
-<a id="ref-11"></a>[11] Open-Sora 1.2 Report [![GitHub: hpcaitech/Open-Sora](https://img.shields.io/badge/GitHub-hpcaitech%2FOpen-Sora-181717?logo=github&logoColor=white)](https://github.com/hpcaitech/Open-Sora/blob/main/docs/report_02.md). HPC-AI Tech. Official technical report and code. 2024.
+<a id="ref-11"></a>[11] Open-Sora 1.2 Report [![GitHub: hpcaitech/Open-Sora](https://img.shields.io/github/stars/hpcaitech/Open-Sora?style=social)](https://github.com/hpcaitech/Open-Sora/blob/main/docs/report_02.md). HPC-AI Tech. Official technical report and code. 2024.
 
 <a id="ref-12"></a>[12] [LinGen: Towards High-Resolution Minute-Length Text-to-Video Generation with Linear Computational Complexity](https://openaccess.thecvf.com/content/CVPR2025/papers/Wang_LinGen_Towards_High-Resolution_Minute-Length_Text-to-Video_Generation_with_Linear_Computational_Complexity_CVPR_2025_paper.pdf). Fu-Yun Wang et al. CVPR. 2025.
 
@@ -541,9 +541,9 @@ flowchart LR
 
 <a id="ref-17"></a>[17] [SANA-Video 2.0 Official Documentation](https://nvlabs.github.io/Sana/docs/sana_video2/). NVIDIA Research. Official documentation and release surface. 2026.
 
-<a id="ref-18"></a>[18] Wan2.2 Official Repository [![GitHub: Wan-Video/Wan2.2](https://img.shields.io/badge/GitHub-Wan-Video%2FWan2.2-181717?logo=github&logoColor=white)](https://github.com/Wan-Video/Wan2.2). Wan Team. Official code, model cards and weights. 2025.
+<a id="ref-18"></a>[18] Wan2.2 Official Repository [![GitHub: Wan-Video/Wan2.2](https://img.shields.io/github/stars/Wan-Video/Wan2.2?style=social)](https://github.com/Wan-Video/Wan2.2). Wan Team. Official code, model cards and weights. 2025.
 
-<a id="ref-19"></a>[19] Wan2.2 timestep expert routing implementation [![GitHub: Wan-Video/Wan2.2](https://img.shields.io/badge/GitHub-Wan-Video%2FWan2.2-181717?logo=github&logoColor=white)](https://github.com/Wan-Video/Wan2.2/blob/main/wan/text2video.py). Wan Team. Official code. 2025.
+<a id="ref-19"></a>[19] Wan2.2 timestep expert routing implementation [![GitHub: Wan-Video/Wan2.2](https://img.shields.io/github/stars/Wan-Video/Wan2.2?style=social)](https://github.com/Wan-Video/Wan2.2/blob/main/wan/text2video.py). Wan Team. Official code. 2025.
 
 <a id="ref-20"></a>[20] [RAPID: Reusing Attention Sparsity with Inter-step Adaptation for Efficient Video Generation](https://openaccess.thecvf.com/content/CVPR2026/papers/Lin_RAPID_Reusing_Attention_Sparsity_with_Inter-step_Adaptation_for_Efficient_Video_CVPR_2026_paper.pdf). CVPR. 2026.
 
@@ -565,7 +565,7 @@ flowchart LR
 
 <a id="ref-29"></a>[29] [ScaleFusion: Fusing Model and Parallelism for Efficient Video Diffusion Transformers](https://openreview.net/pdf?id=anZWBeWnWh). MLSys. 2025.
 
-<a id="ref-30"></a>[30] Open-Sora official repository [![GitHub: hpcaitech/Open-Sora](https://img.shields.io/badge/GitHub-hpcaitech%2FOpen-Sora-181717?logo=github&logoColor=white)](https://github.com/hpcaitech/Open-Sora). HPC-AI Tech. Official code and reports.
+<a id="ref-30"></a>[30] Open-Sora official repository [![GitHub: hpcaitech/Open-Sora](https://img.shields.io/github/stars/hpcaitech/Open-Sora?style=social)](https://github.com/hpcaitech/Open-Sora). HPC-AI Tech. Official code and reports.
 
 <a id="ref-31"></a>[31] [xDiT: an Inference Engine for Diffusion Transformers with Massive Parallelism](https://arxiv.org/abs/2411.01738). Author preprint and official implementation. 2024.
 

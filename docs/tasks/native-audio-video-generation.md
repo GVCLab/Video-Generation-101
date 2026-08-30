@@ -430,31 +430,31 @@ ITS 论文在其协议中发现：只用文本—视频 verifier 会提高文本
 
 <a id="ref-9"></a>[9] Liu et al. [JavisDiT: Joint Audio-Video Diffusion Transformer with Hierarchical Spatio-Temporal Prior Synchronization](https://proceedings.iclr.cc/paper_files/paper/2026/hash/e11afe29671baa67c9f15fa77fc97357-Abstract-Conference.html). ICLR, 2026.
 
-<a id="ref-10"></a>[10] JavisVerse. JavisDiT official repository [![GitHub: JavisVerse/JavisDiT](https://img.shields.io/badge/GitHub-JavisVerse%2FJavisDiT-181717?logo=github&logoColor=white)](https://github.com/JavisVerse/JavisDiT). Accessed 2026-08-30.
+<a id="ref-10"></a>[10] JavisVerse. JavisDiT official repository [![GitHub: JavisVerse/JavisDiT](https://img.shields.io/github/stars/JavisVerse/JavisDiT?style=social)](https://github.com/JavisVerse/JavisDiT). Accessed 2026-08-30.
 
 <a id="ref-11"></a>[11] Low et al. [Ovi: Twin Backbone Cross-Modal Fusion for Audio-Video Generation](https://arxiv.org/abs/2510.01284). arXiv preprint, 2025.
 
-<a id="ref-12"></a>[12] Character.AI. Ovi official repository and Ovi 1.1 release [![GitHub: character-ai/Ovi](https://img.shields.io/badge/GitHub-character-ai%2FOvi-181717?logo=github&logoColor=white)](https://github.com/character-ai/Ovi). Accessed 2026-08-30.
+<a id="ref-12"></a>[12] Character.AI. Ovi official repository and Ovi 1.1 release [![GitHub: character-ai/Ovi](https://img.shields.io/github/stars/character-ai/Ovi?style=social)](https://github.com/character-ai/Ovi). Accessed 2026-08-30.
 
 <a id="ref-13"></a>[13] HaCohen et al. [LTX-2: Efficient Joint Audio-Visual Foundation Model](https://arxiv.org/abs/2601.03233). arXiv preprint, 2026.
 
-<a id="ref-14"></a>[14] Lightricks. LTX-2 official repository [![GitHub: Lightricks/LTX-2](https://img.shields.io/badge/GitHub-Lightricks%2FLTX-2-181717?logo=github&logoColor=white)](https://github.com/Lightricks/LTX-2). Accessed 2026-08-30.
+<a id="ref-14"></a>[14] Lightricks. LTX-2 official repository [![GitHub: Lightricks/LTX-2](https://img.shields.io/github/stars/Lightricks/LTX-2?style=social)](https://github.com/Lightricks/LTX-2). Accessed 2026-08-30.
 
 <a id="ref-15"></a>[15] Hu et al. [Harmony: Harmonizing Audio and Video Generation through Cross-Task Synergy](https://openaccess.thecvf.com/content/CVPR2026/papers/Hu_Harmony_Harmonizing_Audio_and_Video_Generation_through_Cross-Task_Synergy_CVPR_2026_paper.pdf). CVPR, 2026.
 
 <a id="ref-16"></a>[16] Ji et al. [Native Audio-Visual Alignment for Generation](https://arxiv.org/abs/2605.30073). arXiv preprint, 2026.
 
-<a id="ref-17"></a>[17] ERNIE Research. NAVA official repository [![GitHub: ernie-research/NAVA](https://img.shields.io/badge/GitHub-ernie-research%2FNAVA-181717?logo=github&logoColor=white)](https://github.com/ernie-research/NAVA). Accessed 2026-08-30.
+<a id="ref-17"></a>[17] ERNIE Research. NAVA official repository [![GitHub: ernie-research/NAVA](https://img.shields.io/github/stars/ernie-research/NAVA?style=social)](https://github.com/ernie-research/NAVA). Accessed 2026-08-30.
 
 <a id="ref-18"></a>[18] Baidu. [NAVA model card](https://huggingface.co/baidu/NAVA). Accessed 2026-08-30.
 
 <a id="ref-19"></a>[19] Zhan et al. [OmniVAE: An Audio-Video VAE with Cross-Modal Alignment for Joint Generation](https://arxiv.org/abs/2607.23855). arXiv preprint, 2026.
 
-<a id="ref-20"></a>[20] OpenMOSS. OmniVAE official repository [![GitHub: OpenMOSS/OmniVAE](https://img.shields.io/badge/GitHub-OpenMOSS%2FOmniVAE-181717?logo=github&logoColor=white)](https://github.com/OpenMOSS/OmniVAE). Accessed 2026-08-30.
+<a id="ref-20"></a>[20] OpenMOSS. OmniVAE official repository [![GitHub: OpenMOSS/OmniVAE](https://img.shields.io/github/stars/OpenMOSS/OmniVAE?style=social)](https://github.com/OpenMOSS/OmniVAE). Accessed 2026-08-30.
 
 <a id="ref-21"></a>[21] Jung et al. [Inference-Time Scaling for Joint Audio-Video Generation](https://openreview.net/forum?id=MHNFjjm5nO). TMLR, 2026.
 
-<a id="ref-22"></a>[22] KAIST Multimodal AI Lab. ITS-AVGen official repository [![GitHub: kaistmm/ITS-AVGen](https://img.shields.io/badge/GitHub-kaistmm%2FITS-AVGen-181717?logo=github&logoColor=white)](https://github.com/kaistmm/ITS-AVGen). Accessed 2026-08-30.
+<a id="ref-22"></a>[22] KAIST Multimodal AI Lab. ITS-AVGen official repository [![GitHub: kaistmm/ITS-AVGen](https://img.shields.io/github/stars/kaistmm/ITS-AVGen?style=social)](https://github.com/kaistmm/ITS-AVGen). Accessed 2026-08-30.
 
 <a id="ref-23"></a>[23] Ding et al. [Ripple: Real-Time Streaming Audio-Video Generation With Cross-Modal Recurrent Memory](https://arxiv.org/abs/2607.26818). arXiv preprint, 2026.
 
@@ -470,10 +470,10 @@ ITS 论文在其协议中发现：只用文本—视频 verifier 会提高文本
 
 <a id="ref-29"></a>[29] Seedance Team et al. [Seedance 2.0: Advancing Video Generation for World Complexity](https://arxiv.org/abs/2604.14148). Official preprint, 2026.
 
-<a id="ref-30"></a>[30] ResearchMM. MM-Diffusion official repository [![GitHub: researchmm/MM-Diffusion](https://img.shields.io/badge/GitHub-researchmm%2FMM-Diffusion-181717?logo=github&logoColor=white)](https://github.com/researchmm/MM-Diffusion). Accessed 2026-08-30.
+<a id="ref-30"></a>[30] ResearchMM. MM-Diffusion official repository [![GitHub: researchmm/MM-Diffusion](https://img.shields.io/github/stars/researchmm/MM-Diffusion?style=social)](https://github.com/researchmm/MM-Diffusion). Accessed 2026-08-30.
 
-<a id="ref-31"></a>[31] Xing et al. Seeing and Hearing official repository [![GitHub: yzxing87/Seeing-and-Hearing](https://img.shields.io/badge/GitHub-yzxing87%2FSeeing-and-Hearing-181717?logo=github&logoColor=white)](https://github.com/yzxing87/Seeing-and-Hearing). Accessed 2026-08-30.
+<a id="ref-31"></a>[31] Xing et al. Seeing and Hearing official repository [![GitHub: yzxing87/Seeing-and-Hearing](https://img.shields.io/github/stars/yzxing87/Seeing-and-Hearing?style=social)](https://github.com/yzxing87/Seeing-and-Hearing). Accessed 2026-08-30.
 
-<a id="ref-32"></a>[32] Cheng et al. MMAudio official repository [![GitHub: hkchengrex/MMAudio](https://img.shields.io/badge/GitHub-hkchengrex%2FMMAudio-181717?logo=github&logoColor=white)](https://github.com/hkchengrex/MMAudio). Accessed 2026-08-30.
+<a id="ref-32"></a>[32] Cheng et al. MMAudio official repository [![GitHub: hkchengrex/MMAudio](https://img.shields.io/github/stars/hkchengrex/MMAudio?style=social)](https://github.com/hkchengrex/MMAudio). Accessed 2026-08-30.
 
 <a id="ref-33"></a>[33] Wang et al. [JointDiT project page](https://anonymoushub4ai.github.io/JointDiT/). Accessed 2026-08-30.

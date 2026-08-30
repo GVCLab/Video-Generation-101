@@ -433,7 +433,7 @@ FloLPIPS 用端点/插值视频的 flow distortion 对 LPIPS feature difference 
 
 <a id="ref-9"></a>[9] [IFRNet: Intermediate Feature Refine Network for Efficient Frame Interpolation](https://openaccess.thecvf.com/content/CVPR2022/html/Kong_IFRNet_Intermediate_Feature_Refine_Network_for_Efficient_Frame_Interpolation_CVPR_2022_paper.html). Lingtong Kong, Boyuan Jiang, Donghao Luo, Wenqing Chu, Xiaoming Huang, Ying Tai, Chengjie Wang, Jie Yang. CVPR. 2022. [arXiv](https://arxiv.org/abs/2205.14620).
 
-<a id="ref-10"></a>[10] [FILM: Frame Interpolation for Large Motion](https://arxiv.org/abs/2202.04901). Fitsum Reda, Janne Kontkanen, Eric Tabellion, Deqing Sun, Caroline Pantofaru, Brian Curless. ECCV. 2022. 官方代码 [![GitHub: google-research/frame-interpolation](https://img.shields.io/badge/GitHub-google-research%2Fframe-interpolation-181717?logo=github&logoColor=white)](https://github.com/google-research/frame-interpolation).
+<a id="ref-10"></a>[10] [FILM: Frame Interpolation for Large Motion](https://arxiv.org/abs/2202.04901). Fitsum Reda, Janne Kontkanen, Eric Tabellion, Deqing Sun, Caroline Pantofaru, Brian Curless. ECCV. 2022. 官方代码 [![GitHub: google-research/frame-interpolation](https://img.shields.io/github/stars/google-research/frame-interpolation?style=social)](https://github.com/google-research/frame-interpolation).
 
 <a id="ref-11"></a>[11] [Video Frame Interpolation with Transformer](https://openaccess.thecvf.com/content/CVPR2022/html/Lu_Video_Frame_Interpolation_With_Transformer_CVPR_2022_paper.html). Liying Lu, Ruizheng Wu, Huaijia Lin, Jiangbo Lu, Jiaya Jia. CVPR. 2022. [arXiv](https://arxiv.org/abs/2205.07230).
 
@@ -463,7 +463,7 @@ FloLPIPS 用端点/插值视频的 flow distortion 对 LPIPS feature difference 
 
 <a id="ref-24"></a>[24] [A Database and Evaluation Methodology for Optical Flow](https://vision.middlebury.edu/flow/floweval-ijcv2011.pdf). Simon Baker, Daniel Scharstein, J. P. Lewis, Stefan Roth, Michael J. Black, Richard Szeliski. *International Journal of Computer Vision*. 2011. [官方评测页](https://vision.middlebury.edu/flow/eval/).
 
-<a id="ref-25"></a>[25] [Channel Attention Is All You Need for Video Frame Interpolation](https://ojs.aaai.org/index.php/AAAI/article/view/6693). Myungsub Choi, Heewon Kim, Bohyung Han, Ning Xu, Kyoung Mu Lee. AAAI. 2020. SNU-FILM 官方代码与下载说明 [![GitHub: myungsub/CAIN](https://img.shields.io/badge/GitHub-myungsub%2FCAIN-181717?logo=github&logoColor=white)](https://github.com/myungsub/CAIN).
+<a id="ref-25"></a>[25] [Channel Attention Is All You Need for Video Frame Interpolation](https://ojs.aaai.org/index.php/AAAI/article/view/6693). Myungsub Choi, Heewon Kim, Bohyung Han, Ning Xu, Kyoung Mu Lee. AAAI. 2020. SNU-FILM 官方代码与下载说明 [![GitHub: myungsub/CAIN](https://img.shields.io/github/stars/myungsub/CAIN?style=social)](https://github.com/myungsub/CAIN).
 
 <a id="ref-26"></a>[26] [XVFI: eXtreme Video Frame Interpolation](https://openaccess.thecvf.com/content/ICCV2021/html/Sim_XVFI_eXtreme_Video_Frame_Interpolation_ICCV_2021_paper.html). Hyeonjun Sim, Jihyong Oh, Munchurl Kim. ICCV. 2021.
 
@@ -475,6 +475,6 @@ FloLPIPS 用端点/插值视频的 flow distortion 对 LPIPS feature difference 
 
 <a id="ref-30"></a>[30] [FloLPIPS: A Bespoke Video Quality Metric for Frame Interpolation](https://arxiv.org/abs/2207.08119). Duolikun Danier, Fan Zhang, David Bull. Picture Coding Symposium. 2022. [DOI](https://doi.org/10.1109/PCS56426.2022.10018062).
 
-<a id="ref-31"></a>[31] [BVI-VFI: A Video Quality Database for Video Frame Interpolation](https://doi.org/10.1109/TIP.2023.3327912). Duolikun Danier, Fan Zhang, David Bull. *IEEE Transactions on Image Processing*. 2023. 官方数据库 [![GitHub: danier97/BVI-VFI-database](https://img.shields.io/badge/GitHub-danier97%2FBVI-VFI-database-181717?logo=github&logoColor=white)](https://github.com/danier97/BVI-VFI-database).
+<a id="ref-31"></a>[31] [BVI-VFI: A Video Quality Database for Video Frame Interpolation](https://doi.org/10.1109/TIP.2023.3327912). Duolikun Danier, Fan Zhang, David Bull. *IEEE Transactions on Image Processing*. 2023. 官方数据库 [![GitHub: danier97/BVI-VFI-database](https://img.shields.io/github/stars/danier97/BVI-VFI-database?style=social)](https://github.com/danier97/BVI-VFI-database).
 
 <a id="ref-32"></a>[32] [Benchmarking Video Frame Interpolation](https://arxiv.org/abs/2403.17128). Simon Kiefhaber, Simon Niklaus, Feng Liu, Simone Schaub-Meyer. arXiv preprint. 2024.

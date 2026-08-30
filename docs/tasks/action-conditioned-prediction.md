@@ -396,13 +396,13 @@ flowchart TD
 
 <a id="ref-8"></a>[8] Gaoyue Zhou et al. [DINO-WM: World Models on Pre-trained Visual Features enable Zero-shot Planning](https://proceedings.mlr.press/v267/zhou25a.html). ICML. 2025.
 
-<a id="ref-9"></a>[9] DINO-WM authors. Official DINO-WM repository [![GitHub: gaoyuezhou/dino_wm](https://img.shields.io/badge/GitHub-gaoyuezhou%2Fdino_wm-181717?logo=github&logoColor=white)](https://github.com/gaoyuezhou/dino_wm). GitHub. Accessed 2026-08-30.
+<a id="ref-9"></a>[9] DINO-WM authors. Official DINO-WM repository [![GitHub: gaoyuezhou/dino_wm](https://img.shields.io/github/stars/gaoyuezhou/dino_wm?style=social)](https://github.com/gaoyuezhou/dino_wm). GitHub. Accessed 2026-08-30.
 
 <a id="ref-10"></a>[10] Jake Bruce et al. [Genie: Generative Interactive Environments](https://proceedings.mlr.press/v235/bruce24a.html). ICML. 2024.
 
 <a id="ref-11"></a>[11] Eloi Alonso, Adam Jelley, Vincent Micheli, Anssi Kanervisto, Amos Storkey, Tim Pearce, François Fleuret. [Diffusion for World Modeling: Visual Details Matter in Atari](https://proceedings.neurips.cc/paper_files/paper/2024/hash/6bdde0373d53d4a501249547084bed43-Abstract-Conference.html). NeurIPS. 2024.
 
-<a id="ref-12"></a>[12] DIAMOND authors. Official DIAMOND repository [![GitHub: eloialonso/diamond](https://img.shields.io/badge/GitHub-eloialonso%2Fdiamond-181717?logo=github&logoColor=white)](https://github.com/eloialonso/diamond). GitHub. Accessed 2026-08-30.
+<a id="ref-12"></a>[12] DIAMOND authors. Official DIAMOND repository [![GitHub: eloialonso/diamond](https://img.shields.io/github/stars/eloialonso/diamond?style=social)](https://github.com/eloialonso/diamond). GitHub. Accessed 2026-08-30.
 
 <a id="ref-13"></a>[13] Dani Valevski, Yaniv Leviathan, Moab Arar, Shlomi Fruchter. [Diffusion Models Are Real-Time Game Engines](https://openreview.net/forum?id=P8pqeEkn1H). ICLR. 2025.
 
@@ -410,7 +410,7 @@ flowchart TD
 
 <a id="ref-15"></a>[15] Mahmoud Assran et al. [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](https://arxiv.org/abs/2506.09985). arXiv:2506.09985. 2025.
 
-<a id="ref-16"></a>[16] Meta AI Research. Official V-JEPA 2 repository [![GitHub: facebookresearch/vjepa2](https://img.shields.io/badge/GitHub-facebookresearch%2Fvjepa2-181717?logo=github&logoColor=white)](https://github.com/facebookresearch/vjepa2). GitHub. Accessed 2026-08-30.
+<a id="ref-16"></a>[16] Meta AI Research. Official V-JEPA 2 repository [![GitHub: facebookresearch/vjepa2](https://img.shields.io/github/stars/facebookresearch/vjepa2?style=social)](https://github.com/facebookresearch/vjepa2). GitHub. Accessed 2026-08-30.
 
 <a id="ref-17"></a>[17] Joel Jang et al. [DreamGen: Unlocking Generalization in Robot Learning through Video World Models](https://proceedings.mlr.press/v305/jang25a.html). CoRL. 2025.
 
@@ -426,17 +426,17 @@ flowchart TD
 
 <a id="ref-23"></a>[23] Angen Ye et al. [GigaWorld-Policy: An Efficient Action-Centered World-Action Model](https://arxiv.org/abs/2603.17240). arXiv:2603.17240. 2026.
 
-<a id="ref-24"></a>[24] GigaAI team. [GigaWorld-Policy-0.5](https://arxiv.org/abs/2607.13960) and official release repository [![GitHub: open-gigaai/giga-world-policy](https://img.shields.io/badge/GitHub-open-gigaai%2Fgiga-world-policy-181717?logo=github&logoColor=white)](https://github.com/open-gigaai/giga-world-policy). 2026.
+<a id="ref-24"></a>[24] GigaAI team. [GigaWorld-Policy-0.5](https://arxiv.org/abs/2607.13960) and official release repository [![GitHub: open-gigaai/giga-world-policy](https://img.shields.io/github/stars/open-gigaai/giga-world-policy?style=social)](https://github.com/open-gigaai/giga-world-policy). 2026.
 
 <a id="ref-25"></a>[25] Ze Huang, Jiahui Zhang, Hairuo Liu, Chenxi Zhang, Ran Cheng, Li Zhang. [Learning Transferable Dynamics Priors from Action to World Modeling](https://arxiv.org/abs/2606.29501). arXiv:2606.29501. 2026.
 
-<a id="ref-26"></a>[26] A2World authors. Official A2World repository [![GitHub: LogosRoboticsGroup/A2World](https://img.shields.io/badge/GitHub-LogosRoboticsGroup%2FA2World-181717?logo=github&logoColor=white)](https://github.com/LogosRoboticsGroup/A2World) and [model card](https://huggingface.co/Fleurrr/A2World-World-Model). Accessed 2026-08-30.
+<a id="ref-26"></a>[26] A2World authors. Official A2World repository [![GitHub: LogosRoboticsGroup/A2World](https://img.shields.io/github/stars/LogosRoboticsGroup/A2World?style=social)](https://github.com/LogosRoboticsGroup/A2World) and [model card](https://huggingface.co/Fleurrr/A2World-World-Model). Accessed 2026-08-30.
 
 <a id="ref-27"></a>[27] Haoyu Wu, Jiwen Yu, Yingtian Zou, Xihui Liu. [MultiWorld: Scalable Multi-Agent Multi-View Video World Models](https://arxiv.org/abs/2604.18564). arXiv:2604.18564. 2026.
 
-<a id="ref-28"></a>[28] MultiWorld authors. Official MultiWorld repository [![GitHub: CIntellifusion/MultiWorld](https://img.shields.io/badge/GitHub-CIntellifusion%2FMultiWorld-181717?logo=github&logoColor=white)](https://github.com/CIntellifusion/MultiWorld). GitHub. Accessed 2026-08-30.
+<a id="ref-28"></a>[28] MultiWorld authors. Official MultiWorld repository [![GitHub: CIntellifusion/MultiWorld](https://img.shields.io/github/stars/CIntellifusion/MultiWorld?style=social)](https://github.com/CIntellifusion/MultiWorld). GitHub. Accessed 2026-08-30.
 
-<a id="ref-29"></a>[29] Lucas Maes, Quentin Le Lidec, Damien Scieur, Yann LeCun, Randall Balestriero. [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312) and official repository [![GitHub: lucas-maes/le-wm](https://img.shields.io/badge/GitHub-lucas-maes%2Fle-wm-181717?logo=github&logoColor=white)](https://github.com/lucas-maes/le-wm). 2026.
+<a id="ref-29"></a>[29] Lucas Maes, Quentin Le Lidec, Damien Scieur, Yann LeCun, Randall Balestriero. [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312) and official repository [![GitHub: lucas-maes/le-wm](https://img.shields.io/github/stars/lucas-maes/le-wm?style=social)](https://github.com/lucas-maes/le-wm). 2026.
 
 <a id="ref-30"></a>[30] WorldGym authors. [WorldGym: World Model as an Environment for Policy Evaluation](https://openreview.net/forum?id=hidBHy1CAw) and [official project page](https://world-model-eval.github.io/). ICLR. 2026.
 

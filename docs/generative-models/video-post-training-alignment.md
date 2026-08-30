@@ -346,7 +346,7 @@ VideoDPO 使用多个视觉模型构造 OmniScore，论文补充材料也承认�
 
 <a id="ref-19"></a>[19] Wang et al. [Align-A-Video: Deterministic Reward Tuning of Image Diffusion Models for Consistent Video Editing](https://openaccess.thecvf.com/content/CVPR2025/html/Wang_Align-A-Video_Deterministic_Reward_Tuning_of_Image_Diffusion_Models_for_Consistent_CVPR_2025_paper.html). CVPR, 2025.
 
-<a id="ref-20"></a>[20] Li et al. T2V-Turbo official code [![GitHub: Ji4chenLi/t2v-turbo](https://img.shields.io/badge/GitHub-Ji4chenLi%2Ft2v-turbo-181717?logo=github&logoColor=white)](https://github.com/Ji4chenLi/t2v-turbo). Official repository, accessed 2026-08-30.
+<a id="ref-20"></a>[20] Li et al. T2V-Turbo official code [![GitHub: Ji4chenLi/t2v-turbo](https://img.shields.io/github/stars/Ji4chenLi/t2v-turbo?style=social)](https://github.com/Ji4chenLi/t2v-turbo). Official repository, accessed 2026-08-30.
 
 <a id="ref-21"></a>[21] Zhang et al. [Align Video Diffusion Model with Online Video-Centric Preference Optimization](https://openaccess.thecvf.com/content/WACV2026/html/Zhang_Align_Video_Diffusion_Model_with_Online_Video-Centric_Preference_Optimization_WACV_2026_paper.html). WACV, 2026.
 

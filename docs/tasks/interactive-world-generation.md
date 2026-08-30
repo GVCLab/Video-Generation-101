@@ -400,7 +400,7 @@ UniSim、DIAMOND、DreamZero、GeniWorld、WorldGym 与 World-In-World 分别从
 
 <a id="ref-8"></a>[8] [Oasis: A Universe in a Transformer](https://oasis-model.github.io/). Decart, Etched, et al. Official project report. 2024.
 
-<a id="ref-9"></a>[9] open-oasis: Inference Script for Oasis 500M [![GitHub: etched-ai/open-oasis](https://img.shields.io/badge/GitHub-etched-ai%2Fopen-oasis-181717?logo=github&logoColor=white)](https://github.com/etched-ai/open-oasis). Etched AI. Official code repository.
+<a id="ref-9"></a>[9] open-oasis: Inference Script for Oasis 500M [![GitHub: etched-ai/open-oasis](https://img.shields.io/github/stars/etched-ai/open-oasis?style=social)](https://github.com/etched-ai/open-oasis). Etched AI. Official code repository.
 
 <a id="ref-10"></a>[10] [Etched/oasis-500m](https://huggingface.co/Etched/oasis-500m). Etched. Official model repository.
 
@@ -414,7 +414,7 @@ UniSim、DIAMOND、DreamZero、GeniWorld、WorldGym 与 World-In-World 分别从
 
 <a id="ref-15"></a>[15] [Astra: General Interactive World Model with Autoregressive Denoising](https://proceedings.iclr.cc/paper_files/paper/2026/hash/7fc516909e0b90c96bcc75a16ebee6a2-Abstract-Conference.html). Yixuan Zhu, Jiaqi Feng, Wenzhao Zheng, et al. ICLR 2026.
 
-<a id="ref-16"></a>[16] Astra [![GitHub: EternalEvan/Astra](https://img.shields.io/badge/GitHub-EternalEvan%2FAstra-181717?logo=github&logoColor=white)](https://github.com/EternalEvan/Astra). EternalEvan et al. Official code and checkpoint repository.
+<a id="ref-16"></a>[16] Astra [![GitHub: EternalEvan/Astra](https://img.shields.io/github/stars/EternalEvan/Astra?style=social)](https://github.com/EternalEvan/Astra). EternalEvan et al. Official code and checkpoint repository.
 
 <a id="ref-17"></a>[17] [WorldPack: Dynamic Frame Compression for Long-context Video World Modeling](https://arxiv.org/abs/2512.02473). Yuta Oshima, Yusuke Iwasawa, Masahiro Suzuki, Yutaka Matsuo, Hiroki Furuta. arXiv v3. 2026.
 
@@ -428,7 +428,7 @@ UniSim、DIAMOND、DreamZero、GeniWorld、WorldGym 与 World-In-World 分别从
 
 <a id="ref-22"></a>[22] [ReWorld: An Interactive World Model with Long-Horizon Memory](https://arxiv.org/abs/2608.23565). Zhifei Chen, Luozhou Wang, Guibao Shen, et al. arXiv v1. 2026.
 
-<a id="ref-23"></a>[23] ReWorld [![GitHub: zhifeichen097/ReWorld](https://img.shields.io/badge/GitHub-zhifeichen097%2FReWorld-181717?logo=github&logoColor=white)](https://github.com/zhifeichen097/ReWorld). Zhifei Chen et al. Official inference-code repository; core checkpoints pending at freeze date.
+<a id="ref-23"></a>[23] ReWorld [![GitHub: zhifeichen097/ReWorld](https://img.shields.io/github/stars/zhifeichen097/ReWorld?style=social)](https://github.com/zhifeichen097/ReWorld). Zhifei Chen et al. Official inference-code repository; core checkpoints pending at freeze date.
 
 <a id="ref-24"></a>[24] [iWorld-Bench: A Benchmark for Interactive World Models with a Unified Action Generation Framework](https://icml.cc/virtual/2026/poster/63894). Jianjie Fang, Yingshan Lei, Qin Wan, et al. ICML 2026.
 
@@ -458,6 +458,6 @@ UniSim、DIAMOND、DreamZero、GeniWorld、WorldGym 与 World-In-World 分别从
 
 <a id="ref-37"></a>[37] [Get started with Project Genie](https://support.google.com/labs/answer/16875695). Google Labs Help. Current official access and policy page.
 
-<a id="ref-38"></a>[38] Matrix-Game 3.0 code and checkpoints [![GitHub: SkyworkAI/Matrix-Game](https://img.shields.io/badge/GitHub-SkyworkAI%2FMatrix-Game-181717?logo=github&logoColor=white)](https://github.com/SkyworkAI/Matrix-Game/tree/main/Matrix-Game-3). Skywork AI. Official repository and release surface. 2026.
+<a id="ref-38"></a>[38] Matrix-Game 3.0 code and checkpoints [![GitHub: SkyworkAI/Matrix-Game](https://img.shields.io/github/stars/SkyworkAI/Matrix-Game?style=social)](https://github.com/SkyworkAI/Matrix-Game/tree/main/Matrix-Game-3). Skywork AI. Official repository and release surface. 2026.
 
-<a id="ref-39"></a>[39] Matrix-Game 3.5: Enhancing Real-Time Streaming Interactive World Models with Patch Memory [![GitHub: Riemann-Dynamics/Matrix-Game-3.5](https://img.shields.io/badge/GitHub-Riemann-Dynamics%2FMatrix-Game-3.5-181717?logo=github&logoColor=white)](https://github.com/Riemann-Dynamics/Matrix-Game-3.5). Riemann Dynamics. Official code, checkpoints and project/technical-report repository. 2026.
+<a id="ref-39"></a>[39] Matrix-Game 3.5: Enhancing Real-Time Streaming Interactive World Models with Patch Memory [![GitHub: Riemann-Dynamics/Matrix-Game-3.5](https://img.shields.io/github/stars/Riemann-Dynamics/Matrix-Game-3.5?style=social)](https://github.com/Riemann-Dynamics/Matrix-Game-3.5). Riemann Dynamics. Official code, checkpoints and project/technical-report repository. 2026.

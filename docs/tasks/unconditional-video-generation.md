@@ -391,7 +391,7 @@ artifacts: [config, environment, checkpoint_hash, clip_manifest, seed_manifest, 
 
 <a id="ref-3"></a>[3] [Generating Videos with Scene Dynamics](https://proceedings.neurips.cc/paper_files/paper/2016/hash/04025959b191f8f9de3f924f0940515f-Abstract.html). Carl Vondrick, Hamed Pirsiavash, Antonio Torralba. NeurIPS. 2016.
 
-<a id="ref-4"></a>[4] [Temporal Generative Adversarial Nets with Singular Value Clipping](https://openaccess.thecvf.com/content_iccv_2017/html/Saito_Temporal_Generative_Adversarial_ICCV_2017_paper.html). Masaki Saito, Eiichi Matsumoto, Shunta Saito. ICCV. 2017. Official code [![GitHub: pfnet-research/tgan](https://img.shields.io/badge/GitHub-pfnet-research%2Ftgan-181717?logo=github&logoColor=white)](https://github.com/pfnet-research/tgan).
+<a id="ref-4"></a>[4] [Temporal Generative Adversarial Nets with Singular Value Clipping](https://openaccess.thecvf.com/content_iccv_2017/html/Saito_Temporal_Generative_Adversarial_ICCV_2017_paper.html). Masaki Saito, Eiichi Matsumoto, Shunta Saito. ICCV. 2017. Official code [![GitHub: pfnet-research/tgan](https://img.shields.io/github/stars/pfnet-research/tgan?style=social)](https://github.com/pfnet-research/tgan).
 
 <a id="ref-5"></a>[5] [MoCoGAN: Decomposing Motion and Content for Video Generation](https://openaccess.thecvf.com/content_cvpr_2018/html/Tulyakov_MoCoGAN_Decomposing_Motion_CVPR_2018_paper.html). Sergey Tulyakov, Ming-Yu Liu, Xiaodong Yang, Jan Kautz. CVPR. 2018.
 
@@ -409,11 +409,11 @@ artifacts: [config, environment, checkpoint_hash, clip_manifest, seed_manifest, 
 
 <a id="ref-12"></a>[12] [Neural Discrete Representation Learning](https://proceedings.neurips.cc/paper/2017/hash/7a98af17e63a0ac09ce2e96d03992fbc-Abstract.html). Aaron van den Oord, Oriol Vinyals, Koray Kavukcuoglu. NeurIPS. 2017.
 
-<a id="ref-13"></a>[13] [VideoGPT: Video Generation using VQ-VAE and Transformers](https://arxiv.org/abs/2104.10157). Wilson Yan, Yunzhi Zhang, Pieter Abbeel, Aravind Srinivas. arXiv preprint. 2021. Official code [![GitHub: wilson1yan/VideoGPT](https://img.shields.io/badge/GitHub-wilson1yan%2FVideoGPT-181717?logo=github&logoColor=white)](https://github.com/wilson1yan/VideoGPT).
+<a id="ref-13"></a>[13] [VideoGPT: Video Generation using VQ-VAE and Transformers](https://arxiv.org/abs/2104.10157). Wilson Yan, Yunzhi Zhang, Pieter Abbeel, Aravind Srinivas. arXiv preprint. 2021. Official code [![GitHub: wilson1yan/VideoGPT](https://img.shields.io/github/stars/wilson1yan/VideoGPT?style=social)](https://github.com/wilson1yan/VideoGPT).
 
 <a id="ref-14"></a>[14] [Long Video Generation with Time-Agnostic VQGAN and Time-Sensitive Transformer](https://www.ecva.net/papers/eccv_2022/papers_ECCV/html/5950_ECCV_2022_paper.php). Songwei Ge et al. ECCV. 2022.
 
-<a id="ref-15"></a>[15] [MAGVIT: Masked Generative Video Transformer](https://openaccess.thecvf.com/content/CVPR2023/html/Yu_MAGVIT_Masked_Generative_Video_Transformer_CVPR_2023_paper.html). Lijun Yu et al. CVPR. 2023. Official code [![GitHub: google-research/magvit](https://img.shields.io/badge/GitHub-google-research%2Fmagvit-181717?logo=github&logoColor=white)](https://github.com/google-research/magvit).
+<a id="ref-15"></a>[15] [MAGVIT: Masked Generative Video Transformer](https://openaccess.thecvf.com/content/CVPR2023/html/Yu_MAGVIT_Masked_Generative_Video_Transformer_CVPR_2023_paper.html). Lijun Yu et al. CVPR. 2023. Official code [![GitHub: google-research/magvit](https://img.shields.io/github/stars/google-research/magvit?style=social)](https://github.com/google-research/magvit).
 
 <a id="ref-16"></a>[16] [Language Model Beats Diffusion — Tokenizer is Key to Visual Generation](https://research.google/pubs/language-model-beats-diffusion-tokenizer-is-key-to-visual-generation/). Lijun Yu et al. ICLR. 2024.
 
@@ -429,13 +429,13 @@ artifacts: [config, environment, checkpoint_hash, clip_manifest, seed_manifest, 
 
 <a id="ref-22"></a>[22] [Scalable Diffusion Models with Transformers](https://openaccess.thecvf.com/content/ICCV2023/html/Peebles_Scalable_Diffusion_Models_with_Transformers_ICCV_2023_paper.html). William Peebles, Saining Xie. ICCV. 2023.
 
-<a id="ref-23"></a>[23] [Latte: Latent Diffusion Transformer for Video Generation](https://openreview.net/forum?id=ntGPYNUF3t). Xin Ma et al. *Transactions on Machine Learning Research*. 2025. Official code [![GitHub: Vchitect/Latte](https://img.shields.io/badge/GitHub-Vchitect%2FLatte-181717?logo=github&logoColor=white)](https://github.com/Vchitect/Latte).
+<a id="ref-23"></a>[23] [Latte: Latent Diffusion Transformer for Video Generation](https://openreview.net/forum?id=ntGPYNUF3t). Xin Ma et al. *Transactions on Machine Learning Research*. 2025. Official code [![GitHub: Vchitect/Latte](https://img.shields.io/github/stars/Vchitect/Latte?style=social)](https://github.com/Vchitect/Latte).
 
 <a id="ref-24"></a>[24] [Flow Matching for Generative Modeling](https://openreview.net/forum?id=PqvMRDCJT9t). Yaron Lipman et al. ICLR. 2023.
 
-<a id="ref-25"></a>[25] [Generative Video Bi-flow](https://openaccess.thecvf.com/content/ICCV2025/html/Liu_Generative_Video_Bi-flow_ICCV_2025_paper.html). Bo Liu et al. ICCV. 2025. Official code [![GitHub: ryushinn/ode-video](https://img.shields.io/badge/GitHub-ryushinn%2Fode-video-181717?logo=github&logoColor=white)](https://github.com/ryushinn/ode-video).
+<a id="ref-25"></a>[25] [Generative Video Bi-flow](https://openaccess.thecvf.com/content/ICCV2025/html/Liu_Generative_Video_Bi-flow_ICCV_2025_paper.html). Bo Liu et al. ICCV. 2025. Official code [![GitHub: ryushinn/ode-video](https://img.shields.io/github/stars/ryushinn/ode-video?style=social)](https://github.com/ryushinn/ode-video).
 
-<a id="ref-26"></a>[26] [SSM Meets Video Diffusion Models: Efficient Long-Term Video Generation with Structured State Spaces](https://doi.org/10.1007/s00354-026-00326-8). Yuta Oshima, Shohei Taniguchi, Masahiro Suzuki, Yutaka Matsuo. *New Generation Computing*. 2026. Official code [![GitHub: shim0114/SSM-Meets-Video-Diffusion-Models](https://img.shields.io/badge/GitHub-shim0114%2FSSM-Meets-Video-Diffusion-Models-181717?logo=github&logoColor=white)](https://github.com/shim0114/SSM-Meets-Video-Diffusion-Models).
+<a id="ref-26"></a>[26] [SSM Meets Video Diffusion Models: Efficient Long-Term Video Generation with Structured State Spaces](https://doi.org/10.1007/s00354-026-00326-8). Yuta Oshima, Shohei Taniguchi, Masahiro Suzuki, Yutaka Matsuo. *New Generation Computing*. 2026. Official code [![GitHub: shim0114/SSM-Meets-Video-Diffusion-Models](https://img.shields.io/github/stars/shim0114/SSM-Meets-Video-Diffusion-Models?style=social)](https://github.com/shim0114/SSM-Meets-Video-Diffusion-Models).
 
 <a id="ref-27"></a>[27] [Towards Accurate Generative Models of Video: A New Metric & Challenges](https://arxiv.org/abs/1812.01717). Thomas Unterthiner et al. arXiv preprint. 2018.
 

@@ -533,7 +533,7 @@ Physical AI 闭环系统
 
 <a id="ref-11"></a>[11] [How Far Is Video Generation from World Model: A Physical Law Perspective](https://arxiv.org/abs/2411.02385). arXiv preprint. 2024.
 
-<a id="ref-12"></a>[12] [Physics-IQ Verified](https://arxiv.org/abs/2606.18943). arXiv preprint. 2026. Official benchmark repository [![GitHub: google-deepmind/physics-IQ-benchmark](https://img.shields.io/badge/GitHub-google-deepmind%2Fphysics-IQ-benchmark-181717?logo=github&logoColor=white)](https://github.com/google-deepmind/physics-IQ-benchmark).
+<a id="ref-12"></a>[12] [Physics-IQ Verified](https://arxiv.org/abs/2606.18943). arXiv preprint. 2026. Official benchmark repository [![GitHub: google-deepmind/physics-IQ-benchmark](https://img.shields.io/github/stars/google-deepmind/physics-IQ-benchmark?style=social)](https://github.com/google-deepmind/physics-IQ-benchmark).
 
 <a id="ref-13"></a>[13] [PAI-Bench: A Comprehensive Benchmark For Physical AI](https://openaccess.thecvf.com/content/CVPR2026/html/Zhou_PAI-Bench_A_Comprehensive_Benchmark_For_Physical_AI_CVPR_2026_paper.html). CVPR. 2026.
 

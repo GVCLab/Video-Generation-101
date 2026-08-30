@@ -424,24 +424,24 @@ S_{\mathrm{edit}}=s(Y\odot M,U,R,C),
 
 <a id="ref-36"></a>[36] [IVEBench: Modern Benchmark Suite for Instruction-Guided Video Editing Assessment](https://arxiv.org/abs/2510.11647). ICLR, 2026.
 
-<a id="ref-37"></a>[37] VACE official repository [![GitHub: ali-vilab/VACE](https://img.shields.io/badge/GitHub-ali-vilab%2FVACE-181717?logo=github&logoColor=white)](https://github.com/ali-vilab/VACE). GitHub, accessed 2026-08-30.
+<a id="ref-37"></a>[37] VACE official repository [![GitHub: ali-vilab/VACE](https://img.shields.io/github/stars/ali-vilab/VACE?style=social)](https://github.com/ali-vilab/VACE). GitHub, accessed 2026-08-30.
 
-<a id="ref-38"></a>[38] AnyV2V official repository [![GitHub: TIGER-AI-Lab/AnyV2V](https://img.shields.io/badge/GitHub-TIGER-AI-Lab%2FAnyV2V-181717?logo=github&logoColor=white)](https://github.com/TIGER-AI-Lab/AnyV2V). GitHub, accessed 2026-08-30.
+<a id="ref-38"></a>[38] AnyV2V official repository [![GitHub: TIGER-AI-Lab/AnyV2V](https://img.shields.io/github/stars/TIGER-AI-Lab/AnyV2V?style=social)](https://github.com/TIGER-AI-Lab/AnyV2V). GitHub, accessed 2026-08-30.
 
-<a id="ref-39"></a>[39] StableV2V official repository [![GitHub: AlonzoLeeeooo/StableV2V](https://img.shields.io/badge/GitHub-AlonzoLeeeooo%2FStableV2V-181717?logo=github&logoColor=white)](https://github.com/AlonzoLeeeooo/StableV2V). GitHub, accessed 2026-08-30.
+<a id="ref-39"></a>[39] StableV2V official repository [![GitHub: AlonzoLeeeooo/StableV2V](https://img.shields.io/github/stars/AlonzoLeeeooo/StableV2V?style=social)](https://github.com/AlonzoLeeeooo/StableV2V). GitHub, accessed 2026-08-30.
 
-<a id="ref-40"></a>[40] Ditto official repository [![GitHub: EzioBy/Ditto](https://img.shields.io/badge/GitHub-EzioBy%2FDitto-181717?logo=github&logoColor=white)](https://github.com/EzioBy/Ditto). GitHub, accessed 2026-08-30.
+<a id="ref-40"></a>[40] Ditto official repository [![GitHub: EzioBy/Ditto](https://img.shields.io/github/stars/EzioBy/Ditto?style=social)](https://github.com/EzioBy/Ditto). GitHub, accessed 2026-08-30.
 
-<a id="ref-41"></a>[41] Memory-V2V official repository [![GitHub: DoHunLee1/Memory-V2V](https://img.shields.io/badge/GitHub-DoHunLee1%2FMemory-V2V-181717?logo=github&logoColor=white)](https://github.com/DoHunLee1/Memory-V2V). GitHub, accessed 2026-08-30.
+<a id="ref-41"></a>[41] Memory-V2V official repository [![GitHub: DoHunLee1/Memory-V2V](https://img.shields.io/github/stars/DoHunLee1/Memory-V2V?style=social)](https://github.com/DoHunLee1/Memory-V2V). GitHub, accessed 2026-08-30.
 
-<a id="ref-42"></a>[42] EgoEdit official repository [![GitHub: snap-research/EgoEdit](https://img.shields.io/badge/GitHub-snap-research%2FEgoEdit-181717?logo=github&logoColor=white)](https://github.com/snap-research/EgoEdit). GitHub, accessed 2026-08-30.
+<a id="ref-42"></a>[42] EgoEdit official repository [![GitHub: snap-research/EgoEdit](https://img.shields.io/github/stars/snap-research/EgoEdit?style=social)](https://github.com/snap-research/EgoEdit). GitHub, accessed 2026-08-30.
 
-<a id="ref-43"></a>[43] JoyAI-Video-Edit official repository [![GitHub: jd-opensource/JoyAI-Video-Edit](https://img.shields.io/badge/GitHub-jd-opensource%2FJoyAI-Video-Edit-181717?logo=github&logoColor=white)](https://github.com/jd-opensource/JoyAI-Video-Edit). GitHub, accessed 2026-08-30.
+<a id="ref-43"></a>[43] JoyAI-Video-Edit official repository [![GitHub: jd-opensource/JoyAI-Video-Edit](https://img.shields.io/github/stars/jd-opensource/JoyAI-Video-Edit?style=social)](https://github.com/jd-opensource/JoyAI-Video-Edit). GitHub, accessed 2026-08-30.
 
-<a id="ref-44"></a>[44] MotionV2V official repository [![GitHub: RyannDaGreat/MotionV2V](https://img.shields.io/badge/GitHub-RyannDaGreat%2FMotionV2V-181717?logo=github&logoColor=white)](https://github.com/RyannDaGreat/MotionV2V). GitHub, accessed 2026-08-30.
+<a id="ref-44"></a>[44] MotionV2V official repository [![GitHub: RyannDaGreat/MotionV2V](https://img.shields.io/github/stars/RyannDaGreat/MotionV2V?style=social)](https://github.com/RyannDaGreat/MotionV2V). GitHub, accessed 2026-08-30.
 
-<a id="ref-45"></a>[45] [EditCtrl paper](https://arxiv.org/abs/2602.15031) and public reimplementation [![GitHub: yehonathanlitman/EditCtrl](https://img.shields.io/badge/GitHub-yehonathanlitman%2FEditCtrl-181717?logo=github&logoColor=white)](https://github.com/yehonathanlitman/EditCtrl). CVPR / GitHub, 2026.
+<a id="ref-45"></a>[45] [EditCtrl paper](https://arxiv.org/abs/2602.15031) and public reimplementation [![GitHub: yehonathanlitman/EditCtrl](https://img.shields.io/github/stars/yehonathanlitman/EditCtrl?style=social)](https://github.com/yehonathanlitman/EditCtrl). CVPR / GitHub, 2026.
 
-<a id="ref-46"></a>[46] LiveEdit official repository [![GitHub: cp-cp/LiveEdit](https://img.shields.io/badge/GitHub-cp-cp%2FLiveEdit-181717?logo=github&logoColor=white)](https://github.com/cp-cp/LiveEdit). GitHub, accessed 2026-08-30.
+<a id="ref-46"></a>[46] LiveEdit official repository [![GitHub: cp-cp/LiveEdit](https://img.shields.io/github/stars/cp-cp/LiveEdit?style=social)](https://github.com/cp-cp/LiveEdit). GitHub, accessed 2026-08-30.
 
 <a id="ref-47"></a>[47] [EditStream official project page](https://real-time-video-research.github.io/editstream/). Accessed 2026-08-30.
