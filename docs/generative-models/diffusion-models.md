@@ -222,6 +222,8 @@ $$
 
 ## 6. 视频时空架构与条件控制
 
+本节只说明 diffusion denoiser 的接口与历史代表；Video DiT 的 token 公式、full/factorized/window/sparse/linear/hybrid topology、position/fusion、MoE、并行和 cache 统一由[骨干扩展专章](video-dit-backbones.md)维护。
+
 ### 6.1 Backbone 只实现 denoiser，不定义概率家族
 
 视频 denoiser 接收 $X_\tau$ 或 $Z_\tau$、噪声时间 $\tau$ 与条件 $c$。它必须在同一次或多次前向中处理空间结构、帧间运动和条件信息，但网络形态并不决定训练 objective。
@@ -230,13 +232,11 @@ $$
 |---|---|---|---|
 | 3D U-Net | 时空卷积与注意力直接处理固定片段 | Video Diffusion Models [[9]](#ref-9) | 局部时空建模直接，但长片段激活昂贵 |
 | 图像 backbone + temporal layers | 复用图像权重，在层间加入时间卷积/注意力 | Make-A-Video、Video LDM、SVD [[11]](#ref-11) [[12]](#ref-12) [[14]](#ref-14) | 迁移图像先验容易，但时间模块仍需视频训练 |
-| Factorized space–time | 空间与时间运算分开或交替 | Make-A-Video [[11]](#ref-11) | 降低全时空交互成本，也可能限制跨轴耦合 |
 | Space-Time U-Net | 一次覆盖完整短视频时间范围 | Lumiere [[15]](#ref-15) | 减少关键帧后插帧的分段设计，但仍受固定窗口限制 |
-| DiT / spacetime Transformer | 把 latent patch 当作序列，由 Transformer 预测去噪量 | DiT、Sora [[13]](#ref-13) [[16]](#ref-16) | 易于扩大模型与统一条件，token 数和注意力成本突出 |
-| Causal frame/chunk backbone | 当前帧或块只读历史，块内可联合去噪 | CausVid、Self Forcing、SCD [[20]](#ref-20) [[21]](#ref-21) [[23]](#ref-23) | 可缓存并增量输出，但会引入 exposure bias 与长期记忆问题 |
-| Cascade / multistage | 基础模型生成低分辨率或低帧率视频，再做空间/时间超分 | Imagen Video、Make-A-Video [[10]](#ref-10) [[11]](#ref-11) | 分摊难度，但多阶段误差、延迟与条件漂移需联合评测 |
+| DiT / spacetime Transformer | 把 latent patch 当作序列，由 full/factorized/window/sparse/linear/hybrid mixer 预测目标 | DiT、W.A.L.T.、CogVideoX、HunyuanVideo 等；详见[专章](video-dit-backbones.md) | 只有 global dense attention 的 score 主项随 token 数二次增长；其他 mixer 另有表达、state、selector 与 kernel 代价 |
+| Recurrent / state-space backbone | 用递归/压缩状态传播历史 | 因果长视频与 hybrid 路线 | 状态容量、遗忘与暴露偏移需独立检验 |
 
-DiT 是 backbone，不是与 diffusion、flow matching 并列的生成目标。原始 DiT 在图像 latent patches 上验证了 Transformer denoiser 的扩展性 [[13]](#ref-13)；视频工作把 patch 扩展到空间—时间维，但仍需另行说明 objective、attention 方向、表示空间与 sampler。
+DiT 是 backbone，不是与 diffusion、flow matching 并列的生成目标。原始 DiT 在图像 latent patches 上验证了 Transformer denoiser 的扩展性 [[13]](#ref-13)；视频工作把 patch 扩展到空间—时间维，但仍需另行说明 objective、attention topology/mask、表示空间与 sampler。Causal frame/chunk 属于 factorization/information mask，cascade 属于系统组合，rolling/inter-step cache 属于 execution；它们不再伪装成互斥 backbone 行。
 
 ### 6.2 条件怎样进入模型
 

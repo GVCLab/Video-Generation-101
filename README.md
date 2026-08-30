@@ -43,7 +43,7 @@
 
 四条技术主线回答四个相互关联但目标不同的问题：模型怎样生成视频、怎样扩展为可迁移的多条件多模态系统、怎样把生成的视觉状态用作计算与推演、怎样预测动作对世界的影响。它们可能共享视频 tokenizer/codec 这一表示接口、Transformer/DiT 骨干，以及 diffusion/flow 等目标或采样路径；这些词不在同一分类层。Video Reasoning 还需要结果与过程可验证，World Model 还需要动作条件、反事实和闭环证据；二者都不是画质提升后的自动“下一等级”。
 
-> **分类提醒：**“无条件视频生成”是一种具体任务；pixel、连续 latent 与离散 token 属于 representation，autoregressive 与 masked 属于 factorization，ELBO、adversarial、diffusion/score 与 flow matching 属于 objective，DiT 等则属于 backbone。现代所谓 video VAE 还可能只是 tokenizer/decoder，而不是用 ELBO 独立定义完整生成分布。因此第一条主线称为“生成机制基础”，而不是“不可控视频生成”。同理，causal codec、causal generator、streaming commit 与 real-time SLO 是四份独立合同：只读过去的 codec 不保证生成器无未来泄漏，因果生成器不保证输出已越过不可撤回的提交前沿，持续提交也不保证 TTFF、p99、jitter 和 deadline miss 达标；完整的 lookahead、revision、backpressure、恢复与 `StreamFork-1` 反证协议见[因果流式专章](docs/generative-models/causal-streaming-generation.md)。
+> **分类提醒：**“无条件视频生成”是一种具体任务；pixel、连续 latent 与离散 token 属于 representation，autoregressive 与 masked 属于 factorization，ELBO、adversarial、diffusion/score 与 flow matching 属于 objective，DiT 等则属于 backbone。现代所谓 video VAE 还可能只是 tokenizer/decoder，而不是用 ELBO 独立定义完整生成分布。因此第一条主线称为“生成机制基础”，而不是“不可控视频生成”。Video DiT 内部的 full/factorized/window/sparse/linear attention、条件融合、3D 位置、noise-time MoE 与并行/cache 也不是一个标签，见[骨干扩展专章](docs/generative-models/video-dit-backbones.md)。同理，causal codec、causal generator、streaming commit 与 real-time SLO 是四份独立合同：只读过去的 codec 不保证生成器无未来泄漏，因果生成器不保证输出已越过不可撤回的提交前沿，持续提交也不保证 TTFF、p99、jitter 和 deadline miss 达标；完整的 lookahead、revision、backpressure、恢复与 `StreamFork-1` 反证协议见[因果流式专章](docs/generative-models/causal-streaming-generation.md)。
 
 > **编辑的位置：**Video editing 不是第五种生成机制，也不只是末端应用。它是贯穿图像模型、I2V、T2V、视频基础模型和创作系统的横向控制能力：复用生成先验，同时增加源视频约束、局部可寻址控制、未编辑区域保持和多轮状态管理。
 
@@ -81,7 +81,7 @@ flowchart LR
 
 | 结构 | 核心问题 | 主要演进与代表工作 | 学习入口 |
 |---|---|---|---|
-| **1. 技术基础：视频表示、时序建模与生成机制** | 模型怎样表达时间、运动和多种可能未来？ | 从 Video Textures [[1]](#ref-1)、Dynamic Textures [[2]](#ref-2)、ConvLSTM [[3]](#ref-3)、CDNA [[4]](#ref-4)，到 MoCoGAN [[5]](#ref-5)、DVD-GAN [[6]](#ref-6) 和 Video Diffusion [[10]](#ref-10)；表示从 pixel 扩展到连续 latent 与离散 token，时间分解采用 recurrent、autoregressive 或 masked 路线，训练目标再选择 ELBO、adversarial、diffusion/score 或 flow，并可叠加少步蒸馏、偏好后训练、长期记忆和 SLO | [生成模型路线](docs/generative-models.md) · [视频 Tokenizer 与生成式压缩边界](docs/generative-models/video-tokenizers.md) · [视频后训练与对齐](docs/generative-models/video-post-training-alignment.md) · [因果流式专章](docs/generative-models/causal-streaming-generation.md) |
+| **1. 技术基础：视频表示、时序建模与生成机制** | 模型怎样表达时间、运动和多种可能未来？ | 从 Video Textures [[1]](#ref-1)、Dynamic Textures [[2]](#ref-2)、ConvLSTM [[3]](#ref-3)、CDNA [[4]](#ref-4)，到 MoCoGAN [[5]](#ref-5)、DVD-GAN [[6]](#ref-6) 和 Video Diffusion [[10]](#ref-10)；表示从 pixel 扩展到连续 latent 与离散 token，时间分解采用 recurrent、autoregressive 或 masked 路线，训练目标再选择 ELBO、adversarial、diffusion/score 或 flow，骨干再选择 U-Net、full/factorized/sparse/linear/hybrid Video DiT，并可叠加少步蒸馏、偏好后训练、长期记忆和 SLO | [生成模型路线](docs/generative-models.md) · [视频 Tokenizer 与生成式压缩边界](docs/generative-models/video-tokenizers.md) · [Video DiT 与骨干扩展](docs/generative-models/video-dit-backbones.md) · [视频后训练与对齐](docs/generative-models/video-post-training-alignment.md) · [因果流式专章](docs/generative-models/causal-streaming-generation.md) |
 | **2. 视频基础模型与创作系统** | 模型怎样从单任务生成器扩展为可迁移、多条件、多模态系统？ | VideoGPT [[7]](#ref-7)、Phenaki [[8]](#ref-8)、MAGVIT [[9]](#ref-9)、Make-A-Video [[11]](#ref-11)、Imagen Video [[12]](#ref-12)、Lumiere [[13]](#ref-13) 与 Sora [[14]](#ref-14) 串起技术前驱与规模化模型。发展应从六个正交维度观察：开放式文本到视频；相机、轨迹、姿态与几何控制；相机 × 世界时间的多视角/4D 查询与状态；源视频保持与可寻址编辑；多段 prompt/storyboard 与跨镜头连续；原生联合音视频。所谓“统一”还必须说明是统一接口、流水线、backbone、模型家族还是单一 checkpoint | [视频基础模型路线](docs/foundation-models.md) · [细粒度可控生成](docs/tasks/controllable-video-generation.md) · [多视角/4D 生成](docs/tasks/multiview-4d-generation.md) · [原生音视频](docs/tasks/native-audio-video-generation.md) · [视频编辑](docs/tasks/video-to-video.md) |
 | **3. Video Reasoning：把视觉生成作为计算介质** | 模型能否用连续视觉状态执行搜索、规则、物理推演与规划；结果和过程怎样验证？ | 以 *Video models are zero-shot learners and reasoners* 为叙事原点：先还原其零样本证据、Chain-of-Frames 假说与黑盒边界，再向前追溯视觉化思维，向后展开 benchmark、VBVR 百万规模监督、Chain-of-Steps、early commitment、verifiable reward、test-time adaptation、层级去噪和 planner—generator—verifier 闭环；不把正确终态等同于忠实推理 | [Video Reasoning 专章](docs/video-reasoning.md) |
 | **4. World Model：从未来预测到行动闭环** | 模型能否根据状态和动作预测后果，并进一步支持交互、规划或决策？ | 决策型 latent dynamics 与生成式视觉模型形成两条并行历史，并在 Genie [[15]](#ref-15)、GameNGen [[16]](#ref-16)、Genie 3 [[17]](#ref-17)、GWM-1 [[18]](#ref-18) 和 Cosmos [[19]](#ref-19) 等交互环境与 Physical AI 系统中逐渐汇合；是否达到闭环仍须逐个系统核验 | [从视频生成到 World Model](docs/world-models.md) · [物理一致性的视频生成](docs/physical-consistency.md) |
@@ -113,13 +113,14 @@ flowchart LR
 
 1. 用 [任务地图](docs/taxonomy.md) 明确不同任务的输入和输出。
 2. 阅读 [生成模型路线](docs/generative-models.md)，先拆开 representation、factorization、objective、backbone 与 deployment；再分别用[视频 Tokenizer 与生成式压缩边界](docs/generative-models/video-tokenizers.md)理解表示接口，用[变分生成](docs/generative-models/variational-generation.md)理解 ELBO 与随机未来。
-3. 用 [因果、流式与实时视频生成](docs/generative-models/causal-streaming-generation.md) 理解少步生成、训练—推理分布、长期记忆和在线系统怎样汇合，并能分别写出 codec、generator、commit 与 SLO 四层合同。
-4. 阅读 [视频基础模型路线](docs/foundation-models.md)，理解 tokenizer、Transformer、多模态条件，以及“统一”发生在接口、backbone、模型家族还是 checkpoint 层。
-5. 按研究问题进入 [细粒度可控生成](docs/tasks/controllable-video-generation.md)、[多视角/4D 生成](docs/tasks/multiview-4d-generation.md)、[视频退化修复](docs/tasks/video-restoration.md)、[原生音视频](docs/tasks/native-audio-video-generation.md)或[视频后训练与对齐](docs/generative-models/video-post-training-alignment.md)，练习区分任务条件、观测证据、相机/时间查询、优化目标与采样成本。
-6. 阅读 [Video Reasoning 专章](docs/video-reasoning.md)，区分输出帧、去噪过程和交互闭环三种推理时间，并掌握可验证证据阶梯。
-7. 阅读 [World Model 专章](docs/world-models.md)，区分生成质量、环境预测和决策能力。
-8. 补充 [物理一致性的视频生成](docs/physical-consistency.md)，理解视觉 plausibility 与真实规律的差别。
-9. 用 [相关应用](docs/applications.md) 和 [评测指南](docs/evaluation.md) 分析一个具体模型。
+3. 阅读 [Video DiT 与骨干扩展](docs/generative-models/video-dit-backbones.md)，从 latent token 预算出发，分清 attention topology、条件融合、MoE、并行与 cache，并学会做 matched-backbone / fixed-checkpoint 比较。
+4. 用 [因果、流式与实时视频生成](docs/generative-models/causal-streaming-generation.md) 理解少步生成、训练—推理分布、长期记忆和在线系统怎样汇合，并能分别写出 codec、generator、commit 与 SLO 四层合同。
+5. 阅读 [视频基础模型路线](docs/foundation-models.md)，理解 tokenizer、Transformer、多模态条件，以及“统一”发生在接口、backbone、模型家族还是 checkpoint 层。
+6. 按研究问题进入 [细粒度可控生成](docs/tasks/controllable-video-generation.md)、[多视角/4D 生成](docs/tasks/multiview-4d-generation.md)、[视频退化修复](docs/tasks/video-restoration.md)、[原生音视频](docs/tasks/native-audio-video-generation.md)或[视频后训练与对齐](docs/generative-models/video-post-training-alignment.md)，练习区分任务条件、观测证据、相机/时间查询、优化目标与采样成本。
+7. 阅读 [Video Reasoning 专章](docs/video-reasoning.md)，区分输出帧、去噪过程和交互闭环三种推理时间，并掌握可验证证据阶梯。
+8. 阅读 [World Model 专章](docs/world-models.md)，区分生成质量、环境预测和决策能力。
+9. 补充 [物理一致性的视频生成](docs/physical-consistency.md)，理解视觉 plausibility 与真实规律的差别。
+10. 用 [相关应用](docs/applications.md) 和 [评测指南](docs/evaluation.md) 分析一个具体模型。
 
 ### 准备做研究
 
@@ -156,6 +157,7 @@ flowchart LR
 │   │   ├── masked-generation.md
 │   │   ├── diffusion-models.md
 │   │   ├── flow-consistency-models.md
+│   │   ├── video-dit-backbones.md
 │   │   ├── video-post-training-alignment.md
 │   │   └── causal-streaming-generation.md
 │   ├── foundation-models.md

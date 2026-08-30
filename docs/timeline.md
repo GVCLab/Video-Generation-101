@@ -16,7 +16,7 @@
 > - 每个节点的“资源”栏统一标记 Paper/Report、Project、Code、Weights 与 Demo；Code 只认作者或机构官方实现，`未公开` 表示截至核查日未找到官方公开资源，第三方复现不会冒充官方实现；`—` 表示没有独立入口或不适用，失效、归档、下线与访问受限会直接标注状态。
 > - 企业节点中的分辨率、速度、时长与性能，如无独立复现，均按“官方或作者报告”理解。
 > - 2025–2026 节点默认是 **frontier observation**：它们记录截止日可见的前沿方向，不把预印本、机构自评或宣传演示升格为已经独立验证的能力事实。
-> - 本轮新增的联合音视频、后训练和显式控制节点，其结构性纳入依据与一手来源交叉核验见[缺口审计](../sources/research_20260830_missing_subfields_integration.md)；多视角/4D 的 camera-time 合同、里程碑和预印本边界见[4D 研究日志](../sources/research_20260830_multiview_4d_generation.md)；退化修复的检索、纳排和证据边界见[独立研究日志](../sources/research_20260830_video_restoration.md)；视频表示节点的正式 venue、位流边界与开放实现见[tokenizer 研究日志](../sources/research_20260830_video_representation_tokenizers.md)。
+> - 本轮新增的联合音视频、后训练和显式控制节点，其结构性纳入依据与一手来源交叉核验见[缺口审计](../sources/research_20260830_missing_subfields_integration.md)；Video DiT 的 first-public/formal、attention topology、融合、MoE、并行与缓存边界见[backbone 研究日志](../sources/research_20260830_video_dit_backbones.md)；多视角/4D 的 camera-time 合同、里程碑和预印本边界见[4D 研究日志](../sources/research_20260830_multiview_4d_generation.md)；退化修复的检索、纳排和证据边界见[独立研究日志](../sources/research_20260830_video_restoration.md)；视频表示节点的正式 venue、位流边界与开放实现见[tokenizer 研究日志](../sources/research_20260830_video_representation_tokenizers.md)。
 > - 下列图片均由 imagegen 根据论文机制生成，属于**概念示意图，不是论文原图，也不代表模型真实输出**。
 
 ## 并行泳道索引
@@ -29,7 +29,7 @@ flowchart TB
     subgraph generation_track ["生成机制基础：视频如何被表示与生成"]
         direction LR
         motion_prediction["显式运动与<br/>时序预测"] --> probabilistic_generation["随机生成与<br/>序列建模"]
-        probabilistic_generation --> scalable_generation["Diffusion、Flow<br/>与 DiT"]
+        probabilistic_generation --> scalable_generation["Diffusion / Flow 目标<br/>与 Video DiT 骨干"]
     end
 
     subgraph foundation_track ["视频基础模型与创作能力：规模、条件与模态如何扩展"]
@@ -95,7 +95,7 @@ flowchart TB
 
 | 泳道 | 核心问题 | 阅读方法 | 对应专题 |
 |---|---|---|---|
-| **生成机制基础** | 视频如何表示、压缩、预测和采样？ | 显式运动与统计动态 → 深度视频预测 → 随机预测与 GAN → 视频 Token → Diffusion、DiT 与 Flow | [生成模型路线](generative-models.md) · [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md) |
+| **生成机制基础** | 视频如何表示、压缩、预测和采样？ | 显式运动与统计动态 → 深度视频预测 → 随机预测与 GAN → 视频 Token → Diffusion/Flow objective 与 U-Net/Video DiT backbone 的正交扩展 | [生成模型路线](generative-models.md) · [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md) · [Video DiT 与骨干扩展](generative-models/video-dit-backbones.md) |
 | **视频基础模型与创作能力** | 模型如何从技术前驱扩展为规模化、可迁移的多模态系统？ | 先读 T2V、视频 Token 与规模化预训练，再分别看开放生成、多条件/多参考、相机 × 世界时间的多视角/4D、源视频约束与编辑、多段 prompt/分镜、跨镜头连续和原生联合音视频；遇到“统一”时继续追问统一发生在哪一层 | [视频基础模型路线](foundation-models.md) · [多视角/4D](tasks/multiview-4d-generation.md) · [视频编辑 milestones](tasks/video-to-video.md) · [任务地图](taxonomy.md) |
 | **World Model 与行动闭环** | 模型能否维护状态、响应动作，并进一步支持反事实、规划或持续交互？ | 分别追踪决策型 latent dynamics 与动作条件视觉 rollout；先检查动作条件转移、状态持久和干预证据，若声称支持决策或控制，再要求“动作 → 环境响应 → 新观测 → 再决策”的闭环验证 | [World Model 专章](world-models.md) · [JEPA 路线](jepa.md) |
 | **应用层** | 技术在哪里产生价值，又提出哪些新约束？ | 内容、编辑与退化修复工作流、数字人、游戏与交互、数据合成、自动驾驶、机器人和科学可视化 | [相关应用](applications.md) · [退化修复](tasks/video-restoration.md) · [任务地图](taxonomy.md) |
@@ -492,9 +492,24 @@ flowchart LR
 
 ---
 
-## 视频基础模型｜2020–2025：Diffusion、DiT、Flow Matching 与规模化生成
+## 视频基础模型｜2020–2026：表示、Objective、Backbone 与规模化生成
 
-这条路线同时发生了三次迁移：从像素到连续 latent、从 U-Net 到 Transformer、从 denoising 目标扩展到速度场与 Flow Matching。不能把所有方法都概括为“逐步去噪”。
+这条路线发生的是三条可组合而非互相替代的迁移：representation 从 pixel 扩展到连续 latent，objective 从 denoising/score 扩展到 flow/consistency 等路径，规模化 backbone 从 U-Net 扩展到 Transformer/DiT、window/factorized/full、sparse/linear/hybrid 与 noise-time experts。U-Net、hybrid 与任务专用结构仍并存；不能把三条轴压成“U-Net 被 DiT/Flow 淘汰”，也不能把所有方法概括为“逐步去噪”。完整公式、论文精读和公平实验见[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)。
+
+### Backbone 子谱系：首次公开与正式发表分开
+
+| First-public → formal | 节点 | 可核验推进 | 不应越界的结论 |
+|---|---|---|---|
+| 2022-12 → ICCV 2023 | [DiT](https://openaccess.thecvf.com/content/ICCV2023/html/Peebles_Scalable_Diffusion_Models_with_Transformers_ICCV_2023_paper.html) | latent patch Transformer、adaLN-Zero 与图像 scaling | 图像结果不是视频时序证据 |
+| 2023-12 → ECCV 2024 | [W.A.L.T.](https://www.ecva.net/papers/eccv_2024/papers_ECCV/html/10270_ECCV_2024_paper.php) | spatial/spatiotemporal window attention | window 降直接连边，也延长跨窗传播路径 |
+| 2024-01 → TMLR 2025 | [Latte](https://openreview.net/forum?id=ntGPYNUF3t) | 四类 factorized Video DiT 变体 | 小/中规模作者配置不是全局 topology 排名 |
+| 2024-08 → ICLR 2025 | [CogVideoX](https://proceedings.iclr.cc/paper_files/paper/2025/hash/ce31378e9f41d8907e97dab172b6c559-Abstract-Conference.html) | joint full attention、Expert AdaLN、3D RoPE、frame packing | Expert AdaLN 不是 MoE |
+| 2024-12 / 2025-02 → 作者报告 | [HunyuanVideo](https://arxiv.org/abs/2412.03603) / [Step-Video-T2V](https://arxiv.org/abs/2502.10248) | dual→single/full 与 video-full + text-cross 两类规模化融合 | 系统结果不能只归因于 attention |
+| 2025-07 → 官方 artifact | [Wan2.2](https://github.com/Wan-Video/Wan2.2) | 按噪声时间硬切 high/low-noise experts | 不是 token-routed MoE；无独立 Wan2.2 正式论文 |
+| 2025-09 → ICLR 2026 | [SANA-Video](https://proceedings.iclr.cc/paper_files/paper/2026/hash/41b93c59da0d0f835907fd661d419db2-Abstract-Conference.html) | block linear DiT 与 constant-memory cumulative state | 分钟级、720p 与速度均是作者协议 |
+| 2026-07 → 预印本/部分开放 | [SANA-Video 2.0](https://arxiv.org/abs/2607.21553) | 75% linear + 25% softmax anchor、AttnRes | 固定 dense 比例使严格渐近仍含 $O(N^2)$；14B 截止日未发布 |
+| 2025-10 → CVPR 2026 | [LinVideo](https://openaccess.thecvf.com/content/CVPR2026/html/Huang_LinVideo_A_Post-Training_Framework_towards_On_Attention_in_Efficient_Video_CVPR_2026_paper.html) | 选择性 post-training linearization | 4-step 结果还改变 NFE，不能归给 attention alone |
+| 2026 formal | [RAPID](https://openaccess.thecvf.com/content/CVPR2026/papers/Lin_RAPID_Reusing_Attention_Sparsity_with_Inter-step_Adaptation_for_Efficient_Video_CVPR_2026_paper.pdf)、[DSA](https://proceedings.iclr.cc/paper_files/paper/2026/hash/c3728248f3c627d1f16ca5726cdf83f5-Abstract-Conference.html)、[TimeRipples](https://openaccess.thecvf.com/content/CVPR2026/html/Mao_TimeRipples_Accelerating_vDiTs_by_Understanding_the_Spatio-Temporal_Correlations_in_Latent_CVPR_2026_paper.html) | inter-step sparse mask reuse、distributed sparse execution、intra-attention 时空复用 | 三者不是同一种 cache；TimeRipples 的速度含比例估算 |
 
 <table>
 <tr>
@@ -874,8 +889,10 @@ Sora 在生成路线中提出“视频生成可能通向世界模拟器”的研
 
 1. **表示是什么？** 原始像素、光流、离散 code、连续 latent、feature，还是显式 3D？
 2. **时间如何建模？** 帧重组、RNN、变换核、自回归、masked prediction、diffusion、速度场，还是动作条件 dynamics？
-3. **控制信号是什么？** 历史帧、文本、图像、音频、相机、键鼠、机器人动作，还是目标状态？
-4. **成功如何证明？** 画质、人评、likelihood、FVD、实时帧率、规划回报，还是现实任务成功率？
+3. **骨干怎样混合？** patch/grid、full/factorized/window/sparse/linear mixer、mask、3D position、condition fusion、total/active parameters 分别是什么？
+4. **控制信号是什么？** 历史帧、文本、图像、音频、相机、键鼠、机器人动作，还是目标状态？
+5. **成本怎样产生？** 每次 denoiser FLOPs、NFE、precision、cache、并行、通信与 codec 是否分别报告？
+6. **成功如何证明？** 画质、人评、likelihood、FVD、长距/绑定/网格外推、实时帧率、规划回报，还是现实任务成功率？
 
 最需要避免的四种推断是：
 
@@ -884,4 +901,4 @@ Sora 在生成路线中提出“视频生成可能通向世界模拟器”的研
 - 开环 demo 稳定 ⇒ 闭环控制可靠；
 - 官方 benchmark 领先 ⇒ 已被独立复现。
 
-JEPA 从图像表征、视频预测到动作条件规划的独立演化，见 [JEPA 参考阅读](jepa.md)。视频表示的完整定义、预算与 codec 验收见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)；具体任务与模型则见 [任务与方法分类](taxonomy.md)、[评测指南](evaluation.md) 和 [开放模型与代码](../resources/open-models.md)。
+JEPA 从图像表征、视频预测到动作条件规划的独立演化，见 [JEPA 参考阅读](jepa.md)。视频表示的完整定义、预算与 codec 验收见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)，attention/fusion/MoE/parallel/cache 的机制与反证见[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)；具体任务与模型则见 [任务与方法分类](taxonomy.md)、[评测指南](evaluation.md) 和 [开放模型与代码](../resources/open-models.md)。

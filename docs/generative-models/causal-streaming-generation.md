@@ -9,7 +9,7 @@
 3. **长期记忆**：全历史 KV cache 会持续增长，短窗口又会忘记身份、布局和早期事件；
 4. **系统期限**：平均 FPS 足够不等于流畅；首帧时间、尾延迟、抖动和 deadline miss 同样重要。
 
-本章证据核验截至 **2026-08-30**，重点解释这四条路线怎样汇合，以及论文中的“流式”“长视频”“实时”和“交互式”为什么不能互换。
+本章证据核验截至 **2026-08-30**，重点解释这四条路线怎样汇合，以及论文中的“流式”“长视频”“实时”和“交互式”为什么不能互换。Video DiT 的 full/factorized/window/sparse/linear topology、3D 位置、noise-time MoE、distributed parallelism 与 inter-step cache 由[骨干扩展专章](video-dit-backbones.md)负责；本章只接收其真实 information mask、state/cache 更新和执行成本，再验证 commit 与 SLO。
 
 ![离线双向视频扩散与因果流式视频扩散的对比。左侧整段联合去噪并在完成后解码；右侧按块生成，复用有界滚动记忆，逐块解码并接受新条件。](../../assets/diagrams/causal-streaming-video-generation.png)
 
@@ -73,9 +73,9 @@ $$
 
 ## 2. 为什么双向视频扩散难以流式输出
 
-标准全片 DiT 令所有时空 token 互相注意。若每次去噪都重新处理 $N$ 个视频 token，注意力成本约为 $O(N^2)$；新增未来帧还会改变旧帧的上下文，因此很难把旧计算安全地缓存下来。更关键的是：模型在第一帧的表示中使用了“未来位置”，完整未来不存在时，第一帧的计算图也未闭合。
+标准双向全片 **global dense-attention** DiT 令所有时空 token 互相注意。若每次去噪都重新处理 $N$ 个视频 token，attention 主项约为 $O(N^2d)$；window、sparse、linear 或 hybrid mixer 会改变这笔账，但只要旧 token 仍可读取未来，新增未来帧就可能改变旧上下文，旧计算也不能仅凭“attention 更省”而安全提交。更关键的是：双向模型在第一帧表示中使用了未来位置，完整未来不存在时，第一帧的计算图尚未闭合。
 
-因果 DiT 将时间注意力限制到历史与当前块。已经发出的块可转成 KV cache，下一块只需计算新的 query 与必要的历史 key/value。若保存全部历史，缓存仍近似随时长线性增长：
+因果 DiT 将视频数据时间 $k$ 上的访问限制到历史与当前块。对可增量执行的 softmax attention，已经发出的块可转成 data-time KV cache，下一块只需计算新的 query 与必要历史 key/value；recurrent/linear state 则可能保存固定维状态。两者都不同于跨噪声时间 $\tau$ 的 PAB/AdaCache 类 inter-step reuse。若 softmax cache 保存全部历史，缓存仍近似随时长线性增长：
 
 $$
 M_{KV}\propto L\,N_{history}\,d,

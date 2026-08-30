@@ -24,7 +24,8 @@
     "H": "JEPA 表征与规划",
     "I": "跨路线生成基础、测量与 tokenizer",
     "J": "现代视频基础模型与系统报告",
-    "K": "因果、自回归流式生成与加速"
+    "K": "因果、自回归流式生成与加速",
+    "L": "Video DiT 骨干、注意力与扩展"
   },
   "entries": [
     {
@@ -1286,6 +1287,98 @@
         "id": "2608.19556"
       },
       "github": null
+    },
+    {
+      "citekey": "peebles2022scalable",
+      "section": "L",
+      "source": {
+        "kind": "arxiv",
+        "id": "2212.09748"
+      },
+      "github": {
+        "url": "https://github.com/facebookresearch/DiT",
+        "status": "official-code",
+        "note": "作者官方 DiT 实现；仓库已归档"
+      }
+    },
+    {
+      "citekey": "gupta2023photorealistic",
+      "section": "L",
+      "source": {
+        "kind": "arxiv",
+        "id": "2312.06662"
+      },
+      "github": null
+    },
+    {
+      "citekey": "ma2024latte",
+      "section": "L",
+      "source": {
+        "kind": "arxiv",
+        "id": "2401.03048"
+      },
+      "github": {
+        "url": "https://github.com/Vchitect/Latte",
+        "status": "official-code",
+        "note": "作者官方 Latte 训练与推理实现"
+      }
+    },
+    {
+      "citekey": "yang2024cogvideox",
+      "section": "L",
+      "source": {
+        "kind": "arxiv",
+        "id": "2408.06072"
+      },
+      "github": {
+        "url": "https://github.com/zai-org/CogVideo",
+        "status": "official-code",
+        "note": "智谱官方 CogVideoX 代码、权重与训练入口"
+      }
+    },
+    {
+      "citekey": "chen2025sanavideo",
+      "section": "L",
+      "source": {
+        "kind": "arxiv",
+        "id": "2509.24695"
+      },
+      "github": {
+        "url": "https://github.com/NVlabs/Sana",
+        "status": "official-code",
+        "note": "NVIDIA Research 官方 SANA 与 SANA-Video 实现和权重入口"
+      }
+    },
+    {
+      "citekey": "huang2025linvideo",
+      "section": "L",
+      "source": {
+        "kind": "arxiv",
+        "id": "2510.08318"
+      },
+      "github": null
+    },
+    {
+      "citekey": "mao2025timeripples",
+      "section": "L",
+      "source": {
+        "kind": "arxiv",
+        "id": "2511.12035"
+      },
+      "github": null
+    },
+    {
+      "citekey": "chen2026sanavideo2",
+      "section": "L",
+      "source": {
+        "kind": "arxiv",
+        "id": "2607.21553"
+      },
+      "github": {
+        "url": "https://github.com/NVlabs/Sana",
+        "status": "official-code",
+        "note": "官方统一仓库；具体已发布 checkpoint 仍须按模型文档核对"
+      }
     }
   ]
 }

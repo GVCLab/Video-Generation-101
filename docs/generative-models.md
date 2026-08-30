@@ -18,7 +18,7 @@ $$
 
 例如，NOVA 是**连续 latent 表示**、**帧间与帧内集合式自回归分解**、**逐 token diffusion loss**和 Transformer 的组合；Pyramidal Flow 把**连续 latent**、**时间金字塔自回归**、**flow matching**与 DiT 组合；CausVid 则把双向视频 diffusion teacher 蒸馏成**时间因果**、**少步** student [[21]](#ref-21) [[20]](#ref-20) [[23]](#ref-23)。这些系统不能被放进一列互斥“模型家族”而不丢失关键信息。
 
-本章建立全局地图。连续/离散表示、压缩账本、因果 codec 与实际 bitstream 的边界见[视频 Tokenizer 与生成式压缩专章](generative-models/video-tokenizers.md)，ELBO、learned prior 与随机未来见[变分生成专章](generative-models/variational-generation.md)；DDPM、score、SDE/PF-ODE 的完整推导见[扩散模型专章](generative-models/diffusion-models.md)；FM、RF、Consistency、Shortcut 与 DMD 的差异见[Flow 与 Consistency 专章](generative-models/flow-consistency-models.md)；SFT、reward model、DPO/RWR、policy-gradient RL、推理期 guidance 与蒸馏的边界见[视频后训练与对齐专章](generative-models/video-post-training-alignment.md)；在线生成的暴露偏移、缓存和 SLO 见[因果、流式与实时专章](generative-models/causal-streaming-generation.md)。
+本章建立全局地图。连续/离散表示、压缩账本、因果 codec 与实际 bitstream 的边界见[视频 Tokenizer 与生成式压缩专章](generative-models/video-tokenizers.md)，ELBO、learned prior 与随机未来见[变分生成专章](generative-models/variational-generation.md)；DDPM、score、SDE/PF-ODE 的完整推导见[扩散模型专章](generative-models/diffusion-models.md)；FM、RF、Consistency、Shortcut 与 DMD 的差异见[Flow 与 Consistency 专章](generative-models/flow-consistency-models.md)；latent patch、full/factorized/window/sparse/linear attention、条件融合、3D 位置、noise-time MoE、并行与 cache 的分账见[Video DiT 与骨干扩展专章](generative-models/video-dit-backbones.md)；SFT、reward model、DPO/RWR、policy-gradient RL、推理期 guidance 与蒸馏的边界见[视频后训练与对齐专章](generative-models/video-post-training-alignment.md)；在线生成的暴露偏移、缓存和 SLO 见[因果、流式与实时专章](generative-models/causal-streaming-generation.md)。
 
 ## 1. 一张图看懂五个交叉分类轴
 
@@ -64,7 +64,7 @@ flowchart LR
 | Representation | 模型在哪种变量空间工作？ | RGB pixel、连续 AE/VAE latent、离散 VQ token、多尺度/混合状态 | 不能推出生成顺序、loss 或是否实时 |
 | Factorization | 数据联合分布按什么条件顺序产生或补全？ | full-sequence joint、stepwise state、strict AR、masked/block、hierarchical、causal chunk | 不能推出条件项使用 CE、diffusion 还是 flow |
 | Objective | 参数通过什么统计目标学习？ | MLE/ELBO、adversarial、denoising/score、FM/RF、consistency/shortcut、DMD、preference/RL | 不能推出 U-Net/DiT，也不能推出帧的先后 |
-| Backbone | 用什么网络实现条件映射、score 或速度场？ | 2D/3D U-Net、DiT、decoder Transformer、RNN/recurrent-state/SSM、cascade/MoE | “DiT”不是与 diffusion/flow 并列的概率家族 |
+| Backbone | 用什么网络实现条件映射、score 或速度场？ | 2D/3D U-Net、DiT、decoder Transformer、RNN/recurrent-state/SSM、dense/sparse/linear mixer、FFN/MoE | “DiT”不是与 diffusion/flow 并列的概率家族；cascade 与 cache 属于系统/执行设计 |
 | Deployment | 输出何时可见，系统受什么运行约束？ | offline multistep、few-step、preview、streaming、interactive、quantized/cached/pipelined | causal mask、低 NFE 或平均 FPS 不能自动证明 SLO |
 
 VAE 还容易同时指两件事：一是用 ELBO 学整个生成分布的潜变量模型；二是现代视频系统中只负责紧凑编码与解码的 tokenizer。后者的上层 generator 完全可以使用 diffusion、flow、AR 或 DMD；若没有量化、概率模型、熵编码器与 bitstream，也不能仅凭 latent shape 声称实际码率压缩。因此，“用了 VAE”往往只回答表示轴的一部分，而不是整个系统属于哪一派 [[1]](#ref-1)。两种角色分别见[变分生成](generative-models/variational-generation.md)与[视频 Tokenizer](generative-models/video-tokenizers.md)。
@@ -240,12 +240,12 @@ DMD 的核心是 distribution matching：用 target score 与 fake/student score
 |---|---|---|---|
 | 2D/3D U-Net | pixel/latent diffusion、局部时空卷积 | 多尺度局部结构强，成熟稳定 | 大窗口注意力与长程状态成本高 |
 | 图像 backbone + temporal blocks | 从 T2I 权重迁移到视频 | 复用强图像先验 | temporal adapter 可能只学局部平滑 |
-| DiT / spacetime Transformer | diffusion、FM、RF、consistency | 扩展参数和混合时空 token 灵活 | token 二次复杂度、缓存和长时漂移 |
+| DiT / spacetime Transformer | diffusion、FM、RF、consistency | 扩展参数和混合时空 token 灵活 | **global dense attention** 随 token 数二次增长；其他 topology 另有表达与 kernel 代价 |
 | Decoder-only Transformer | 离散/连续 token AR、多模态统一 | 变长序列与统一接口 | 严格串行深度和 tokenizer 上限 |
-| Recurrent / SSM / rolling cache | causal chunk、在线状态 | 内存可控、适合持续输出 | 状态遗忘、暴露偏移、难以回改过去 |
-| Cascade / MoE | 分辨率、时间或能力分工 | 专家化、可分级计算 | 误差传递，端到端归因困难 |
+| Recurrent / SSM | causal chunk、压缩状态 | 内存可控、适合持续输出 | 状态遗忘、暴露偏移、难以回改过去 |
+| FFN/MoE 与 hybrid mixer | 模态、噪声阶段或 token 的容量分工 | total/active parameters 可分；选择性保留昂贵交互 | 路由轴必须写清；不是所有“expert”都有稀疏路由 |
 
-“DiT 模型”“Transformer diffusion”“flow Transformer”不是同一层标签。DiT 只说明 backbone；它可以承载 denoising、score、FM、RF、consistency 或其他目标。
+“DiT 模型”“Transformer diffusion”“flow Transformer”不是同一层标签。DiT 只说明 backbone；它可以承载 denoising、score、FM、RF、consistency 或其他目标。更重要的是，Video DiT 也不是单一实现：full、factorized、window、sparse、linear、recurrent 与 hybrid mixer 的连边、复杂度和证据合同不同；完整 token 账、融合、位置、MoE、并行、缓存及 `BackboneFork-1`/`ServeFork-1` 见[专章](generative-models/video-dit-backbones.md)。
 
 ## 7. 第五轴：Deployment——离线、少步、流式和实时不是同义词
 
@@ -344,7 +344,14 @@ sampler:
   stochastic:
 backbone:
   family:
-  context_and_cache:
+  latent_grid_and_patch:
+  mixer_and_mask:
+  position_and_condition_fusion:
+  total_and_active_parameters:
+execution:
+  dtype_quantization:
+  cache_and_parallelism:
+  flops_vram_latency_communication:
 deployment:
   mode: offline | few_step | streaming | interactive
   hardware_and_precision:
@@ -385,9 +392,10 @@ evidence:
 | [掩码生成](generative-models/masked-generation.md) | mask schedule、block commit、双向上下文 | 假定 masked 只能离散 |
 | [扩散模型](generative-models/diffusion-models.md) | DDPM→score→SDE/PF-ODE、参数化、sampler | 重复完整 streaming 系统 |
 | [Flow 与 Consistency](generative-models/flow-consistency-models.md) | FM/RF/CM/Shortcut/DMD 与 few-step 证据 | 把 causal/streaming 当 objective |
+| [Video DiT 与骨干扩展](generative-models/video-dit-backbones.md) | token 预算、attention topology、position/fusion、MoE、parallelism/cache 与公平比较 | 重复 tokenizer/objective 推导；把多卡或少步误称骨干复杂度下降 |
 | [因果、流式与实时](generative-models/causal-streaming-generation.md) | codec→generator→commit→SLO 合同、自生成历史、bounded memory、KV/cache、lookahead、backpressure、open horizon | 把低 NFE、因果 mask 或长 demo 自动写成实时 |
 
-推荐先读本章，再按 representation 进入[视频 Tokenizer](generative-models/video-tokenizers.md)，按 objective 进入变分、Diffusion 或 Flow/Consistency；随后根据 factorization 去读 AR、masked 或 causal streaming。最后回到[大模型系统路线](foundation-models.md)、[评测指南](evaluation.md)和[World Models](world-models.md)，检查能力 claim 是否真的由对应证据支持。
+推荐先读本章，再按 representation 进入[视频 Tokenizer](generative-models/video-tokenizers.md)，按 objective 进入变分、Diffusion 或 Flow/Consistency，按 backbone 进入[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)；随后根据 factorization 去读 AR、masked 或 causal streaming。最后回到[大模型系统路线](foundation-models.md)、[评测指南](evaluation.md)和[World Models](world-models.md)，检查能力 claim 是否真的由对应证据支持。
 
 ## 参考文献
 

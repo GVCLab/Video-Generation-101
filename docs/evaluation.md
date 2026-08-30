@@ -499,13 +499,14 @@ WorldModelBench 在 2025 年开始专门用指令遵循、物理违规和大规�
 |---|---|---|---|
 | 样本质量 | 清晰度、美学、伪影 | no-reference VQA + 盲测人评 | 多设备/编码条件下的人类 MOS |
 | 时间质量 | 闪烁、平滑、运动幅度 | motion/flow/track 指标 + 人评 | 合成时间破坏的 sensitivity 验证 |
-| 分布 | fidelity、coverage、多样性 | 同协议 FVD + precision/recall | 多 backbone、bootstrap CI、分层结果 |
+| 分布 | fidelity、coverage、多样性 | 同协议 FVD + precision/recall | 多个评价特征编码器、bootstrap CI、分层结果 |
 | 条件 | 文本/图像/姿态/轨迹遵循 | 原子事实与约束核验 | 检测、跟踪、VQA、人评交叉验证 |
 | 退化修复 | fidelity、时间稳定、感知细节、幻觉 | paired 指标 + 未见退化 + OCR/身份/闪烁 | 真实设备/codec shift、重退化一致性、多 seed 与高风险人工审计 |
 | 编辑 | edit success、源保留、局部性 | source/instruction 双条件 + mask/track 可选 | 真实长序列上的对象级与时间级副作用审计 |
 | 推理 | 问题、答案、合法中间状态、预算 | deterministic scorer + process violation | OOD 状态、长链、预算受控的 pass@k |
 | 长时结构 | 身份、状态、叙事、镜头 | horizon 切片与失败分类 | 回环、遮挡恢复、跨镜头实体测试 |
 | 因果/流式正确性 | future access、commit、revision、condition index | 相同 prefix/seed 下扰动隐藏未来；逐 commit hash 与边界检查 | codec/generator/commit/SLO 四层独立 probe、backpressure/reset 恢复 |
+| 生成骨干/架构 | attention topology、position/fusion、active capacity、scaling | 同 tokenizer/data/condition/objective/sampler 下 parameter-matched 与 FLOP-matched；固定 checkpoint 的执行 fork | 长距/绑定/网格外推 + FLOPs/VRAM/latency/communication 联合非劣检验 |
 | 物理 | 接触、重力、材料、守恒 | 专项 prompt + 物理人评 | 可控状态变量和仿真 ground truth |
 | 世界模型 | 动作、反事实、闭环 | paired intervention + rollout | 策略排序、实际任务 optimization lift |
 | 行为安全 | 有害输出、误拒、肖像/版权 | 红队 prompt + refusal/output taxonomy | 持续攻击、人工复核、部署监测 |
@@ -530,6 +531,8 @@ WorldModelBench 在 2025 年开始专门用指令遵循、物理违规和大规�
 
 所有模型使用同一 prompt 集、同一每-prompt 样本数、同一最大重试次数和尽可能一致的分辨率、时长、FPS、音频设置。需要记录 checkpoint/API 版本、访问日期、seed、采样器、步数、guidance、负向 prompt、扩写器、超分、插帧和安全过滤。商业 API 无法控制的变量也要披露，不能默认为相同。
 
+若比较 backbone 或效率，还必须冻结/记录 latent grid 与 patch 后 token 数 $N$、layers/width/heads、mixer/mask/window/density/state、position、condition fusion、total/active parameters、每次 denoiser FLOPs、训练 tokens/FLOPs、dtype/quantization、kernel、cache、parallelism、设备与互连。Attention FLOPs、每卡 FLOPs、端到端 NFE 成本与 wall latency 是四个字段；任一项都不能替代其余三项。完整模板与 `BackboneFork-1`/`ServeFork-1` 见[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)。
+
 应保存并计入所有输出：成功、拒绝、超时、损坏文件和明显失败。只对成功样本算分会系统性奖励拒绝困难 prompt 的模型。
 
 ### 10.4 自动评测、人评和任务评测三角验证
@@ -550,7 +553,7 @@ WorldModelBench 在 2025 年开始专门用指令遵循、物理违规和大规�
 
 | 使用方式 | 必须报告 | 常见遗漏 |
 |---|---|---|
-| 离线批量 | 冷/热启动、videos/hour、生成帧率、`RTF = 计算秒 / 输出视频秒`、峰值 device allocated/reserved、host RAM、offload、墙上能耗 | 只报最快一批；忽略编解码、加载与失败重试 |
+| 离线批量 | 输出 contract、token 数、NFE、FLOPs/forward、cold/warm、videos/hour、生成帧率、`RTF = 计算秒 / 输出视频秒`、峰值 device allocated/reserved、host RAM、offload、通信、墙上能耗 | 只报 attention FLOPs 或最快一批；忽略编解码、加载、通信与失败重试 |
 | 交互/streaming | causal codec/generator 边界、commit unit/hash、lookahead/revision、condition effective index、time-to-first-frame/chunk、控制到可见响应、inter-frame p50/p95/p99、jitter、deadline miss、可持续 horizon、GPU/CPU/外存增长、backpressure/reset 与 miss 后恢复 | 只报平均延迟；因果 mask 代替 commit 证据；短 demo 掩盖内存增长和尾延迟 |
 | 商业 API | 上传、排队、推理、编码、下载的端到端分解；I2V/编辑还要计源视频上传 | 只使用服务端宣称的 inference time；不计拒绝、超时和网络 |
 
@@ -615,6 +618,12 @@ temporal:
   - identity_drift
   - object_appearance_or_disappearance
   - loop_or_transition_failure
+backbone:
+  - position_or_grid_aliasing
+  - attention_horizon_failure
+  - condition_leakage_or_binding_failure
+  - expert_collapse_or_route_discontinuity
+  - fps_aspect_or_padding_extrapolation_failure
 conditioning:
   - missing_entity
   - wrong_attribute_binding
@@ -682,6 +691,15 @@ safety:
 - access date:
 - inference settings and prompt rewriting:
 - safety filters and refusal behavior:
+
+## 2a. Backbone and execution, if compared
+- codec latent grid / patch / video-token count:
+- layers / width / heads / mixer / mask / window or density:
+- position encoding / condition fusion:
+- total and active parameters:
+- dtype / quantization / kernel / cache:
+- tensor / sequence-context / pipeline / CFG parallelism:
+- FLOPs per denoiser, NFE, peak VRAM, communication and timing boundary:
 
 ## 3. Evaluation data
 - prompt/scenario source and license:

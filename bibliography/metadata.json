@@ -1204,5 +1204,94 @@
     "title": "Self Gradient Forcing: Native Long Video Extrapolation",
     "url": "https://arxiv.org/abs/2607.20368",
     "year": "2026"
+  },
+  "peebles2022scalable": {
+    "arxiv_id": "2212.09748",
+    "authors": "William Peebles and Saining Xie",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2212.09748",
+    "source_kind": "arxiv",
+    "title": "Scalable Diffusion Models with Transformers",
+    "url": "https://arxiv.org/abs/2212.09748",
+    "year": "2022"
+  },
+  "gupta2023photorealistic": {
+    "arxiv_id": "2312.06662",
+    "authors": "Agrim Gupta and Lijun Yu and Kihyuk Sohn and Xiuye Gu and Meera Hahn and Li Fei-Fei and Irfan Essa and Lu Jiang and José Lezama",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2312.06662",
+    "source_kind": "arxiv",
+    "title": "Photorealistic Video Generation with Diffusion Models",
+    "url": "https://arxiv.org/abs/2312.06662",
+    "year": "2023"
+  },
+  "ma2024latte": {
+    "arxiv_id": "2401.03048",
+    "authors": "Xin Ma and Yaohui Wang and Xinyuan Chen and Gengyun Jia and Ziwei Liu and Yuan-Fang Li and Cunjian Chen and Yu Qiao",
+    "entry_type": "misc",
+    "journal": "Transactions on Machine Learning Research",
+    "primary_class": "cs.CV",
+    "source_id": "2401.03048",
+    "source_kind": "arxiv",
+    "title": "Latte: Latent Diffusion Transformer for Video Generation",
+    "url": "https://arxiv.org/abs/2401.03048",
+    "year": "2024"
+  },
+  "yang2024cogvideox": {
+    "arxiv_id": "2408.06072",
+    "authors": "Zhuoyi Yang and Jiayan Teng and Wendi Zheng and Ming Ding and Shiyu Huang and Jiazheng Xu and Yuanming Yang and Wenyi Hong and Xiaohan Zhang and Guanyu Feng and Da Yin and Yuxuan Zhang and Weihan Wang and Yean Cheng and Bin Xu and Xiaotao Gu and Yuxiao Dong and Jie Tang",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2408.06072",
+    "source_kind": "arxiv",
+    "title": "CogVideoX: Text-to-Video Diffusion Models with An Expert Transformer",
+    "url": "https://arxiv.org/abs/2408.06072",
+    "year": "2024"
+  },
+  "chen2025sanavideo": {
+    "arxiv_id": "2509.24695",
+    "authors": "Junsong Chen and Yuyang Zhao and Jincheng Yu and Ruihang Chu and Junyu Chen and Shuai Yang and Xianbang Wang and Yicheng Pan and Daquan Zhou and Huan Ling and Haozhe Liu and Hongwei Yi and Hao Zhang and Muyang Li and Yukang Chen and Han Cai and Sanja Fidler and Ping Luo and Song Han and Enze Xie",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2509.24695",
+    "source_kind": "arxiv",
+    "title": "SANA-Video: Efficient Video Generation with Block Linear Diffusion Transformer",
+    "url": "https://arxiv.org/abs/2509.24695",
+    "year": "2025"
+  },
+  "huang2025linvideo": {
+    "arxiv_id": "2510.08318",
+    "authors": "Yushi Huang and Xingtong Ge and Ruihao Gong and Chengtao Lv and Jun Zhang",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2510.08318",
+    "source_kind": "arxiv",
+    "title": "LinVideo: A Post-Training Framework towards O(n) Attention in Efficient Video Generation",
+    "url": "https://arxiv.org/abs/2510.08318",
+    "year": "2025"
+  },
+  "mao2025timeripples": {
+    "arxiv_id": "2511.12035",
+    "authors": "Wenxuan Miao and Yulin Sun and Aiyue Chen and Jing Lin and Yiwu Yao and Yiming Gan and Jieru Zhao and Jingwen Leng and Minyi Guo and Yu Feng",
+    "entry_type": "misc",
+    "primary_class": "cs.AR",
+    "source_id": "2511.12035",
+    "source_kind": "arxiv",
+    "title": "Timeripple: Accelerating vDiTs by Understanding the Spatio-Temporal Correlations in Latent Space",
+    "url": "https://arxiv.org/abs/2511.12035",
+    "year": "2025"
+  },
+  "chen2026sanavideo2": {
+    "arxiv_id": "2607.21553",
+    "authors": "Junsong Chen and Jincheng Yu and Yitong Li and Shuchen Xue and Haozhe Liu and Jingyu Xin and Yuyang Zhao and Tian Ye and Zhangjie Wu and Zian Wang and Daquan Zhou and Ping Luo and Song Han and Enze Xie",
+    "entry_type": "misc",
+    "primary_class": "cs.CV",
+    "source_id": "2607.21553",
+    "source_kind": "arxiv",
+    "title": "SANA-Video 2.0: Hybrid Linear Attention with Attention Residuals for Efficient Video Generation",
+    "url": "https://arxiv.org/abs/2607.21553",
+    "year": "2026"
   }
 }

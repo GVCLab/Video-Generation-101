@@ -1,6 +1,6 @@
 {
-  "as_of": "2026-08-29",
-  "fetched_at": "2026-08-29T22:39:55Z",
+  "as_of": "2026-08-30",
+  "fetched_at": "2026-08-30T02:58:58Z",
   "repositories": {
     "https://github.com/CompVis/maskflow": {
       "stars": 28
@@ -12,13 +12,16 @@
       "stars": 9294
     },
     "https://github.com/Lightricks/LTX-Video": {
-      "stars": 10915
+      "stars": 10916
     },
     "https://github.com/NVIDIA/Cosmos": {
-      "stars": 11669
+      "stars": 11670
     },
     "https://github.com/NVlabs/LongLive": {
       "stars": 2582
+    },
+    "https://github.com/NVlabs/Sana": {
+      "stars": 8890
     },
     "https://github.com/NVlabs/rcm": {
       "stars": 794
@@ -27,7 +30,7 @@
       "stars": 3774
     },
     "https://github.com/SkyworkAI/SkyReels-V2": {
-      "stars": 7471
+      "stars": 7472
     },
     "https://github.com/SkyworkAI/SkyReels-V3": {
       "stars": 555
@@ -41,8 +44,11 @@
     "https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5": {
       "stars": 4537
     },
+    "https://github.com/Vchitect/Latte": {
+      "stars": 1948
+    },
     "https://github.com/Wan-Video/Wan2.1": {
-      "stars": 16907
+      "stars": 16908
     },
     "https://github.com/alexlee-gk/video_prediction": {
       "stars": 304
@@ -66,10 +72,13 @@
       "stars": 3714
     },
     "https://github.com/dreamzero0/dreamzero": {
-      "stars": 2602
+      "stars": 2603
     },
     "https://github.com/edenton/svg": {
       "stars": 188
+    },
+    "https://github.com/facebookresearch/DiT": {
+      "stars": 8689
     },
     "https://github.com/facebookresearch/eb_jepa": {
       "stars": 765
@@ -117,7 +126,7 @@
       "stars": 114
     },
     "https://github.com/lucas-maes/le-wm": {
-      "stars": 4356
+      "stars": 4357
     },
     "https://github.com/lucidrains/video-diffusion-pytorch": {
       "stars": 1383
@@ -151,6 +160,9 @@
     },
     "https://github.com/yang-song/score_sde": {
       "stars": 1844
+    },
+    "https://github.com/zai-org/CogVideo": {
+      "stars": 12985
     }
   }
 }

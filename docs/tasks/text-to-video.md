@@ -65,7 +65,7 @@ flowchart TD
 
 ## 技术路线不是一条时间轴
 
-现代系统通常同时选择一种表示、一种序列分解、一种训练目标和一种部署方式。把模型只分成“GAN、Transformer、Diffusion”会混淆表示、骨干和目标。更准确的路线矩阵如下。
+现代系统通常同时选择一种表示、一种序列分解、一种训练目标、一种骨干和一种部署方式。把模型只分成“GAN、Transformer、Diffusion”会混淆表示、骨干和目标；即使都叫 Video DiT，full、factorized、window、sparse、linear 与 hybrid attention 的连边和成本也不同。更准确的路线矩阵如下。
 
 | 路线 | 生成变量与分解 | 文本如何进入 | 代表工作 | 真正推进 | 主要瓶颈 |
 |---|---|---|---|---|---|
@@ -78,7 +78,7 @@ flowchart TD
 | 分块/因果/滚动生成 | chunk 条件于历史 chunk 或压缩状态 | 文本 + 历史窗口/记忆 | SkyReels-V2 [[18]](#ref-18)、MAGI-1 [[19]](#ref-19) | 把有限窗口扩展为连续输出 | “能继续生成”不等于叙事正确或永不漂移 |
 | 原生联合音视频 | 联合或双流建模视频与音频 | 文本同时控制两个模态 | Ovi [[27]](#ref-27)、LTX-2 [[28]](#ref-28) | 对白、音效和画面可在生成阶段耦合 | 同步、多说话人绑定、采样率差异与联合评测 |
 
-路线之间可以组合：例如“连续 latent + chunk factorization + flow matching + DiT + preference post-training”是一套合法配置，而不是五个互斥模型类别。机制细节见[生成模型路线](../generative-models.md)、[视频基础模型](../foundation-models.md)与[因果/流式生成](../generative-models/causal-streaming-generation.md)。
+路线之间可以组合：例如“连续 latent + chunk factorization + flow matching + hybrid Video DiT + preference post-training”是一套合法配置，而不是五个互斥模型类别。机制细节见[生成模型路线](../generative-models.md)、[Video DiT 与骨干扩展](../generative-models/video-dit-backbones.md)、[视频基础模型](../foundation-models.md)与[因果/流式生成](../generative-models/causal-streaming-generation.md)。
 
 ## 从 prompt 到视频张量：训练和推理的数据契约
 
@@ -187,13 +187,13 @@ Video Generation from Text 将句子表示、随机变量与视频生成器连�
 
 CogVideo 延续 CogView2 的离散视觉 token 与 Transformer，采用多帧率层次训练，把文本—图像预训练迁移到视频 [[3]](#ref-3)。Phenaki 的 C-ViViT 压缩视频，MaskGIT 式生成器根据一串 prompt 生成可变长度视频 [[7]](#ref-7)。VideoPoet 更进一步把图像、视频和音频任务表达为 token 到 token 的自回归建模 [[9]](#ref-9)。共同优点是接口统一，缺点是原始时空 token 数巨大：更强压缩会丢失细节，更弱压缩会让注意力、KV cache 和误差传播变贵。
 
-### Diffusion、latent 与 DiT/flow：当前主干的三次扩展
+### Diffusion、latent 与 DiT/flow：三条正交扩展
 
 Video Diffusion Models 把图像 diffusion 架构时空化，并用联合图像—视频训练与时空超分展示了可扩展路线 [[4]](#ref-4)。Make-A-Video 把成对图文数据中的语义先验和无文本视频中的运动先验拆开学习 [[5]](#ref-5)；Imagen Video 则以多个级联扩散模块提升空间和时间分辨率 [[6]](#ref-6)。
 
 Align your Latents 在预训练图像 LDM 中插入时间层，并在压缩 latent 中训练，形成后来大量 T2V 系统的工程母版 [[10]](#ref-10)。Lumiere 的 Space-Time U-Net 直接在完整时空体上生成低分辨率视频，再做空间超分，避免“先稀疏关键帧、再时间插值”的部分边界误差 [[11]](#ref-11)。
 
-2024–2025 的大模型路线把 U-Net 进一步替换或混合为 Transformer/DiT，并大量采用 flow matching。CogVideoX 公开了 expert Transformer 与 3D causal VAE 设计 [[12]](#ref-12)；HunyuanVideo 讨论双流/单流 Transformer、文本编码和系统训练 [[14]](#ref-14)；Wan 给出较完整的大规模视频生成模型族 [[15]](#ref-15)；Step-Video-T2V 报告 30B 模型、Video-VAE、双语编码器、3D full-attention DiT、flow matching 与 Video-DPO [[16]](#ref-16)。这些是作者技术报告中的系统描述，不应把其自报 benchmark 直接写成独立领先结论。
+2024–2025 的规模化主路径扩展到 Transformer/DiT，并大量采用 flow matching；这不是“U-Net 被线性淘汰”，U-Net、hybrid 与任务专用架构仍并存。CogVideoX 公开了 joint full attention 与模态专属 Expert AdaLN，后者不是 MoE [[12]](#ref-12)；HunyuanVideo 讨论 dual-stream→single-stream full attention、文本编码和系统训练 [[14]](#ref-14)；Wan 给出大规模视频模型族，Wan2.2 又沿噪声时间切 high/low-noise expert [[15]](#ref-15)；Step-Video-T2V 报告 30B 模型、Video-VAE、双语编码器、视觉 token 3D full self-attention、独立文本 cross-attention、flow matching 与 Video-DPO [[16]](#ref-16)。这些系统结果同时来自 codec、数据、backbone、objective、post-train 和执行栈，不应把作者 benchmark 直接写成 backbone 排名；内部结构和公平比较见[Video DiT 专章](../generative-models/video-dit-backbones.md)。
 
 ## 数据与 prompt compiler：模型先学到的是 caption 的盲区
 
@@ -374,7 +374,7 @@ T2V-CompBench 用 1,400 个 prompt 和七类组合性维度分析复杂属性、
 
 1. 先读[任务分类](../taxonomy.md)，用“条件来源 × 来源像素关系 × 反馈时域”确定边界；
 2. 读 Video Diffusion Models、Make-A-Video、Phenaki 和 Align your Latents，分别理解 diffusion、迁移、token/变长和 latent 路线；
-3. 读 CogVideoX/HunyuanVideo/Step-Video-T2V，理解现代 codec—DiT/flow—系统工程；
+3. 读 CogVideoX/HunyuanVideo/Step-Video-T2V，并配合[Video DiT 与骨干扩展](../generative-models/video-dit-backbones.md)，逐项写出 token、attention、fusion、position、active params 与 execution manifest；
 4. 读 InstructVideo、T2V-Turbo、VideoDPO 与 2026 post-train framework，比较 SFT、偏好、蒸馏和 RL；
 5. 读 SkyReels-V2/MAGI-1，但先确认它们的输入契约再讨论“长视频”；
 6. 读 Ovi/LTX-2 与 Sora 2/Veo model card，练习区分公开方法证据与产品声明；

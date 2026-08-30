@@ -2,7 +2,7 @@
 
 这不是按年份堆论文的 awesome list，而是一门可以执行、留痕和被证伪的路线式课程。目标不是“读过多少篇”，而是最终能回答四个问题：模型表示了什么、怎样沿时间生成、证据真正支持什么、下一次实验怎样推翻自己的判断。
 
-本页证据冻结于 **2026-08-30（Asia/Shanghai）**。检索式、纳入排除、正式发表状态和关键断言见[阅读路线研究日志](../sources/research_20260830_reading_routes.md)，新增结构性技术轴的选择依据见[缺口审计](../sources/research_20260830_missing_subfields_integration.md)、[多视角/4D 研究日志](../sources/research_20260830_multiview_4d_generation.md)与[退化修复研究日志](../sources/research_20260830_video_restoration.md)。完整书目信息与仓库索引仍见[引用与代码索引](bibliography.md)；专题细节分别见[生成模型](generative-models.md)、[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)、[视频后训练与对齐](generative-models/video-post-training-alignment.md)、[因果流式生成](generative-models/causal-streaming-generation.md)、[原生音视频](tasks/native-audio-video-generation.md)、[细粒度可控生成](tasks/controllable-video-generation.md)、[多视角/4D 生成](tasks/multiview-4d-generation.md)、[视频退化修复](tasks/video-restoration.md)、[评测](evaluation.md)、[World Model](world-models.md)与 [JEPA](jepa.md)。
+本页证据冻结于 **2026-08-30（Asia/Shanghai）**。检索式、纳入排除、正式发表状态和关键断言见[阅读路线研究日志](../sources/research_20260830_reading_routes.md)，新增结构性技术轴的选择依据见[缺口审计](../sources/research_20260830_missing_subfields_integration.md)、[Video DiT / backbone 研究日志](../sources/research_20260830_video_dit_backbones.md)、[多视角/4D 研究日志](../sources/research_20260830_multiview_4d_generation.md)与[退化修复研究日志](../sources/research_20260830_video_restoration.md)。完整书目信息与仓库索引仍见[引用与代码索引](bibliography.md)；专题细节分别见[生成模型](generative-models.md)、[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)、[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)、[视频后训练与对齐](generative-models/video-post-training-alignment.md)、[因果流式生成](generative-models/causal-streaming-generation.md)、[原生音视频](tasks/native-audio-video-generation.md)、[细粒度可控生成](tasks/controllable-video-generation.md)、[多视角/4D 生成](tasks/multiview-4d-generation.md)、[视频退化修复](tasks/video-restoration.md)、[评测](evaluation.md)、[World Model](world-models.md)与 [JEPA](jepa.md)。
 
 ## 0. 课程规则与证据标签
 
@@ -28,6 +28,7 @@
 | 概率与生成建模 | 能解释联合分布与自回归分解的差别，并说明“多种合理未来”为何使逐像素 MSE 变模糊 | [生成模型总览](generative-models.md) |
 | 视频表示 | 能区分 pixel、连续 latent、离散 token、结构化 state，并分别写出 shape、dtype、时空网格、元素/token 预算；知道何时才存在可报告的 bitstream 码率 | [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md) |
 | Diffusion / flow | 能画出 data → noise → data，并区分“训练目标”“数值求解步数”“网络调用次数” | [Diffusion](generative-models/diffusion-models.md)与 [Flow / consistency](generative-models/flow-consistency-models.md) |
+| Video backbone | 能由 latent grid 和 patch 算出 $N$，并区分 full/factorized/window/sparse/linear attention、3D RoPE、Expert AdaLN、noise-time MoE 与多卡并行 | [Video DiT 与骨干扩展](generative-models/video-dit-backbones.md) |
 | 序列与系统 | 能解释 causal mask、KV cache、首帧时间、平均 FPS、p95 帧延迟为什么不是同一个量 | [因果流式生成](generative-models/causal-streaming-generation.md) |
 | 控制 | 能区分 observation、state、action、reward、open-loop rollout 与 receding-horizon control | [World Model](world-models.md) |
 | 视觉控制坐标 | 能区分 2D 像素轨迹、3D 世界轨迹、相机内外参、pose/depth/flow，并说明它们为何不是环境 action | [任务地图](taxonomy.md) |
@@ -37,21 +38,22 @@
 
 最低入口产物是一页术语表：每个术语必须同时写“定义”“反例”和“怎样测”。如果只能写定义，说明还不能进入分支。
 
-## 2. 总路线图：一条主干，七条分支
+## 2. 总路线图：共同主干与加深单元，七条任务分支
 
 ```mermaid
 flowchart TB
     accTitle: 视频生成论文课程的依赖路线
-    accDescr: 学习者先完成先修诊断，再通过 tokenizer 表示、生成目标和评测组成的共同主干。之后可选择因果流式、少步与后训练、原生音视频、World Action 与 JEPA、细粒度可控生成、视频退化修复、多视角与4D七条分支。每条分支都进入共同验收，并以跨分支结课项目结束。
+    accDescr: 学习者先完成先修诊断，再通过 tokenizer 表示、生成目标和评测组成的共同主干，并完成 Video DiT 的 token、注意力、融合与扩展加深单元。之后可选择因果流式、少步与后训练、原生音视频、World Action 与 JEPA、细粒度可控生成、视频退化修复、多视角与4D七条任务分支。每条分支都进入共同验收，并以跨分支结课项目结束。
 
     P["先修诊断"] --> K["共同主干：tokenizer 表示 · 目标 · 评测"]
-    K --> S["分支 A：因果 · 流式 · 实时"]
-    K --> D["分支 B：少步 · 后训练 · 蒸馏"]
-    K --> A["分支 C：原生音视频"]
-    K --> W["分支 D：World Action · JEPA"]
-    K --> G["分支 E：细粒度可控生成"]
-    K --> R["分支 F：视频退化修复"]
-    K --> M["分支 G：多视角 · 4D"]
+    K --> B["共同加深：Video DiT<br/>token · topology · fusion · scaling"]
+    B --> S["分支 A：因果 · 流式 · 实时"]
+    B --> D["分支 B：少步 · 后训练 · 蒸馏"]
+    B --> A["分支 C：原生音视频"]
+    B --> W["分支 D：World Action · JEPA"]
+    B --> G["分支 E：细粒度可控生成"]
+    B --> R["分支 F：视频退化修复"]
+    B --> M["分支 G：多视角 · 4D"]
     D --> S
     S --> V["共同验收：复现 + 反证 + 边界"]
     D --> V
@@ -67,12 +69,12 @@ flowchart TB
     classDef branch fill:#fff0cc,stroke:#a65f00,color:#111
     classDef verify fill:#dff2e5,stroke:#147a4b,color:#111
     class P,C gate
-    class K trunk
+    class K,B trunk
     class S,D,A,W,G,R,M branch
     class V verify
 ```
 
-文字替代：先通过先修诊断，再完成共同主干。视频 tokenizer 是所有分支共享的表示先修，不单列为应用分支；主干之后才选一条主修分支。少步蒸馏又是流式生成的常见前提，因此分支 B 连接分支 A。七条分支都必须经过同一套“复现、反证、证据边界”验收，最后再做跨分支项目。颜色只辅助分组，节点标签和箭头已经给出全部语义。
+文字替代：先通过先修诊断，再完成 tokenizer/目标/评测共同主干和 Video DiT 的 token、attention、fusion、scaling 加深单元。Tokenizer 与 backbone 都是七条任务分支共享的技术先修，不另算应用分支；之后才选一条主修分支。少步蒸馏又是流式生成的常见前提，因此分支 B 连接分支 A。七条分支都必须经过同一套“复现、反证、证据边界”验收，最后再做跨分支项目。颜色只辅助分组，节点标签和箭头已经给出全部语义。
 
 ### 怎样选主修分支
 
@@ -104,15 +106,32 @@ flowchart TB
 | 6 | [MAGVIT](https://openaccess.thecvf.com/content/CVPR2023/html/Yu_MAGVIT_Masked_Generative_Video_Transformer_CVPR_2023_paper.html) | tokenizer、masked generation 与多任务条件怎样组合？ | **A·正式发表** |
 | 7 | [VBench](https://openaccess.thecvf.com/content/CVPR2024/html/Huang_VBench_Comprehensive_Benchmark_Suite_for_Video_Generative_Models_CVPR_2024_paper.html) | 一个总分掩盖了哪些失败？自动指标与人工判断怎样对齐？ | **A·正式发表** |
 
-### 表示加深单元：共同先修，不是第七分支
+### 表示加深单元：共同先修，不是任务分支
 
-主干第 2、6 篇建立离散 token 与视频 token 建模入口；下面三篇分别补齐连续兼容表示、真实 bitstream 和自适应预算。它们仍属于所有分支共享的 representation 层，不改变“六条分支”的任务结构。详细机制、更多里程碑和统一记账口径见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)。
+主干第 2、6 篇建立离散 token 与视频 token 建模入口；下面三篇分别补齐连续兼容表示、真实 bitstream 和自适应预算。它们仍属于所有七条任务分支共享的 representation 层。详细机制、更多里程碑和统一记账口径见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)。
 
 | 表示问题 | 论文 | 阅读时必须核对 | 证据 |
 |---|---|---|---|
 | 连续 video latent 怎样接入既有生成器 | [CV-VAE](https://proceedings.neurips.cc/paper_files/paper/2024/hash/1787533e171dcc8549cc2eb5a4840eec-Abstract-Conference.html) | “兼容”是训练约束与特定 checkpoint 协议，不是任意 VAE 可无损互换 | **A·正式发表，NeurIPS 2024** |
 | 离散 token 何时成为实际码流 | [Image and Video Tokenization with Binary Spherical Quantization](https://proceedings.iclr.cc/paper_files/paper/2025/hash/e25198b6a75f74277ee3a2bd4165d9ef-Abstract-Conference.html) | 只有接上先验、概率模型与算术编码后，bpp 才是 bitstream 证据 | **A·正式发表，ICLR 2025** |
 | 固定网格怎样变成内容自适应预算 | [InfoTok](https://proceedings.iclr.cc/paper_files/paper/2026/hash/432f048a844654ba981953491e6dc80e-Abstract-Conference.html) | token 节省要连同 router、变长 batching、最坏长度和下游质量报告 | **A·正式发表，ICLR 2026** |
+
+### Backbone 加深单元：共同先修，不是第八条分支
+
+这组阅读不要求背模型名，而是用同一张账回答：latent/patch 后有多少 token、谁能读取谁、条件在哪里融合、位置怎样编码、每步激活多少参数、算法 FLOPs 怎样落到 kernel/通信和端到端 NFE。完整公式、精读与 `BackboneFork-1`/`ServeFork-1` 见[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)。
+
+| 阶段 | 一手论文/发布 | 带着什么问题读 | 证据 |
+|---|---|---|---|
+| 图像架构桥梁 | [DiT](https://openaccess.thecvf.com/content/ICCV2023/html/Peebles_Scalable_Diffusion_Models_with_Transformers_ICCV_2023_paper.html) | latent patch、adaLN-Zero、depth/width/token GFLOPs 怎样组成 backbone scaling？为什么图像结果不证明视频时序？ | **A·ICCV 2023，首次公开 2022** |
+| window 与 factorization | [W.A.L.T.](https://www.ecva.net/papers/eccv_2024/papers_ECCV/html/10270_ECCV_2024_paper.php)；[Latte](https://openreview.net/forum?id=ntGPYNUF3t) | window 与 space/time 交替删掉哪些直接连边？跨窗口和快速运动需要多少层传播？ | **A·ECCV 2024 / TMLR 2025** |
+| joint 与 expert normalization | [CogVideoX](https://proceedings.iclr.cc/paper_files/paper/2025/hash/ce31378e9f41d8907e97dab172b6c559-Abstract-Conference.html) | joint full attention、3D RoPE、frame packing 与 Expert AdaLN 分别改变什么？为何 Expert AdaLN 不是 MoE？ | **A·ICLR 2025** |
+| dual→single 与 full attention | [HunyuanVideo](https://arxiv.org/abs/2412.03603)；[Step-Video-T2V](https://arxiv.org/abs/2502.10248) | 文本/视频双流何时合并？“视觉 full self-attention + 文本 cross-attention”和 joint sequence 有何差别？ | **B·作者技术报告/开放实现** |
+| noise-time experts | [Wan2.2 official repository](https://github.com/Wan-Video/Wan2.2) | high/low-noise expert 沿 $\tau$ 怎样切换？total、active 与 resident parameters 为什么是三本账？ | **D·官方发布；无独立正式 Wan2.2 论文** |
+| linear 与 hybrid | [SANA-Video](https://proceedings.iclr.cc/paper_files/paper/2026/hash/41b93c59da0d0f835907fd661d419db2-Abstract-Conference.html)；[SANA-Video 2.0](https://arxiv.org/abs/2607.21553) | cumulative state 怎样控制长序列内存？保留 25% softmax anchor 后为什么严格渐近仍含 $O(N^2)$？ | **A·ICLR 2026 / B·2026 预印本** |
+| post-training linearization | [LinVideo](https://openaccess.thecvf.com/content/CVPR2026/html/Huang_LinVideo_A_Post-Training_Framework_towards_On_Attention_in_Efficient_Video_CVPR_2026_paper.html) | 从已有 checkpoint 替换部分 attention 与 from-scratch linear architecture 有何不同？4-step 数字为何不能归给 attention alone？ | **A·CVPR 2026** |
+| sparse 与 reuse | [RAPID](https://openaccess.thecvf.com/content/CVPR2026/papers/Lin_RAPID_Reusing_Attention_Sparsity_with_Inter-step_Adaptation_for_Efficient_Video_CVPR_2026_paper.pdf)；[DSA](https://proceedings.iclr.cc/paper_files/paper/2026/hash/c3728248f3c627d1f16ca5726cdf83f5-Abstract-Conference.html)；[TimeRipples](https://openaccess.thecvf.com/content/CVPR2026/html/Mao_TimeRipples_Accelerating_vDiTs_by_Understanding_the_Spatio-Temporal_Correlations_in_Latent_CVPR_2026_paper.html) | 跨 denoising step 的 mask/score reuse、distributed sparse execution 与同一次 attention 内局部复用怎样区分？selector/kernel/通信谁主导？ | **A·CVPR/ICLR 2026** |
+
+通关产物是一张七轴 manifest：`representation / factorization / objective / backbone / conditions / execution / evidence`。速度必须绑定输出、NFE、precision、hardware、warm-up 和计时边界；稀疏、cache、量化、少步与多卡的倍数不能相乘。
 
 ### 主干阅读问题
 
@@ -130,9 +149,9 @@ flowchart TB
 2. 同时报 pixel error、分支覆盖率、最优样本与平均样本；观察 MSE 是否用模糊平均换取更低误差。
 3. 对同一段 16 帧视频做 tokenizer 重建，报告 latent/token 的 shape、dtype、时空网格、元素/token 数、重建误差和运动事件是否保存；只有实际产生可解码 bitstream 时才报告 bpp/bitrate。
 4. 固定同一个 generator、数据与训练预算替换 tokenizer，拆分“重建更好”与“下游生成更好”。
-5. 写一张六列模型卡：`representation / temporal factorization / objective / conditions / network calls / evidence`。
+5. 写一张七轴模型卡：`representation / temporal factorization / objective / backbone / conditions / execution / evidence`；其中 backbone 至少填 patch/grid、mixer/mask、position/fusion 和 total/active parameters，execution 至少填 NFE、precision、cache、parallelism 与硬件。
 
-**反证条件：** 如果你无法仅凭方法和实验部分填完六列，或把重建误差当成生成质量，就不能进入分支。主干通关产物不是排行榜，而是一张能容纳后续所有论文的比较表。
+**反证条件：** 如果你无法仅凭方法和实验部分填完七轴，或把重建误差当成生成质量、把 attention FLOPs 当成端到端 latency，就不能进入分支。主干通关产物不是排行榜，而是一张能容纳后续所有论文的比较表。
 
 ## 4. 分支 A：因果、流式与实时视频
 

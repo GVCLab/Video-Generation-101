@@ -684,7 +684,7 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 
 ## 17. 与本知识地图其他章节的关系
 
-- 想理解 video diffusion、flow、tokenizer 和 Transformer：读[生成模型路线](generative-models.md)与[视频基础模型路线](foundation-models.md)。
+- 想理解 video diffusion、flow、tokenizer 和 Transformer：先读[生成模型路线](generative-models.md)，再用[视频 Tokenizer](generative-models/video-tokenizers.md)与[Video DiT / backbone](generative-models/video-dit-backbones.md)分别核对表示和网络实现，系统发布面见[视频基础模型路线](foundation-models.md)。
 - 想区分视觉推演与动作条件 world model：读[从视频生成到 World Model](world-models.md)。
 - 想建立可重现的 scorer、人评和计算预算：读[视频生成与世界模型评测](evaluation.md)。
 - 想检查真实物理、守恒量和常见 glitch：读[物理一致性的视频生成](physical-consistency.md)。

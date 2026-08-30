@@ -112,6 +112,8 @@ flowchart LR
 
 表中的“已发布”仅指冻结日能从官方入口定位；性能数字均为作者口径，除非另有独立复现。
 
+同一“DiT”标签不能用来推断 full/factorized/sparse/linear attention、条件融合、3D 位置、MoE 路由或多卡执行。选型前应先按[Video DiT 与骨干扩展](../docs/generative-models/video-dit-backbones.md)填写 patch/token、mixer/mask、position/fusion、total/active parameters 与 execution manifest；本页只回答冻结日哪些具体 artifact 可得。
+
 | 项目 / 当前版本 | 任务与机制 | 冻结日已发布 | 明确缺口或边界 | 官方硬件入口 | 适合的研究问题 |
 |---|---|---|---|---|---|
 | MiniMax H3 [[1]](#ref-1) | 33B dense omni Transformer；T2V、首尾帧、multi-reference、native AV | H3-Base FL2VA / Ref2VA 权重、推理和多框架入口 | Context-IR、2K regenerate、稀疏注意力未开放；自定义权重许可 | 官方示例以 4 GPU serving 为主 | 原生 AV、复杂参考条件、开放模块与产品模块差异 |
@@ -120,9 +122,9 @@ flowchart LR
 | MAGI-1.1 [[6]](#ref-6) | causal autoregressive diffusion，长视频分块生成 | 24B、distilled/quantized 与 4.5B 系列权重、推理 | 论文/作者 benchmark 不是独立速度复现 | 4.5B 约 24 GB；量化窗口可到约 12 GB；24B 多卡 | causal AR、chunk cache、量化与长时漂移 |
 | Bernini / Bernini-R [[7]](#ref-7) | MLLM semantic planner + Wan-based renderer；生成与编辑 | full pipeline 与 14B/1.3B renderer 权重、推理；Renderer 训练代码 | prompt enhancer 可依赖外部 VLM；full planner 与 renderer 训练面不同 | 官方主要在 H100 环境验证 | semantic planning、统一生成编辑、planner ablation |
 | Lance [[8]](#ref-8) | 3B active unified understanding / generation / editing | 权重、推理、I2V、fine-tuning 和评测入口 | 研究 artifact；公开视频仅到 480p/12 FPS 训练口径 | 官方要求至少 40 GB VRAM | 小型统一模型、多任务正负迁移、训练预算研究 |
-| HunyuanVideo-1.5 [[9]](#ref-9) | 8.3B DiT；T2V/I2V、SSTA、超分和蒸馏 | 权重、推理、training/LoRA、部分 step-distilled I2V | open-source plan 中仍有 sparse/distill/SR 权重未完成 | offload 最低约 14 GB；配置不同不可直接比时延 | 消费级基线、训练代码、蒸馏和 bilingual prompt |
-| Wan2.2 [[10]](#ref-10) | A14B MoE + 5B dense TI2V；T2V/I2V/S2V/Animate | 多系列权重和一方推理代码 | 一方主仓偏推理；社区 training 不能冒充官方预训练配方 | 5B 官方称约 24 GB；A14B 路线约 80 GB | MoE denoising、统一 TI2V、语音驱动与角色动画 |
-| SANA-Video / LongSANA [[11]](#ref-11) | linear-attention video DiT；短视频与流式长视频 | 2B 权重、推理、LongSANA train/test/weights、RL 入口 | SANA-Video 2.0 的新报告/项目不能自动视作对应权重已发 | 作者在 H100 条件报告长视频速度 | 线性注意力、长上下文、实时流式与固定预算 |
+| HunyuanVideo-1.5 [[9]](#ref-9) | 8.3B DiT；T2V/I2V、SSTA、超分和蒸馏 | 权重、推理、training/LoRA、部分 step-distilled I2V | SSTA 是 block-selective sparse attention；open-source plan 中仍有 sparse/distill/SR 权重未完成 | offload 最低约 14 GB；该显存协议不能和 8×H800 SSTA 速度协议混写 | 消费级基线、训练代码、稀疏/蒸馏和 bilingual prompt |
+| Wan2.2 [[10]](#ref-10) | A14B noise-time two-expert + 5B dense TI2V；T2V/I2V/S2V/Animate | 多系列权重和一方推理代码 | A14B 约 27B total、每 step active 约 14B，不是 token-routed MoE；社区 training 不能冒充官方预训练配方 | 5B 官方称约 24 GB；A14B 单卡路线约 80 GB | noise-time specialization、统一 TI2V、语音驱动与角色动画 |
+| SANA-Video / LongSANA [[11]](#ref-11) | block-linear video DiT；短视频与常量状态的长视频 | 2B 权重、推理、LongSANA train/test/weights、RL 入口；SANA-Video 2.0 官方页可核验 5B 720p checkpoint | 2.0 的 14B config/weights 截止日仍 coming soon；25% dense anchor 使严格渐近仍含二次项 | 作者在 H100/5090 等不同协议报告速度，不可横排 | 线性/混合注意力、长上下文、固定状态与部署预算 |
 | SkyReels-V3 [[12]](#ref-12) | multi-reference、video extension、talking avatar | 任务权重与推理脚本 | 作者内评不能当独立质量排名；许可须逐模型卡复核 | 按 task 和 checkpoint 分开核对 | 多参考组合、多镜头续写、长音频数字人 |
 | Open-Sora 2.0 [[13]](#ref-13) | 11B 开放训练栈，图像/视频统一 | checkpoint、训练/推理与数据处理代码 | 作者的成本和 human preference 仍需复现 | 训练面面向多卡集群 | 从数据到 checkpoint 的端到端研究、训练成本消融 |
 | CogVideoX-1.5 [[14]](#ref-14) | expert Transformer + 3D causal VAE；T2V/I2V | 2B/5B/1.5 权重、SAT/Diffusers 推理、LoRA 路线 | 2B Apache 与 5B 自定义许可不同；不是同一许可对象 | Diffusers/offload 可显著降低峰值显存 | 成熟基线、VAE、LoRA、text encoder 和 scheduler 对照 |

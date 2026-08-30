@@ -2,7 +2,7 @@
 
 # 论文引用、代码仓库与 GitHub Stars
 
-本索引收录 **109 篇**在 `bibliography/registry.json` 中登记的核心论文与技术报告，用于提供标准 BibTeX 和官方代码状态。仓库正文引用的文献总数多于此，完整清单以各章文末的参考文献为准。论文元数据来自 Crossref、arXiv 或机构原始页面；GitHub Stars 是 **2026-08-29** 的快照，不代表代码质量。
+本索引收录 **117 篇**在 `bibliography/registry.json` 中登记的核心论文与技术报告，用于提供标准 BibTeX 和官方代码状态。仓库正文引用的文献总数多于此，完整清单以各章文末的参考文献为准。论文元数据来自 Crossref、arXiv 或机构原始页面；GitHub Stars 是 **2026-08-30** 的快照，不代表代码质量。
 
 - [完整 BibTeX](../bibliography/references.bib)
 - [引用与仓库登记表](../bibliography/registry.json)
@@ -37,6 +37,7 @@
 - **I**：跨路线生成基础、测量与 tokenizer
 - **J**：现代视频基础模型与系统报告
 - **K**：因果、自回归流式生成与加速
+- **L**：Video DiT 骨干、注意力与扩展
 
 这里的“代码仓库”表示可公开访问的 GitHub 实现；是否属于 OSI 定义的开源软件、权重是否开放，以及可否商用，仍需逐项查看仓库许可证。
 
@@ -82,10 +83,10 @@
 | F | `ha2018worldmodels` | [World Models](https://arxiv.org/abs/1803.10122) | 2018 | [hardmaru/WorldModelsExperiments](https://github.com/hardmaru/WorldModelsExperiments) · **官方研究产物**；作者发布的实验代码与笔记 | 734 |
 | G | `bruce2024genie` | [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391) | 2024 | **未发现官方 GitHub 仓库** | — |
 | G | `nvidia2025cosmos` | [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575) | 2025 | [nvidia-cosmos/cosmos-predict1](https://github.com/nvidia-cosmos/cosmos-predict1) · **官方代码**；NVIDIA Cosmos Predict1 官方实现 | 468 |
-| G | `nvidia2026cosmos3` | [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800) | 2026 | [NVIDIA/Cosmos](https://github.com/NVIDIA/Cosmos) · **官方代码**；NVIDIA 官方统一 Cosmos 仓库 | 11,669 |
+| G | `nvidia2026cosmos3` | [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800) | 2026 | [NVIDIA/Cosmos](https://github.com/NVIDIA/Cosmos) · **官方代码**；NVIDIA 官方统一 Cosmos 仓库 | 11,670 |
 | G | `valevski2024diffusion` | [Diffusion Models Are Real-Time Game Engines](https://arxiv.org/abs/2408.14837) | 2024 | [GameNGen/GameNGen.github.io](https://github.com/GameNGen/GameNGen.github.io) · **官方项目页（非模型代码）**；官方项目页源码，不含模型训练或推理实现 | 91 |
 | G | `yang2023interactive` | [Learning Interactive Real-World Simulators](https://arxiv.org/abs/2310.06114) | 2023 | **未发现官方 GitHub 仓库** | — |
-| G | `ye2026worldaction` | [World Action Models are Zero-shot Policies](https://arxiv.org/abs/2602.15922) | 2026 | [dreamzero0/dreamzero](https://github.com/dreamzero0/dreamzero) · **官方代码**；DreamZero / World Action Model 作者实现 | 2,602 |
+| G | `ye2026worldaction` | [World Action Models are Zero-shot Policies](https://arxiv.org/abs/2602.15922) | 2026 | [dreamzero0/dreamzero](https://github.com/dreamzero0/dreamzero) · **官方代码**；DreamZero / World Action Model 作者实现 | 2,603 |
 | G | `deepmind2024genie2` | [Genie 2: A Large-Scale Foundation World Model](https://deepmind.google/blog/genie-2-a-large-scale-foundation-world-model/) | 2024 | **未发现官方 GitHub 仓库** | — |
 | G | `deepmind2025genie3` | [Genie 3: A New Frontier for World Models](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/) | 2025 | **未发现官方 GitHub 仓库** | — |
 | G | `nvidia2025cosmospredict2` | [Develop Custom Physical AI Foundation Models with NVIDIA Cosmos Predict-2](https://developer.nvidia.com/blog/?p=101575) | 2025 | [nvidia-cosmos/cosmos-predict2](https://github.com/nvidia-cosmos/cosmos-predict2) · **官方代码**；NVIDIA Cosmos 官方实现 | 793 |
@@ -97,7 +98,7 @@
 | H | `balestriero2025lejepa` | [LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics](https://arxiv.org/abs/2511.08544) | 2025 | [galilai-group/lejepa](https://github.com/galilai-group/lejepa) · **官方代码**；LeJEPA 与 SIGReg 官方实现 | 1,325 |
 | H | `bardes2023mcjepa` | [MC-JEPA: A Joint-Embedding Predictive Architecture for Self-Supervised Learning of Motion and Content Features](https://arxiv.org/abs/2307.12698) | 2023 | **未发现官方 GitHub 仓库** | — |
 | H | `bardes2024revisiting` | [Revisiting Feature Prediction for Learning Visual Representations from Video](https://arxiv.org/abs/2404.08471) | 2024 | [facebookresearch/jepa](https://github.com/facebookresearch/jepa) · **官方代码**；Meta AI Research 官方实现 | 4,112 |
-| H | `maes2026leworldmodel` | [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312) | 2026 | [lucas-maes/le-wm](https://github.com/lucas-maes/le-wm) · **官方代码**；LeWorldModel 官方实现 | 4,356 |
+| H | `maes2026leworldmodel` | [LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels](https://arxiv.org/abs/2603.19312) | 2026 | [lucas-maes/le-wm](https://github.com/lucas-maes/le-wm) · **官方代码**；LeWorldModel 官方实现 | 4,357 |
 | H | `murlabadia2026vjepa21` | [V-JEPA 2.1: Unlocking Dense Features in Video Self-Supervised Learning](https://arxiv.org/abs/2603.14482) | 2026 | [facebookresearch/vjepa2](https://github.com/facebookresearch/vjepa2) · **官方代码**；与 V-JEPA 2 / 2-AC 共用 Meta AI Research 官方仓库 | 4,541 |
 | H | `terver2026lightweight` | [A Lightweight Library for Energy-Based Joint-Embedding Predictive Architectures](https://arxiv.org/abs/2602.03604) | 2026 | [facebookresearch/eb_jepa](https://github.com/facebookresearch/eb_jepa) · **官方代码**；Meta FAIR 官方轻量教学与研究库 | 765 |
 | H | `zhou2024dinowm` | [DINO-WM: World Models on Pre-trained Visual Features enable Zero-shot Planning](https://arxiv.org/abs/2411.04983) | 2024 | [gaoyuezhou/dino_wm](https://github.com/gaoyuezhou/dino_wm) · **官方代码**；作者实现 | 558 |
@@ -116,11 +117,11 @@
 | I | `guo2026vrae` | [V-RAE: Rethinking Video Latent Spaces for Generation](https://arxiv.org/abs/2608.13556) | 2026 | **未发现官方 GitHub 仓库** | — |
 | J | `polyak2024moviegen` | [Movie Gen: A Cast of Media Foundation Models](https://arxiv.org/abs/2410.13720) | 2024 | **未发现官方 GitHub 仓库** | — |
 | J | `kong2024hunyuanvideo` | [HunyuanVideo: A Systematic Framework For Large Video Generative Models](https://arxiv.org/abs/2412.03603) | 2024 | [Tencent-Hunyuan/HunyuanVideo](https://github.com/Tencent-Hunyuan/HunyuanVideo) · **官方代码**；腾讯混元官方代码与权重仓库 | 12,490 |
-| J | `hacohen2024ltxvideo` | [LTX-Video: Realtime Video Latent Diffusion](https://arxiv.org/abs/2501.00103) | 2024 | [Lightricks/LTX-Video](https://github.com/Lightricks/LTX-Video) · **官方代码**；Lightricks 官方代码、权重与训练工具 | 10,915 |
+| J | `hacohen2024ltxvideo` | [LTX-Video: Realtime Video Latent Diffusion](https://arxiv.org/abs/2501.00103) | 2024 | [Lightricks/LTX-Video](https://github.com/Lightricks/LTX-Video) · **官方代码**；Lightricks 官方代码、权重与训练工具 | 10,916 |
 | J | `ma2025stepvideo` | [Step-Video-T2V Technical Report: The Practice, Challenges, and Future of Video Foundation Model](https://arxiv.org/abs/2502.10248) | 2025 | [stepfun-ai/Step-Video-T2V](https://github.com/stepfun-ai/Step-Video-T2V) · **官方代码**；阶跃星辰官方代码、权重与评测入口 | 3,188 |
 | J | `zheng2025opensora2` | [Open-Sora 2.0: Training a Commercial-Level Video Generation Model in $200k](https://arxiv.org/abs/2503.09642) | 2025 | [hpcaitech/Open-Sora](https://github.com/hpcaitech/Open-Sora) · **官方代码**；Open-Sora 2.0 官方训练代码与 checkpoints | 29,322 |
-| J | `wan2025wan` | [Wan: Open and Advanced Large-Scale Video Generative Models](https://arxiv.org/abs/2503.20314) | 2025 | [Wan-Video/Wan2.1](https://github.com/Wan-Video/Wan2.1) · **官方代码**；Wan 2.1 官方代码、权重与模型卡 | 16,907 |
-| J | `chen2025skyreelsv2` | [SkyReels-V2: Infinite-length Film Generative Model](https://arxiv.org/abs/2504.13074) | 2025 | [SkyworkAI/SkyReels-V2](https://github.com/SkyworkAI/SkyReels-V2) · **官方代码**；Skywork AI 官方代码与权重 | 7,471 |
+| J | `wan2025wan` | [Wan: Open and Advanced Large-Scale Video Generative Models](https://arxiv.org/abs/2503.20314) | 2025 | [Wan-Video/Wan2.1](https://github.com/Wan-Video/Wan2.1) · **官方代码**；Wan 2.1 官方代码、权重与模型卡 | 16,908 |
+| J | `chen2025skyreelsv2` | [SkyReels-V2: Infinite-length Film Generative Model](https://arxiv.org/abs/2504.13074) | 2025 | [SkyworkAI/SkyReels-V2](https://github.com/SkyworkAI/SkyReels-V2) · **官方代码**；Skywork AI 官方代码与权重 | 7,472 |
 | J | `sandai2025magi1` | [MAGI-1: Autoregressive Video Generation at Scale](https://arxiv.org/abs/2505.13211) | 2025 | [SandAI-org/MAGI-1](https://github.com/SandAI-org/MAGI-1) · **官方代码**；Sand.ai 官方代码、权重及蒸馏与量化版本 | 3,774 |
 | J | `low2025ovi` | [Ovi: Twin Backbone Cross-Modal Fusion for Audio-Video Generation](https://arxiv.org/abs/2510.01284) | 2025 | [character-ai/Ovi](https://github.com/character-ai/Ovi) · **官方代码**；Character.AI 官方代码与权重 | 1,750 |
 | J | `wu2025hunyuanvideo15` | [HunyuanVideo 1.5 Technical Report](https://arxiv.org/abs/2511.18870) | 2025 | [Tencent-Hunyuan/HunyuanVideo-1.5](https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5) · **官方代码**；腾讯混元 1.5 官方代码、权重与训练更新 | 4,537 |
@@ -153,6 +154,14 @@
 | K | `zhuang2026selfgradient` | [Self Gradient Forcing: Native Long Video Extrapolation](https://arxiv.org/abs/2607.20368) | 2026 | **未发现官方 GitHub 仓库** | — |
 | K | `xiao2026joyaivideoedit` | [JoyAI-Video-Edit: Real-Time Open-Ended Video Editing with Autoregressive Diffusion](https://arxiv.org/abs/2608.03974) | 2026 | **未发现官方 GitHub 仓库** | — |
 | K | `ban2026stream4d` | [Stream4D: 4D-Consistency for Streaming Autoregressive Diffusion Video Models](https://arxiv.org/abs/2608.19556) | 2026 | **未发现官方 GitHub 仓库** | — |
+| L | `peebles2022scalable` | [Scalable Diffusion Models with Transformers](https://arxiv.org/abs/2212.09748) | 2022 | [facebookresearch/DiT](https://github.com/facebookresearch/DiT) · **官方代码**；作者官方 DiT 实现；仓库已归档 | 8,689 |
+| L | `gupta2023photorealistic` | [Photorealistic Video Generation with Diffusion Models](https://arxiv.org/abs/2312.06662) | 2023 | **未发现官方 GitHub 仓库** | — |
+| L | `ma2024latte` | [Latte: Latent Diffusion Transformer for Video Generation](https://arxiv.org/abs/2401.03048) | 2024 | [Vchitect/Latte](https://github.com/Vchitect/Latte) · **官方代码**；作者官方 Latte 训练与推理实现 | 1,948 |
+| L | `yang2024cogvideox` | [CogVideoX: Text-to-Video Diffusion Models with An Expert Transformer](https://arxiv.org/abs/2408.06072) | 2024 | [zai-org/CogVideo](https://github.com/zai-org/CogVideo) · **官方代码**；智谱官方 CogVideoX 代码、权重与训练入口 | 12,985 |
+| L | `chen2025sanavideo` | [SANA-Video: Efficient Video Generation with Block Linear Diffusion Transformer](https://arxiv.org/abs/2509.24695) | 2025 | [NVlabs/Sana](https://github.com/NVlabs/Sana) · **官方代码**；NVIDIA Research 官方 SANA 与 SANA-Video 实现和权重入口 | 8,890 |
+| L | `huang2025linvideo` | [LinVideo: A Post-Training Framework towards O(n) Attention in Efficient Video Generation](https://arxiv.org/abs/2510.08318) | 2025 | **未发现官方 GitHub 仓库** | — |
+| L | `mao2025timeripples` | [Timeripple: Accelerating vDiTs by Understanding the Spatio-Temporal Correlations in Latent Space](https://arxiv.org/abs/2511.12035) | 2025 | **未发现官方 GitHub 仓库** | — |
+| L | `chen2026sanavideo2` | [SANA-Video 2.0: Hybrid Linear Attention with Attention Residuals for Efficient Video Generation](https://arxiv.org/abs/2607.21553) | 2026 | [NVlabs/Sana](https://github.com/NVlabs/Sana) · **官方代码**；官方统一仓库；具体已发布 checkpoint 仍须按模型文档核对 | 8,890 |
 
 ## 维护约定
 
