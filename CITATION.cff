@@ -3,6 +3,8 @@ message: "If you use this knowledge map, please cite the repository."
 title: "Video Generation 101: From Motion Models to World Models"
 type: software
 authors:
+  - family-names: "Cun"
+    given-names: "Xiaodong"
   - name: "Video Generation 101 contributors"
 version: 0.1.0
 date-released: 2026-08-09
