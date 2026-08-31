@@ -52,12 +52,6 @@ _Coding Agent 扩展研究覆盖面，研究者对结论与证据负责。_
 | 推理与世界模型 | [Video Reasoning](docs/video-reasoning.md) · [World Model](docs/world-models.md) | [物理一致性](docs/physical-consistency.md) · [动作条件预测](docs/tasks/action-conditioned-prediction.md) · [交互式世界生成](docs/tasks/interactive-world-generation.md) |
 | 应用与研究资源 | [应用地图](docs/applications.md) · [评测指南](docs/evaluation.md) | [精选阅读](docs/reading-list.md) · [开放模型](resources/open-models.md) · [数据集](resources/datasets.md) |
 
-### 技术演化
-
-[![从视频生成到 World Action Model 的技术演化全景图](assets/diagrams/video-to-world-action-model.visual-check.1440x900.light.png)](assets/diagrams/video-to-world-action-model.html)
-
-_点击图片打开交互版技术地图。图中强调路线之间的继承、分化与汇合，而不是简单的新旧替代关系。_
-
 ## 🎓 推荐学习路径
 
 | 路径 | 建议顺序 |
