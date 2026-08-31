@@ -1,0 +1,4 @@
+mkdocs-material==9.7.6
+pymdown-extensions>=10.21
+jieba>=0.42          # Chinese tokenisation for the search index
+Pillow>=10           # scripts/optimize_assets.py

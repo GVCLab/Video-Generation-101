@@ -1,0 +1,95 @@
+site_name: Video Generation 101
+site_description: 从生成原理、系统能力、世界理解到真实应用与验证的视频生成知识体系
+site_author: Xiaodong Cun, GVC Lab, Great Bay University
+site_url: https://gvclab.github.io/Video-Generation-101/
+repo_url: https://github.com/GVCLab/Video-Generation-101
+repo_name: GVCLab/Video-Generation-101
+edit_uri: edit/main/
+copyright: MIT License &middot; GVC Lab, Great Bay University
+
+# The repository is browsed on GitHub as much as on the site, so the whole repo
+# is the docs root. That keeps every existing relative link (docs/x.md,
+# ../../assets/y.png) working identically in both places.
+docs_dir: .mkdocs-build/docs
+site_dir: _site
+
+not_in_nav: |
+  sources/*
+
+theme:
+  name: material
+  language: zh
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.top
+    - navigation.indexes
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.action.edit
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: 切换到深色模式
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: 切换到浅色模式
+
+plugins:
+  - search:
+      lang:
+        - zh
+        - en
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.superfences:
+      custom_fences:
+        # The chapters write display equations as ```math fences (GitHub style).
+        - name: math
+          class: arithmatex
+          format: !!python/object/apply:pymdownx.arithmatex.arithmatex_fenced_format
+            kwds:
+              mode: generic
+              tag: pre
+
+extra_javascript:
+  - assets/js/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/GVCLab
+    - icon: fontawesome/solid/flask
+      link: https://gvclab.github.io/

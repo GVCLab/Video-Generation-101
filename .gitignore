@@ -10,3 +10,8 @@ __pycache__/
 dist/
 build/
 .worktrees/
+_site/
+.mkdocs-build/
+_to_delete/
+.learnings/
+.workbuddy/
