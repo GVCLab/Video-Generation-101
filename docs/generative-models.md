@@ -16,7 +16,7 @@
 
 这五个轴在分析上可分，却不表示统计独立或任意笛卡尔积都可实现：离散 token 通常对应分类式目标，连续状态才适合直接学习 score/velocity；因果分解还会约束可用骨干、缓存方式与流式部署。五轴的用途是拆开问题、显式写出兼容约束，而不是宣称所有取值可以自由拼装。
 
-例如，NOVA 是**连续 latent 表示**、**帧间与帧内集合式自回归分解**、**逐 token diffusion loss**和 Transformer 的组合；Pyramidal Flow 把**连续 latent**、**时间金字塔自回归**、**flow matching**与 DiT 组合；CausVid 则把双向视频 diffusion teacher 蒸馏成**时间因果**、**少步** student [[21]](#ref-21) [[20]](#ref-20) [[23]](#ref-23)。这些系统不能被放进一列互斥“模型家族”而不丢失关键信息。
+例如，NOVA 是**连续 latent 表示**、**帧间与帧内集合式自回归分解**、**逐 token diffusion loss**和 Transformer 的组合；Pyramidal Flow 把**连续 latent**、**时间金字塔自回归**、**flow matching**与 DiT 组合；CausVid 则把双向视频 diffusion teacher 蒸馏成**时间因果**、**少步** student [[21]](#ref-21) [[20]](#ref-20) [[23]](#ref-23)。用五轴配置描述这些系统，可以同时说明它们生成什么、如何分解联合分布、怎样训练、由什么网络实现，以及以何种方式输出。
 
 本章建立全局地图。连续/离散表示、压缩账本、因果 codec 与实际 bitstream 的边界见[视频 Tokenizer 与生成式压缩专章](generative-models/video-tokenizers.md)，ELBO、learned prior 与随机未来见[变分生成专章](generative-models/variational-generation.md)；DDPM、score、SDE/PF-ODE 的完整推导见[扩散模型专章](generative-models/diffusion-models.md)；FM、RF、Consistency、Shortcut 与 DMD 的差异见[Flow 与 Consistency 专章](generative-models/flow-consistency-models.md)；latent patch、full/factorized/window/sparse/linear attention、条件融合、3D 位置、noise-time MoE、并行与 cache 的分账见[Video DiT 与骨干扩展专章](generative-models/video-dit-backbones.md)；SFT、reward model、DPO/RWR、policy-gradient RL、推理期 guidance 与蒸馏的边界见[视频后训练与对齐专章](generative-models/video-post-training-alignment.md)；在线生成的暴露偏移、缓存和 SLO 见[因果、流式与实时专章](generative-models/causal-streaming-generation.md)。
 
@@ -29,27 +29,27 @@
 ![图 008：视频生成系统的五个交叉分类轴](../assets/imagegen-diagrams/008/diagram.png)
 顺序化文字替代：先确定生成变量是像素、连续 latent 还是离散 token；再确定联合分布按全片、逐帧、逐 token、mask 块、尺度或因果 chunk 怎样分解；再选择 ELBO、adversarial、denoising/score、flow、consistency/DMD 或偏好目标；由 U-Net、DiT、decoder-only Transformer 或 recurrent/SSM 实现；最后才讨论离线、少步、流式或交互部署。系统声称什么，就必须提供对应的质量、NFE、TTFF、deadline、长期漂移或闭环控制证据。
 
-## 2. 为什么旧式“路线列表”会误导
+## 2. 五个分类轴的定义与组合
 
-把 recurrent、VAE、GAN、autoregressive、masked、diffusion、flow 和 streaming 并列，会把不同层的问题压在一起：
+理解一个视频生成系统时，可以先分别回答下面五个问题，再把答案组合成完整配置。下表给出每个轴的定义、典型取值，以及它与其他轴的关系；后文将逐轴展开。
 
-| 轴 | 它真正回答的问题 | 常见取值 | 不能由这一轴推出什么 |
+| 分类轴 | 核心问题 | 典型取值 | 与其他轴的关系 |
 |---|---|---|---|
-| Representation | 模型在哪种变量空间工作？ | RGB pixel、连续 AE/VAE latent、离散 VQ token、多尺度/混合状态 | 不能推出生成顺序、loss 或是否实时 |
-| Factorization | 数据联合分布按什么条件顺序产生或补全？ | full-sequence joint、stepwise state、strict AR、masked/block、hierarchical、causal chunk | 不能推出条件项使用 CE、diffusion 还是 flow |
-| Objective | 参数通过什么统计目标学习？ | MLE/ELBO、adversarial、denoising/score、FM/RF、consistency/shortcut、DMD、preference/RL | 不能推出 U-Net/DiT，也不能推出帧的先后 |
-| Backbone | 用什么网络实现条件映射、score 或速度场？ | 2D/3D U-Net、DiT、decoder Transformer、RNN/recurrent-state/SSM、dense/sparse/linear mixer、FFN/MoE | “DiT”不是与 diffusion/flow 并列的概率家族；cascade 与 cache 属于系统/执行设计 |
-| Deployment | 输出何时可见，系统受什么运行约束？ | offline multistep、few-step、preview、streaming、interactive、quantized/cached/pipelined | causal mask、低 NFE 或平均 FPS 不能自动证明 SLO |
+| **表示（Representation）** | 模型在哪种变量空间工作？ | RGB pixel、连续 AE/VAE latent、离散 VQ token、多尺度/混合状态 | 确定生成变量；生成顺序、训练目标和部署方式由其他轴补充 |
+| **分解（Factorization）** | 数据联合分布按什么条件顺序产生或补全？ | full-sequence joint、stepwise state、strict AR、masked/block、hierarchical、causal chunk | 描述数据依赖；每个条件分布可以采用不同训练目标 |
+| **目标（Objective）** | 参数通过什么统计信号学习？ | MLE/ELBO、adversarial、denoising/score、FM/RF、consistency/shortcut、DMD、preference/RL | 描述学习信号；网络实现和数据生成顺序由其他轴说明 |
+| **骨干（Backbone）** | 用什么网络实现条件映射、score 或速度场？ | 2D/3D U-Net、DiT、decoder Transformer、RNN/recurrent-state/SSM、dense/sparse/linear mixer、FFN/MoE | 负责具体计算，可承载多种表示、分解方式和训练目标 |
+| **部署（Deployment）** | 输出何时可见，系统受什么运行约束？ | offline multistep、few-step、preview、streaming、interactive、quantized/cached/pipelined | 描述运行合同，需要结合因果范围、采样步数和系统实测理解 |
 
-VAE 还容易同时指两件事：一是用 ELBO 学整个生成分布的潜变量模型；二是现代视频系统中只负责紧凑编码与解码的 tokenizer。后者的上层 generator 完全可以使用 diffusion、flow、AR 或 DMD；若没有量化、概率模型、熵编码器与 bitstream，也不能仅凭 latent shape 声称实际码率压缩。因此，“用了 VAE”往往只回答表示轴的一部分，而不是整个系统属于哪一派 [[1]](#ref-1)。两种角色分别见[变分生成](generative-models/variational-generation.md)与[视频 Tokenizer](generative-models/video-tokenizers.md)。
+VAE 在这套框架中常承担两种不同角色：一是用 ELBO 学习整个生成分布的潜变量模型；二是在现代视频系统中作为负责紧凑编码与解码的 tokenizer。后一种系统的上层 generator 可以使用 diffusion、flow、AR 或 DMD。若没有量化、概率模型、熵编码器与 bitstream，仅凭 latent shape 只能说明表示预算，不能说明实际码率压缩。因此，“使用 VAE”通常描述表示轴的一部分；完整系统还需要结合其余四轴理解 [[1]](#ref-1)。两种角色分别见[变分生成](generative-models/variational-generation.md)与[视频 Tokenizer](generative-models/video-tokenizers.md)。
 
-### 2.1 三条常见兼容配置怎样串起来
+### 2.1 三种常见系统配置
 
 ![三条视频 token 生成路线。A：像素视频经 causal 3D VAE 形成连续 latent grid，在 joint 或 frame/chunk 分解下由 diffusion/flow head 生成并解码；B：像素视频经 VQ、LFQ 或 BSQ 形成离散 token IDs，在 strict token 或 grouped AR 下用 categorical cross-entropy 预测并解码；C：部分 masked token set 经双向预测、置信度选择、提交高置信 token 和重掩码循环直至完成。页脚强调 representation、factorization、training head 与 deployment claim 不是同一概念。](../assets/diagrams/video-token-generation-routes.png)
 
-**图 2：三条常见配置，不是三个互斥且穷尽的“家族”。** A 路线把 codec 的重建上限、外层数据分解和内层去噪时钟分开；B 路线把词表与 token 数量连接到序列长度、缓存和串行深度；C 路线展示 masked/discrete-diffusion 的并行 refinement。现代系统可以把 frame/chunk AR 放在外层，再在组内运行 diffusion、flow 或 masked head；即使得到少步内循环，也仍要另外实测 TTFF、deadline 和长期漂移。图的语义规范、被拒绝首稿与灰度验收见[生成记录](../sources/research_20260830_token_generation_schematic.md)。
+**图 2：三种常见配置如何落在五个分类轴上。** A 路线把 codec 的重建上限、外层数据分解和内层去噪时钟分开；B 路线把词表与 token 数量连接到序列长度、缓存和串行深度；C 路线展示 masked/discrete-diffusion 的并行 refinement。现代系统可以把 frame/chunk AR 放在外层，再在组内运行 diffusion、flow 或 masked head；即使得到少步内循环，也仍要另外实测 TTFF、deadline 和长期漂移。图的语义规范、被拒绝首稿与灰度验收见[生成记录](../sources/research_20260830_token_generation_schematic.md)。
 
-顺序化文字替代：连续路线是 `pixel → causal 3D VAE → continuous latent → joint 或 frame/chunk factorization → diffusion/flow head → decode`；离散自回归路线是 `pixel → VQ/LFQ/BSQ → token IDs → strict 或 grouped AR → categorical CE → decode`；masked 路线从部分 mask 开始，经双向预测、置信度选择和提交，再把不确定位置 remask，循环到完整。三条路线只代表常见兼容配置；表示、分解、条件 head 与部署证据必须分别报告。
+顺序化文字替代：连续路线是 `pixel → causal 3D VAE → continuous latent → joint 或 frame/chunk factorization → diffusion/flow head → decode`；离散自回归路线是 `pixel → VQ/LFQ/BSQ → token IDs → strict 或 grouped AR → categorical CE → decode`；masked 路线从部分 mask 开始，经双向预测、置信度选择和提交，再把不确定位置 remask，循环到完整。这三种配置用于展示五个轴怎样组合；具体系统仍需分别说明表示、分解、训练 head 与部署证据。
 
 ## 3. 第一轴：Representation——模型到底生成什么
 
