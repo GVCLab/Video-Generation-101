@@ -33,7 +33,7 @@ _Coding Agent 扩展研究覆盖面，研究者对结论与证据负责。_
 | 第一次接触视频生成 | [零基础入门](docs/getting-started.md) | 用直观例子理解视频如何从条件与噪声中生成 |
 | 希望建立完整技术框架 | [生成模型路线](docs/generative-models.md) | 串起表示、时序、生成机制、骨干网络与推理系统 |
 | 关注模型能力与创作控制 | [视频基础模型](docs/foundation-models.md) | 理解规模化、多条件、多模态与可控生成系统 |
-| 准备选择研究问题 | [任务地图](docs/taxonomy.md) | 从输入、输出、约束和证据定位研究方向 |
+| 准备选择研究问题 | [任务地图](docs/taxonomy.md) · [World Action Model](docs/world-action-model.md) | 从输入、输出、约束、行动后果与证据定位研究方向 |
 | 希望追踪领域演进 | [技术时间线](docs/timeline.md) | 观察不同路线如何长期并行、汇合与分化 |
 | 关注落地与可靠性 | [应用地图](docs/applications.md) · [评测指南](docs/evaluation.md) | 把模型能力映射到真实任务与可验证标准 |
 
@@ -49,7 +49,7 @@ _Coding Agent 扩展研究覆盖面，研究者对结论与证据负责。_
 | 生成原理 | [生成模型路线](docs/generative-models.md) | [视频 Tokenizer](docs/generative-models/video-tokenizers.md) · [Video DiT](docs/generative-models/video-dit-backbones.md) · [后训练与对齐](docs/generative-models/video-post-training-alignment.md) · [因果与流式生成](docs/generative-models/causal-streaming-generation.md) |
 | 基础模型与控制 | [视频基础模型](docs/foundation-models.md) | [个性化](docs/tasks/personalized-video-generation.md) · [细粒度控制](docs/tasks/controllable-video-generation.md) · [多视角/4D](docs/tasks/multiview-4d-generation.md) · [原生音视频](docs/tasks/native-audio-video-generation.md) |
 | 编辑与时序任务 | [视频编辑](docs/tasks/video-to-video.md) | [视频补全](docs/tasks/video-inpainting.md) · [视频修复](docs/tasks/video-restoration.md) · [视频虚拟试衣](docs/tasks/video-virtual-try-on.md) · [故事与多镜头](docs/tasks/story-multishot.md) |
-| 推理与世界模型 | [Video Reasoning](docs/video-reasoning.md) · [World Model](docs/world-models.md) | [物理一致性](docs/physical-consistency.md) · [动作条件预测](docs/tasks/action-conditioned-prediction.md) · [交互式世界生成](docs/tasks/interactive-world-generation.md) |
+| 推理与世界模型 | [Video Reasoning](docs/video-reasoning.md) · [World Model](docs/world-models.md) · [World Action Model](docs/world-action-model.md) | [物理一致性](docs/physical-consistency.md) · [动作条件预测](docs/tasks/action-conditioned-prediction.md) · [交互式世界生成](docs/tasks/interactive-world-generation.md) |
 | 应用与研究资源 | [应用地图](docs/applications.md) · [评测指南](docs/evaluation.md) | [精选阅读](docs/reading-list.md) · [开放模型](resources/open-models.md) · [数据集](resources/datasets.md) |
 
 ## 🎓 推荐学习路径
@@ -58,7 +58,7 @@ _Coding Agent 扩展研究覆盖面，研究者对结论与证据负责。_
 |---|---|
 | 建立直觉 | [零基础入门](docs/getting-started.md) → [应用地图](docs/applications.md) → [任务地图](docs/taxonomy.md) |
 | 掌握技术体系 | [生成模型](docs/generative-models.md) → [基础模型](docs/foundation-models.md) → [评测](docs/evaluation.md) |
-| 开展研究 | [任务地图](docs/taxonomy.md) → [技术时间线](docs/timeline.md) → [精选阅读](docs/reading-list.md) → 具体专题 |
+| 开展研究 | [任务地图](docs/taxonomy.md) → [World Action Model](docs/world-action-model.md) → [技术时间线](docs/timeline.md) → [精选阅读](docs/reading-list.md) → 具体专题 |
 | 面向系统与应用 | 选择任务专题 → [开放模型](resources/open-models.md) → [数据集](resources/datasets.md) → [评测指南](docs/evaluation.md) |
 | 按身份获得完整路线 | [分读者阅读指引](docs/reader-guides.md) → 选择通识、创作/产品、工程、研究、世界模型或教学路线 → 完成对应阶段产出 |
 
@@ -78,6 +78,7 @@ Video-Generation-101/
 │   ├── foundation-models.md     # 视频基础模型
 │   ├── video-reasoning.md       # 视频推理
 │   ├── world-models.md          # 世界模型
+│   ├── world-action-model.md    # 世界—动作模型
 │   ├── applications.md          # 应用地图
 │   ├── evaluation.md            # 评测体系
 │   ├── timeline.md              # 技术时间线
