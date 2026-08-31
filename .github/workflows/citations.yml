@@ -1,0 +1,27 @@
+name: Verify citations
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 4 * * 1"      # weekly, catches venue/ID drift
+
+permissions:
+  contents: read
+
+jobs:
+  citations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check reference titles, venues and years
+        run: python3 scripts/verify_citations.py --json citation-findings.json
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: citation-findings
+          path: citation-findings.json
+          if-no-files-found: ignore
