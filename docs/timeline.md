@@ -2,86 +2,145 @@
 
 # 技术时间线
 
-本页将视频生成的发展整理为三条并行技术泳道、一个应用层和一套横向验证框架。它们并非简单的前后替代关系：生成机制持续为大规模模型提供底座，World Model 还拥有来自控制、强化学习与规划的独立谱系，最终在交互生成和 Physical AI 中逐渐汇合。
+本页不把视频生成史排成一条“旧模型被新模型替代”的队伍，而是追踪三条长期并行、彼此借力的技术主线：**表示与生成机制、视频基础模型与创作、World Model 与行动闭环**。应用层承接三条主线的成果，验证框架则横向检查每个能力主张是否站得住。
 
 资料核查截止：**2026-08-30**
 
-> **阅读说明**
+> **30 秒读法**
 >
-> - 年份采用论文首次公开或机构首次官方发布的时间，而不是后续会议、期刊或产品开放年份；因此年份标签不代表该工作已经正式发表。涉及论文的新增节点同时写“首次公开 / 正式状态”，没有 proceedings 的保留 `preprint` 标签。
-> - 这是一组经过筛选的技术谱系，不是所有模型的产品年表。
-> - Video editing 是贯穿多条泳道的横向能力；从 Video Rewrite、时空补全、vid2vid 到 Diffusion / DiT、instruction editing 与 memory 的专门节点，见[视频编辑 milestones](tasks/video-to-video.md)。
-> - 视频退化修复是与生成/编辑相邻的观测逆问题：目标是从 blur、downsample、noise、compression 等低质观测恢复同一内容，不是重新创作或只在 mask 内补全；其横向谱系见本页专题表与[退化修复专章](tasks/video-restoration.md)。
-> - 每个节点均链接到论文、作者项目页或机构官方发布等一手来源。
-> - 每个节点的“资源”栏统一标记 Paper/Report、Project、Code、Weights 与 Demo；Code 只认作者或机构官方实现，`未公开` 表示截至核查日未找到官方公开资源，第三方复现不会冒充官方实现；`—` 表示没有独立入口或不适用，失效、归档、下线与访问受限会直接标注状态。
-> - 企业节点中的分辨率、速度、时长与性能，如无独立复现，均按“官方或作者报告”理解。
-> - 2025–2026 节点默认是 **frontier observation**：它们记录截止日可见的前沿方向，不把预印本、机构自评或宣传演示升格为已经独立验证的能力事实。
-> - 本轮新增的联合音视频、后训练和显式控制节点，其结构性纳入依据与一手来源交叉核验见[缺口审计](../sources/research_20260830_missing_subfields_integration.md)；Video DiT 的 first-public/formal、attention topology、融合、MoE、并行与缓存边界见[backbone 研究日志](../sources/research_20260830_video_dit_backbones.md)；多视角/4D 的 camera-time 合同、里程碑和预印本边界见[4D 研究日志](../sources/research_20260830_multiview_4d_generation.md)；退化修复的检索、纳排和证据边界见[独立研究日志](../sources/research_20260830_video_restoration.md)；视频表示节点的正式 venue、位流边界与开放实现见[tokenizer 研究日志](../sources/research_20260830_video_representation_tokenizers.md)。
-> - 下列图片均由 imagegen 根据论文机制生成，属于**概念示意图，不是论文原图，也不代表模型真实输出**。
+> 1. 先在下方泳道图中选择你关心的主线。
+> 2. 再沿同名章节阅读节点卡片，关注“机制改变了什么”，而不是只记模型名。
+> 3. 最后查看节点的四项标签，区分首次公开、正式发表、本页定位和当前开放状态。
 
-## 并行泳道索引
+<details markdown="1">
+<summary><strong>资料口径与收录原则</strong></summary>
 
-![图 080：视频生成技术发展的并行泳道](../assets/imagegen-diagrams/080/diagram.png)
-| 泳道 | 核心问题 | 阅读方法 | 对应专题 |
-|---|---|---|---|
-| **生成机制基础** | 视频如何表示、压缩、预测和采样？ | 显式运动与统计动态 → 深度视频预测 → 随机预测与 GAN → 视频 Token → Diffusion/Flow objective 与 U-Net/Video DiT backbone 的正交扩展 | [生成模型路线](generative-models.md) · [变分随机视频生成](generative-models/variational-generation.md) · [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md) · [Video DiT 与骨干扩展](generative-models/video-dit-backbones.md) |
-| **视频基础模型与创作能力** | 模型如何从技术前驱扩展为规模化、可迁移的多模态系统？ | 先读 T2V、视频 Token 与规模化预训练，再分别看开放生成、多条件/多参考、相机 × 世界时间的多视角/4D、源视频约束与编辑、多段 prompt/分镜、跨镜头连续和原生联合音视频；遇到“统一”时继续追问统一发生在哪一层 | [视频基础模型路线](foundation-models.md) · [多视角/4D](tasks/multiview-4d-generation.md) · [视频编辑 milestones](tasks/video-to-video.md) · [任务地图](taxonomy.md) |
-| **World Model 与行动闭环** | 模型能否维护状态、响应动作，并进一步支持反事实、规划或持续交互？ | 分别追踪决策型 latent dynamics 与动作条件视觉 rollout；先检查动作条件转移、状态持久和干预证据，若声称支持决策或控制，再要求“动作 → 环境响应 → 新观测 → 再决策”的闭环验证 | [World Model 专章](world-models.md) · [JEPA 路线](jepa.md) |
-| **应用层** | 技术在哪里产生价值，又提出哪些新约束？ | 内容、编辑与退化修复工作流、数字人、游戏与交互、数据合成、自动驾驶、机器人和科学可视化 | [相关应用](applications.md) · [退化修复](tasks/video-restoration.md) · [任务地图](taxonomy.md) |
-| **验证框架** | 应以什么证据证明能力有效？ | 分开检查生成质量、条件遵循、长程状态、物理与反事实、延迟、规划或控制闭环，以及安全治理 | [评测指南](evaluation.md) · [物理一致性](physical-consistency.md) |
+- 年份采用论文首次公开或机构首次官方发布的时间，而不是后续会议、期刊或产品开放年份；因此年份标签不代表该工作已经正式发表。涉及论文的新增节点同时写“首次公开 / 正式状态”，没有 proceedings 的保留 `preprint` 标签。
+- 这是一组经过筛选的技术谱系，不是所有模型的产品年表；每个节点均链接论文、作者项目页或机构官方发布等一手来源。
+- 视频编辑是贯穿多条泳道的横向能力；从 Video Rewrite、时空补全、vid2vid 到 Diffusion / DiT、instruction editing 与 memory 的节点，见[视频编辑 milestones](tasks/video-to-video.md)。
+- 视频退化修复是与生成/编辑相邻的观测逆问题：目标是从 blur、downsample、noise、compression 等低质观测恢复同一内容，不是重新创作或只在 mask 内补全；其横向谱系见本页专题表与[退化修复专章](tasks/video-restoration.md)。
+- 每个节点的“资源”栏统一标记 Paper/Report、Project、Code、Weights 与 Demo；Code 只认作者或机构官方实现，`未公开` 表示截至核查日未找到官方公开资源，第三方复现不会冒充官方实现；`—` 表示没有独立入口或不适用，失效、归档、下线与访问受限会直接标注状态。
+- 企业节点中的分辨率、速度、时长与性能，如无独立复现，均按“官方或作者报告”理解。2025–2026 节点默认标为**前沿观察（暂定）**，不把预印本、机构自评或宣传演示升格为已独立验证的能力事实。
+- 联合音视频、后训练和显式控制节点的一手来源交叉核验见[缺口审计](../sources/research_20260830_missing_subfields_integration.md)；Video DiT 的公开/发表、attention topology、融合、MoE、并行与缓存边界见[backbone 研究日志](../sources/research_20260830_video_dit_backbones.md)；多视角/4D、退化修复与视频表示分别见[4D 研究日志](../sources/research_20260830_multiview_4d_generation.md)、[退化修复研究日志](../sources/research_20260830_video_restoration.md)和[tokenizer 研究日志](../sources/research_20260830_video_representation_tokenizers.md)。
+- 节点卡片中的模型概念图由 imagegen 根据论文机制生成，属于**概念示意图，不是论文原图，也不代表模型真实输出**；页首索引图使用可维护的 Mermaid 文本图。
 
-> **术语与归属原则：**同一模型可能横跨多条泳道。本页按其主要技术贡献和验证证据归类，而不是因为使用了 Diffusion、Transformer 或“World Model”名称就重复收录。这里的“多段 prompt”特指按时间或镜头组织的 prompt/storyboard，不等同于多参考输入；“统一模型”必须注明统一的是接口、流水线、共享 backbone、模型家族还是单一 checkpoint；动作条件 rollout 或实时交互可以提供 World Model 证据，但只有反复执行“动作 → 环境响应 → 新观测 → 再决策”才构成闭环验证，平台或模型家族也不能整体继承某个策略分支的闭环能力。
+</details>
 
 ---
 
-## 证据状态：四条时间轴不能合并成“发布”
+## 三条技术泳道与两个横向层
 
-一个节点同时有四种状态：首次公开的时间、学术发表状态、是否被本页判定为研究里程碑，以及截止日能否实际获取或使用。这四者相互独立。
+技术泳道回答“研究问题沿哪条路线演进”；应用层和验证尺横跨三条泳道，不是第 4、第 5 条技术路线。图中的年份是宽阶段，只用于导航，不替代后文节点的首次公开与正式发表日期。
 
-![图 081：时间线节点的四条独立证据轴](../assets/imagegen-diagrams/081/diagram.png)
-**图示文字替代：**预印本只确定首次公开，正式发表只说明进入某个期刊或会议记录；里程碑是技术史判断，代码/权重决定可复现范围，产品可用性则是会随时间变化的访问快照。
+```mermaid
+flowchart TB
+    accTitle: 视频生成技术的三条并行主线
+    accDescr: 三条主线从各自前驱走向规模化与交互生成；应用层承接成果，验证尺横向检查所有能力主张。
 
-| 页面标签 | 严格含义 | 不能推出 |
+    lane_1["泳道 1｜表示、预测与生成机制<br/>1981–2019｜运动、状态、深度预测、GAN/VAE<br/>2020–2023｜视频 Token、Diffusion/Flow<br/>2024–2026｜Video DiT、因果流式、后训练"]
+    lane_2["泳道 2｜视频基础模型与创作<br/>2017–2021｜早期 T2V 与序列建模<br/>2022–2024｜规模化、多条件与编辑<br/>2025–2026｜原生音视频、4D 与长叙事"]
+    lane_3["泳道 3｜World Model 与行动闭环<br/>2015–2020｜动作预测、latent dynamics<br/>2021–2024｜驾驶、游戏、JEPA、动作 rollout<br/>2025–2026｜交互世界、规划、Physical AI"]
+    application_layer["横向应用层（承接三条泳道）<br/>创作 · 编辑 · 修复 · 数字人 · 4D · 游戏 · 机器人"]
+    validation_layer["横向验证尺（检查三条泳道）<br/>画质 · 条件 · 时序 · 物理 · 效率 · 闭环 · 安全"]
+
+    lane_1 ~~~ lane_2
+    lane_2 ~~~ lane_3
+    lane_3 ~~~ application_layer
+    application_layer ~~~ validation_layer
+
+    classDef lane stroke:#3b82f6,stroke-width:2px
+    classDef application stroke:#8b5cf6,stroke-width:2px,stroke-dasharray:5 3
+    classDef validation stroke:#d97706,stroke-width:2px,stroke-dasharray:5 3
+    class lane_1,lane_2,lane_3 lane
+    class application_layer application
+    class validation_layer validation
+```
+
+*图 1：三条技术泳道并行推进；应用层和验证尺横跨主线，不代表单线替代或能力等级。*
+
+| 层次 | 它回答什么 | 建议入口 |
 |---|---|---|
-| **正式发表** | 已有官方期刊或会议 proceedings 记录；workshop 会单独注明 | 代码已开放、结果已复现或产品可用 |
-| **首次预印本** | arXiv 等一手记录的 v1 日期 | 已同行评议或已被录用 |
-| **官方技术/产品发布** | 机构项目页、模型卡、系统卡或发布说明 | 宣传中的能力已获独立验证 |
-| **研究里程碑** | 本页基于机制差异、实验证据和后续影响的编辑判断 | 学术录用、产品成功或通用能力 |
-| **Frontier observation** | 对 2025–2026 方向的截止日观察，后续可能修订 | 已形成稳定共识 |
-| **可用性快照** | 截止 2026-08-30 的官方代码、权重、API、托管服务或下线状态 | 未来仍可用，或与论文中的完整系统等价 |
+| **泳道 1｜表示、预测与生成机制** | 视频如何表示、压缩、预测和采样？ | [生成模型路线](generative-models.md) · [视频 Tokenizer](generative-models/video-tokenizers.md) · [Video DiT](generative-models/video-dit-backbones.md) |
+| **泳道 2｜视频基础模型与创作** | 模型如何扩展为规模化、多条件、可迁移的创作系统？ | [视频基础模型路线](foundation-models.md) · [多视角/4D](tasks/multiview-4d-generation.md) · [视频编辑](tasks/video-to-video.md) |
+| **泳道 3｜World Model 与行动闭环** | 模型能否维护状态、响应动作，并支持反事实、规划或持续交互？ | [World Model 专章](world-models.md) · [JEPA 路线](jepa.md) |
+| **横向应用层** | 三条主线如何进入编辑、修复、数字人、游戏、自动驾驶与机器人？ | [相关应用](applications.md) · [任务地图](taxonomy.md) |
+| **横向验证尺** | 每项能力主张应由什么证据支撑？ | [评测指南](evaluation.md) · [物理一致性](physical-consistency.md) |
 
-### 2025–2026 frontier observation 与可用性快照
+> **归类原则：** 同一模型可能横跨多条泳道，本页按主要贡献归类。“统一模型”必须说明统一的是接口、流水线、共享 backbone、模型家族还是单一 checkpoint。动作条件 rollout 只有反复完成“动作 → 环境响应 → 新观测 → 再决策”，才算闭环验证。
 
-下表只解决“当前证据和访问状态是什么”；机制、任务和边界仍以后文卡片为准。“未找到正式发表记录”指截止本次核查没有在论文记录、官方 proceedings 或作者项目页中确认，不是对未来录用状态的预测。
+---
 
-| 节点 | 首次公开与学术状态 | 本页角色 | 截止 2026-08-30 的官方可用性 |
+## 一个节点要看四件事
+
+这里不再把它们含混地统称为“证据状态”。技术泳道回答“它沿哪条路线发展”；下面四项标签分别回答“何时公开、发表到哪一步、为何收录、现在能获取或访问什么”。它们同时存在、彼此独立，也不是从低到高的等级。
+
+```mermaid
+flowchart TB
+    accTitle: 时间线节点的四项独立标签
+    accDescr: 每个节点同时记录首次公开、学术状态、本页定位和当前开放状态；四项回答不同问题，不能合并成一个已发布标签。
+
+    first_public["① 首次公开｜何时进入公共记录？"]
+    academic_status["② 学术状态｜预印本、研讨会或正式会议/期刊？"]
+    page_role["③ 本页定位｜研究里程碑、历史节点、专题汇总或前沿观察（暂定）？"]
+    availability["④ 当前开放与访问｜论文、代码、模型权重、接口、在线演示或下线？"]
+
+    first_public ~~~ academic_status
+    academic_status ~~~ page_role
+    page_role ~~~ availability
+
+    classDef label stroke:#64748b,stroke-width:2px
+    class first_public,academic_status,page_role,availability label
+```
+
+*图 2：四项标签同时描述同一节点，彼此独立，不是从低到高的成熟度等级。*
+
+| 你想知道什么 | 本页怎么写 | 不能据此推出 |
+|---|---|---|
+| **何时进入公共记录？** | arXiv v1、项目页或官方发布的首次日期 | 已同行评议或已经录用 |
+| **学术进展到哪一步？** | 预印本、研讨会论文、正式会议或期刊记录 | 代码已开放、结果已复现或产品可用 |
+| **为什么收进这条时间线？** | “研究里程碑”“历史节点”“专题汇总”或“前沿观察（暂定）”，属于本页的编辑定位 | 学术录用、产品成功、业界共识或通用能力 |
+| **现在能拿到什么？** | 论文、代码、模型权重、接口、在线演示、访问受限或下线 | 未来仍可用，或与论文中的完整系统等价 |
+
+> **例：** “2025 年首次公开 + 仍是预印本 + 本页视为研究里程碑 + 代码和权重已开放”完全可以同时成立。四句话分别回答时间、发表、编辑定位和开放范围。
+
+> **能力证据另看一层：** 官方自述、作者实验、开放工件、独立复现和现实闭环实测必须分别标注；“正式发表”或“目前可用”都不能自动替代能力验证。
+
+<details markdown="1">
+<summary><strong>查看 2025–2026 节点的四项标签与开放状态</strong></summary>
+
+下表只回答“当前的记录与访问状态是什么”；机制、任务和边界仍以后文卡片为准。“未找到正式发表记录”指截至本次核查，没有在论文记录、官方 proceedings 或作者项目页中确认，不是对未来录用状态的预测。
+
+| 节点 | 首次公开与学术状态 | 本页定位 | 截止 2026-08-30 的开放与访问状态 |
 |---|---|---|---|
 | Wan 2.1 | 2025-03-26 arXiv v1；预印本/技术报告，未找到正式发表记录 | 开放视频基础模型家族的研究里程碑 | 官方代码、权重和托管 demo 可访问 |
 | NVIDIA Cosmos / Predict2 | 2025-01-07 预印本；Predict2 于 2025-06-11 官方技术发布；未找到正式发表记录 | Physical AI 平台与世界状态生成的研究里程碑 | 官方代码、权重、PyPI 和 demo 可访问 |
 | V-JEPA 2 | 2025-06-11 arXiv v1；预印本，未找到正式发表记录 | 从无动作视频表示到小量动作数据后训练和规划的研究里程碑 | 官方代码与权重可访问；不是托管机器人产品 |
-| Veo 3 / 3.1 | 2025-05-20 官方产品发布；2025-09-24 为独立黑盒探测预印本 | 原生音视频创作和黑盒视觉探测的 frontier observation | 官方页仍提供 Gemini、Flow、AI Studio 和 API 入口；无公开代码/权重 |
-| Genie 3 | 2025-08-05 官方研究发布；未找到论文或正式发表记录 | 实时可交互生成世界的 frontier observation | Project Genie 是可访问的实验性托管原型；无公开代码/权重 |
+| Veo 3 / 3.1 | 2025-05-20 官方产品发布；2025-09-24 为独立黑盒探测预印本 | 原生音视频创作和黑盒视觉探测的前沿观察（暂定） | 官方页仍提供 Gemini、Flow、AI Studio 和 API 入口；无公开代码/权重 |
+| Genie 3 | 2025-08-05 官方研究发布；未找到论文或正式发表记录 | 实时可交互生成世界的前沿观察（暂定） | Project Genie 是可访问的实验性托管原型；无公开代码/权重 |
 | Matrix-Game 2.0 | 2025-08-18 arXiv v1；预印本，未找到正式发表记录 | 少步 causal diffusion 流式交互的研究里程碑 | 官方仓库仍保留 2.0 实现与权重入口；主线已更新到 3.0 |
-| Marble | 2025-11-12 官方产品发布；未找到论文或正式发表记录 | 显式 3D 世界表示与导出的产品/研究 frontier observation | 官方称已普遍可用，需账号；无公开代码/权重 |
+| Marble | 2025-11-12 官方产品发布；未找到论文或正式发表记录 | 显式 3D 世界表示与导出的产品/研究前沿观察（暂定） | 官方称已普遍可用，需账号；无公开代码/权重 |
 | Sora 2 | 2025-09-30 官方发布与系统卡；不是同行评议论文 | 音视频、多镜头和安全治理的历史节点 | 官方确认 Sora 产品已于 2026-04-26 下线；无公开代码/权重 |
-| GWM-1 | 2025-12-11 官方研究/产品发布；未找到论文或正式发表记录 | 共享底座、独立后训练世界模型家族的 frontier observation | Worlds/Robotics 仍为申请式 early access；Characters 分支已提供 Web/API；无公开权重 |
-| Cosmos 3 | 2026-06-01 arXiv v1；官方称 technical report，未找到正式发表记录 | Omnimodal 世界模型家族的 frontier observation | 官方代码、模型卡/权重和托管 demo 可访问 |
-| V-JEPA 2.1 | 2026-03-15 arXiv v1；预印本，未找到正式发表记录 | dense 时空表示的 frontier observation | 官方代码与预训练 checkpoints 可访问 |
-| LeWorldModel | 2026-03-13 arXiv v1；预印本，未找到正式发表记录 | 小型端到端 latent planning 的 frontier observation | 官方代码、数据与 checkpoints 可访问 |
-| EB-JEPA | 2026-02-03 arXiv v1；ICLR 2026 World Models Workshop camera-ready，不冒充主会 archival proceedings | 可复现教学/研究组件的 frontier observation | 官方代码可访问；未另行发布权重 |
-| Kling Video 3 / 3 Omni | 2026 官方产品发布；未找到论文或正式发表记录 | 多参考原生音视频创作的 frontier observation | 官方 Web 产品可访问，受账号/地区限制；无公开代码/权重 |
-| Seedance 2.0 | 2026-02-12 官方产品发布；2026-04-15 arXiv model card，不是同行评议论文 | 统一多模态原生音视频的 frontier observation | 托管产品可访问，受账号/地区限制；无公开代码/权重 |
-| MiniMax H3 | 2026-07-31 官方发布；2026-08-03 开放基础模型；未找到同行评议论文 | 全模态音视频和部分开放系统的 frontier observation | 两个 H3-Base checkpoint 与代码可用，本地基础流程为 768p；Context-IR 与 2K regeneration 仍依赖托管 API |
-| Seedance 2.5 | 2026-07-31 官方产品发布；未找到论文或正式发表记录 | 长叙事、多参考与时间戳编辑的 frontier observation | 官方称已在即梦/Doubao Pro 逐步上线；发布页仍称 API 即将提供；无公开权重 |
+| GWM-1 | 2025-12-11 官方研究/产品发布；未找到论文或正式发表记录 | 共享底座、独立后训练世界模型家族的前沿观察（暂定） | Worlds/Robotics 仍为申请式 early access；Characters 分支已提供 Web/API；无公开权重 |
+| Cosmos 3 | 2026-06-01 arXiv v1；官方称 technical report，未找到正式发表记录 | Omnimodal 世界模型家族的前沿观察（暂定） | 官方代码、模型卡/权重和托管 demo 可访问 |
+| V-JEPA 2.1 | 2026-03-15 arXiv v1；预印本，未找到正式发表记录 | dense 时空表示的前沿观察（暂定） | 官方代码与预训练 checkpoints 可访问 |
+| LeWorldModel | 2026-03-13 arXiv v1；预印本，未找到正式发表记录 | 小型端到端 latent planning 的前沿观察（暂定） | 官方代码、数据与 checkpoints 可访问 |
+| EB-JEPA | 2026-02-03 arXiv v1；ICLR 2026 World Models Workshop camera-ready，不冒充主会 archival proceedings | 可复现教学/研究组件的前沿观察（暂定） | 官方代码可访问；未另行发布权重 |
+| Kling Video 3 / 3 Omni | 2026 官方产品发布；未找到论文或正式发表记录 | 多参考原生音视频创作的前沿观察（暂定） | 官方 Web 产品可访问，受账号/地区限制；无公开代码/权重 |
+| Seedance 2.0 | 2026-02-12 官方产品发布；2026-04-15 arXiv model card，不是同行评议论文 | 统一多模态原生音视频的前沿观察（暂定） | 托管产品可访问，受账号/地区限制；无公开代码/权重 |
+| MiniMax H3 | 2026-07-31 官方发布；2026-08-03 开放基础模型；未找到同行评议论文 | 全模态音视频和部分开放系统的前沿观察（暂定） | 两个 H3-Base checkpoint 与代码可用，本地基础流程为 768p；Context-IR 与 2K regeneration 仍依赖托管 API |
+| Seedance 2.5 | 2026-07-31 官方产品发布；未找到论文或正式发表记录 | 长叙事、多参考与时间戳编辑的前沿观察（暂定） | 官方称已在即梦/Doubao Pro 逐步上线；发布页仍称 API 即将提供；无公开权重 |
 | Dual-IPO / BranchGRPO | ICLR 2026 正式 proceedings | 奖励模型—生成器迭代与去噪轨迹信用分配的研究里程碑 | 正式论文页可访问；本表未把论文实验等同于通用后训练 recipe 或独立复现 |
-| LAMP / FlashMotion / BulletTime | CVPR 2026 正式 proceedings | 语言到运动程序、少步轨迹控制与时间—视角解耦的 frontier observation | 各论文与补充材料入口可访问；工件范围逐项核验，三者不是一个统一控制系统 |
-| NAVA / Ripple | 2026-05-28、2026-07-29 arXiv v1；均为预印本 | 原生 AV 对齐与带跨模态记忆的流式联合生成 frontier observation | NAVA 项目样例与两篇预印本可访问；未把作者同步/速度结果写成开放权重或独立性能 |
-| 4DStreamCtrl | 2026-08-26 arXiv v1，2026-08-27 v2；预印本 | 相机、对象、深度与因果流式统一的最新 frontier observation | arXiv PDF/源码可访问；未在一手记录中确认官方代码或权重，20 FPS/长序列为作者协议结果 |
-| SeedVR2 / FlashVSR / DGAF-VSR / STCDiT / DTG-Restore | SeedVR2 为 ICLR 2026 正式 proceedings；其余四项为 CVPR 2026 正式 proceedings | 一步对抗后训练、streaming、aligned evidence、结构锚定与 training-free refinement 的视频退化修复分叉 | 论文入口可访问；本页不把不同数据、退化、硬件和感知协议下的作者结果合并成统一排名 |
+| LAMP / FlashMotion / BulletTime | CVPR 2026 正式 proceedings | 语言到运动程序、少步轨迹控制与时间—视角解耦的前沿观察（暂定） | 各论文与补充材料入口可访问；工件范围逐项核验，三者不是一个统一控制系统 |
+| NAVA / Ripple | 2026-05-28、2026-07-29 arXiv v1；均为预印本 | 原生 AV 对齐与带跨模态记忆的流式联合生成前沿观察（暂定） | NAVA 项目样例与两篇预印本可访问；未把作者同步/速度结果写成开放权重或独立性能 |
+| 4DStreamCtrl | 2026-08-26 arXiv v1，2026-08-27 v2；预印本 | 相机、对象、深度与因果流式统一的最新前沿观察（暂定） | arXiv PDF/源码可访问；未在一手记录中确认官方代码或权重，20 FPS/长序列为作者协议结果 |
+| SeedVR2 / FlashVSR / DGAF-VSR / STCDiT / DTG-Restore | SeedVR2 为 ICLR 2026 正式 proceedings；其余四项为 CVPR 2026 正式 proceedings | 一步对抗后训练、streaming、aligned evidence、结构锚定与 training-free refinement 的视频退化修复专题汇总 | 论文入口可访问；本页不把不同数据、退化、硬件和感知协议下的作者结果合并成统一排名 |
+
+</details>
 
 ---
 
-## 横向任务谱系｜2017–2026：视频退化修复从对齐传播到生成先验
+<details markdown="1">
+<summary><strong>横向专题（可选）：2017–2026 视频退化修复谱系</strong></summary>
 
 这条谱系不等同于视频编辑：输入 $Y$ 是同一真实视频 $X$ 经未知或已知退化算子后的观测，目标是恢复 $X$，不是按指令改变事件。它也不等同于 inpainting：全帧通常仍有低质证据，并不存在一张天然的 mask 外硬保护区。下表只保留改变任务合同或系统边界的节点；逐篇 paper review、公式、指标和 RestorationFork-1 见[专章](tasks/video-restoration.md)。
 
@@ -92,6 +151,8 @@
 | 2023–2024：图像生成先验获得时间能力 | [SATeCo](https://openaccess.thecvf.com/content/CVPR2024/html/Chen_Learning_Spatial_Adaptation_and_Temporal_Coherence_in_Diffusion_Models_for_CVPR_2024_paper.html)、[Upscale-A-Video](https://openaccess.thecvf.com/content/CVPR2024/html/Zhou_Upscale-A-Video_Temporal-Consistent_Diffusion_Model_for_Real-World_Video_Super-Resolution_CVPR_2024_paper.html)、[MGLD-VSR](https://eccv.ecva.net/virtual/2024/poster/2534) | 冻结或适配图像 diffusion prior，以 latent/pixel、local/global 与 flow guidance 补足视频时间约束 | 感知细节可能没有观测支持；锐利不能替代 re-degradation、OCR/ID 与多 seed 审计 |
 | 2024–2025：高倍率、高分辨率、复杂退化与少步 | [VideoGigaGAN](https://openaccess.thecvf.com/content/CVPR2025/html/Xu_VideoGigaGAN_Towards_Detail-rich_Video_Super-Resolution_CVPR_2025_paper.html)、[PatchVSR](https://openaccess.thecvf.com/content/CVPR2025/html/Du_PatchVSR_Breaking_Video_Diffusion_Resolution_Limits_with_Patch-wise_Video_Super-Resolution_CVPR_2025_paper.html)、[DiffVSR](https://openaccess.thecvf.com/content/ICCV2025/html/Li_DiffVSR_Revealing_an_Effective_Recipe_for_Taming_Robust_Video_Super-Resolution_ICCV_2025_paper.html)、[TurboVSR](https://openaccess.thecvf.com/content/ICCV2025/html/Wang_TurboVSR_Fantastic_Video_Upscalers_and_Where_to_Find_Them_ICCV_2025_paper.html) | 分别把生成细节、patch 条件、复杂退化 curriculum 与压缩/少步效率推到系统层 | 结果绑定各自数据、倍率、硬件与计时边界，不能直接拼成“最佳模型” |
 | 2026：一步、streaming 与证据守恒分叉 | [SeedVR2](https://proceedings.iclr.cc/paper_files/paper/2026/hash/444d69470b24ded080183c907b711bbf-Abstract-Conference.html)、[FlashVSR](https://openaccess.thecvf.com/content/CVPR2026/html/Zhuang_FlashVSR_Towards_Real-time_Diffusion-Based_Streaming_Video_Super_Resolution_CVPR_2026_paper.html)、[DGAF-VSR](https://openaccess.thecvf.com/content/CVPR2026/html/Xu_Rethinking_Diffusion_Model-Based_Video_Super-Resolution_Leveraging_Dense_Guidance_from_Aligned_CVPR_2026_paper.html)、[STCDiT](https://openaccess.thecvf.com/content/CVPR2026/html/Chen_STCDiT_Spatio-Temporally_Consistent_Diffusion_Transformer_for_High-Quality_Video_Super-Resolution_CVPR_2026_paper.html)、[DTG-Restore](https://openaccess.thecvf.com/content/CVPR2026/html/Yesiltepe_DTG-Restore_Training-Free_Diffusion_Refinement_for_Generative_Video_Super-Resolution_CVPR_2026_paper.html) | 将 adversarial 一步、只读历史的 streaming、dense aligned evidence、anchor-frame structure 与无训练 refinement 分成不同系统合同 | “一步”“实时”“training-free”和“忠实”仍是四个独立主张，需分别验证 |
+
+</details>
 
 ---
 
@@ -534,7 +595,7 @@
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2025-wan.jpg" alt="Wan 开放视频模型家族概念图"></td>
-<td><strong>2025 — <a href="https://arxiv.org/abs/2503.20314">Wan 2.1</a></strong> <code>首次预印本</code> <code>Frontier observation</code> <code>开放视频基础模型家族</code><br><strong>表示/机制：</strong>预印本提出视频 DiT 模型家族，以新 VAE、规模化预训练、数据治理和自动评测支撑 1.3B/14B 规模。<br><strong>控制/任务：</strong>覆盖 T2V、I2V、视频编辑与个性化等任务，代码和模型开放 <a href="https://github.com/Wan-Video/Wan2.1"><img src="https://img.shields.io/github/stars/Wan-Video/Wan2.1?style=social" alt="GitHub: Wan-Video/Wan2.1" /></a>。<br><strong>意义/边界：</strong>作者报告 1.3B 版本约需 8.19 GB 显存；性能与效率数字应在具体硬件、分辨率和评测设置下理解。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2503.20314">Preprint</a> · <a href="https://wan.video/">Project</a> · Code <a href="https://github.com/Wan-Video/Wan2.1"><img src="https://img.shields.io/github/stars/Wan-Video/Wan2.1?style=social" alt="GitHub: Wan-Video/Wan2.1" /></a> · <a href="https://huggingface.co/Wan-AI/Wan2.1-T2V-14B">Weights</a> · <a href="https://huggingface.co/spaces/Wan-AI/Wan2.1">Demo</a></td>
+<td><strong>2025 — <a href="https://arxiv.org/abs/2503.20314">Wan 2.1</a></strong> <code>首次预印本</code> <code>前沿观察（暂定）</code> <code>开放视频基础模型家族</code><br><strong>表示/机制：</strong>预印本提出视频 DiT 模型家族，以新 VAE、规模化预训练、数据治理和自动评测支撑 1.3B/14B 规模。<br><strong>控制/任务：</strong>覆盖 T2V、I2V、视频编辑与个性化等任务，代码和模型开放 <a href="https://github.com/Wan-Video/Wan2.1"><img src="https://img.shields.io/github/stars/Wan-Video/Wan2.1?style=social" alt="GitHub: Wan-Video/Wan2.1" /></a>。<br><strong>意义/边界：</strong>作者报告 1.3B 版本约需 8.19 GB 显存；性能与效率数字应在具体硬件、分辨率和评测设置下理解。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2503.20314">Preprint</a> · <a href="https://wan.video/">Project</a> · Code <a href="https://github.com/Wan-Video/Wan2.1"><img src="https://img.shields.io/github/stars/Wan-Video/Wan2.1?style=social" alt="GitHub: Wan-Video/Wan2.1" /></a> · <a href="https://huggingface.co/Wan-AI/Wan2.1-T2V-14B">Weights</a> · <a href="https://huggingface.co/spaces/Wan-AI/Wan2.1">Demo</a></td>
 </tr>
 </table>
 
@@ -661,68 +722,68 @@ Sora 在生成路线中提出“视频生成可能通向世界模拟器”的研
 
 ## 并行进展｜2025：Physical AI、交互世界与原生音视频
 
-2025 年的关键变化不是所有路线合成了一个“万能 world model”，而是视频模型、表征模型、交互世界、显式 3D 和机器人后训练开始共享更大的数据与模型基础。本节全部是截止日的 **frontier observation**；指标、能力和限制均保留“作者/官方报告”的证据属性。
+2025 年的关键变化不是所有路线合成了一个“万能 world model”，而是视频模型、表征模型、交互世界、显式 3D 和机器人后训练开始共享更大的数据与模型基础。本节全部是截止日的 **前沿观察（暂定）**；指标、能力和限制均保留“作者/官方报告”的证据属性。
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2025-cosmos.jpg" alt="NVIDIA Cosmos Physical AI 平台概念图"></td>
-<td><strong>2025 — <a href="https://arxiv.org/abs/2501.03575">NVIDIA Cosmos</a></strong> <code>首次预印本</code> <code>Frontier observation</code> <code>Physical AI 平台</code><br><strong>表示/机制：</strong>技术报告提出由 autoregressive/diffusion world foundation models、tokenizer、数据整理、guardrail 和后训练工具组成的平台。<br><strong>控制/任务：</strong>为机器人和自动驾驶等具体任务提供数据生成与模型底座。<br><strong>意义/边界：</strong>首代官方名称是 Cosmos 平台/Predict1 系列，不是一个严格名为“Cosmos 1”的单模型；平台也不等于闭环机器人策略。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2501.03575">Preprint / Technical Report</a> · <a href="https://research.nvidia.com/labs/cosmos-lab/">Project</a> · Code <a href="https://github.com/NVIDIA/Cosmos"><img src="https://img.shields.io/github/stars/NVIDIA/Cosmos?style=social" alt="GitHub: NVIDIA/Cosmos" /></a> · <a href="https://huggingface.co/collections/nvidia/cosmos-6751e884dc10e013a0a0d8e6">Weights</a> · Demo：—</td>
+<td><strong>2025 — <a href="https://arxiv.org/abs/2501.03575">NVIDIA Cosmos</a></strong> <code>首次预印本</code> <code>前沿观察（暂定）</code> <code>Physical AI 平台</code><br><strong>表示/机制：</strong>技术报告提出由 autoregressive/diffusion world foundation models、tokenizer、数据整理、guardrail 和后训练工具组成的平台。<br><strong>控制/任务：</strong>为机器人和自动驾驶等具体任务提供数据生成与模型底座。<br><strong>意义/边界：</strong>首代官方名称是 Cosmos 平台/Predict1 系列，不是一个严格名为“Cosmos 1”的单模型；平台也不等于闭环机器人策略。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2501.03575">Preprint / Technical Report</a> · <a href="https://research.nvidia.com/labs/cosmos-lab/">Project</a> · Code <a href="https://github.com/NVIDIA/Cosmos"><img src="https://img.shields.io/github/stars/NVIDIA/Cosmos?style=social" alt="GitHub: NVIDIA/Cosmos" /></a> · <a href="https://huggingface.co/collections/nvidia/cosmos-6751e884dc10e013a0a0d8e6">Weights</a> · Demo：—</td>
 </tr>
 </table>
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2025-cosmos-predict2.jpg" alt="Cosmos Predict2 多尺度世界状态生成概念图"></td>
-<td><strong>2025 — <a href="https://developer.nvidia.com/blog/?p=101575">Cosmos Predict2</a></strong> <code>官方技术发布</code> <code>Frontier observation</code> <code>世界状态生成</code><br><strong>表示/机制：</strong>官方技术发布称提供 2B/14B 世界状态视频生成模型，支持灵活分辨率、帧率和面向具体 Physical AI 场景的后训练。<br><strong>控制/任务：</strong>文本、图像、首尾帧等条件的未来状态生成。<br><strong>意义/边界：</strong>适合作为数据与预测底座；“物理准确”等性能为 NVIDIA 自评，具体控制收益仍需由下游任务独立验证。<br><strong>资源：</strong><a href="https://developer.nvidia.com/blog/?p=101575">Technical Release</a> · <a href="https://research.nvidia.com/labs/cosmos-lab/cosmos-predict2/">Project</a> · Code <a href="https://github.com/nvidia-cosmos/cosmos-predict2"><img src="https://img.shields.io/github/stars/nvidia-cosmos/cosmos-predict2?style=social" alt="GitHub: nvidia-cosmos/cosmos-predict2" /></a> · <a href="https://huggingface.co/collections/nvidia/cosmos-predict2">Weights</a> · <a href="https://huggingface.co/spaces/nvidia/Cosmos-Predict2">Demo</a></td>
+<td><strong>2025 — <a href="https://developer.nvidia.com/blog/?p=101575">Cosmos Predict2</a></strong> <code>官方技术发布</code> <code>前沿观察（暂定）</code> <code>世界状态生成</code><br><strong>表示/机制：</strong>官方技术发布称提供 2B/14B 世界状态视频生成模型，支持灵活分辨率、帧率和面向具体 Physical AI 场景的后训练。<br><strong>控制/任务：</strong>文本、图像、首尾帧等条件的未来状态生成。<br><strong>意义/边界：</strong>适合作为数据与预测底座；“物理准确”等性能为 NVIDIA 自评，具体控制收益仍需由下游任务独立验证。<br><strong>资源：</strong><a href="https://developer.nvidia.com/blog/?p=101575">Technical Release</a> · <a href="https://research.nvidia.com/labs/cosmos-lab/cosmos-predict2/">Project</a> · Code <a href="https://github.com/nvidia-cosmos/cosmos-predict2"><img src="https://img.shields.io/github/stars/nvidia-cosmos/cosmos-predict2?style=social" alt="GitHub: nvidia-cosmos/cosmos-predict2" /></a> · <a href="https://huggingface.co/collections/nvidia/cosmos-predict2">Weights</a> · <a href="https://huggingface.co/spaces/nvidia/Cosmos-Predict2">Demo</a></td>
 </tr>
 </table>
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2025-v-jepa2.jpg" alt="V-JEPA 2 机器人图像目标规划概念图"></td>
-<td><strong>2025 — <a href="https://arxiv.org/abs/2506.09985">V-JEPA 2</a></strong> <code>首次预印本</code> <code>Frontier observation</code> <code>表示到规划</code><br><strong>表示/机制：</strong>预印本报告先从超过一百万小时无动作互联网视频和图像学习表示，再用少于 62 小时 DROID 机器人数据训练动作条件模型。<br><strong>控制/任务：</strong>作者在新实验室的 Franka 机械臂上，以目标图像完成 reach、grasp 与 pick-and-place。<br><strong>意义/边界：</strong>“zero-shot”指无需目标实验室额外机器人数据、任务训练或奖励，并非完全没用机器人数据；论文还报告相机位姿敏感、长时误差和搜索成本等限制。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2506.09985">Preprint</a> · <a href="https://ai.meta.com/research/vjepa/">Project</a> · Code <a href="https://github.com/facebookresearch/vjepa2"><img src="https://img.shields.io/github/stars/facebookresearch/vjepa2?style=social" alt="GitHub: facebookresearch/vjepa2" /></a> · <a href="https://huggingface.co/collections/facebook/v-jepa-2-6841bad8413014e185b497a6">Weights</a> · Usage Demo <a href="https://github.com/facebookresearch/vjepa2#usage-demo"><img src="https://img.shields.io/github/stars/facebookresearch/vjepa2?style=social" alt="GitHub: facebookresearch/vjepa2" /></a></td>
+<td><strong>2025 — <a href="https://arxiv.org/abs/2506.09985">V-JEPA 2</a></strong> <code>首次预印本</code> <code>前沿观察（暂定）</code> <code>表示到规划</code><br><strong>表示/机制：</strong>预印本报告先从超过一百万小时无动作互联网视频和图像学习表示，再用少于 62 小时 DROID 机器人数据训练动作条件模型。<br><strong>控制/任务：</strong>作者在新实验室的 Franka 机械臂上，以目标图像完成 reach、grasp 与 pick-and-place。<br><strong>意义/边界：</strong>“zero-shot”指无需目标实验室额外机器人数据、任务训练或奖励，并非完全没用机器人数据；论文还报告相机位姿敏感、长时误差和搜索成本等限制。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2506.09985">Preprint</a> · <a href="https://ai.meta.com/research/vjepa/">Project</a> · Code <a href="https://github.com/facebookresearch/vjepa2"><img src="https://img.shields.io/github/stars/facebookresearch/vjepa2?style=social" alt="GitHub: facebookresearch/vjepa2" /></a> · <a href="https://huggingface.co/collections/facebook/v-jepa-2-6841bad8413014e185b497a6">Weights</a> · Usage Demo <a href="https://github.com/facebookresearch/vjepa2#usage-demo"><img src="https://img.shields.io/github/stars/facebookresearch/vjepa2?style=social" alt="GitHub: facebookresearch/vjepa2" /></a></td>
 </tr>
 </table>
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2025-veo3.jpg" alt="Veo 3 音视频生成与零样本视觉探测概念图"></td>
-<td><strong>2025 — <a href="https://blog.google/innovation-and-ai/products/generative-media-models-io-2025/">Veo 3</a> / Veo 3.1</strong> <code>官方产品发布</code> <code>Frontier observation</code> <code>创作模型</code> <code>视觉探测</code><br><strong>表示/机制：</strong>Google 于 2025-05 发布原生音视频生成；后续<a href="https://arxiv.org/abs/2509.20328">预印本研究</a>用黑盒 prompting 探测分割、边缘、物理属性、affordance、工具使用、迷宫与对称推理。<br><strong>控制/任务：</strong>文本/图像到视频与音频、创作控制。<br><strong>意义/边界：</strong>这些零样本能力来自后续黑盒研究，不代表显式 perception head 或机器人闭环验证；任务专用模型通常仍更强，部分结果依赖多次采样，该预印本也不支持“深度估计”这一旧表述。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2509.20328">Probing Preprint</a> · <a href="https://deepmind.google/models/veo/">Project / Model Card</a> · Code：未公开 · Weights：未公开 · <a href="https://labs.google/fx/tools/flow">Demo</a></td>
+<td><strong>2025 — <a href="https://blog.google/innovation-and-ai/products/generative-media-models-io-2025/">Veo 3</a> / Veo 3.1</strong> <code>官方产品发布</code> <code>前沿观察（暂定）</code> <code>创作模型</code> <code>视觉探测</code><br><strong>表示/机制：</strong>Google 于 2025-05 发布原生音视频生成；后续<a href="https://arxiv.org/abs/2509.20328">预印本研究</a>用黑盒 prompting 探测分割、边缘、物理属性、affordance、工具使用、迷宫与对称推理。<br><strong>控制/任务：</strong>文本/图像到视频与音频、创作控制。<br><strong>意义/边界：</strong>这些零样本能力来自后续黑盒研究，不代表显式 perception head 或机器人闭环验证；任务专用模型通常仍更强，部分结果依赖多次采样，该预印本也不支持“深度估计”这一旧表述。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2509.20328">Probing Preprint</a> · <a href="https://deepmind.google/models/veo/">Project / Model Card</a> · Code：未公开 · Weights：未公开 · <a href="https://labs.google/fx/tools/flow">Demo</a></td>
 </tr>
 </table>
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2025-genie3.jpg" alt="Genie 3 实时可交互动态世界概念图"></td>
-<td><strong>2025 — <a href="https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/">Genie 3</a></strong> <code>官方研究发布</code> <code>Frontier observation</code> <code>交互世界</code><br><strong>表示/机制：</strong>官方页面报告从文本生成 720p、24 FPS 的动态世界，并允许通过文本事件改变环境。<br><strong>控制/任务：</strong>官方演示实时导航与数分钟级交互一致性。<br><strong>意义/边界：</strong>2025-08 初始发布为有限研究预览；截止日的 Project Genie 是可访问的实验性托管原型，仍受账号、订阅和地区等条件限制。官方还列出动作空间、多智能体、地理准确性、文字渲染和持续时长等限制。<br><strong>资源：</strong><a href="https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/">Official Research Release</a> · <a href="https://deepmind.google/models/genie/">Project</a> · Code：未公开 · Weights：未公开 · <a href="https://labs.google/fx/projectgenie/">Experimental Demo（受访问条件限制）</a></td>
+<td><strong>2025 — <a href="https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/">Genie 3</a></strong> <code>官方研究发布</code> <code>前沿观察（暂定）</code> <code>交互世界</code><br><strong>表示/机制：</strong>官方页面报告从文本生成 720p、24 FPS 的动态世界，并允许通过文本事件改变环境。<br><strong>控制/任务：</strong>官方演示实时导航与数分钟级交互一致性。<br><strong>意义/边界：</strong>2025-08 初始发布为有限研究预览；截止日的 Project Genie 是可访问的实验性托管原型，仍受账号、订阅和地区等条件限制。官方还列出动作空间、多智能体、地理准确性、文字渲染和持续时长等限制。<br><strong>资源：</strong><a href="https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/">Official Research Release</a> · <a href="https://deepmind.google/models/genie/">Project</a> · Code：未公开 · Weights：未公开 · <a href="https://labs.google/fx/projectgenie/">Experimental Demo（受访问条件限制）</a></td>
 </tr>
 </table>
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2025-matrix-game2.jpg" alt="Matrix-Game 2 流式交互视频世界概念图"></td>
-<td><strong>2025 — <a href="https://arxiv.org/abs/2508.13009">Matrix-Game 2</a></strong> <code>首次预印本</code> <code>Frontier observation</code> <code>开放交互视频世界</code><br><strong>表示/机制：</strong>预印本提出以 UE/GTA 等游戏数据和键鼠动作训练 few-step causal diffusion，逐帧生成可控画面。<br><strong>控制/任务：</strong>键盘鼠标驱动的流式游戏交互。<br><strong>意义/边界：</strong>作者报告约 1,200 小时数据、25 FPS 和分钟级交互；均是作者设置下的结果，不代表现实物理或跨游戏泛化。截止日官方仓库主线已纳入 3.0，本卡仍只记录 2.0 的历史节点。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2508.13009">Preprint</a> · <a href="https://matrix-game-v2.github.io/">Project</a> · Code <a href="https://github.com/SkyworkAI/Matrix-Game"><img src="https://img.shields.io/github/stars/SkyworkAI/Matrix-Game?style=social" alt="GitHub: SkyworkAI/Matrix-Game" /></a> · <a href="https://huggingface.co/Skywork/Matrix-Game-2.0">Weights</a> · Demo：—</td>
+<td><strong>2025 — <a href="https://arxiv.org/abs/2508.13009">Matrix-Game 2</a></strong> <code>首次预印本</code> <code>前沿观察（暂定）</code> <code>开放交互视频世界</code><br><strong>表示/机制：</strong>预印本提出以 UE/GTA 等游戏数据和键鼠动作训练 few-step causal diffusion，逐帧生成可控画面。<br><strong>控制/任务：</strong>键盘鼠标驱动的流式游戏交互。<br><strong>意义/边界：</strong>作者报告约 1,200 小时数据、25 FPS 和分钟级交互；均是作者设置下的结果，不代表现实物理或跨游戏泛化。截止日官方仓库主线已纳入 3.0，本卡仍只记录 2.0 的历史节点。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2508.13009">Preprint</a> · <a href="https://matrix-game-v2.github.io/">Project</a> · Code <a href="https://github.com/SkyworkAI/Matrix-Game"><img src="https://img.shields.io/github/stars/SkyworkAI/Matrix-Game?style=social" alt="GitHub: SkyworkAI/Matrix-Game" /></a> · <a href="https://huggingface.co/Skywork/Matrix-Game-2.0">Weights</a> · Demo：—</td>
 </tr>
 </table>
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2025-marble.jpg" alt="Marble 显式三维世界生成概念图"></td>
-<td><strong>2025 — <a href="https://www.worldlabs.ai/blog/marble-world-model">Marble</a></strong> <code>官方产品发布</code> <code>Frontier observation</code> <code>显式 3D 世界</code><br><strong>表示/机制：</strong>官方发布称可从文本、图像、视频或粗略 3D 条件生成可持续、可编辑、可扩展的世界，并可导出 Gaussian splat、mesh 或视频。<br><strong>控制/任务：</strong>相机探索、世界编辑、扩展和资产导出。<br><strong>意义/边界：</strong>它补上显式三维表示路线；官方仍把动态交互列为后续方向，因此不应写成动作条件动态模拟器。“可持续”等描述仍是产品自述，尚无论文或独立评测支持通用能力结论。<br><strong>资源：</strong><a href="https://www.worldlabs.ai/blog/marble-world-model">Official Product Release</a> · <a href="https://docs.worldlabs.ai/">Project</a> · Code：未公开 · Weights：未公开 · <a href="https://marble.worldlabs.ai/">Demo（需账号/付费）</a></td>
+<td><strong>2025 — <a href="https://www.worldlabs.ai/blog/marble-world-model">Marble</a></strong> <code>官方产品发布</code> <code>前沿观察（暂定）</code> <code>显式 3D 世界</code><br><strong>表示/机制：</strong>官方发布称可从文本、图像、视频或粗略 3D 条件生成可持续、可编辑、可扩展的世界，并可导出 Gaussian splat、mesh 或视频。<br><strong>控制/任务：</strong>相机探索、世界编辑、扩展和资产导出。<br><strong>意义/边界：</strong>它补上显式三维表示路线；官方仍把动态交互列为后续方向，因此不应写成动作条件动态模拟器。“可持续”等描述仍是产品自述，尚无论文或独立评测支持通用能力结论。<br><strong>资源：</strong><a href="https://www.worldlabs.ai/blog/marble-world-model">Official Product Release</a> · <a href="https://docs.worldlabs.ai/">Project</a> · Code：未公开 · Weights：未公开 · <a href="https://marble.worldlabs.ai/">Demo（需账号/付费）</a></td>
 </tr>
 </table>
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2025-sora2.jpg" alt="Sora 2 多镜头音视频与安全概念图"></td>
-<td><strong>2025 — <a href="https://openai.com/index/sora-2/">Sora 2</a></strong> <code>官方产品发布</code> <code>Frontier observation</code> <code>可用性：已下线</code><br><strong>表示/机制：</strong>官方发布称相较前代改进物理结果、多镜头控制和状态延续，并原生生成对白、环境声和音效。<br><strong>控制/任务：</strong>复杂镜头指令、参考主体与同步音视频。<br><strong>意义/边界：</strong><a href="https://openai.com/index/sora-2-system-card/">系统卡</a>仍记录物理、控制、肖像同意、误导性媒体与来源风险；上述改进为官方自述，不是独立能力证据。官方页面注明 Sora 产品自 2026-04-26 起不再提供，但这不改变其历史节点地位。<br><strong>资源：</strong><a href="https://openai.com/index/sora-2-system-card/">System Card</a> · <a href="https://openai.com/index/sora-2/">Project</a> · Code：未公开 · Weights：未公开 · Demo：已下线</td>
+<td><strong>2025 — <a href="https://openai.com/index/sora-2/">Sora 2</a></strong> <code>官方产品发布</code> <code>前沿观察（暂定）</code> <code>可用性：已下线</code><br><strong>表示/机制：</strong>官方发布称相较前代改进物理结果、多镜头控制和状态延续，并原生生成对白、环境声和音效。<br><strong>控制/任务：</strong>复杂镜头指令、参考主体与同步音视频。<br><strong>意义/边界：</strong><a href="https://openai.com/index/sora-2-system-card/">系统卡</a>仍记录物理、控制、肖像同意、误导性媒体与来源风险；上述改进为官方自述，不是独立能力证据。官方页面注明 Sora 产品自 2026-04-26 起不再提供，但这不改变其历史节点地位。<br><strong>资源：</strong><a href="https://openai.com/index/sora-2-system-card/">System Card</a> · <a href="https://openai.com/index/sora-2/">Project</a> · Code：未公开 · Weights：未公开 · Demo：已下线</td>
 </tr>
 </table>
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2025-gwm1.jpg" alt="GWM-1 三个独立后训练分支概念图"></td>
-<td><strong>2025 — <a href="https://runway.com/research/introducing-runway-gwm-1">GWM-1</a></strong> <code>官方研究/产品发布</code> <code>Frontier observation</code> <code>模型家族</code><br><strong>表示/机制：</strong>官方页面称以 Gen-4.5 为共同底座，分别后训练 Worlds、Avatars/Characters 与 Robotics 三个模型。<br><strong>控制/任务：</strong>官方展示可探索世界、实时角色和机器人动作条件 rollout。<br><strong>意义/边界：</strong>不是一个 checkpoint 同时完成全部任务；官方展示最长约两分钟、720p 的实时逐帧生成，但没有论文或独立评测支撑通用能力结论。<br><strong>资源：</strong>Paper/Report：— · <a href="https://runway.com/research/introducing-runway-gwm-1">Official Page</a> · Code：未公开 · Weights：未公开 · Access：Worlds/Robotics 需申请，Characters 已提供 Web/API</td>
+<td><strong>2025 — <a href="https://runway.com/research/introducing-runway-gwm-1">GWM-1</a></strong> <code>官方研究/产品发布</code> <code>前沿观察（暂定）</code> <code>模型家族</code><br><strong>表示/机制：</strong>官方页面称以 Gen-4.5 为共同底座，分别后训练 Worlds、Avatars/Characters 与 Robotics 三个模型。<br><strong>控制/任务：</strong>官方展示可探索世界、实时角色和机器人动作条件 rollout。<br><strong>意义/边界：</strong>不是一个 checkpoint 同时完成全部任务；官方展示最长约两分钟、720p 的实时逐帧生成，但没有论文或独立评测支撑通用能力结论。<br><strong>资源：</strong>Paper/Report：— · <a href="https://runway.com/research/introducing-runway-gwm-1">Official Page</a> · Code：未公开 · Weights：未公开 · Access：Worlds/Robotics 需申请，Characters 已提供 Web/API</td>
 </tr>
 </table>
 
@@ -730,33 +791,33 @@ Sora 在生成路线中提出“视频生成可能通向世界模拟器”的研
 
 ## World Model｜2026：世界—动作系统与可规划表征
 
-本节全部是截止日的 **frontier observation**。预印本、workshop camera-ready、开源工件和托管演示是不同证据，不使用一个“已发布”统称。
+本节全部是截止日的 **前沿观察（暂定）**。预印本、workshop camera-ready、开源工件和托管演示是不同证据，不使用一个“已发布”统称。
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2026-cosmos3.jpg" alt="Cosmos 3 双塔多模态模型家族概念图"></td>
-<td><strong>2026 — <a href="https://arxiv.org/abs/2606.02800">Cosmos 3</a></strong> <code>首次预印本</code> <code>Frontier observation</code> <code>Omnimodal 模型家族</code><br><strong>表示/机制：</strong>技术报告提出 Edge、Nano、Super 等尺度共享自回归 reasoner 与 diffusion generator 双塔 Mixture-of-Transformers 架构。<br><strong>控制/任务：</strong>作者报告这个家族可接收语言、图像、视频、音频和动作，并以不同后训练版本覆盖视觉语言推理、音视频生成、forward/inverse dynamics 和机器人策略。<br><strong>意义/边界：</strong>这是统一架构下的模型家族，不是一个 checkpoint 已同时解决全部 Physical AI 任务；基准结果仍是作者自评。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2606.02800">Preprint / Technical Report</a> · <a href="https://research.nvidia.com/labs/cosmos-lab/cosmos3/">Project</a> · Code <a href="https://github.com/NVIDIA/cosmos"><img src="https://img.shields.io/github/stars/NVIDIA/cosmos?style=social" alt="GitHub: NVIDIA/cosmos" /></a> · <a href="https://huggingface.co/collections/nvidia/cosmos3">Weights / Model Cards</a> · <a href="https://build.nvidia.com/models?q=cosmos">Demo</a></td>
+<td><strong>2026 — <a href="https://arxiv.org/abs/2606.02800">Cosmos 3</a></strong> <code>首次预印本</code> <code>前沿观察（暂定）</code> <code>Omnimodal 模型家族</code><br><strong>表示/机制：</strong>技术报告提出 Edge、Nano、Super 等尺度共享自回归 reasoner 与 diffusion generator 双塔 Mixture-of-Transformers 架构。<br><strong>控制/任务：</strong>作者报告这个家族可接收语言、图像、视频、音频和动作，并以不同后训练版本覆盖视觉语言推理、音视频生成、forward/inverse dynamics 和机器人策略。<br><strong>意义/边界：</strong>这是统一架构下的模型家族，不是一个 checkpoint 已同时解决全部 Physical AI 任务；基准结果仍是作者自评。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2606.02800">Preprint / Technical Report</a> · <a href="https://research.nvidia.com/labs/cosmos-lab/cosmos3/">Project</a> · Code <a href="https://github.com/NVIDIA/cosmos"><img src="https://img.shields.io/github/stars/NVIDIA/cosmos?style=social" alt="GitHub: NVIDIA/cosmos" /></a> · <a href="https://huggingface.co/collections/nvidia/cosmos3">Weights / Model Cards</a> · <a href="https://build.nvidia.com/models?q=cosmos">Demo</a></td>
 </tr>
 </table>
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2026-v-jepa21.jpg" alt="V-JEPA 2.1 稠密时空特征概念图"></td>
-<td><strong>2026 — <a href="https://arxiv.org/abs/2603.14482">V-JEPA 2.1</a></strong> <code>首次预印本</code> <code>Frontier observation</code> <code>稠密表征</code><br><strong>表示/机制：</strong>预印本提出通过 dense predictive loss、跨层 deep self-supervision、统一图像—视频输入表示和规模扩展学习 dense 时空特征。<br><strong>控制/任务：</strong>服务视觉理解、密集预测与机器人后训练。<br><strong>意义/边界：</strong>作者报告相对 V-JEPA 2-AC 抓取成功率提高 20 个百分点；它仍主要是 representation/world-modeling 方法，不是交互式像素世界生成器。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2603.14482">Preprint</a> · <a href="https://ai.meta.com/research/vjepa/">Project</a> · Code <a href="https://github.com/facebookresearch/vjepa2"><img src="https://img.shields.io/github/stars/facebookresearch/vjepa2?style=social" alt="GitHub: facebookresearch/vjepa2" /></a> · Weights <a href="https://github.com/facebookresearch/vjepa2#v-jepa-21-pretrained-checkpoints"><img src="https://img.shields.io/github/stars/facebookresearch/vjepa2?style=social" alt="GitHub: facebookresearch/vjepa2" /></a> · Demo <a href="https://github.com/facebookresearch/vjepa2#usage-demo"><img src="https://img.shields.io/github/stars/facebookresearch/vjepa2?style=social" alt="GitHub: facebookresearch/vjepa2" /></a></td>
+<td><strong>2026 — <a href="https://arxiv.org/abs/2603.14482">V-JEPA 2.1</a></strong> <code>首次预印本</code> <code>前沿观察（暂定）</code> <code>稠密表征</code><br><strong>表示/机制：</strong>预印本提出通过 dense predictive loss、跨层 deep self-supervision、统一图像—视频输入表示和规模扩展学习 dense 时空特征。<br><strong>控制/任务：</strong>服务视觉理解、密集预测与机器人后训练。<br><strong>意义/边界：</strong>作者报告相对 V-JEPA 2-AC 抓取成功率提高 20 个百分点；它仍主要是 representation/world-modeling 方法，不是交互式像素世界生成器。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2603.14482">Preprint</a> · <a href="https://ai.meta.com/research/vjepa/">Project</a> · Code <a href="https://github.com/facebookresearch/vjepa2"><img src="https://img.shields.io/github/stars/facebookresearch/vjepa2?style=social" alt="GitHub: facebookresearch/vjepa2" /></a> · Weights <a href="https://github.com/facebookresearch/vjepa2#v-jepa-21-pretrained-checkpoints"><img src="https://img.shields.io/github/stars/facebookresearch/vjepa2?style=social" alt="GitHub: facebookresearch/vjepa2" /></a> · Demo <a href="https://github.com/facebookresearch/vjepa2#usage-demo"><img src="https://img.shields.io/github/stars/facebookresearch/vjepa2?style=social" alt="GitHub: facebookresearch/vjepa2" /></a></td>
 </tr>
 </table>
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2026-leworldmodel.jpg" alt="LeWorldModel 小型可规划 latent dynamics 概念图"></td>
-<td><strong>2026 — <a href="https://arxiv.org/abs/2603.19312">LeWorldModel</a></strong> <code>首次预印本</code> <code>Frontier observation</code> <code>端到端 latent dynamics</code><br><strong>表示/机制：</strong>预印本提出以 next-embedding prediction 和 Gaussian latent regularization，从原始像素稳定联合训练 encoder 与动作条件 dynamics。<br><strong>控制/任务：</strong>作者在 latent rollout 上执行 model predictive control。<br><strong>意义/边界：</strong>作者报告约 15M 参数、单 GPU 数小时训练和显著规划加速；证据来自小规模 2D/3D 控制实验，不能外推为 foundation-scale Physical AI。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2603.19312">Preprint</a> · <a href="https://le-wm.github.io/">Project</a> · Code / Data <a href="https://github.com/lucas-maes/le-wm"><img src="https://img.shields.io/github/stars/lucas-maes/le-wm?style=social" alt="GitHub: lucas-maes/le-wm" /></a> · <a href="https://huggingface.co/collections/quentinll/lewm">Weights</a> · Demo：—</td>
+<td><strong>2026 — <a href="https://arxiv.org/abs/2603.19312">LeWorldModel</a></strong> <code>首次预印本</code> <code>前沿观察（暂定）</code> <code>端到端 latent dynamics</code><br><strong>表示/机制：</strong>预印本提出以 next-embedding prediction 和 Gaussian latent regularization，从原始像素稳定联合训练 encoder 与动作条件 dynamics。<br><strong>控制/任务：</strong>作者在 latent rollout 上执行 model predictive control。<br><strong>意义/边界：</strong>作者报告约 15M 参数、单 GPU 数小时训练和显著规划加速；证据来自小规模 2D/3D 控制实验，不能外推为 foundation-scale Physical AI。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2603.19312">Preprint</a> · <a href="https://le-wm.github.io/">Project</a> · Code / Data <a href="https://github.com/lucas-maes/le-wm"><img src="https://img.shields.io/github/stars/lucas-maes/le-wm?style=social" alt="GitHub: lucas-maes/le-wm" /></a> · <a href="https://huggingface.co/collections/quentinll/lewm">Weights</a> · Demo：—</td>
 </tr>
 </table>
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2026-eb-jepa.jpg" alt="EB-JEPA 教学与模块化实验概念图"></td>
-<td><strong>2026 — <a href="https://arxiv.org/abs/2602.03604">EB-JEPA</a></strong> <code>Workshop camera-ready</code> <code>Frontier observation</code> <code>教学/研究组件</code><br><strong>表示/机制：</strong>作者将 context encoder、predictor、collapse regularization 与 latent planning 拆成轻量模块。<br><strong>控制/任务：</strong>覆盖 CIFAR-10 表征、MovingMNIST 多步预测和 Two Rooms 动作规划。<br><strong>意义/边界：</strong>价值在于单卡、数小时级可复现实验；它是 toy-scale 教学库，不是现实世界 foundation model。arXiv v3 标注为 ICLR 2026 World Models Workshop camera-ready，不写成 ICLR 主会正式发表。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2602.03604">Workshop Paper / Preprint</a> · Project <a href="https://github.com/facebookresearch/eb_jepa"><img src="https://img.shields.io/github/stars/facebookresearch/eb_jepa?style=social" alt="GitHub: facebookresearch/eb_jepa" /></a> · Code <a href="https://github.com/facebookresearch/eb_jepa"><img src="https://img.shields.io/github/stars/facebookresearch/eb_jepa?style=social" alt="GitHub: facebookresearch/eb_jepa" /></a> · Weights：未公开 · Demo：—</td>
+<td><strong>2026 — <a href="https://arxiv.org/abs/2602.03604">EB-JEPA</a></strong> <code>Workshop camera-ready</code> <code>前沿观察（暂定）</code> <code>教学/研究组件</code><br><strong>表示/机制：</strong>作者将 context encoder、predictor、collapse regularization 与 latent planning 拆成轻量模块。<br><strong>控制/任务：</strong>覆盖 CIFAR-10 表征、MovingMNIST 多步预测和 Two Rooms 动作规划。<br><strong>意义/边界：</strong>价值在于单卡、数小时级可复现实验；它是 toy-scale 教学库，不是现实世界 foundation model。arXiv v3 标注为 ICLR 2026 World Models Workshop camera-ready，不写成 ICLR 主会正式发表。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2602.03604">Workshop Paper / Preprint</a> · Project <a href="https://github.com/facebookresearch/eb_jepa"><img src="https://img.shields.io/github/stars/facebookresearch/eb_jepa?style=social" alt="GitHub: facebookresearch/eb_jepa" /></a> · Code <a href="https://github.com/facebookresearch/eb_jepa"><img src="https://img.shields.io/github/stars/facebookresearch/eb_jepa?style=social" alt="GitHub: facebookresearch/eb_jepa" /></a> · Weights：未公开 · Demo：—</td>
 </tr>
 </table>
 
@@ -764,33 +825,33 @@ Sora 在生成路线中提出“视频生成可能通向世界模拟器”的研
 
 ## 视频基础模型｜2026：原生音视频与多模态创作
 
-这些模型代表生成—参考—编辑一体化，但目前没有证据证明它们已经构成可用于机器人闭环控制的 Physical AI world model。本节全部是截止日的 **frontier observation**；官方产品规格不作为已独立验证的研究结论。
+这些模型代表生成—参考—编辑一体化，但目前没有证据证明它们已经构成可用于机器人闭环控制的 Physical AI world model。本节全部是截止日的 **前沿观察（暂定）**；官方产品规格不作为已独立验证的研究结论。
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2026-kling3.jpg" alt="Kling 3 多模态原生音视频创作概念图"></td>
-<td><strong>2026 — <a href="https://kling.ai/release-note/release-notes/whbvu8hsip">Kling Video 3 / Video 3 Omni</a></strong> <code>官方产品发布</code> <code>Frontier observation</code> <code>创作模型</code><br><strong>表示/机制：</strong>官方产品页称以统一多模态输入输出支持文本、图像、音频和视频参考。<br><strong>控制/任务：</strong>官方规格包括文本/图像/参考到视频、视频内编辑、最长 15 秒多镜头 storyboard 与原生多语言/方言音频。<br><strong>意义/边界：</strong>代表创作控制和音视频联合生成的产品方向；没有论文、开源权重、机器人闭环或可规划状态证据。<br><strong>资源：</strong><a href="https://kling.ai/release-note/release-notes/whbvu8hsip">Official Product Release</a> · <a href="https://kling.ai/quickstart/klingai-video-3-model-user-guide">Product Guide</a> · Code：未公开 · Weights：未公开 · <a href="https://kling.ai/">Demo（需账号/地区限制）</a></td>
+<td><strong>2026 — <a href="https://kling.ai/release-note/release-notes/whbvu8hsip">Kling Video 3 / Video 3 Omni</a></strong> <code>官方产品发布</code> <code>前沿观察（暂定）</code> <code>创作模型</code><br><strong>表示/机制：</strong>官方产品页称以统一多模态输入输出支持文本、图像、音频和视频参考。<br><strong>控制/任务：</strong>官方规格包括文本/图像/参考到视频、视频内编辑、最长 15 秒多镜头 storyboard 与原生多语言/方言音频。<br><strong>意义/边界：</strong>代表创作控制和音视频联合生成的产品方向；没有论文、开源权重、机器人闭环或可规划状态证据。<br><strong>资源：</strong><a href="https://kling.ai/release-note/release-notes/whbvu8hsip">Official Product Release</a> · <a href="https://kling.ai/quickstart/klingai-video-3-model-user-guide">Product Guide</a> · Code：未公开 · Weights：未公开 · <a href="https://kling.ai/">Demo（需账号/地区限制）</a></td>
 </tr>
 </table>
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2026-seedance2.jpg" alt="Seedance 2.0 多模态音视频参考概念图"></td>
-<td><strong>2026 — <a href="https://seed.bytedance.com/en/blog/seedance-2-0-%E6%AD%A3%E5%BC%8F%E5%8F%91%E5%B8%83">Seedance 2.0</a></strong> <code>官方产品发布</code> <code>arXiv model card</code> <code>Frontier observation</code><br><strong>表示/机制：</strong>官方模型卡称采用统一多模态音视频架构，可同时接收文本、图像、视频和音频参考。<br><strong>控制/任务：</strong>官方规格为最多 9 张图像、3 段视频、3 段音频参考，生成最长 15 秒多镜头立体声音视频，并支持编辑与延展。<br><strong>意义/边界：</strong>官方仍列出细节稳定性、复杂动态、多主体、文字和音频失真等限制；自评结果不是同行评议或独立复现。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2604.14148">Model Card / Preprint</a> · <a href="https://seed.bytedance.com/seedance2_0">Project</a> · Code：未公开 · Weights：未公开 · <a href="https://jimeng.jianying.com/">Demo（需账号/地区限制）</a></td>
+<td><strong>2026 — <a href="https://seed.bytedance.com/en/blog/seedance-2-0-%E6%AD%A3%E5%BC%8F%E5%8F%91%E5%B8%83">Seedance 2.0</a></strong> <code>官方产品发布</code> <code>arXiv model card</code> <code>前沿观察（暂定）</code><br><strong>表示/机制：</strong>官方模型卡称采用统一多模态音视频架构，可同时接收文本、图像、视频和音频参考。<br><strong>控制/任务：</strong>官方规格为最多 9 张图像、3 段视频、3 段音频参考，生成最长 15 秒多镜头立体声音视频，并支持编辑与延展。<br><strong>意义/边界：</strong>官方仍列出细节稳定性、复杂动态、多主体、文字和音频失真等限制；自评结果不是同行评议或独立复现。<br><strong>资源：</strong><a href="https://arxiv.org/abs/2604.14148">Model Card / Preprint</a> · <a href="https://seed.bytedance.com/seedance2_0">Project</a> · Code：未公开 · Weights：未公开 · <a href="https://jimeng.jianying.com/">Demo（需账号/地区限制）</a></td>
 </tr>
 </table>
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2026-minimax-h3.jpg" alt="MiniMax H3 全模态音视频与开放基础模型概念图"></td>
-<td><strong>2026 — <a href="https://www.minimax.io/blog/minimax-h3">MiniMax H3</a></strong> <code>官方技术发布</code> <code>Frontier observation</code> <code>部分开放权重</code><br><strong>表示/机制：</strong>官方技术说明称将文本、图像、视频和音频编码为 packed multimodal sequence，由 33B dense single-stream H3-Omni-Transformer 联合预测视频与双声道音频 latent；视觉与音频分别使用 H3-VisualVAE 和 H3-AudioVAE。<br><strong>控制/任务：</strong>官方规格覆盖文本、首/尾帧和全模态参考生成；Ref2VA 最多接收 9 张图像、3 段视频和 3 段音频且总文件不超过 12 个，托管系统规格为 4–15 秒、24 FPS、32 kHz 立体声，2K 通过 in-context regeneration 获得。<br><strong>意义/边界：</strong><a href="https://www.minimax.io/news/minimax-h3-open-source">2026-08-03 开放</a>的是两个 CFG-distilled H3-Base checkpoint，本地 Base 工作流输出 768p；H3-Context-IR、H3-Regenerate-2K 与初版 sparse-attention 实现并未随首批权重开放，因此不能把完整托管 2K 系统笼统称为全部开源；性能仍是官方自评。<br><strong>资源：</strong><a href="https://www.minimax.io/blog/minimax-h3">Official Technical Release</a> · <a href="https://www.minimax.io/research">Project</a> · Code <a href="https://github.com/MiniMax-AI/MiniMax-H3"><img src="https://img.shields.io/github/stars/MiniMax-AI/MiniMax-H3?style=social" alt="GitHub: MiniMax-AI/MiniMax-H3" /></a> · <a href="https://huggingface.co/MiniMaxAI/MiniMax-H3">Base Weights</a> · <a href="https://hailuoai.video/">Hosted Demo（需账号/地区限制）</a></td>
+<td><strong>2026 — <a href="https://www.minimax.io/blog/minimax-h3">MiniMax H3</a></strong> <code>官方技术发布</code> <code>前沿观察（暂定）</code> <code>部分开放权重</code><br><strong>表示/机制：</strong>官方技术说明称将文本、图像、视频和音频编码为 packed multimodal sequence，由 33B dense single-stream H3-Omni-Transformer 联合预测视频与双声道音频 latent；视觉与音频分别使用 H3-VisualVAE 和 H3-AudioVAE。<br><strong>控制/任务：</strong>官方规格覆盖文本、首/尾帧和全模态参考生成；Ref2VA 最多接收 9 张图像、3 段视频和 3 段音频且总文件不超过 12 个，托管系统规格为 4–15 秒、24 FPS、32 kHz 立体声，2K 通过 in-context regeneration 获得。<br><strong>意义/边界：</strong><a href="https://www.minimax.io/news/minimax-h3-open-source">2026-08-03 开放</a>的是两个 CFG-distilled H3-Base checkpoint，本地 Base 工作流输出 768p；H3-Context-IR、H3-Regenerate-2K 与初版 sparse-attention 实现并未随首批权重开放，因此不能把完整托管 2K 系统笼统称为全部开源；性能仍是官方自评。<br><strong>资源：</strong><a href="https://www.minimax.io/blog/minimax-h3">Official Technical Release</a> · <a href="https://www.minimax.io/research">Project</a> · Code <a href="https://github.com/MiniMax-AI/MiniMax-H3"><img src="https://img.shields.io/github/stars/MiniMax-AI/MiniMax-H3?style=social" alt="GitHub: MiniMax-AI/MiniMax-H3" /></a> · <a href="https://huggingface.co/MiniMaxAI/MiniMax-H3">Base Weights</a> · <a href="https://hailuoai.video/">Hosted Demo（需账号/地区限制）</a></td>
 </tr>
 </table>
 
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2026-seedance25.jpg" alt="Seedance 2.5 长音视频延展与时间轴编辑概念图"></td>
-<td><strong>2026 — <a href="https://seed.bytedance.com/en/blog/one-take-creation-flexible-referencing-introducing-seedance-2-5">Seedance 2.5</a></strong> <code>官方产品发布</code> <code>Frontier observation</code> <code>创作模型</code><br><strong>表示/机制：</strong>官方发布称在 Seedance 2.0 的联合音视频架构上强化长叙事、参考生成与局部编辑。<br><strong>控制/任务：</strong>官方规格为单次最长 30 秒、支持多轮延展，最多 30 张图像、10 段视频和 10 段音频参考，并支持时间戳级编辑。<br><strong>意义/边界：</strong>截至 2026-08 是该路线更新节点；复杂物理、多主体与长时状态稳定性仍需独立评测，官方也明示了相关限制。<br><strong>资源：</strong><a href="https://seed.bytedance.com/en/blog/one-take-creation-flexible-referencing-introducing-seedance-2-5">Official Product Release</a> · <a href="https://seed.bytedance.com/seedance2_5">Project</a> · Code：未公开 · Weights：未公开 · <a href="https://jimeng.jianying.com/">Demo（需账号/地区限制）</a> · API：发布页仍标注即将提供</td>
+<td><strong>2026 — <a href="https://seed.bytedance.com/en/blog/one-take-creation-flexible-referencing-introducing-seedance-2-5">Seedance 2.5</a></strong> <code>官方产品发布</code> <code>前沿观察（暂定）</code> <code>创作模型</code><br><strong>表示/机制：</strong>官方发布称在 Seedance 2.0 的联合音视频架构上强化长叙事、参考生成与局部编辑。<br><strong>控制/任务：</strong>官方规格为单次最长 30 秒、支持多轮延展，最多 30 张图像、10 段视频和 10 段音频参考，并支持时间戳级编辑。<br><strong>意义/边界：</strong>截至 2026-08 是该路线更新节点；复杂物理、多主体与长时状态稳定性仍需独立评测，官方也明示了相关限制。<br><strong>资源：</strong><a href="https://seed.bytedance.com/en/blog/one-take-creation-flexible-referencing-introducing-seedance-2-5">Official Product Release</a> · <a href="https://seed.bytedance.com/seedance2_5">Project</a> · Code：未公开 · Weights：未公开 · <a href="https://jimeng.jianying.com/">Demo（需账号/地区限制）</a> · API：发布页仍标注即将提供</td>
 </tr>
 </table>
 
@@ -798,7 +859,7 @@ Sora 在生成路线中提出“视频生成可能通向世界模拟器”的研
 
 ## 如何正确阅读这条时间线
 
-对每个节点都问四个问题：
+对每个节点都问六个问题：
 
 1. **表示是什么？** 原始像素、光流、离散 code、连续 latent、feature，还是显式 3D？
 2. **时间如何建模？** 帧重组、RNN、变换核、自回归、masked prediction、diffusion、速度场，还是动作条件 dynamics？

@@ -83,6 +83,10 @@ markdown_extensions:
             kwds:
               mode: generic
               tag: pre
+        # Material for MkDocs initializes Mermaid diagrams from this class.
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
 
 extra_javascript:
   - assets/js/mathjax.js
