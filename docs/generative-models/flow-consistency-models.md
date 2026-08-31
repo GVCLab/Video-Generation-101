@@ -81,7 +81,7 @@ f(x,\tau)-\frac{1}{2}g(\tau)^2s_\tau(x).
 
 ### 2.2 一张图看清从 score 到 flow
 
-![图 020：Diffusion 到连续运输的桥梁](assets/imagegen-diagrams/020/diagram.png)
+![图 020：Diffusion 到连续运输的桥梁](../../assets/imagegen-diagrams/020/diagram.png)
 **图的顺序化文字替代：**
 
 1. 数据经离散加噪或前向 SDE 形成噪声边缘族。
@@ -133,7 +133,7 @@ v_\theta(\hat X_s,s),
 
 **图：五层不能压成一个方法名。** 第一、二层描述模型学到的场与对应连续过程；第三层只替换已有模型的积分方法或时间网格；第四层会优化新的参数或 student；第五层处理视频时间 $k$ 上的因果性和系统交付。图中 `CM / PD` 是紧凑记忆标签，不表示二者损失相同；`Shortcut / MeanFlow` 也只表示两者都学习跨区间运输信息。
 
-![图 021：DDPM、SDE、PF-ODE、Flow Matching、Rectified Flow、Consistency 与 DMD 的五层关系](assets/imagegen-diagrams/021/diagram.png)
+![图 021：DDPM、SDE、PF-ODE、Flow Matching、Rectified Flow、Consistency 与 DMD 的五层关系](../../assets/imagegen-diagrams/021/diagram.png)
 **顺序化文字替代：** 第一，DDPM/score 训练学习可换算的 denoiser 或 score，既能驱动随机 reverse SDE，也能驱动确定 PF-ODE；第二，FM/RF 回归的是由所选概率路径和耦合诱导的边缘速度，生成时积分 learned ODE；第三，DDIM、DPM-Solver 或新时间网格通常复用已有场，不产生新 student；第四，PD/CD/CM 对齐轨迹或 flow map，DMD/DMD2 对齐教师与学生分布，Shortcut/MeanFlow/$\alpha$-Flow 学习跨步长或区间运输；第五，以上任一路线都还需独立选择 causal attention、chunking、KV cache 和服务流水线，少 NFE 本身不提供 streaming。
 
 | 看到的词 | 它真正改变什么 | 不能据此推出什么 | 最低复现字段 |
@@ -382,7 +382,7 @@ CausVid 把 50-step 双向视频 diffusion 教师蒸馏为 4-step 因果自回�
 - **Streaming**：系统能否边接收条件、边生成、边交付，并维持跨 chunk 状态？
 - **Real-time**：在明确硬件与服务级目标（SLO）下，首帧、截止期与抖动是否达标？
 
-![图 022：Few-Step 与流式生成的正交关系](assets/imagegen-diagrams/022/diagram.png)
+![图 022：Few-Step 与流式生成的正交关系](../../assets/imagegen-diagrams/022/diagram.png)
 **图的顺序化文字替代：**
 
 1. 先在噪声/运输时间轴上选择场学习、映射学习或分布蒸馏。

@@ -55,7 +55,7 @@ c_{\mathrm{motion}},c_{\mathrm{cam}},c_{\mathrm{audio}}),
 
 Animate Anyone 用参考人物图和姿态序列驱动角色，属于 reference-driven character animation；不能用它证明通用场景首帧 I2V 已解决 [[29]](#ref-29)。VACE 同时覆盖视频生成、编辑、参考图和控制信号，只有其“图像作为时间锚点、无源视频”的子协议属于 I2V [[30]](#ref-30)。CameraCtrl 从文本和相机轨迹生成视频，若没有输入锚点图，任务仍是 camera-conditioned T2V [[31]](#ref-31)。
 
-![图 052：图像条件视频任务的边界判定](assets/imagegen-diagrams/052/diagram.png)
+![图 052：图像条件视频任务的边界判定](../../assets/imagegen-diagrams/052/diagram.png)
 **图的顺序化文字替代：**
 
 1. 先检查是否有源视频：保留并修改既有时间轴属于 video editing；只把已发生片段当历史、生成未知未来属于 continuation/prediction。
@@ -120,7 +120,7 @@ A_{\mathrm{out}}\in\mathbb R^{B\times C_a\times S}.
 
 ### 2.3 六种条件注入位置
 
-![图 053：图像到视频的条件注入与失败定位链](assets/imagegen-diagrams/053/diagram.png)
+![图 053：图像到视频的条件注入与失败定位链](../../assets/imagegen-diagrams/053/diagram.png)
 **图的顺序化文字替代：**
 
 1. 训练视频先经时空 VAE 得到干净视频 latent，再进入加噪或 flow-matching 路径。

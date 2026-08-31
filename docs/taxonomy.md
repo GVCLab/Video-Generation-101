@@ -16,7 +16,7 @@
 
 **图 1：任务是坐标，不是等级。** 中央卡片给出非穷尽的常见主坐标，不表示任务只能接受一种输入；图中的 `Video Inpainting` 是缺失支持补全，整帧 blur、noise、downsample 或 compression 的退化恢复已在下方任务表及[专门合同图](tasks/video-restoration.md)中独立建模。上方 `INTERACTION HORIZON` 是独立第三轴，因此没有用连线把每个任务永久绑定到某个时域。生成图经过两轮纠错：首稿纠正了插帧、预测和数字人的条件位置，次稿删除了会暗示固定关系的虚线。图像提示词、版本和 SHA-256 见[研究日志](../sources/research_20260830_task_application_taxonomy.md)。
 
-![图 078：视频生成任务的三个可组合坐标](assets/imagegen-diagrams/078/diagram.png)
+![图 078：视频生成任务的三个可组合坐标](../assets/imagegen-diagrams/078/diagram.png)
 顺序化文字替代：先写条件来源，再写输出与源素材之间的关系，然后写系统是一次性生成、跨段记忆还是动作—观测闭环；三项合成任务合同。任务合同规定哪些内容必须改变、哪些内容不得改变以及需要什么证据。AR、masked、diffusion、flow、GAN 或混合系统只是实现方案，不能反向替代任务定义。
 
 ## 2. 三个坐标分别回答什么
@@ -169,7 +169,7 @@ Video Diffusion Models 曾在同一研究框架里覆盖无条件生成、文本
 - $H$：clip、长期记忆或闭环时域；
 - $E$：能证伪任务主张的评测协议。
 
-![图 079：从任务合同到证伪测试](assets/imagegen-diagrams/079/diagram.png)
+![图 079：从任务合同到证伪测试](../assets/imagegen-diagrams/079/diagram.png)
 ### 5.1 保持账本与变化账本
 
 对每个属性 $j$，先声明它属于必须保持集合 $K$ 还是允许改变集合 $\Delta$。编辑任务可把综合损失写成：

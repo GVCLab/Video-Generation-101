@@ -26,7 +26,7 @@
 
 **图 1：系统不是单标签，claim 也不能脱离证据。** 图中示例只说明组合关系，不代表性能排序。生成图中的虚线用于提示代表系统；下面的 Mermaid 给出确定性连接和可搜索文字。
 
-![图 008：视频生成系统的五个交叉分类轴](assets/imagegen-diagrams/008/diagram.png)
+![图 008：视频生成系统的五个交叉分类轴](../assets/imagegen-diagrams/008/diagram.png)
 顺序化文字替代：先确定生成变量是像素、连续 latent 还是离散 token；再确定联合分布按全片、逐帧、逐 token、mask 块、尺度或因果 chunk 怎样分解；再选择 ELBO、adversarial、denoising/score、flow、consistency/DMD 或偏好目标；由 U-Net、DiT、decoder-only Transformer 或 recurrent/SSM 实现；最后才讨论离线、少步、流式或交互部署。系统声称什么，就必须提供对应的质量、NFE、TTFF、deadline、长期漂移或闭环控制证据。
 
 ## 2. 为什么旧式“路线列表”会误导
@@ -241,7 +241,7 @@ StreamDiffusionV2 把 TTFF、逐帧 deadline、jitter、SLO-aware batching 和�
 
 最常见的概念错误，是把视频帧时间 $k$ 与去噪/运输时间 $\tau$ 混成一个 $t$。下图右侧的 $\tau$ 链只适用于采用 diffusion、flow 或 consistency 条件头的分支；纯分类式 CE 或其他条件头不会进入这条噪声时间链。
 
-![图 009：视频时间与噪声时间的双时钟](assets/imagegen-diagrams/009/diagram.png)
+![图 009：视频时间与噪声时间的双时钟](../assets/imagegen-diagrams/009/diagram.png)
 顺序化文字替代：factorization 先决定当前要生成第 $k$ 帧、一个 token、一个 chunk 或一个 mask 块；若条件分布采用 diffusion/flow，内部再沿 $\tau$ 从 base noise 走到样本；样本被 commit 后才进入下一个数据时间。因而“autoregressive diffusion”通常是 data-time AR 与 noise-time denoising 的组合，不是一个神秘的第三时钟。
 
 ## 9. 2023–2026 的关键里程碑应该怎样读

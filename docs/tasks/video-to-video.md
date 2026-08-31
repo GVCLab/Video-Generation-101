@@ -64,7 +64,7 @@ T_{\mathrm{V2V}}=(X,U,M,R,C,H)\rightarrow(Y,\Delta,D),
 | driving video + 人像参考 → 新人物动画 | 通常否 | driving video 提供动作控制；若还要编辑 driving video 本身才进入 V2V |
 | 主体参考集 + prompt → 新时间轴视频 | 否 | 没有完整源视频可守恒；属于[开放集视频个性化](personalized-video-generation.md) |
 
-![图 074：严格视频到视频编辑的边界判定](assets/imagegen-diagrams/074/diagram.png)
+![图 074：严格视频到视频编辑的边界判定](../../assets/imagegen-diagrams/074/diagram.png)
 **顺序化文字替代：** 先确认存在完整源视频；再确认输出修改的是这条既有时间轴，而非把它当驱动或历史。若目标只是恢复原内容，再判断是全帧退化观测的 restoration，还是由 mask 指定缺失支持的 inpainting。其余按局部、全局、运动或相机 / 视角编辑分流，每一支都同时写出编辑目标和守恒目标。
 
 ## 2. 方法选择器：控制越强，证据合同越具体
@@ -82,7 +82,7 @@ T_{\mathrm{V2V}}=(X,U,M,R,C,H)\rightarrow(Y,\Delta,D),
 5. 若改变速度、运动路径或镜头结构，进入 retime / restructure，并显式冻结身份和因果连续性。
 6. 所有路线都输出 edit ledger，并分别验收 edit success、source fidelity、locality、temporal consistency 和 identity/motion preservation。
 
-![图 075：视频编辑方法主线选择器](assets/imagegen-diagrams/075/diagram.png)
+![图 075：视频编辑方法主线选择器](../../assets/imagegen-diagrams/075/diagram.png)
 **顺序化文字替代：** 先由 mask 外是否需要像素级锁定决定是否使用 mask-aware 路线。没有专用训练数据时优先考虑 inversion 与测试时注入；大幅语义变化优先原生编辑模型；首帧或关键帧驱动的小改动可走对应传播。运动、相机和材质分解需要更具体的 2D / 3D / RGBX 控制。最后按离线、多轮长视频或因果流式选择状态管理。上方 PNG 用于快速识别输出关系；本 Mermaid 保留“任务合同 → 控制自由度 → 时序形态”的可编辑精确分支。
 
 ## 3. 八条机制路线及各自的守恒假设

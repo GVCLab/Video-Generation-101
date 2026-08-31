@@ -24,7 +24,7 @@ s=(T,H,W,f,\rho,\gamma,\text{seed},\ldots)
 
 ## 三条边界：条件、来源像素和反馈
 
-![图 063：T2V task boundary by condition and feedback](assets/imagegen-diagrams/063/diagram.png)
+![图 063：T2V task boundary by condition and feedback](../../assets/imagegen-diagrams/063/diagram.png)
 顺序替代：先问系统是否持续接收动作与新观测；只要存在这种在线反馈，就进入动作条件或交互式 world model，再在该任务内部记录观测是像素、状态还是二者兼有。没有闭环反馈时，再判断是否含文本以外的来源内容或结构条件：首帧/参考图转到 I2V/TI2V，来源视频转到 V2V、编辑或修复，姿态/深度/轨迹属于结构控制生成；只有文本、seed 和生成配置时才是纯 T2V。
 
 | 任务 | 最小输入 | 主要验收对象 | 本仓库入口 |
@@ -60,7 +60,7 @@ s=(T,H,W,f,\rho,\gamma,\text{seed},\ldots)
 
 一个可复现实验必须保存的不只是 prompt，还包括 prompt 的结构化版本、数据过滤版本、编码器、codec、噪声/流时间、采样器与 seed。
 
-![图 064：Text-to-video training and inference contract](assets/imagegen-diagrams/064/diagram.png)
+![图 064：Text-to-video training and inference contract](../../assets/imagegen-diagrams/064/diagram.png)
 顺序替代：原始视频及标题、字幕、ASR、OCR 先做镜头切分、授权/去重/安全/质量过滤，再由 captioner 编译多粒度事件描述；视频经 codec 得到 latent/token，文本经编码器得到条件；基础模型用 diffusion/flow 或 AR/masked likelihood 训练。偏好对或 reward data 可以再与预训练生成器进入 DPO/RL 后训练，也可以跳过该阶段直接冻结基础模型。推理时，原始用户 prompt 必须经版本匹配的 compiler/text encoder 产生 condition tokens，与冻结生成器、seed、求解器、guidance 和长度共同进入采样，最后记录事实命中、失败类型、成本和延迟。
 
 一个足以复现实验的最小记录可写成：
@@ -163,7 +163,7 @@ Classifier-free guidance 或更强文本编码器只能改变条件强度，不�
 
 预训练优化的是数据分布拟合；后训练开始直接优化可用性，但 reward 只能覆盖它测得到的内容。
 
-![图 065：Post-training routes and evidence risks for T2V](assets/imagegen-diagrams/065/diagram.png)
+![图 065：Post-training routes and evidence risks for T2V](../../assets/imagegen-diagrams/065/diagram.png)
 顺序替代：预训练生成器可走高质量 SFT、直接偏好 DPO、reward-model 加 RL，或少步蒸馏，这些路线会更新生成器；prompt optimizer 则产生优化后的 prompt，送入冻结的版本化生成器，改变的是候选系统输入而非模型权重。两类候选都必须在未用于奖励训练的难例与外部评测上检查；通过后冻结模型、编译器与评测版本，失败则定位 reward hacking、多样性下降、语义篡改或偏好过拟合。
 
 | 工作 | 更新对象 | 训练信号 | 应如何解释证据 |

@@ -82,7 +82,7 @@ A=a_{T_c:T_c+T_h-1}\in\mathbb R^{B\times T_h\times d_a}.
 
 ## 🧩 2. Tensor、训练与 rollout 合同
 
-![图 070：视频预测的训练与推理张量合同](assets/imagegen-diagrams/070/diagram.png)
+![图 070：视频预测的训练与推理张量合同](../../assets/imagegen-diagrams/070/diagram.png)
 **顺序化文字替代：**
 
 1. 把完整训练片段沿时间切成 $X$ 与 $Y$，并保留原始时间戳/FPS。
@@ -124,7 +124,7 @@ Self Forcing 用自回归 rollout、KV cache、少步 diffusion 和 stochastic g
 
 ## 🧭 3. 技术路线：表示、随机性与 rollout 是三条正交轴
 
-![图 071：视频预测的五条技术路线及其证据出口](assets/imagegen-diagrams/071/diagram.png)
+![图 071：视频预测的五条技术路线及其证据出口](../../assets/imagegen-diagrams/071/diagram.png)
 **顺序化文字替代：**
 
 1. 所有路线都从只含过去的前缀开始。

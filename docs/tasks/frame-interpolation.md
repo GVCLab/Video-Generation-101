@@ -68,7 +68,7 @@ Super SloMo 通过时间相关的流组合和 visibility map 支持多个查询�
 
 ## 🧩 2. 一条可检查形状的 tensor/data flow
 
-![图 049：双帧视频插值的张量数据流](assets/imagegen-diagrams/049/diagram.png)
+![图 049：双帧视频插值的张量数据流](../../assets/imagegen-diagrams/049/diagram.png)
 最低限度应在实现文档里写出三件事：flow 的方向、坐标单位和 `align_corners`/边界采样约定。只写“warp 两帧”而不写 $F_{\tau\rightarrow0}$ 还是 $F_{0\rightarrow\tau}$，复现时很容易得到符号相反但仍能运行的代码。
 
 ### 2.1 backward warping：目标像素去哪里取值
@@ -108,7 +108,7 @@ Softmax Splatting 用可学习的重要性 $Z(x)$ 对碰撞做指数归一化 [[
 
 ## 🗺️ 3. 机制地图：不要按网络名字硬分家
 
-![图 050：视频帧插值技术路线与可组合模块](assets/imagegen-diagrams/050/diagram.png)
+![图 050：视频帧插值技术路线与可组合模块](../../assets/imagegen-diagrams/050/diagram.png)
 这张图纠正两个常见误分类：**IFRNet 是 encoder–decoder CNN，不是 Transformer**；**AMT 的 Transforms 不是 Transformer**，官方摘要明确称其为 convolution-based model [[9]](#ref-9), [[13]](#ref-13)。
 
 ## 🌊 4. 显式运动、遮挡与局部采样
@@ -260,7 +260,7 @@ BiM-VFI 用由相对距离与方向描述的 bidirectional motion field 缓解�
 
 ## 📊 10. Benchmark 不是一个名字，而是一组数据协议
 
-![图 051：可复核的视频帧插值评测协议](assets/imagegen-diagrams/051/diagram.png)
+![图 051：可复核的视频帧插值评测协议](../../assets/imagegen-diagrams/051/diagram.png)
 ### 10.1 常用数据集的正确用途
 
 | 数据集/协议 | 常见设置 | 能测什么 | 可比性陷阱 |

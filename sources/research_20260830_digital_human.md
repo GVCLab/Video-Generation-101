@@ -139,11 +139,12 @@ arXiv 五个主查询共返回 344 个“query slots”，存在大量重叠，�
 
 授权要求由系统用途决定，不能从开源许可证推导。例如代码 Apache-2.0 或 MIT，不代表训练数据、人物肖像、声音、模型输出或数据集都可商用；TalkCuts 的数据许可必须与代码许可分开读取。
 
-## 8. 旧图与正文引用审计
+## 8. 原图中文重绘与正文引用审计
 
-- 被要求检查的旧路径：`figures/digital-human-video-generation-overview.png`。
-- 2026-08-30 在仓库中检查结果：文件存在，尺寸 1672 × 941，SHA-256 为 `735fa1795dc64505ca35cd8a0435d92d0100cc55c6dafc8fb8f231d4ee4255de`。图中包含 `Identity 0.92`、`Temporal Consistency 0.90` 等示意数值，但没有给出数据集、模型版本、样本数、特征提取器或计算方法，不能当作实验结果。
-- 处理：保留旧文件但新正文不再引用；另生成一张不含外部数值的条件与同步合同图，并保留两幅教学型 Mermaid，分别说明任务决策树和授权—生成—评测—溯源链。
+- 被要求检查的完整路径：`docs/tasks/figures/digital-human-video-generation-overview.png`；2026-08-31 已在原路径原位替换为中文重绘版。
+- 2026-08-30 原图记录：尺寸 1672 × 941，SHA-256 为 `735fa1795dc64505ca35cd8a0435d92d0100cc55c6dafc8fb8f231d4ee4255de`。原图包含 `Identity 0.92`、`Temporal Consistency 0.90` 等无协议支撑的示意数值，不能当作实验结果。
+- 2026-08-31 中文重绘版记录：尺寸 1672 × 941，RGB PNG，文件大小 1,287,961 bytes，SHA-256 为 `4e550f7c7646fe6906df485e0be9bf4fc3b9d3f137e2f5252c527fc02f7bd971`。主体文字已改为简体中文，仅保留 `Transformer`、`Token`、`×L` 等必要技术术语；原数值已删除，三条评测均标为“示意值”，并明确注明“评测条仅为流程示意，不代表实验结果”。
+- 处理：原图已在原路径中文重绘；正文仍不引用这张总览图，无示意分数的条件与同步合同图继续作为正文主图；同时保留两幅教学型 Mermaid，分别说明任务决策树和授权—生成—评测—溯源链。
 - Mermaid 只表达分类/流程，不声称 benchmark 分数或 SOTA 排名。
 
 ## 9. 纳入、排除与残余不确定性
@@ -179,7 +180,13 @@ arXiv 五个主查询共返回 344 个“query slots”，存在大量重叠，�
 - Mermaid CLI 11.16.0：从正文提取 2 个 Mermaid block，在临时目录实际生成 2 个非空 SVG；没有把渲染产物写入仓库。
 - `git diff --check`：正文与新日志均无空白错误。
 - 外链语法共解析出 50 个唯一 HTTPS 目标。批量 HTTP 探测受当前环境对 arXiv/GitHub 的超时及 ACM DOI 403 限制，不能把网络失败当作坏链；探测发现的 SadTalker 与 Hallo3 两个 CVF 路径错误已回到 CVF 官方记录逐项修正。
-- 新增教学 PNG；未修改旧 PNG，未修改 coverage audit，未执行 commit/push。
+- 新增教学 PNG；本条记录对应 2026-08-30 当日状态，未执行 commit/push。
+
+2026-08-31 中文重绘补充验证：
+
+- `docs/tasks/figures/digital-human-video-generation-overview.png` 已在原路径完成中文重绘，尺寸仍为 1672 × 941，主体文字为简体中文。
+- 已删除原有 `0.92`、`0.90` 数字，并以“示意值”和“不代表实验结果”的可见文字约束证据边界。
+- 视觉回读确认四栏流程、条件、表征、生成器、输出与评测结构均完整，无边缘裁切；正文仍继续使用无示意分数的合同图。
 
 ## 11. 图像资产记录
 
@@ -188,3 +195,11 @@ arXiv 五个主查询共返回 344 个“query slots”，存在大量重叠，�
 - 像素尺寸：1672 × 941，RGB PNG。
 - SHA-256：`69c11a02b0e27f038096c50cff97b7ddf0b035dee61be6c26dfcc2c4f9818ad5`。
 - 视觉回读：四类输入均先经过授权门，且没有绕过路径；通过与不通过出口、四步生成链和口型/身份/动作/音画四个验收轴均清晰。正文同时保留 Mermaid 与文字合同。
+
+补充资产记录（2026-08-31）：
+
+- 项目文件：[`docs/tasks/figures/digital-human-video-generation-overview.png`](../docs/tasks/figures/digital-human-video-generation-overview.png)
+- 重绘方式：以内置 Imagegen 对原图做中文定向重绘，并在独立视觉复核后删除无协议支撑的具体分数。
+- 像素尺寸：1672 × 941，RGB PNG；文件大小 1,287,961 bytes。
+- SHA-256：`4e550f7c7646fe6906df485e0be9bf4fc3b9d3f137e2f5252c527fc02f7bd971`。
+- 视觉回读：四栏结构与主要流程保持完整；三条评测均标“示意值”，底部明确“不代表实验结果”；该图仍不作为数值证据引用。

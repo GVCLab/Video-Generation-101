@@ -388,7 +388,7 @@ The Seriality Gap in Video Diffusion Models 用可控的多球依赖链指出：
 
 本节把这四级局部机制证据记作 **R1–R4**。它们只回答“视频推理结论由什么实验支持”，不等同于[评测指南](evaluation.md)中世界模型能力的全局 L0–L7；例如 R4 闭环回报仍可能只发生在模拟器里，不能自动上升为全局 L7 现实效用。
 
-![图 082：视频推理的三个时间轴与四级证据](assets/imagegen-diagrams/082/diagram.png)
+![图 082：视频推理的三个时间轴与四级证据](../assets/imagegen-diagrams/082/diagram.png)
 **顺序化文字替代：**
 
 1. 输出时间从 $x_1$ 走到 $x_T$，提供可观察轨迹和最终答案，但不单独证明内部因果计算。

@@ -112,7 +112,7 @@ r_{elem}=\frac{CTHW}{C_zT'H'W'},\qquad
 N_{token}=T'H'W'.
 ```
 
-![图 034：视频 tokenizer 的张量与码率四本账](assets/imagegen-diagrams/034/diagram.png)
+![图 034：视频 tokenizer 的张量与码率四本账](../../assets/imagegen-diagrams/034/diagram.png)
 顺序化文字替代：输入 `[B,C,T,H,W]` 经 encoder 形成 continuous `[B,Cz,T',H',W']` 或 discrete `[B,T',H',W']`。第一本账只计算时间、空间和时空网格比；第二本账加入输入/latent 通道与 dtype；第三本账用 $N_{token}$ 与 $\log_2K_c$ 计算离散代码的名义容量；第四本账必须再经过概率模型、熵或算术编码，并计入 header、chunk、index 与 side information，才得到 actual bits、bpp 和带 duration/FPS 的 bitrate。Cosmos 官方示例把 `[1,3,9,512,512]` 变成 continuous `[1,16,3,64,64]` 或 discrete `[1,3,64,64]` [[20]](#ref-20)：精确 $r_t=3$、$r_{hw}=64$、$r_{grid}=192$、continuous $r_{elem}=36$；名义 $t4s8s8$ 的长片渐近值才是 $r_{grid}=256$、$r_{elem}=48$。配置名不能替代有限 clip 的实际 shape。
 
 ### 3.1 四本账各自回答什么
@@ -159,7 +159,7 @@ T'=1+\left\lfloor\frac{T-1}{f_t}\right\rfloor
 
 但不同实现有不同 padding、stride、chunk 和 crop，**实际 API 输出 shape 优先于公式或型号名**。Cosmos 明确第一个 temporal token 锚定第一帧 [[20]](#ref-20)；HunyuanVideo 公开 CausalConv3D、名义 $t4s8s8$ 与 16 latent channels，这足以核 shape，不足以推 bitrate [[21]](#ref-21)。
 
-![图 035：因果视频 tokenizer 的首帧与分块边界](assets/imagegen-diagrams/035/diagram.png)
+![图 035：因果视频 tokenizer 的首帧与分块边界](../../assets/imagegen-diagrams/035/diagram.png)
 顺序化文字替代：输入 $x_1\ldots x_9$ 经过只读当前与过去的 codec，形成 $z_0,z_1,z_2$；第一个 temporal token 锚定第一帧，后续 receptive field 可以重叠，不能画成永远独占的四帧桶。实现可从 cold start/reset 进入 chunk $k$，也可携带 chunk $k-1$ 的 cache；随后可能有 warm-up、overlap 和 crop，只有 committed frames 可见，并须比较 cache carry 与 reset 的接缝。causal codec 不推出 causal upper generator，后者也不推出 streaming commit 或 real-time SLO；TTFF、稳态 FPS/deadline、峰值显存和质量漂移都要测量。
 
 ### 4.2 Prefix-invariance 是最小因果证据

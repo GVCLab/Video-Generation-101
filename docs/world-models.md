@@ -78,7 +78,7 @@ q_\phi(z_t\mid h_t,o_t) &\quad\text{（后验，用于观测校正）}.
 
 这里的 posterior 在新观测到来时校正 belief，prior 在没有新观测时按动作想象；数学上与随机未来模型共享 variational state-space 接口。ELBO、prior–posterior gap、posterior collapse、aleatoric/epistemic 分账见[变分随机视频生成](generative-models/variational-generation.md)；reward/continue、planner、return 与 model exploitation 仍由本章负责。两种验收不能互相替代。
 
-![图 083：RSSM 的先验想象与后验观测校正](assets/imagegen-diagrams/083/diagram.png)
+![图 083：RSSM 的先验想象与后验观测校正](../assets/imagegen-diagrams/083/diagram.png)
 _图 1：RSSM 的“先验想象—后验校正”结构。实线表示有观测时的更新，虚线表示仅依靠 learned dynamics 的 rollout。_
 
 顺序化文字替代：
@@ -247,7 +247,7 @@ World Action Verifier（WAV）提供了一个可插入这两种级联系统的�
 
 ### 6.4 Receding horizon：每次只相信一小段未来
 
-![图 084：带验证器和不确定性的滚动时域闭环](assets/imagegen-diagrams/084/diagram.png)
+![图 084：带验证器和不确定性的滚动时域闭环](../assets/imagegen-diagrams/084/diagram.png)
 _图 3：带 verifier、不确定性和 persistent state 的 receding-horizon 闭环。_
 
 顺序化文字替代：

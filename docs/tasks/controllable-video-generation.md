@@ -62,7 +62,7 @@ C_k=(s_k,\tau_k,\mathcal F_k,v_k,m_k,q_k,w_k,\pi_k).
 
 ![细粒度可控视频的五阶段合同：控制信号经坐标、时间、遮挡与冲突规则规范化后，通过 adapter、attention 或 guidance 进入生成器，最后分开评估控制、保真、运动和多样性。](../../assets/diagrams/controllable-video-contract.png)
 
-![图 046：细粒度可控视频的五阶段合同](assets/imagegen-diagrams/046/diagram.png)
+![图 046：细粒度可控视频的五阶段合同](../../assets/imagegen-diagrams/046/diagram.png)
 **图的顺序化文字替代：**
 
 1. 输入分成四类：相机内外参、对象轨迹/框/掩码、姿态/深度/法线/边缘/光流结构序列，以及身份/外观参考。

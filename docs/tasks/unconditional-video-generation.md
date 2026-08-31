@@ -60,7 +60,7 @@ $T,H,W,\mathrm{fps}$ 是全局采样规格，不是样本语义条件。若用�
 
 **图 1：从任务定义到证据的最短链。** “无外部条件”约束部署输入；统一输出合同之后，质量、覆盖、长尾与未复制必须分开评测，并固定特征、时长和随机种子。下方判定树进一步区分类别、文本、图像前缀、动作和自条件。
 
-![图 066：无条件视频生成的部署输入判定树](assets/imagegen-diagrams/066/diagram.png)
+![图 066：无条件视频生成的部署输入判定树](../../assets/imagegen-diagrams/066/diagram.png)
 **顺序化文字替代：**
 
 1. 先检查一次部署采样是否接收样本特定的外生信息。
@@ -134,7 +134,7 @@ x_\tau=(1-\tau)\epsilon+\tau X,
 
 学习 $v_\theta\approx u^*$，再积分 $\mathrm d x/\mathrm d\tau=v_\theta(x,\tau)$。Flow Matching 提供了通用连续归一化流训练框架 [[24]](#ref-24)；它减少到多少步、是否仍需首帧，必须由具体视频系统证明。
 
-![图 067：无条件视频生成的训练采样与证据闭环](assets/imagegen-diagrams/067/diagram.png)
+![图 067：无条件视频生成的训练采样与证据闭环](../../assets/imagegen-diagrams/067/diagram.png)
 **顺序化文字替代：**
 
 1. 原始视频先按 source ID 去重和划分，再按固定 $T,H,W,$ FPS 与 crop 生成 clip。

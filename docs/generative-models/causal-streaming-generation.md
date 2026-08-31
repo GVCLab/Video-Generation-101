@@ -85,7 +85,7 @@ M_{KV}\propto L\,N_{history}\,d,
 
 ## 3. 一张技术栈图：实时不是单个算法
 
-![图 014：因果流式视频生成的五层技术栈](assets/imagegen-diagrams/014/diagram.png)
+![图 014：因果流式视频生成的五层技术栈](../../assets/imagegen-diagrams/014/diagram.png)
 这五层可独立变化。评测发现的暴露偏移、漂移、冻结、遗忘或 deadline miss，应分别反馈到 on-policy 训练、memory policy 或 serving 层。一个论文可能只改训练范式，一个只压缩 KV cache，另一个只做 serving scheduler；比较时必须指出增益来自哪一层，否则容易把多卡系统吞吐误写成生成模型本身的质量进步。
 
 ## 4. 训练路线一：Diffusion Forcing 改变“哪些位置有多噪”
@@ -101,7 +101,7 @@ z_i(\tau_i)=\alpha(\tau_i)z_i^0+\sigma(\tau_i)\epsilon_i,
 
 ### 4.1 逐位置噪声怎样变成滚动提交
 
-![图 015：逐位置噪声与滚动提交](assets/imagegen-diagrams/015/diagram.png)
+![图 015：逐位置噪声与滚动提交](../../assets/imagegen-diagrams/015/diagram.png)
 顺序文字替代：A 只把一个噪声目标去噪到 $\tau=0$ 后提交，更远未来尚不存在；B 让整段共享同一噪声阶段，所有位置一起下降，最后一次提交全片；C 保留 $\tau=0$ 的不可变前缀，让活动窗口中的位置处于不同噪声等级，最左单元完成后才提交、右移并追加一个 $\tau=1$ 的新位置。图中实线表示去噪或提交，虚线表示四个仍需独立证明的 gate。$[0,0,.25,.5,.75,1]$ 只是单调 rolling schedule 的例子，不是所有 Diffusion Forcing 训练样本的必要形式。
 
 两个反例尤其重要：即使 $\tau_i$ 不同，只要 attention 仍读取未来且系统等待全片才交付，它就不是 causal streaming；“4 denoising steps”描述一次输出单元的网络调用预算，不是“生成或提交 4 帧”。
@@ -221,7 +221,7 @@ M_{recent}+M_{anchor}+M_{persistent}+M_{compressed}
 
 而 $M_{ext}(k)$ 可以随已提交时长 $k$ 增长。把检索索引放到 CPU 或磁盘，只证明 resident GPU memory 有界，不能写成总系统成本恒定。
 
-![图 016：长时生成的有界记忆合同](assets/imagegen-diagrams/016/diagram.png)
+![图 016：长时生成的有界记忆合同](../../assets/imagegen-diagrams/016/diagram.png)
 顺序文字替代：已提交块先进入 recent window；过期后可以固定为锚点、选择为持久块、经过有损压缩、汇总进递归状态、写入外部索引或彻底丢弃。下一块只读取 GPU 预算内的 working set，并可按 query 从外存取回 top-$r$ 块；生成、提交后再写回窗口。对象离场回归、场景切换、小快物体和错误块四个 probe 分别检查遗忘、锚点污染、压缩损失和 cache poisoning。窗口恒定但回归身份失败，只能证明 fixed resident memory，不能证明长期记忆。
 
 几条 2026 年路线说明“压 cache”也不是单一问题：
@@ -256,7 +256,7 @@ H_j^{\text{before future perturbation}}
 \qquad j\le h-R.
 ```
 
-![图 017：流式提交、回压与恢复状态机](assets/imagegen-diagrams/017/diagram.png)
+![图 017：流式提交、回压与恢复状态机](../../assets/imagegen-diagrams/017/diagram.png)
 顺序文字替代：条件只能进入未提交未来；speculative 输出经过 decode、边界裁切以及质量/期限 gate 后才 commit、写 hash、更新记忆并显示。失败可以在预算内重做 speculative 单元；逼近期限则按预注册策略降级，仍不足时回压或拒绝。新条件不能静默改写已提交前缀，future-leak probe 通过 hash 直接检查这一点。
 
 ### 8.2 Real-time 是带负载与恢复条件的端到端 SLO

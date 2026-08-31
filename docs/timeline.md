@@ -21,7 +21,7 @@
 
 ## 并行泳道索引
 
-![图 080：视频生成技术发展的并行泳道](assets/imagegen-diagrams/080/diagram.png)
+![图 080：视频生成技术发展的并行泳道](../assets/imagegen-diagrams/080/diagram.png)
 | 泳道 | 核心问题 | 阅读方法 | 对应专题 |
 |---|---|---|---|
 | **生成机制基础** | 视频如何表示、压缩、预测和采样？ | 显式运动与统计动态 → 深度视频预测 → 随机预测与 GAN → 视频 Token → Diffusion/Flow objective 与 U-Net/Video DiT backbone 的正交扩展 | [生成模型路线](generative-models.md) · [变分随机视频生成](generative-models/variational-generation.md) · [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md) · [Video DiT 与骨干扩展](generative-models/video-dit-backbones.md) |
@@ -38,7 +38,7 @@
 
 一个节点同时有四种状态：首次公开的时间、学术发表状态、是否被本页判定为研究里程碑，以及截止日能否实际获取或使用。这四者相互独立。
 
-![图 081：时间线节点的四条独立证据轴](assets/imagegen-diagrams/081/diagram.png)
+![图 081：时间线节点的四条独立证据轴](../assets/imagegen-diagrams/081/diagram.png)
 **图示文字替代：**预印本只确定首次公开，正式发表只说明进入某个期刊或会议记录；里程碑是技术史判断，代码/权重决定可复现范围，产品可用性则是会随时间变化的访问快照。
 
 | 页面标签 | 严格含义 | 不能推出 |

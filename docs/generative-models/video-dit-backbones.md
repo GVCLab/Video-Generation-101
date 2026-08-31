@@ -85,7 +85,7 @@ N=
 
 ## 3. Video DiT block 到底做什么
 
-![图 031：Video DiT 的接口、位置与条件融合](assets/imagegen-diagrams/031/diagram.png)
+![图 031：Video DiT 的接口、位置与条件融合](../../assets/imagegen-diagrams/031/diagram.png)
 **图 2：同一个 block 可以承载不同 objective。** 顺序化文字替代：pixel video 先由 codec 变成 latent grid；patch embedding 加入时空、FPS 和 modality 位置后成为 $N$ 个视频 token。噪声时间可以经 AdaLN/FiLM 调制 block，文本、图像、音频或控制可经 cross-attention 或 joint/dual stream 融合。时空 mixer 与 FFN/experts 重复 $L$ 层，输出再 unpatchify；最终预测 $\epsilon$、$x_0$、score、$v$ 还是 flow velocity 由 objective 决定，solver/NFE 属于采样层。
 
 ### 3.1 Mixer、FFN 与 residual 是三笔不同计算
@@ -405,7 +405,7 @@ cost:
 |---|---|---|---|
 | codec/latent、patch、数据及顺序、文本 encoder、条件 dropout、objective/loss weighting、sampler/NFE/CFG、输出、训练 tokens、精度与硬件 | U-Net、full、factorized、window/sparse、linear/recurrent；position 和 fusion 另做单变量 fork | parameter-matched；training-FLOP-matched | 按 $\tau$ 分桶 target error；质量/覆盖；长程/绑定/网格 probe；forward FLOPs、VRAM、tokens/s、端到端成本 |
 
-![图 032：BackboneFork-1 的冻结、分叉与反证路径](assets/imagegen-diagrams/032/diagram.png)
+![图 032：BackboneFork-1 的冻结、分叉与反证路径](../../assets/imagegen-diagrams/032/diagram.png)
 顺序化文字替代：先冻结 codec、数据、objective、sampler 和输出；再分叉 full、factorized、window/sparse 与 linear/recurrent 骨干；每个分叉都做等参数和等训练 FLOPs 两套比较；随后同时运行质量/覆盖、长程/绑定、网格外推和资源斜率探针。只有达到预注册质量非劣界并出现所声称收益时保留有限结论，否则驳回或收窄。
 
 预注册反证：

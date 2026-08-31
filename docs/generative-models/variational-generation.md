@@ -43,7 +43,7 @@ _图 1：future-aware posterior 只属于训练；history-only prior 才是部�
 | **latent action / plan** | 对未来转移的控制码或技能 | 人、policy 或 conditional plan prior | controllability、policy agreement、任务成功 | [可控与交互路线](../tasks/action-conditioned-prediction.md) |
 | **diffusion / flow noise** | 生成路径上的随机状态 | noise schedule / base distribution | score/flow objective、sampler、生成分布 | [Diffusion](diffusion-models.md) / [Flow](flow-consistency-models.md) |
 
-![图 028：latent 系统的严格分类门](assets/imagegen-diagrams/028/diagram.png)
+![图 028：latent 系统的严格分类门](../../assets/imagegen-diagrams/028/diagram.png)
 顺序化文字替代：遇到 latent/VAE 名称，先找能看真实未来的训练 posterior；再找固定或只看历史与合法条件、绝不看未来的部署 prior；再核对 KL/ELBO；最后确认测试确实从 prior 采样。四项都成立才进入严格随机未来主线。缺任一项时分别检查 tokenizer、diffusion/flow、确定性层级、latent action 或 posterior oracle。
 
 ## 2. 从不可算 posterior 到顺序条件 ELBO
@@ -158,7 +158,7 @@ Improved Conditional VRNNs 将一部分模糊定位为 hierarchy 与 likelihood 
 
 SRVP 把完整时序演化移到 latent residual process，frame generator 只负责渲染 [[10]](#ref-10)。这不是“再堆一层 latent”，而是把动力学和像素回灌解耦。
 
-![图 029：变分随机视频生成的机制演化](assets/imagegen-diagrams/029/diagram.png)
+![图 029：变分随机视频生成的机制演化](../../assets/imagegen-diagrams/029/diagram.png)
 顺序化文字替代：VRNN 建立逐步随机状态，SV2P 将未来 posterior 与固定 prior 接到视频，SVG-LP 改为历史条件 learned prior。随后一支提升容量和 latent 深度，一支把 dynamics 完全移入 latent；再分别发展成贪心深层、固定/事件时间抽象和 object/module 结构。DDLP 在 2023/2024 把粒子 posterior 与 Transformer dynamics prior 接成直接对象粒子预测，LPWM 在 2026 再加入 latent action 与多条件控制。PlaNet–Dreamer 则把同类数学接到 action/reward/return。开放域高保真生成的另一主流转向表示 VAE/VQ 加 diffusion/flow/AR，那是不同合同。
 
 ### 3.2 prior 不是只有“固定或 learned”两档
@@ -190,7 +190,7 @@ NUQ 用层级变分网络从 latent variance 构造 predictive uncertainty 并�
 
 posterior collapse 指 decoder 或 deterministic recurrence 能绕过 $z$，使 $q\approx p$、KL 接近零、改变 $z$ 也不改变有意义的未来。Lagging Inference Networks 说明强生成网络与滞后 inference network 可能形成不利训练动力学 [[6]](#ref-6)。
 
-![图 030：posterior collapse 的因果诊断与修复闭环](assets/imagegen-diagrams/030/diagram.png)
+![图 030：posterior collapse 的因果诊断与修复闭环](../../assets/imagegen-diagrams/030/diagram.png)
 顺序化文字替代：历史进入 prior，并从 prior 采样部署 latent；历史和真实未来进入训练 posterior，并从 posterior 采样训练/oracle latent。二者各自把样本送入共享 decoder，KL 只负责形成训练对齐损失，并不“生成” latent；历史也可能沿强 AR/确定性旁路直达 decoder。随后联合检查逐层 KL/active units、置零/打乱/重采样 $z$、posterior-oracle 与 prior rollout 差距，以及 mode/条件随 horizon 的变化。只有多项证据一致时才定位 collapse，再按成因选择 KL 调度、改善 inference、限制旁路/结构化 prior 或多步对齐，并按原协议复测。
 
 ### 5.1 最小诊断集

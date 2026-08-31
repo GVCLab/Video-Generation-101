@@ -43,7 +43,7 @@ z_T=\mathrm{sg}\!\left(f_{\bar\theta}(x)_{T}\right),
 
 I-JEPA 通过“大目标块 + 空间分散的 context”把任务推向对象级语义；V-JEPA 将 mask 扩展到时空 tube，并在论文配置中遮住约 90% token。target encoder 看完整视频，context encoder 丢弃 masked token，损失只在 target 位置计算。[[3]](#ref-3), [[4]](#ref-4)
 
-![图 036：典型 teacher student JEPA 的信息流与梯度边界](assets/imagegen-diagrams/036/diagram.png)
+![图 036：典型 teacher student JEPA 的信息流与梯度边界](../assets/imagegen-diagrams/036/diagram.png)
 **文字替代：** 完整样本分成可见 context 与被遮挡 target；在线 encoder 只看 context，predictor 再接收 target 位置。完整样本由 EMA target encoder 编码，target 输出被 stop-gradient 截断。两路表征在 target 位置比较，梯度只回到在线 encoder 和 predictor，在线权重再以 EMA 更新 target encoder。
 
 ### 2.1 “能量”到底是什么
@@ -122,7 +122,7 @@ E(a_{1:H};z_t,s_t,z_g)
 
 ## 6. 可检验能力里程碑
 
-![图 037：JEPA 路线按可检验能力而不是模型年份分层](assets/imagegen-diagrams/037/diagram.png)
+![图 037：JEPA 路线按可检验能力而不是模型年份分层](../assets/imagegen-diagrams/037/diagram.png)
 **文字替代：** 主线从图像 masked embedding、视频时空表征、大规模 action-free encoder、动作条件 rollout，依次进入目标能量、CEM 和 MPC 闭环。V-JEPA 2.1 解决 dense feature；LeJEPA / LeWorldModel 解决另一类稳定训练与端到端控制；TD-JEPA 研究长期策略动力学；Branch-JEPA / Var-JEPA 研究多未来。横向分支没有闭环证据时不能自动升到控制层。
 
 | 可检验能力 | 代表里程碑 | 当时新增证据 | 仍不能声称 |
@@ -145,7 +145,7 @@ DINO-WM 是重要邻近基线：它冻结 DINOv2 patch feature，学习动作条
 
 V-JEPA 2-AC 冻结 V-JEPA 2 ViT-g frame encoder，在少于 62 小时 DROID 轨迹上训练 block-causal predictor。输入含视觉 feature、7D 末端执行器动作与 proprioceptive state；训练包含 teacher-forced 单步预测和两步 rollout loss。部署时，视觉目标编码成 `z_g`，CEM 在固定候选预算内最小化终点 latent 与目标的 L1 energy，只执行首个动作，再用新观测重规划。[[6]](#ref-6)
 
-![图 038：动作条件 latent 训练与闭环 MPC 是两个独立验收环](assets/imagegen-diagrams/038/diagram.png)
+![图 038：动作条件 latent 训练与闭环 MPC 是两个独立验收环](../assets/imagegen-diagrams/038/diagram.png)
 **文字替代：** 训练环用真实动作序列预测未来 target latent；部署环从当前 latent 和机器人状态出发，用 CEM 反复采样动作序列、latent rollout、按目标 energy 排序，只执行最佳序列第一步。环境的新观测回到 encoder，形成 receding-horizon MPC。
 
 “zero-shot”在这项机器人实验里有严格限定：部署实验室、具体对象和任务没有提供任务奖励或环境特定训练轨迹，但动作模型见过 DROID 的同类 Franka embodiment，且长任务需要人工提供视觉子目标。论文在两个实验室、每项 10 次试验下报告 reach 100%、cup / box grasp 65% / 25%、cup / box pick-place 80% / 65%；这些是小样本协议结果，不是跨机器人通用成功率。[[6]](#ref-6), [[7]](#ref-7)

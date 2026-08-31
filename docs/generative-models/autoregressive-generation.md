@@ -60,7 +60,7 @@ p(Y_k\mid Y_{<k},c).
 
 ### 1.4 一张图定位一个 AR 系统
 
-![图 012：自回归视频生成的三层选择](assets/imagegen-diagrams/012/diagram.png)
+![图 012：自回归视频生成的三层选择](../../assets/imagegen-diagrams/012/diagram.png)
 **图的顺序化文字替代：**
 
 1. 先确定生成变量是原始像素、离散视觉码还是连续 latent。
@@ -345,7 +345,7 @@ CausVid 依赖高质量双向 teacher，并使用 distribution matching distilla
 
 ### 6.5 一张时序图看训练—推理差异
 
-![图 013：Teacher forcing 与 self forcing 的历史来源](assets/imagegen-diagrams/013/diagram.png)
+![图 013：Teacher forcing 与 self forcing 的历史来源](../../assets/imagegen-diagrams/013/diagram.png)
 **图的顺序化文字替代：**
 
 1. Teacher forcing 对每个位置都把 ground-truth 前缀交给生成器。

@@ -58,7 +58,7 @@ m_{\text{obj}}
 
 2025–2026 年对象移除研究的关键进展，正是从“补对象轮廓里的像素”走向“发现并消除对象造成的环境效应” [[28]](#ref-28), [[29]](#ref-29), [[30]](#ref-30), [[31]](#ref-31), [[32]](#ref-32), [[34]](#ref-34)。
 
-![图 068：视频补全、对象移除、扩画幅、局部编辑与生成填充的任务边界](assets/imagegen-diagrams/068/diagram.png)
+![图 068：视频补全、对象移除、扩画幅、局部编辑与生成填充的任务边界](../../assets/imagegen-diagrams/068/diagram.png)
 **图的顺序化文字替代：** 先判断未知区是否在原画布外；若在外，是 outpainting。若在原画布内，再判断目标是否恢复缺失内容；是则属于 inpainting / completion。若不是，再判断是否删除对象及其副作用；是则属于 object removal。其余任务按已知区是否必须严格不变，分成区域内 generative fill 与更一般的 masked / global V2V editing。前三类和区域生成至少共同报告 mask 内质量、mask 外保护与时间一致；V2V 还要单独报告指令遵循和编辑范围。
 
 ## 🖼️ 3. 一张图读懂现代证据管线
@@ -176,7 +176,7 @@ m_z\odot z^{\text{gen}}_{k-1}
 
 E²FGVI 把 flow completion、feature propagation 与 content hallucination 三个模块端到端联合优化 [[10]](#ref-10)。这降低了分阶段手工流水线的接口误差，却没有消除错误传播：错误 flow 会复制错误纹理，错误纹理会成为 attention 的高置信锚点，生成器再把它扩散到残余洞；窗口把错误结果当下一段条件时，局部伪影还会变成长程漂移。
 
-![图 069：视频补全中的误差传播与四道证据闸门](assets/imagegen-diagrams/069/diagram.png)
+![图 069：视频补全中的误差传播与四道证据闸门](../../assets/imagegen-diagrams/069/diagram.png)
 **图的顺序化文字替代：** 视频和 mask 先产生双向 flow；只有可见、未遮挡且未越界的对应才进入传播。传播结果还要通过 forward–backward 与边界检查，不可靠位置回到 residual hole。可靠锚点与残余洞共同进入 Transformer 或 diffusion；跨帧、跨窗口和身份检查失败时，应降低错误锚点权重、扩大上下文或重采样。通过后在 decoded RGB 上硬合成，并把洞内、洞外、时序和成本分开验收。
 
 ## 🧬 5. 技术路线：不是“传统方法被 DiT 取代”

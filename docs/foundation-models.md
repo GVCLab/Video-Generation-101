@@ -27,7 +27,7 @@
 
 ## 2. 端到端闭环：checkpoint 只是中间件
 
-![图 006：视频基础模型从数据治理到服务审计的端到端闭环](assets/imagegen-diagrams/006/diagram.png)
+![图 006：视频基础模型从数据治理到服务审计的端到端闭环](../assets/imagegen-diagrams/006/diagram.png)
 图的顺序文字替代：
 
 1. 先冻结素材权利、来源和版本，再做切镜、质量/安全过滤与近重复去除。
@@ -127,7 +127,7 @@ tokenizer 的验收必须同时覆盖：静态纹理、快速运动、镜头切�
 
 ## 6. 从 checkpoint 到 API：能力归因与治理
 
-![图 007：产品能力到可下载权重的归因边界](assets/imagegen-diagrams/007/diagram.png)
+![图 007：产品能力到可下载权重的归因边界](../assets/imagegen-diagrams/007/diagram.png)
 图的顺序文字替代：
 
 1. 用户看到的能力先属于某个版本的 API 或 UI，而不是自动属于模型权重。

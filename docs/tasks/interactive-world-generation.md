@@ -78,7 +78,7 @@ Oasis 正是典型分层案例：项目页同时展示更大在线 demo，并开
 
 ## 🔁 3. 闭环合同：预测分支与真实执行分支必须分开
 
-![图 054：交互式世界生成的最小闭环合同](assets/imagegen-diagrams/054/diagram.png)
+![图 054：交互式世界生成的最小闭环合同](../../assets/imagegen-diagrams/054/diagram.png)
 **图的顺序化文字替代：**
 
 1. 人或策略在带时间戳的接口上提出动作；系统记录实际接受的序列 $A_t$ 及 hold 区间。
@@ -197,7 +197,7 @@ Sekai2 本身是 2026 数据集报告，不是完成的 interactive model；其�
 
 ## 🧠 6. 长程记忆与回访：把“像”升级为“还是同一个世界”
 
-![图 055：持久世界的写入、离开、干预与回访协议](assets/imagegen-diagrams/055/diagram.png)
+![图 055：持久世界的写入、离开、干预与回访协议](../../assets/imagegen-diagrams/055/diagram.png)
 **图的顺序化文字替代：**
 
 1. 在初始视图记录几何锚点、实体 ID 和可干预状态。

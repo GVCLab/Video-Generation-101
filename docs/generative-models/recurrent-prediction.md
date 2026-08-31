@@ -33,7 +33,7 @@ $h_t$ 可以是 LSTM feature map、Transformer KV、deterministic–stochastic s
 
 ## 🧭 2. 一套 rollout 外壳，多种预测机制
 
-![图 026：递归视频预测的共同 rollout 外壳与四类条件头](assets/imagegen-diagrams/026/diagram.png)
+![图 026：递归视频预测的共同 rollout 外壳与四类条件头](../../assets/imagegen-diagrams/026/diagram.png)
 **图的顺序化文字替代：**
 
 1. 已观测帧或 latent、动作和旧状态共同进入状态更新器。
@@ -219,7 +219,7 @@ Self Forcing 则真正把生成结果提交为下一步训练历史，但论文�
 
 ## 🎮 11. 动作干预与 closed-loop planning：从“会续写”到“可用模型”
 
-![图 027：动作干预与闭环规划的最小证据循环](assets/imagegen-diagrams/027/diagram.png)
+![图 027：动作干预与闭环规划的最小证据循环](../../assets/imagegen-diagrams/027/diagram.png)
 **图的顺序化文字替代：**
 
 1. 从相同初始状态复制试验，只改变动作，并固定其他条件与随机种子。
