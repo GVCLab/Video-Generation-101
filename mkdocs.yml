@@ -12,6 +12,7 @@ copyright: MIT License &middot; GVC Lab, Great Bay University
 # ../../assets/y.png) working identically in both places.
 docs_dir: .mkdocs-build/docs
 site_dir: _site
+use_directory_urls: false
 
 not_in_nav: |
   sources/*
