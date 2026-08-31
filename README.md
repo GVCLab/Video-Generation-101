@@ -2,9 +2,37 @@
 
 _Created by Codex and <a href="https://vinthony.github.io/">Xiaodong Cun (Corresponding Author)</a>, from <a href="https://gvclab.github.io/">GVC Lab, Great Bay University</a>_
 
+[![Site](https://img.shields.io/badge/read-gvclab.github.io%2FVideo--Generation--101-1f6feb)](https://gvclab.github.io/Video-Generation-101/)
+[![Chapters](https://img.shields.io/badge/chapters-40%2B-informational)](docs/taxonomy.md)
+[![Evidence snapshot](https://img.shields.io/badge/evidence%20snapshot-2026--08-success)](docs/timeline.md)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+> 📖 **在线阅读（带全文搜索）：<https://gvclab.github.io/Video-Generation-101/>**
+
+
 一份面向初学者、研究者、工程师与创作者的视频生成知识体系。它不以堆叠模型和榜单为目标，而是试图建立一条从**生成原理、系统能力、世界理解到真实应用与验证**的完整学习路径。
 
 > 资料更新时间：**2026-08**
+
+---
+
+
+<details>
+<summary><strong>English summary</strong></summary>
+
+**Video Generation 101** is a structured knowledge base on video generation, written for learners,
+researchers, engineers and creators. Rather than ranking models, it builds one continuous path from
+generative principles, through system capabilities and world understanding, to real applications and
+the evidence needed to believe them.
+
+Five layers organise the material: **generation foundations**, **system capabilities**,
+**controllable creation**, **world understanding**, and an **evidence framework**.
+
+Every chapter carries an explicit evidence snapshot date and separates author-reported numbers from
+independently reproduced ones. The prose is in Chinese; paper titles, venues and links are in English,
+and reference metadata is checked in CI.
+
+</details>
 
 ---
 
@@ -41,7 +69,7 @@ _Coding Agent 扩展研究覆盖面，研究者对结论与证据负责。_
 
 仓库以“原理 → 系统 → 能力 → 世界 → 应用”为主轴，并让评测与治理贯穿每一层。
 
-![图 001：Video Generation 101 知识全景](assets/imagegen-diagrams/001/创建一张用于中文学术教程的高质量横向信息图_主题_Video_2026-08-30T17-01-58.png)
+![图 001：Video Generation 101 知识全景](assets/imagegen-diagrams/001/diagram.png)
 ### 内容导航
 
 | 板块 | 核心入口 | 延伸专题 |

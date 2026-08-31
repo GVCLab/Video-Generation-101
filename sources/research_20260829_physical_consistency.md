@@ -116,7 +116,7 @@ E_k=
 
 ## 4. 证据阶梯
 
-![图 092：L0 · 视觉真实感单帧外观与参考相似到禁止压成一个不透明总分的流程](assets/imagegen-diagrams/092/diagram.png)
+![图 092：L0 · 视觉真实感单帧外观与参考相似到禁止压成一个不透明总分的流程](../assets/imagegen-diagrams/092/diagram.png)
 使用规则：
 
 - claim 不得高于实际通过的最高证据层；L2 高分不能写成 L3，L3 也不能自动写成 L6。
@@ -242,7 +242,7 @@ E_k=
 
 ## 7. 训练、后训练与验证路线
 
-![图 093：成组数据真实标定 + 模拟干预 + action logs到按证据层分别报告的流程](assets/imagegen-diagrams/093/diagram.png)
+![图 093：成组数据真实标定 + 模拟干预 + action logs到按证据层分别报告的流程](../assets/imagegen-diagrams/093/diagram.png)
 推荐的工程顺序：
 
 1. **先定义 claim。** 如果目标只是减少明显穿透，就不应把工作描述成“学习真实世界定律”；如果目标是机器人 planning，就必须预先定义决策指标。
