@@ -67,7 +67,7 @@ N_{\mathrm{eff,source}}
 
 下面给出可编辑、可搜索、对读屏器更友好的确定性版本：
 
-![图 085：可审计的现代 Video Data Engine](assets/imagegen-diagrams/085/diagram.png)
+![图 085：可审计的现代 Video Data Engine](../assets/imagegen-diagrams/085/diagram.png)
 顺序化文字替代：
 
 1. 登记来源、权利证据与 opt-out 通道；通过权利门后再做不可变摄取。

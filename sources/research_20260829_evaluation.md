@@ -89,7 +89,7 @@ For each promoted source, the audit checked the title, venue/status, current ver
 
 The review workflow is shown below. This is a trace diagram, not a numerical PRISMA flow because a complete candidate denominator was not captured.
 
-![图 089：Repository claims and named benchmark families到Benchmark registry and evaluation protocol的流程](assets/imagegen-diagrams/089/diagram.png)
+![图 089：Repository claims and named benchmark families到Benchmark registry and evaluation protocol的流程](../assets/imagegen-diagrams/089/diagram.png)
 ## Evidence levels
 
 Evidence level describes the source and the maximum claim it can safely support. It is not a score for paper quality.
@@ -431,7 +431,7 @@ The interpretation boundary is non-negotiable: absence of C2PA does not prove me
 
 The protocol below prevents a metric from being promoted beyond the task it measures.
 
-![图 090：Write claim card: task, conditions, use and failure cost到Per-dimension results, failures and Pareto frontier的流程](assets/imagegen-diagrams/090/diagram.png)
+![图 090：Write claim card: task, conditions, use and failure cost到Per-dimension results, failures and Pareto frontier的流程](../assets/imagegen-diagrams/090/diagram.png)
 | Task | Evaluation unit | Primary evidence | Claim that remains unsupported |
 |---|---|---|---|
 | Open generation | Prompt by seed | Quality, distribution/coverage, compositional adherence, time, task-specific physics and human preference | Action causality or planning value |
