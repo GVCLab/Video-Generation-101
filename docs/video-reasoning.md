@@ -342,6 +342,8 @@ VideoRLVR 将 Maze、FlowFree、Sokoban 的程序正确性分解为 dense reward
 | 逐步生成—验证 | CollabVR [[28]](#ref-28) | 可不改基础模型 | VLM 规划下一步并验证 | 错误在短片段后被发现和重规划 | 属于协作式闭环系统 |
 | 工具化 agent | NEWTON [[30]](#ref-30) | 可不改 | planner、科学计算、关键帧、verifier | 把物理推演拆成可审计工具链 | 视频生成器是行动模块之一 |
 
+本节的最终指标是推理或任务成功率；若最终交付物是视频，并需要比较 Best-of-\(N\)、去噪轨迹搜索、验证器与总生成成本，应转到[视频生成 Test-Time Scaling 专章](generative-models/test-time-scaling.md)。
+
 ### 9.1 计算公平性是核心问题
 
 若系统 A 生成一次，系统 B 生成 16 次并调用一个更强的 VLM 选择，两者不能只比较最终准确率。至少应报告：

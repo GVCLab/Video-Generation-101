@@ -167,6 +167,8 @@ A_i
 
 Test-time 方法不一定改权重。Free2Guide 用黑盒 image LVLM 对中间候选进行训练免费、无梯度的路径积分式引导，并通过多帧拼接形成视频判断 [[18]](#ref-18)；它节省离线训练，却增加每次请求的 reward 调用。VideoAlign 的 Flow-NRG 在每个 flow 步对 latent reward 求梯度并修改方向 [[13]](#ref-13)，会增加推理反传。TTOM 为长视频在测试时优化新参数与 layout attention，并把结果保留为 parametric memory；基础模型可不重训，但每请求/每段仍发生优化 [[23]](#ref-23)。
 
+如果问题从“这种对齐信号是什么”转向“怎样让质量随候选、搜索、验证或更新预算变化”，以及如何隔离搜索 reward 与最终 evaluator，应进入[Test-Time Scaling 专章](test-time-scaling.md)。
+
 Align-A-Video 则在一致视频编辑任务中固定随机性并做确定性 reward tuning，论文报告的是按样例花费分钟级优化的设置 [[19]](#ref-19)；它不是通用文本到视频生成器完成一次离线后训练后即可零额外成本部署的证据。
 
 因此部署报告必须把 base-model NFE、CFG 双前向、decoder、reward/VLM 调用、best-of-$N$、梯度反传与临时适配迭代全部计入，不能只写 sampler steps。

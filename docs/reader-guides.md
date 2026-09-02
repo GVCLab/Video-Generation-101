@@ -89,8 +89,9 @@
 2. [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md) —— 明确 latent、token、量化、时空预算与真实码率的边界。
 3. [Video DiT 与骨干扩展](generative-models/video-dit-backbones.md) —— 从 token 数量、注意力拓扑、条件融合与并行策略理解瓶颈。
 4. [视频后训练与对齐](generative-models/video-post-training-alignment.md) —— 区分 SFT、偏好优化、强化学习、guidance 与少步蒸馏。
-5. [因果与流式生成](generative-models/causal-streaming-generation.md) —— 如果目标是低首帧延迟、连续生成或中途修改条件。
-6. [开放模型](../resources/open-models.md) → [数据集](../resources/datasets.md) → [评测指南](evaluation.md) —— 将方法选择落到可运行工件和实验协议。
+5. [Test-Time Scaling](generative-models/test-time-scaling.md) —— 学会为候选、验证、在线优化和外部模型建立总预算账本，并检查质量—成本曲线。
+6. [因果与流式生成](generative-models/causal-streaming-generation.md) —— 如果目标是低首帧延迟、连续生成或中途修改条件。
+7. [开放模型](../resources/open-models.md) → [数据集](../resources/datasets.md) → [评测指南](evaluation.md) —— 将方法选择落到可运行工件和实验协议。
 
 ### 按需分支
 
@@ -98,6 +99,7 @@
 |---|---|
 | 长视频、上下文与记忆 | [视频预测](tasks/video-prediction.md) · [因果与流式生成](generative-models/causal-streaming-generation.md) |
 | 少步、高吞吐与部署成本 | [Flow / consistency](generative-models/flow-consistency-models.md) · [视频后训练与对齐](generative-models/video-post-training-alignment.md) |
+| 用额外推理预算换质量或约束满足 | [Test-Time Scaling](generative-models/test-time-scaling.md) · [视频后训练与对齐](generative-models/video-post-training-alignment.md) · [评测指南](evaluation.md) |
 | 控制接口与多条件融合 | [细粒度可控生成](tasks/controllable-video-generation.md) · [视频基础模型](foundation-models.md) |
 | 声画联合时序 | [原生音视频](tasks/native-audio-video-generation.md) |
 | 数据退化与恢复 | [视频退化修复](tasks/video-restoration.md) |
