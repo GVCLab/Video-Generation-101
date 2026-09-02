@@ -137,7 +137,7 @@ Video-Generation-101/
 
 ```bibtex
 @software{video_generation_101_2026,
-  title = {Video Generation 101: From Motion Models to World Models},
+  title = {Video Generation 101: From Pixel Animation to World Model},
   author = {Cun, Xiaodong and Video Generation 101 contributors},
   year = {2026},
   version = {0.1.0},

@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this knowledge map, please cite the repository."
-title: "Video Generation 101: From Motion Models to World Models"
+title: "Video Generation 101: From Pixel Animation to World Model"
 type: software
 authors:
   - family-names: "Cun"
