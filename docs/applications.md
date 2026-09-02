@@ -57,19 +57,23 @@
 
 NIST AI 600-1 把生成式 AI 风险管理组织为面向生命周期的 govern、map、measure 与 manage；它提供跨行业风险框架，不替代本应用的具体任务指标 [[10]](#ref-10)。
 
+<a id="application-capability-matrix"></a>
+
 ## 4. 场景 → 能力链 → 验收门槛
 
-| 场景 | 需要组合的能力 | 系统级验收 | 硬失败 / 安全门 |
-|---|---|---|---|
-| 影视、广告与动态分镜 | T2V / I2V、相机控制、角色参考、多镜头、局部编辑、超分与音频 | 指令遵循、角色/道具连续、镜头可改率、人工分钟/成片秒、版本可重放 | 未授权素材、品牌/人物误用、无法定位生成来源 |
-| 虚拟制作、AR/VR 与动态资产 | 多视角视频、4D 重建/生成、相机—时间查询、显式动态状态与实时 renderer | 同刻跨视角、重投影、遮挡、loop closure、未见区域不确定性、构建/查询成本 | 一条相机路径冒充 4D；生成背面冒充真实重建；渲染 FPS 冒充构建实时 |
-| 后期、修复与本地化 | V2V、退化修复、inpainting、插帧、重定时、口型/语音、本地字幕 | 观测保真、时间闪烁、生成幻觉、mask 外误差、边界 seam、口型偏移、文字正确率、往返编辑损失 | 未编辑区域被改、生成细节冒充真实证据、来源链丢失 |
-| 数字人和虚拟主播 | 身份参考、音频/文字/动作驱动、长时/流式人体动画 | 身份、口型、表情、身体、语义和延迟分项；多人和遮挡压力测试 | 无同意身份、冒用、声音克隆、未成年人或敏感人物风险 |
-| 游戏原型与交互世界 | 场景生成、动作条件 rollout、状态记忆、低延迟输出 | 动作响应、回访一致、状态账本、deadline miss、任务完成 | 动作无效却画面逼真、平均 FPS 掩盖尾延迟、状态不可恢复 |
-| 机器人与自动驾驶 | 视频世界模型、反事实 rollout、规划/策略、传感器或多视角条件 | 状态/动作正确性、闭环成功、真实迁移、罕见事件覆盖、安全边界 | 用感知质量替代决策效用；模拟器漏洞被策略利用 |
-| 合成数据与仿真 | 条件采样、长尾场景、标签/伪动作恢复、域随机化 | 下游收益、覆盖、校准、真实验证集表现、数据谱系 | synthetic bias、标签错误、训练测试污染、只报生成分数 |
-| 教育与科学可视化 | 过程生成、结构/公式约束、交互解释、来源链接 | 事实逐项核验、单位/边界条件、专家复核、可访问性 | 视觉可信但科学错误、无来源的“实验结果” |
-| 工业设计与流程预演 | 参考保持、几何/相机控制、多版本比较、数字孪生接口 | 尺寸/状态约束、变更追踪、与 CAD/模拟器一致性 | 把概念视频当工程验证或合规证据 |
+“需验收的 C1–C9 能力族”均反链[能力地图](foundation-model-capabilities.md#capability-cross-table-index)；任务接口、超分、renderer 与低延迟等系统组件另列，避免把“模型会什么”和“系统怎样交付”混为一类。[C8](foundation-model-capabilities.md#capability-c8) / [C9](foundation-model-capabilities.md#capability-c9) 若由外部规划器、控制器或闭环环境提供，还必须按模块归因，不能直接记在 base checkpoint 名下。
+
+| 场景 | 需验收的 C1–C9 能力族 | 任务 / 系统组件 | 系统级验收 | 硬失败 / 安全门 |
+|---|---|---|---|---|
+| 影视、广告与动态分镜 | [C1](foundation-model-capabilities.md#capability-c1) · [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C5](foundation-model-capabilities.md#capability-c5) · [C6](foundation-model-capabilities.md#capability-c6) · [C7](foundation-model-capabilities.md#capability-c7) | T2V / I2V、相机控制、角色参考、多镜头、局部编辑、超分与音频 | 指令遵循、角色/道具连续、镜头可改率、人工分钟/成片秒、版本可重放 | 未授权素材、品牌/人物误用、无法定位生成来源 |
+| 虚拟制作、AR/VR 与动态资产 | [C1](foundation-model-capabilities.md#capability-c1) · [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C5](foundation-model-capabilities.md#capability-c5) · [C7](foundation-model-capabilities.md#capability-c7) | 多视角视频、4D 重建/生成、相机—时间查询、显式动态状态与实时 renderer | 同刻跨视角、重投影、遮挡、loop closure、未见区域不确定性、构建/查询成本 | 一条相机路径冒充 4D；生成背面冒充真实重建；渲染 FPS 冒充构建实时 |
+| 后期、修复与本地化 | [C1](foundation-model-capabilities.md#capability-c1) · [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C5](foundation-model-capabilities.md#capability-c5) · [C6](foundation-model-capabilities.md#capability-c6) | V2V、退化修复、inpainting、插帧、重定时、口型/语音、本地字幕 | 观测保真、时间闪烁、生成幻觉、mask 外误差、边界 seam、口型偏移、文字正确率、往返编辑损失 | 未编辑区域被改、生成细节冒充真实证据、来源链丢失 |
+| 数字人和虚拟主播 | [C1](foundation-model-capabilities.md#capability-c1) · [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C5](foundation-model-capabilities.md#capability-c5) · [C6](foundation-model-capabilities.md#capability-c6) · [C7](foundation-model-capabilities.md#capability-c7) | 身份参考、音频/文字/动作驱动、长时/流式人体动画 | 身份、口型、表情、身体、语义和延迟分项；多人和遮挡压力测试 | 无同意身份、冒用、声音克隆、未成年人或敏感人物风险 |
+| 游戏原型与交互世界 | [C1](foundation-model-capabilities.md#capability-c1) · [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C7](foundation-model-capabilities.md#capability-c7) · [C8](foundation-model-capabilities.md#capability-c8) · [C9](foundation-model-capabilities.md#capability-c9) | 场景生成、动作条件 rollout、状态记忆、规划器与低延迟输出 | 动作响应、回访一致、状态账本、deadline miss、任务完成 | 动作无效却画面逼真、平均 FPS 掩盖尾延迟、状态不可恢复 |
+| 机器人与自动驾驶 | [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C7](foundation-model-capabilities.md#capability-c7) · [C8](foundation-model-capabilities.md#capability-c8) · [C9](foundation-model-capabilities.md#capability-c9) | 视频世界模型、反事实 rollout、规划/策略、传感器或多视角条件 | 状态/动作正确性、闭环成功、真实迁移、罕见事件覆盖、安全边界 | 用感知质量替代决策效用；模拟器漏洞被策略利用 |
+| 合成数据与仿真 | [C1](foundation-model-capabilities.md#capability-c1) · [C2](foundation-model-capabilities.md#capability-c2) · [C5](foundation-model-capabilities.md#capability-c5) · [C7](foundation-model-capabilities.md#capability-c7) | 条件采样、长尾场景、标签/伪动作恢复、域随机化；只有显式推理或动作闭环才追加 [C8](foundation-model-capabilities.md#capability-c8) / [C9](foundation-model-capabilities.md#capability-c9) | 下游收益、覆盖、校准、真实验证集表现、数据谱系 | synthetic bias、标签错误、训练测试污染、只报生成分数 |
+| 教育与科学可视化 | [C1](foundation-model-capabilities.md#capability-c1) · [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C5](foundation-model-capabilities.md#capability-c5) · [C7](foundation-model-capabilities.md#capability-c7) · [C8](foundation-model-capabilities.md#capability-c8) | 过程生成、结构/公式约束、交互解释、来源链接 | 事实逐项核验、单位/边界条件、专家复核、可访问性 | 视觉可信但科学错误、无来源的“实验结果” |
+| 工业设计与流程预演 | [C1](foundation-model-capabilities.md#capability-c1) · [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C5](foundation-model-capabilities.md#capability-c5) · [C7](foundation-model-capabilities.md#capability-c7) | 参考保持、几何/相机控制、多版本比较、数字孪生接口；只有动作闭环才追加 [C9](foundation-model-capabilities.md#capability-c9) | 尺寸/状态约束、变更追踪、与 CAD/模拟器一致性 | 把概念视频当工程验证或合规证据 |
 
 统一模型可以降低部署与交互成本，但不能用“all-in-one”替代分任务验收。VACE 通过 Video Condition Unit 组织 reference、editing 和 mask 条件，并在 12 类任务上做作者实验；部署时仍须分别测试参考保持、编辑泄漏和 mask 外保护 [[1]](#ref-1)。
 

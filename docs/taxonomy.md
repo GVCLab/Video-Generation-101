@@ -114,44 +114,46 @@ R\subseteq
 
 上下文窗口、memory/cache、状态压缩与淘汰是实现或系统状态披露，不属于 $H$ 本身；reset、rewind、branch 和 error recovery 也应单独声明。只有“已提交的第 $t$ 步观测由控制器读取，并据此选择第 $t+1$ 步输入或动作”才构成 closed-loop。closed-loop 也不自动等于实时；只有同时报告 deadline、TTFF、p95/p99 latency 和 deadline miss，才形成部署证据。
 
+<a id="task-capability-matrix"></a>
+
 ## 3. 全仓库任务的最小合同
 
-下列“导航关系”只帮助定位；正式实验仍须写完整 $\mathcal T$。表格按相近合同拆分，避免移动端出现无法阅读的超宽总表。
+下列“导航关系”只帮助定位；正式实验仍须写完整 $\mathcal T$。表格按相近合同拆分，避免移动端出现无法阅读的超宽总表。“主要能力”中的编号均反链[基础模型能力地图](foundation-model-capabilities.md#capability-cross-table-index)，表示该任务通常需要验证的能力，不表示某个模型已经具备这些能力。
 
 ### 3.1 创作、参考与人物生成
 
-| 任务与专章 | 输入 → 输出 | 导航关系 $R$ | 一票否决式错误 |
-|---|---|---|---|
-| [严格无条件生成](tasks/unconditional-video-generation.md) | $z$ → 新视频样本 | 创作 | 使用类别/文字却仍称无条件；训练样本记忆或模式坍塌 |
-| [文本到视频](tasks/text-to-video.md) | 文字 → 满足主体、关系、动作和镜头的片段 | 创作 | 只出现关键词，但关系或时间顺序错误 |
-| [原生音视频](tasks/native-audio-video-generation.md) | 文字，可附图像/音色参考 → 同一生成过程中的画面与声音 | 创作；有参考时另加参考 | 实际是视频后配音；事件、说话人或声源错绑 |
-| [图像到视频](tasks/image-to-video.md) | 已知首帧/时刻锚点，常附文字 → 从该时刻延展的视频 | 锚定、外推 | 首帧跳变、参考布局漂移；把任意身份参考误写成 I2V |
-| [开放集视频个性化](tasks/personalized-video-generation.md) | 输出时间轴外的主体参考 + 文字 → 新场景/动作视频 | 参考、创作 | 参考姿态/背景复制、多主体融合、身份泄漏 |
-| [细粒度可控生成](tasks/controllable-video-generation.md) | 语义/参考 + 相机、轨迹、姿态或几何控制 → 受控视频 | 按子合同为创作、参考 + 创作或变换 | 控制被忽略、坐标误读、主体/背景串扰 |
-| [多视角视频](tasks/multiview-4d-generation.md) | 图像/视频 + 同时刻多相机查询 → 一致的多视角视频 | 参考、补全 | 一条相机路径伪装成多视角；同一时刻视图不一致 |
-| [可渲染 4D 状态](tasks/multiview-4d-generation.md) | 多视角时序观测 → 可按 $(v,t)$ 重复查询的动态状态 | 重建、补全 | 只有生成视频，没有显式或可查询状态；重投影/遮挡失败 |
-| [故事与多镜头](tasks/story-multishot.md) | 剧本、分镜、角色/场景参考 → 有叙事关系的镜头序列 | 创作、参考 | 单镜头漂亮，但人物、道具和事件因果跨镜头断裂 |
-| [参考驱动数字人](tasks/digital-human.md) | 身份参考 + 音频/文字 → 身份稳定、同步的人体视频 | 参考、创作 | 未授权身份、口型/身体错拍、多人串扰 |
-| [数字人重演](tasks/digital-human.md) | 源人物视频 + 驱动音频/姿态/表演 → 指定表演变化 | 参考、变换 | 未指定身份/背景变化；驱动者身份泄漏 |
+| 任务与专章 | 输入 → 输出 | 主要能力 | 导航关系 $R$ | 一票否决式错误 |
+|---|---|---|---|---|
+| [严格无条件生成](tasks/unconditional-video-generation.md) | $z$ → 新视频样本 | [C1](foundation-model-capabilities.md#capability-c1) · [C3](foundation-model-capabilities.md#capability-c3) · [C7](foundation-model-capabilities.md#capability-c7) | 创作 | 使用类别/文字却仍称无条件；训练样本记忆或模式坍塌 |
+| [文本到视频](tasks/text-to-video.md) | 文字 → 满足主体、关系、动作和镜头的片段 | [C1](foundation-model-capabilities.md#capability-c1) · [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C7](foundation-model-capabilities.md#capability-c7) | 创作 | 只出现关键词，但关系或时间顺序错误 |
+| [原生音视频](tasks/native-audio-video-generation.md) | 文字，可附图像/音色参考 → 同一生成过程中的画面与声音 | [C1](foundation-model-capabilities.md#capability-c1) · [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C6](foundation-model-capabilities.md#capability-c6) · [C7](foundation-model-capabilities.md#capability-c7) | 创作；有参考时另加参考 | 实际是视频后配音；事件、说话人或声源错绑 |
+| [图像到视频](tasks/image-to-video.md) | 已知首帧/时刻锚点，常附文字 → 从该时刻延展的视频 | [C1](foundation-model-capabilities.md#capability-c1) · [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C5](foundation-model-capabilities.md#capability-c5) · [C7](foundation-model-capabilities.md#capability-c7) | 锚定、外推 | 首帧跳变、参考布局漂移；把任意身份参考误写成 I2V |
+| [开放集视频个性化](tasks/personalized-video-generation.md) | 输出时间轴外的主体参考 + 文字 → 新场景/动作视频 | [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C5](foundation-model-capabilities.md#capability-c5) | 参考、创作 | 参考姿态/背景复制、多主体融合、身份泄漏 |
+| [细粒度可控生成](tasks/controllable-video-generation.md) | 语义/参考 + 相机、轨迹、姿态或几何控制 → 受控视频 | [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C5](foundation-model-capabilities.md#capability-c5) · [C7](foundation-model-capabilities.md#capability-c7) | 按子合同为创作、参考 + 创作或变换 | 控制被忽略、坐标误读、主体/背景串扰 |
+| [多视角视频](tasks/multiview-4d-generation.md) | 图像/视频 + 同时刻多相机查询 → 一致的多视角视频 | [C1](foundation-model-capabilities.md#capability-c1) · [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) | 参考、补全 | 一条相机路径伪装成多视角；同一时刻视图不一致 |
+| [可渲染 4D 状态](tasks/multiview-4d-generation.md) | 多视角时序观测 → 可按 $(v,t)$ 重复查询的动态状态 | [C1](foundation-model-capabilities.md#capability-c1) · [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) | 重建、补全 | 只有生成视频，没有显式或可查询状态；重投影/遮挡失败 |
+| [故事与多镜头](tasks/story-multishot.md) | 剧本、分镜、角色/场景参考 → 有叙事关系的镜头序列 | [C1](foundation-model-capabilities.md#capability-c1) · [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C5](foundation-model-capabilities.md#capability-c5) · [C7](foundation-model-capabilities.md#capability-c7) | 创作、参考 | 单镜头漂亮，但人物、道具和事件因果跨镜头断裂 |
+| [参考驱动数字人](tasks/digital-human.md) | 身份参考 + 音频/文字 → 身份稳定、同步的人体视频 | [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C5](foundation-model-capabilities.md#capability-c5) · [C6](foundation-model-capabilities.md#capability-c6) · [C7](foundation-model-capabilities.md#capability-c7) | 参考、创作 | 未授权身份、口型/身体错拍、多人串扰 |
+| [数字人重演](tasks/digital-human.md) | 源人物视频 + 驱动音频/姿态/表演 → 指定表演变化 | [C3](foundation-model-capabilities.md#capability-c3) · [C5](foundation-model-capabilities.md#capability-c5) · [C6](foundation-model-capabilities.md#capability-c6) | 参考、变换 | 未指定身份/背景变化；驱动者身份泄漏 |
 
 ### 3.2 变换、恢复、补全与虚拟试衣
 
-| 任务与专章 | 输入 → 输出 | 导航关系 $R$ | 一票否决式错误 |
-|---|---|---|---|
-| [视频到视频编辑](tasks/video-to-video.md) | 源视频 + 指令/参考/轨迹 → 指定变化后的完整视频 | 变换 | 未编辑区域变化、目标变化未实现、时间传播不一致 |
-| [源视频虚拟试衣](tasks/video-virtual-try-on.md) | 人物源视频 + 服装参考/商品资产 → 同一时间轴、动作与相机下的换装视频 | 参考、变换 | 人脸/身体/背景漂移，服装纹理标识错位或跨帧闪烁 |
-| [姿态驱动虚拟试衣](tasks/video-virtual-try-on.md) | 人物/身份参考 + 服装参考 + 姿态序列 → 新时间轴试衣视频 | 参考、创作 | 把该合同当作普通 V2V；身份、衣服与驱动姿态错误绑定 |
-| [视频退化修复](tasks/video-restoration.md) | 低质量观测 + 可选退化参数 → 同时间轴高质量视频 | 恢复 | 幻觉文字/人脸/结构、闪烁、真实退化分布外失效 |
-| [视频补全](tasks/video-inpainting.md) | 视频 + 时空 mask → 缺失区域及其时间延续 | 锚定、补全 | mask 外像素被改、边界 seam、错误重现被删对象 |
-| [帧插值](tasks/frame-interpolation.md) | 两侧/多侧已知帧 + 目标时间 → 已知端点之间的帧 | 锚定、补全 | 端点不守恒、遮挡层次反转、目标时间位置错误 |
+| 任务与专章 | 输入 → 输出 | 主要能力 | 导航关系 $R$ | 一票否决式错误 |
+|---|---|---|---|---|
+| [视频到视频编辑](tasks/video-to-video.md) | 源视频 + 指令/参考/轨迹 → 指定变化后的完整视频 | [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C5](foundation-model-capabilities.md#capability-c5) | 变换 | 未编辑区域变化、目标变化未实现、时间传播不一致 |
+| [源视频虚拟试衣](tasks/video-virtual-try-on.md) | 人物源视频 + 服装参考/商品资产 → 同一时间轴、动作与相机下的换装视频 | [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C5](foundation-model-capabilities.md#capability-c5) | 参考、变换 | 人脸/身体/背景漂移，服装纹理标识错位或跨帧闪烁 |
+| [姿态驱动虚拟试衣](tasks/video-virtual-try-on.md) | 人物/身份参考 + 服装参考 + 姿态序列 → 新时间轴试衣视频 | [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C5](foundation-model-capabilities.md#capability-c5) | 参考、创作 | 把该合同当作普通 V2V；身份、衣服与驱动姿态错误绑定 |
+| [视频退化修复](tasks/video-restoration.md) | 低质量观测 + 可选退化参数 → 同时间轴高质量视频 | [C1](foundation-model-capabilities.md#capability-c1) · [C3](foundation-model-capabilities.md#capability-c3) · [C5](foundation-model-capabilities.md#capability-c5) | 恢复 | 幻觉文字/人脸/结构、闪烁、真实退化分布外失效 |
+| [视频补全](tasks/video-inpainting.md) | 视频 + 时空 mask → 缺失区域及其时间延续 | [C1](foundation-model-capabilities.md#capability-c1) · [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C5](foundation-model-capabilities.md#capability-c5) | 锚定、补全 | mask 外像素被改、边界 seam、错误重现被删对象 |
+| [帧插值](tasks/frame-interpolation.md) | 两侧/多侧已知帧 + 目标时间 → 已知端点之间的帧 | [C1](foundation-model-capabilities.md#capability-c1) · [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C7](foundation-model-capabilities.md#capability-c7) | 锚定、补全 | 端点不守恒、遮挡层次反转、目标时间位置错误 |
 
 ### 3.3 预测与交互
 
-| 任务与专章 | 输入 → 输出 | 导航关系 $R$ | 一票否决式错误 |
-|---|---|---|---|
-| [视频预测](tasks/video-prediction.md) | 真实过去帧 + 可选上下文 → 一个或多个可能未来 | 锚定、外推 | 历史不连续；把多模态未来平均成模糊唯一答案 |
-| [动作条件预测](tasks/action-conditioned-prediction.md) | 历史观测 + 完整或分段动作序列 → 对应未来观测 | 锚定、外推 | 换动作而未来不变；动作单位、坐标或延迟错位 |
-| [交互式世界](tasks/interactive-world-generation.md) | 当前状态 + 每轮到达的动作 → 可持续反馈的观测与状态 | 锚定、外推 | 动作无因果效应、回访失忆、deadline miss 或错误无法恢复 |
+| 任务与专章 | 输入 → 输出 | 主要能力 | 导航关系 $R$ | 一票否决式错误 |
+|---|---|---|---|---|
+| [视频预测](tasks/video-prediction.md) | 真实过去帧 + 可选上下文 → 一个或多个可能未来 | [C1](foundation-model-capabilities.md#capability-c1) · [C3](foundation-model-capabilities.md#capability-c3) · [C7](foundation-model-capabilities.md#capability-c7) | 锚定、外推 | 历史不连续；把多模态未来平均成模糊唯一答案 |
+| [动作条件预测](tasks/action-conditioned-prediction.md) | 历史观测 + 完整或分段动作序列 → 对应未来观测 | [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C7](foundation-model-capabilities.md#capability-c7) · [C9](foundation-model-capabilities.md#capability-c9) | 锚定、外推 | 换动作而未来不变；动作单位、坐标或延迟错位 |
+| [交互式世界](tasks/interactive-world-generation.md) | 当前状态 + 每轮到达的动作 → 可持续反馈的观测与状态 | [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C7](foundation-model-capabilities.md#capability-c7) · [C9](foundation-model-capabilities.md#capability-c9)；含显式规划时再加 [C8](foundation-model-capabilities.md#capability-c8) | 锚定、外推 | 动作无因果效应、回访失忆、deadline miss 或错误无法恢复 |
 
 同一底座可迁移到多个合同，并不意味着任务相同。Video Diffusion Models 同时研究无条件生成、文字条件和视频预测；Stable Video Diffusion 的底座又可适配 I2V、相机运动和多视角生成。这些是技术复用证据，不是任务合并证据 [[1]](#ref-1) [[2]](#ref-2)。
 

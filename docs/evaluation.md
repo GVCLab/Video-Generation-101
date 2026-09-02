@@ -193,21 +193,23 @@ WorldModelBench 主要位于视觉与物理诊断层 [[32]](#ref-32)；Genie 推
 
 **图 1：从能力声明到证据上限的评测链。** 自动指标负责规模化扫描，人类 gold set 负责校准，任务或闭环实验负责验证实际效用；三者结果不应被强行平均成一个缺乏解释的总分。
 
+<a id="capability-evaluation-matrix"></a>
+
 ### 6.1 Claim–task–metric 对齐
 
-评测前应先写 model claim card：模型面向 T2V、I2V、multi-shot/story、编辑、个性化、长视频、联合音频、Video Reasoning，还是 action-conditioned World Model；每项声明需要明确成功条件、失败代价和证据等级。下表列出代表性任务路由，而非穷尽所有子任务。
+评测前应先写 model claim card：模型面向 T2V、I2V、multi-shot/story、编辑、个性化、长视频、联合音频、Video Reasoning，还是 action-conditioned World Model；每项声明需要明确成功条件、失败代价和证据等级。下表列出代表性任务路由，而非穷尽所有子任务。“能力主张”中的编号均反链[基础模型能力地图](foundation-model-capabilities.md#capability-cross-table-index)；它们决定需要验证什么，不代表某个 benchmark 已经充分覆盖该能力。
 
-| 任务 | 最低评测单位 | 必须分开的结果 |
-|---|---|---|
-| 开放生成 | `prompt × seed` | 外观、运动、条件、覆盖、拒绝/失败 |
-| I2V / 修复 | `input × condition/degradation × seed` | 输入保持、目标变化、参考保真、时间稳定 |
-| Multi-shot / story | `story × shot plan × reference set × seed × budget` | 镜头内质量、边界、实体/状态、叙事/电影语言、错误传播与成本 |
-| 编辑 | `source × instruction × seed` | edit success、source preservation、locality、时间稳定 |
-| 个性化 | `subject × reference × prompt × seed × budget` | 身份、运动、绑定、漂移、泄漏、适配成本 |
-| 多视角 / 4D | `scene × view × time × seed` | 新视角/新时刻、几何、遮挡、轨迹、不确定性 |
-| 联合音视频 | `condition × seed × audiovisual event` | 音频与视频质量、事件正确、同步、跨模态一致性 |
-| Video Reasoning | `problem × seed × budget` | 约束保持、最终答案、过程合法性、pass@1/pass@k |
-| World Model | `state × action branch × horizon × policy` | 动作效应、反事实、rollout、校准、策略价值 |
+| 任务 | 能力主张 | 最低评测单位 | 必须分开的结果 |
+|---|---|---|---|
+| 开放生成 | [C1](foundation-model-capabilities.md#capability-c1) · [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C7](foundation-model-capabilities.md#capability-c7) | `prompt × seed` | 外观、运动、条件、覆盖、拒绝/失败 |
+| I2V / 修复 | [C1](foundation-model-capabilities.md#capability-c1) · [C3](foundation-model-capabilities.md#capability-c3) · [C5](foundation-model-capabilities.md#capability-c5) | `input × condition/degradation × seed` | 输入保持、目标变化、参考保真、时间稳定；作语义或物理声明时另验 [C2](foundation-model-capabilities.md#capability-c2) / [C7](foundation-model-capabilities.md#capability-c7) |
+| Multi-shot / story | [C1](foundation-model-capabilities.md#capability-c1) · [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C5](foundation-model-capabilities.md#capability-c5) · [C7](foundation-model-capabilities.md#capability-c7) | `story × shot plan × reference set × seed × budget` | 镜头内质量、边界、实体/状态、叙事/电影语言、错误传播与成本 |
+| 编辑 | [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C5](foundation-model-capabilities.md#capability-c5) | `source × instruction × seed` | edit success、source preservation、locality、时间稳定 |
+| 个性化 | [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C5](foundation-model-capabilities.md#capability-c5) | `subject × reference × prompt × seed × budget` | 身份、运动、绑定、漂移、泄漏、适配成本 |
+| 多视角 / 4D | [C1](foundation-model-capabilities.md#capability-c1) · [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) | `scene × view × time × seed` | 新视角/新时刻、几何、遮挡、轨迹、不确定性 |
+| 联合音视频 | [C1](foundation-model-capabilities.md#capability-c1) · [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C6](foundation-model-capabilities.md#capability-c6) · [C7](foundation-model-capabilities.md#capability-c7) | `condition × seed × audiovisual event` | 音频与视频质量、事件正确、同步、跨模态一致性 |
+| Video Reasoning | [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C7](foundation-model-capabilities.md#capability-c7) · [C8](foundation-model-capabilities.md#capability-c8) | `problem × seed × budget` | 约束保持、最终答案、过程合法性、pass@1/pass@k |
+| World Model | [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C7](foundation-model-capabilities.md#capability-c7) · [C9](foundation-model-capabilities.md#capability-c9)；明示推理或规划时再加 [C8](foundation-model-capabilities.md#capability-c8) | `state × action branch × horizon × policy` | 动作效应、反事实、rollout、校准、策略价值 |
 
 ### 6.2 冻结数据、版本与生成预算
 

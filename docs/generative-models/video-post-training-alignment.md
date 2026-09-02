@@ -8,16 +8,20 @@
 
 视频生成的基础训练通常在大规模视频上学习条件分布；后训练则在已有生成器上追加数据、偏好、奖励、在线 rollout、推理时搜索或教师蒸馏。它们可能共享同一个 checkpoint，却改变不同对象：
 
-| 路线 | 直接优化对象 | 默认改变偏好？ | 默认降低采样步数？ | 主要新增成本 |
-|---|---|---:|---:|---|
-| continued pretraining / SFT | 数据似然、flow 或 denoising 目标 | 间接、取决于数据 | 否 | 数据清洗与训练算力 |
-| reward model（RM） | 视频或视频对的分数/排序 | **单独训练 RM 不会**改变生成器 | 否 | 标注、视频编码与校准 |
-| reward shaping | 把总分拆成帧、段、时间步或集合回报 | 只有接入优化或引导才会 | 否 | 信号设计、额外 reward 调用 |
-| DPO / IPO / ORPO 类 | 偏好对上的相对概率或 odds | 是，目标如此；效果需实证 | 否 | 偏好对与参考/隐式基准 |
-| policy-gradient / RL | 当前策略 rollout 的期望回报 | 是，目标如此；风险也最高 | 否 | 多样本生成、log-prob、reward 与反传 |
-| verifiable reward / test-time adaptation | 单次请求的搜索、梯度或小参数 | 当次输出可能改变；权重未必持久改变 | 否，通常反而增加推理工作 | best-of-$N$、reward 查询或每请求优化 |
-| consistency / DMD / distillation | 少步 student、flow map 或输出分布 | 默认否 | **是** | 教师、student 训练与蒸馏稳定性 |
-| reward-guided distillation | 少步 student + reward | 是 | 是 | 教师与 reward 的双重依赖 |
+<a id="post-training-capability-matrix"></a>
+
+“常见目标能力”中的 C1–C9 均反链[基础模型能力地图](../foundation-model-capabilities.md#capability-cross-table-index)。这里记录优化信号通常瞄准什么，不表示采用该路线就必然获得相应能力；蒸馏还必须逐项复测能力保持。
+
+| 路线 | 主要优化目标 / 信号 | 常见目标能力 | 默认改变偏好？ | 默认降低采样步数？ | 主要新增成本 |
+|---|---|---|---:|---:|---|
+| continued pretraining / SFT | 数据似然、flow 或 denoising 目标 | [C1](../foundation-model-capabilities.md#capability-c1) · [C2](../foundation-model-capabilities.md#capability-c2) · [C3](../foundation-model-capabilities.md#capability-c3) · [C5](../foundation-model-capabilities.md#capability-c5) · [C6](../foundation-model-capabilities.md#capability-c6) | 间接、取决于数据 | 否 | 数据清洗与训练算力 |
+| reward model（RM） | 视频或视频对的分数/排序 | 评价 [C1](../foundation-model-capabilities.md#capability-c1) · [C2](../foundation-model-capabilities.md#capability-c2) · [C3](../foundation-model-capabilities.md#capability-c3) · [C5](../foundation-model-capabilities.md#capability-c5) · [C7](../foundation-model-capabilities.md#capability-c7)；不直接改变生成器 | **单独训练 RM 不会**改变生成器 | 否 | 标注、视频编码与校准 |
+| reward shaping | 把总分拆成帧、段、时间步或集合回报 | [C2](../foundation-model-capabilities.md#capability-c2) · [C3](../foundation-model-capabilities.md#capability-c3) · [C5](../foundation-model-capabilities.md#capability-c5) · [C7](../foundation-model-capabilities.md#capability-c7) | 只有接入优化或引导才会 | 否 | 信号设计、额外 reward 调用 |
+| DPO / IPO / ORPO 类 | 偏好对上的相对概率或 odds | [C1](../foundation-model-capabilities.md#capability-c1) · [C2](../foundation-model-capabilities.md#capability-c2) · [C3](../foundation-model-capabilities.md#capability-c3) · [C5](../foundation-model-capabilities.md#capability-c5) · [C7](../foundation-model-capabilities.md#capability-c7) | 是，目标如此；效果需实证 | 否 | 偏好对与参考/隐式基准 |
+| policy-gradient / RL | 当前策略 rollout 的期望回报 | [C2](../foundation-model-capabilities.md#capability-c2) · [C3](../foundation-model-capabilities.md#capability-c3) · [C5](../foundation-model-capabilities.md#capability-c5) · [C7](../foundation-model-capabilities.md#capability-c7) · [C9](../foundation-model-capabilities.md#capability-c9) | 是，目标如此；风险也最高 | 否 | 多样本生成、log-prob、reward 与反传 |
+| verifiable reward / test-time adaptation | 单次请求的搜索、梯度或小参数 | [C2](../foundation-model-capabilities.md#capability-c2) · [C5](../foundation-model-capabilities.md#capability-c5) · [C7](../foundation-model-capabilities.md#capability-c7) · [C8](../foundation-model-capabilities.md#capability-c8) | 当次输出可能改变；权重未必持久改变 | 否，通常反而增加推理工作 | best-of-$N$、reward 查询或每请求优化 |
+| consistency / DMD / distillation | 少步 student、flow map 或输出分布 | 不默认新增能力；对 teacher 已声明能力做逐项保持性复测 | 默认否 | **是** | 教师、student 训练与蒸馏稳定性 |
+| reward-guided distillation | 少步 student + reward | [C1](../foundation-model-capabilities.md#capability-c1) · [C2](../foundation-model-capabilities.md#capability-c2) · [C3](../foundation-model-capabilities.md#capability-c3) · [C5](../foundation-model-capabilities.md#capability-c5) · [C7](../foundation-model-capabilities.md#capability-c7) | 是 | 是 | 教师与 reward 的双重依赖 |
 
 因此，“用了 reward”不等于“做了 RL”，“online”不等于 policy gradient，“一步视频”也不等于“已经偏好对齐”。DPO 的原始形式把 Bradley–Terry 偏好模型化成参考策略下的直接分类目标，不必先训练显式 reward model，也不需要在线从策略采样 [[1]](#ref-1)；Identity Preference Optimization（IPO）是 $Psi$PO 理论中的 identity 映射实例 [[2]](#ref-2)，ORPO 则把 odds-ratio 惩罚并入单阶段 SFT [[3]](#ref-3)。这三项的奠基证据来自语言模型，不能自动当作视频生成实证。
 
