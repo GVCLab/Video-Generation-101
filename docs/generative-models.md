@@ -18,7 +18,7 @@
 
 例如，NOVA 是**连续 latent 表示**、**帧间与帧内集合式自回归分解**、**逐 token diffusion loss**和 Transformer 的组合；Pyramidal Flow 把**连续 latent**、**时间金字塔自回归**、**flow matching**与 DiT 组合；CausVid 则把双向视频 diffusion teacher 蒸馏成**时间因果**、**少步** student [[21]](#ref-21) [[20]](#ref-20) [[23]](#ref-23)。用五轴配置描述这些系统，可以同时说明它们生成什么、如何分解联合分布、怎样训练、由什么网络实现，以及以何种方式输出。
 
-本章建立全局地图。连续/离散表示、压缩账本、因果 codec 与实际 bitstream 的边界见[视频 Tokenizer 与生成式压缩专章](generative-models/video-tokenizers.md)，ELBO、learned prior 与随机未来见[变分生成专章](generative-models/variational-generation.md)；DDPM、score、SDE/PF-ODE 的完整推导见[扩散模型专章](generative-models/diffusion-models.md)；FM、RF、Consistency、Shortcut 与 DMD 的差异见[Flow 与 Consistency 专章](generative-models/flow-consistency-models.md)；latent patch、full/factorized/window/sparse/linear attention、条件融合、3D 位置、noise-time MoE、并行与 cache 的分账见[Video DiT 与骨干扩展专章](generative-models/video-dit-backbones.md)；如何用多候选、验证器、轨迹搜索与临时适配把额外推理预算换成质量，见[Test-Time Scaling 专章](generative-models/test-time-scaling.md)；SFT、reward model、DPO/RWR、policy-gradient RL、推理期 guidance 与蒸馏的边界见[视频后训练与对齐专章](generative-models/video-post-training-alignment.md)；在线生成的暴露偏移、缓存和 SLO 见[因果、流式与实时专章](generative-models/causal-streaming-generation.md)。
+本章建立全局地图。连续/离散表示、压缩指标、因果 codec 与实际 bitstream 的边界见[视频 Tokenizer 与生成式压缩专章](generative-models/video-tokenizers.md)，ELBO、learned prior 与随机未来见[变分生成专章](generative-models/variational-generation.md)；DDPM、score、SDE/PF-ODE 的完整推导见[扩散模型专章](generative-models/diffusion-models.md)；FM、RF、Consistency、Shortcut 与 DMD 的差异见[Flow 与 Consistency 专章](generative-models/flow-consistency-models.md)；latent patch、full/factorized/window/sparse/linear attention、条件融合、3D 位置、noise-time MoE、并行与 cache 的分项分析见[Video DiT 与骨干扩展专章](generative-models/video-dit-backbones.md)；跨环节成本分析与六类加速方法见[压缩与推理加速综述导航](generative-models/inference-acceleration.md)，并可分别进入[蒸馏](generative-models/inference-acceleration/distillation.md)、[量化](generative-models/inference-acceleration/quantization.md)、[模型剪枝](generative-models/inference-acceleration/pruning.md)、[Token/注意力稀疏](generative-models/inference-acceleration/sparsity.md)、[缓存与复用](generative-models/inference-acceleration/caching.md)及[底层算子、并行与在线服务](generative-models/inference-acceleration/systems.md)综述；如何用多候选、验证器、轨迹搜索与临时适配把额外推理预算换成质量，见[Test-Time Scaling 专章](generative-models/test-time-scaling.md)；SFT、reward model、DPO/RWR、policy-gradient RL、推理期 guidance 与蒸馏的边界见[视频后训练与对齐专章](generative-models/video-post-training-alignment.md)；在线生成的暴露偏移、缓存和 SLO 见[因果、流式与实时专章](generative-models/causal-streaming-generation.md)。
 
 ## 1. 一张图看懂五个交叉分类轴
 
@@ -344,17 +344,18 @@ evidence:
 | 本总览 | 五轴 taxonomy、跨轴组合、历史与选型 | 每个 SDE/ODE 的完整推导 |
 | [递归预测](generative-models/recurrent-prediction.md) | 逐步状态、teacher forcing、rollout | 把所有递归模型归成 objective |
 | [变分生成](generative-models/variational-generation.md) | future-aware posterior、history-only prior、ELBO/collapse、层级/对象 latent、多未来 proper score | 把现代 codec、diffusion noise、确定性 latent 或 posterior oracle 等同完整 stochastic future generator |
-| [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md) | 表示接口、连续/离散/混合 latent、压缩账本、causal codec、重建与下游生成 | 把 latent shape 当实际码率；替代上层 factorization/objective 章节 |
+| [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md) | 表示接口、连续/离散/混合 latent、压缩指标、causal codec、重建与下游生成 | 把 latent shape 当实际码率；替代上层 factorization/objective 章节 |
 | [对抗生成](generative-models/adversarial-generation.md) | 时空判别器、mode collapse、现代辅助角色 | 把 GAN 与 content/motion representation 混写 |
 | [自回归生成](generative-models/autoregressive-generation.md) | strict frame/token/chunk factorization、continuous head | 把 AR 限定为 VQ+CE |
 | [掩码生成](generative-models/masked-generation.md) | mask schedule、block commit、双向上下文 | 假定 masked 只能离散 |
 | [扩散模型](generative-models/diffusion-models.md) | DDPM→score→SDE/PF-ODE、参数化、sampler | 重复完整 streaming 系统 |
 | [Flow 与 Consistency](generative-models/flow-consistency-models.md) | FM/RF/CM/Shortcut/DMD 与 few-step 证据 | 把 causal/streaming 当 objective |
 | [Video DiT 与骨干扩展](generative-models/video-dit-backbones.md) | token 预算、attention topology、position/fusion、MoE、parallelism/cache 与公平比较 | 重复 tokenizer/objective 推导；把多卡或少步误称骨干复杂度下降 |
+| [压缩与推理加速综述导航](generative-models/inference-acceleration.md) | 从 NFE、单次前向、bit/访存、复用、kernel 和并行分析端到端成本，并链接至六篇独立综述 | 把 FLOPs、kernel、DiT-only、E2E 或多卡倍数混报；相乘不同论文倍数 |
 | [Test-Time Scaling](generative-models/test-time-scaling.md) | 多候选、轨迹搜索、验证器、临时适配、自适应预算与质量—成本曲线 | 把精选最好样例、oracle、更多 NFE 或同 reward 自证写成基础模型能力提升 |
 | [因果、流式与实时](generative-models/causal-streaming-generation.md) | codec→generator→commit→SLO 合同、自生成历史、bounded memory、KV/cache、lookahead、backpressure、open horizon | 把低 NFE、因果 mask 或长 demo 自动写成实时 |
 
-推荐先读本章，再按 representation 进入[视频 Tokenizer](generative-models/video-tokenizers.md)，按 objective 进入变分、Diffusion 或 Flow/Consistency，按 backbone 进入[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)；随后根据 factorization 去读 AR、masked 或 causal streaming。最后回到[大模型系统路线](foundation-models.md)、[评测指南](evaluation.md)和[World Models](world-models.md)，检查能力 claim 是否真的由对应证据支持。
+推荐先读本章，再按 representation 进入[视频 Tokenizer](generative-models/video-tokenizers.md)，按 objective 进入变分、Diffusion 或 Flow/Consistency，按 backbone 进入[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)；分析实际部署问题时，先进入[压缩与推理加速综述导航](generative-models/inference-acceleration.md)，再按瓶颈选择蒸馏、量化、剪枝、稀疏、缓存或系统专题；随后根据 factorization 去读 AR、masked 或 causal streaming。最后回到[大模型系统路线](foundation-models.md)、[评测指南](evaluation.md)和[World Models](world-models.md)，检查能力 claim 是否真的由对应证据支持。
 
 ## 参考文献
 

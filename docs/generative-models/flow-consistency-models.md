@@ -429,7 +429,7 @@ CausVid 把 50-step 双向视频 diffusion 教师蒸馏为 4-step 因果自回�
 ### 9.1 选型路径
 
 1. **从头训练、需要灵活 ODE 轨迹**：先考虑 FM/RF；若极低 NFE 是首要约束，再验证 Shortcut、MeanFlow 或 AlphaFlow。
-2. **已有强 diffusion/flow 教师**：CM-CD、sCD、rCM、FACM 或 DMD2 都可能合适，但要把教师生成、JVP/fake-score 与蒸馏成本计入总账。
+2. **已有强 diffusion/flow 教师**：CM-CD、sCD、rCM、FACM 或 DMD2 都可能合适，但要将教师生成、JVP/fake-score 与蒸馏成本一并纳入统计。
 3. **最关心多样性与长尾覆盖**：不要只看单步 FID/FVD；优先检查 recall/coverage、条件长尾和多种子视频，并比较 consistency 与 DMD 目标的覆盖倾向。
 4. **要做交互或无限视频**：few-step 只是必要条件之一，还必须单独设计因果分解、状态记忆、on-policy rollout 与流式服务。
 5. **最高离线质量优先**：多步 diffusion/flow 仍可能更稳；不应为“一步”标签牺牲无法接受的细节、运动或条件一致性。

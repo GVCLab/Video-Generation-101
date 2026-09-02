@@ -257,7 +257,7 @@ ScaleFusion 针对视频 DiT 的时空 attention 做分布式切分与通信重�
 
 ### 6.6 量化与减少 NFE：另两条执行轴
 
-ViDiT-Q、QuantSparse 和 DeltaQuant 分别探索视频 DiT 量化、量化与稀疏协同、时空 delta smoothing [[32]](#ref-32) [[33]](#ref-33) [[34]](#ref-34)。量化改变算术精度、权重/activation bytes 和 kernel；减少 NFE 则减少 backbone 被调用的次数。端到端成本近似：
+ViDiT-Q、QuantSparse 和 DeltaQuant 分别探索视频 DiT 量化、量化与稀疏协同、时空 delta smoothing [[32]](#ref-32) [[33]](#ref-33) [[34]](#ref-34)。量化改变算术精度、权重/activation bytes 和 kernel；减少 NFE 则减少 backbone 被调用的次数。完整方法谱系与校准、低比特 kernel 的证据边界见[视频扩散量化综述](inference-acceleration/quantization.md)。端到端成本近似：
 
 ```math
 C_{sample}
@@ -268,6 +268,8 @@ C_{backbone}(N_i,d,L,\rho_i,q_i,\text{hardware})
 ```
 
 这里 $\rho_i$ 是第 $i$ 步实际 attention density，$q_i$ 是精度。把一个 4-step sparse/quantized 系统与 50-step dense FP16 baseline 比较可以说明“整套系统更快”，却不能单独归因于 attention、quantization 或 distillation。
+
+以上仅分析 backbone 内部的执行成本。若需继续比较少步蒸馏、参数/结构剪枝、token pruning、低比特量化、跨步 cache、底层算子、显存调度和多卡在线服务的端到端组合，见[推理加速综述导航](inference-acceleration.md)；按瓶颈可直接进入[蒸馏](inference-acceleration/distillation.md)、[量化](inference-acceleration/quantization.md)、[模型剪枝](inference-acceleration/pruning.md)、[Token/注意力稀疏](inference-acceleration/sparsity.md)、[缓存与复用](inference-acceleration/caching.md)或[底层算子、并行与在线服务](inference-acceleration/systems.md)综述。
 
 ## 7. 2022–2026 机制里程碑：首次公开与正式发表分开
 
@@ -494,7 +496,7 @@ cost:
 
 <a id="ref-19"></a>[19] Wan2.2 timestep expert routing implementation [![GitHub: Wan-Video/Wan2.2](https://img.shields.io/github/stars/Wan-Video/Wan2.2?style=social)](https://github.com/Wan-Video/Wan2.2/blob/main/wan/text2video.py). Wan Team. Official code. 2025.
 
-<a id="ref-20"></a>[20] [RAPID: Reusing Attention Sparsity with Inter-step Adaptation for Efficient Video Generation](https://openaccess.thecvf.com/content/CVPR2026/papers/Lin_RAPID_Reusing_Attention_Sparsity_with_Inter-step_Adaptation_for_Efficient_Video_CVPR_2026_paper.pdf). CVPR. 2026.
+<a id="ref-20"></a>[20] [RAPID: Reusing Attention Sparsity with Inter-step Adaptation for Efficient Video Diffusion](https://openaccess.thecvf.com/content/CVPR2026/papers/Lin_RAPID_Reusing_Attention_Sparsity_with_Inter-step_Adaptation_for_Efficient_Video_CVPR_2026_paper.pdf). Shangran Lin, Lu Lu, Jian Chen, Qiang Liu. CVPR. 2026.
 
 <a id="ref-21"></a>[21] [LinVideo: A Post-Training Framework towards O(n) Attention in Efficient Video Generation](https://openaccess.thecvf.com/content/CVPR2026/html/Huang_LinVideo_A_Post-Training_Framework_towards_On_Attention_in_Efficient_Video_CVPR_2026_paper.html). CVPR. 2026.
 

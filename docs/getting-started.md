@@ -250,11 +250,12 @@
 2. [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)：理解连续 latent、离散 token、量化、时空预算与真实 bitstream 的边界。
 3. [变分随机视频生成](generative-models/variational-generation.md)：分清 future-aware posterior、history-only prior、tokenizer VAE 与 diffusion noise，并理解多未来校准。
 4. [Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)：从 latent token 数推到 full/factorized/window/sparse/linear attention，再分开核算 MoE、量化、并行、cache 与 NFE。
-5. [大模型路线](foundation-models.md)：理解 tokenizer、generator、Transformer、后训练与基础模型系统怎样组合。
-6. [视频后训练与对齐](generative-models/video-post-training-alignment.md)：区分 SFT、reward、DPO/RL、推理 guidance 与少步蒸馏。
-7. [开放模型与代码](../resources/open-models.md)：选择可以实际运行的模型。
-8. [数据集索引](../resources/datasets.md)：了解训练与评测数据。
-9. [评测指南](evaluation.md)：设计可重复的比较实验。
+5. [视频扩散压缩与推理加速综述导航](generative-models/inference-acceleration.md)：先了解端到端成本构成和性能归因，再根据主要瓶颈进入[蒸馏](generative-models/inference-acceleration/distillation.md)、[量化](generative-models/inference-acceleration/quantization.md)、[剪枝](generative-models/inference-acceleration/pruning.md)、[稀疏](generative-models/inference-acceleration/sparsity.md)、[缓存](generative-models/inference-acceleration/caching.md)或[系统执行](generative-models/inference-acceleration/systems.md)综述。
+6. [大模型路线](foundation-models.md)：理解 tokenizer、generator、Transformer、后训练与基础模型系统怎样组合。
+7. [视频后训练与对齐](generative-models/video-post-training-alignment.md)：区分 SFT、reward、DPO/RL、推理 guidance 与少步蒸馏。
+8. [开放模型与代码](../resources/open-models.md)：选择可以实际运行的模型。
+9. [数据集索引](../resources/datasets.md)：了解训练与评测数据。
+10. [评测指南](evaluation.md)：设计可重复的比较实验。
 
 建议先理解每种方法解决了什么问题，再进入公式和代码。
 

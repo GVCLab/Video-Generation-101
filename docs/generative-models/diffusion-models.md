@@ -243,7 +243,7 @@ Classifier-free guidance（CFG）在训练时随机丢弃条件，使一个网�
 
 ### 7.2 三类加速不能合并成“少步扩散”
 
-这里先按“是否训练新参数、主要对齐轨迹还是分布”做最小分叉；若要同时判断 DDPM/score、reverse SDE、PF-ODE、FM/RF、CM/DMD 与 causal streaming 分别处在哪一层，请对照 [Flow 专章的五层机制地图](flow-consistency-models.md#five-layer-map)。核心原则是：输出参数化不等于训练 objective，确定性动力学不等于 FM，不重训的 solver 不等于少步 student，少 NFE 也不等于视频能持续发帧。
+这里先按“是否训练新参数、主要对齐轨迹还是分布”做最小分叉；若要同时判断 DDPM/score、reverse SDE、PF-ODE、FM/RF、CM/DMD 与 causal streaming 分别处在哪一层，请对照 [Flow 专章的五层机制地图](flow-consistency-models.md#five-layer-map)。核心原则是：输出参数化不等于训练 objective，确定性动力学不等于 FM，不重训的 solver 不等于少步 student，少 NFE 也不等于视频能持续发帧。少步方法的演进、分类与证据争议见[蒸馏综述](inference-acceleration/distillation.md)；与量化、剪枝、稀疏、cache、kernel/多卡的组合关系见[推理加速综述导航](inference-acceleration.md)。
 
 ![图 019：扩散生成三类加速路线](../../assets/imagegen-diagrams/019/diagram.png)
 顺序化文字替代：第一，从已经训练好的 diffusion 或 score 场出发；第二，若不能重训，使用兼容的 DDIM、PF-ODE 或 DPM-Solver 等 sampler/solver；第三，若允许训练新模型，再判断监督主要对齐同一生成轨迹上的端点，还是对齐 student 与目标的生成分布；第四，前者进入 consistency/trajectory 路线，后者进入 DMD 或带对抗项的 DMD2 路线；第五，三条路线都必须在相同分辨率、时长、条件、NFE、硬件和精度下重新验收质量、覆盖与延迟。
@@ -269,7 +269,7 @@ F_\theta(X_\tau,\tau)\approx F_\theta(X_\rho,\rho),
 
 Distribution Matching Distillation（DMD）不要求 student 沿 teacher 的同一条样本轨迹前进，而是利用 target score 与 fake/student score 的差来更新生成器，使 student 分布接近目标分布；原始 DMD 还使用回归项稳定一步训练 [[18]](#ref-18)。DMD2 去掉对固定回归数据集的依赖，引入 two-time-scale fake critic 更新、GAN loss，并扩展到 multi-step/on-policy 输入 [[19]](#ref-19)。因此，“DMD”与“adversarial distillation”有交集但并非天然同义：对抗项是 DMD2 等具体实现新增的训练信号。
 
-CausVid 把 DMD 扩展到视频，用双向 diffusion teacher 监督 4-step causal student，并通过 KV cache 流式生成 [[20]](#ref-20)。Self Forcing 则让 causal video diffusion 在训练时条件于自身已经生成的历史，以处理 teacher-forcing 与 rollout 之间的 exposure gap [[21]](#ref-21)。这两项工作同时改变了噪声轴上的步数和视频轴上的 factorization；不能把其 streaming 能力全部归因于 DMD，也不能把 causal mask 当作新的 diffusion objective。完整部署问题见[因果、流式与实时视频生成](causal-streaming-generation.md)。
+CausVid 把 DMD 扩展到视频，用双向 diffusion teacher 监督 4-step causal student，并通过 KV cache 流式生成 [[20]](#ref-20)。Self Forcing 则让 causal video diffusion 在训练时条件于自身已经生成的历史，以处理 teacher-forcing 与 rollout 之间的 exposure gap [[21]](#ref-21)。这两项工作同时改变了噪声轴上的步数和视频轴上的 factorization；不能把其 streaming 能力全部归因于 DMD，也不能把 causal mask 当作新的 diffusion objective。完整部署问题见[因果、流式与实时视频生成](causal-streaming-generation.md)；如需比较少步 student 与结构压缩、低 bit 和服务系统的交互，请继续阅读[蒸馏综述](inference-acceleration/distillation.md)与[推理加速综述导航](inference-acceleration.md)。
 
 ## 8. 2022–2026：视频扩散的可证据化里程碑
 

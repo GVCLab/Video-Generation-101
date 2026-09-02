@@ -2,7 +2,7 @@
 
 这不是按年份堆论文的 awesome list，而是一门可以执行、留痕和被证伪的路线式课程。目标不是“读过多少篇”，而是最终能回答四个问题：模型表示了什么、怎样沿时间生成、证据真正支持什么、下一次实验怎样推翻自己的判断。
 
-本页证据冻结于 **2026-08-30（Asia/Shanghai）**。检索式、纳入排除、正式发表状态和关键断言见[阅读路线研究日志](../sources/research_20260830_reading_routes.md)，新增结构性技术轴的选择依据见[缺口审计](../sources/research_20260830_missing_subfields_integration.md)、[Video DiT / backbone 研究日志](../sources/research_20260830_video_dit_backbones.md)、[多视角/4D 研究日志](../sources/research_20260830_multiview_4d_generation.md)与[退化修复研究日志](../sources/research_20260830_video_restoration.md)。完整书目信息与仓库索引仍见[引用与代码索引](bibliography.md)；专题细节分别见[生成模型](generative-models.md)、[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)、[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)、[视频后训练与对齐](generative-models/video-post-training-alignment.md)、[因果流式生成](generative-models/causal-streaming-generation.md)、[原生音视频](tasks/native-audio-video-generation.md)、[开放集视频个性化](tasks/personalized-video-generation.md)、[细粒度可控生成](tasks/controllable-video-generation.md)、[多视角/4D 生成](tasks/multiview-4d-generation.md)、[视频退化修复](tasks/video-restoration.md)、[评测](evaluation.md)、[World Model](world-models.md)与 [JEPA](jepa.md)。
+本页证据冻结于 **2026-08-30（Asia/Shanghai）**，推理基础设施专题补充核验于 **2026-09-02**。检索式、纳入排除、正式发表状态和关键断言见[阅读路线研究日志](../sources/research_20260830_reading_routes.md)，新增结构性技术轴的选择依据见[缺口审计](../sources/research_20260830_missing_subfields_integration.md)、[视频扩散基础设施研究记录](../sources/research_20260902_video_diffusion_infrastructure.md)、[Video DiT / backbone 研究日志](../sources/research_20260830_video_dit_backbones.md)、[多视角/4D 研究日志](../sources/research_20260830_multiview_4d_generation.md)与[退化修复研究日志](../sources/research_20260830_video_restoration.md)。完整书目信息与仓库索引仍见[引用与代码索引](bibliography.md)；专题细节分别见[生成模型](generative-models.md)、[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)、[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)、[视频扩散压缩与推理加速](generative-models/inference-acceleration.md)、[视频后训练与对齐](generative-models/video-post-training-alignment.md)、[因果流式生成](generative-models/causal-streaming-generation.md)、[原生音视频](tasks/native-audio-video-generation.md)、[开放集视频个性化](tasks/personalized-video-generation.md)、[细粒度可控生成](tasks/controllable-video-generation.md)、[多视角/4D 生成](tasks/multiview-4d-generation.md)、[视频退化修复](tasks/video-restoration.md)、[评测](evaluation.md)、[World Model](world-models.md)与 [JEPA](jepa.md)。
 
 ## 0. 课程规则与证据标签
 
@@ -115,6 +115,21 @@
 | sparse 与 reuse | [RAPID](https://openaccess.thecvf.com/content/CVPR2026/papers/Lin_RAPID_Reusing_Attention_Sparsity_with_Inter-step_Adaptation_for_Efficient_Video_CVPR_2026_paper.pdf)；[DSA](https://proceedings.iclr.cc/paper_files/paper/2026/hash/c3728248f3c627d1f16ca5726cdf83f5-Abstract-Conference.html)；[TimeRipples](https://openaccess.thecvf.com/content/CVPR2026/html/Mao_TimeRipples_Accelerating_vDiTs_by_Understanding_the_Spatio-Temporal_Correlations_in_Latent_CVPR_2026_paper.html) | 跨 denoising step 的 mask/score reuse、distributed sparse execution 与同一次 attention 内局部复用怎样区分？selector/kernel/通信谁主导？ | **A·CVPR/ICLR 2026** |
 
 通关产物是一张七轴 manifest：`representation / factorization / objective / backbone / conditions / execution / evidence`。速度必须绑定输出、NFE、precision、hardware、warm-up 和计时边界；稀疏、cache、量化、少步与多卡的倍数不能相乘。
+
+### 推理基础设施专题：从模型压缩到端到端服务
+
+先读[视频扩散压缩与推理加速综述导航](generative-models/inference-acceleration.md)，再按问题进入六篇独立综述，并用统一的成本分析框架精读下列工作。阅读目标不是收集最大倍数，而是判断每篇工作主要改变 NFE、参数与结构、token 或注意力连边、位宽、计算复用及硬件执行中的哪一项。
+
+| 方向 | 一手阅读 | 阅读重点 | 证据 |
+|---|---|---|---|
+| [少步生成 / 蒸馏](generative-models/inference-acceleration/distillation.md) | [MCM](https://proceedings.neurips.cc/paper_files/paper/2024/hash/c859b99b5d717c9035e79d43dfd69435-Abstract-Conference.html)、[CausVid](https://openaccess.thecvf.com/content/CVPR2025/html/Yin_From_Slow_Bidirectional_to_Fast_Autoregressive_Video_Diffusion_Models_CVPR_2025_paper.html) | 名义步数和实际 NFE 是否相同？运动、多样性、因果结构与 KV 的收益如何分别分析？ | **A·NeurIPS 2024 / CVPR 2025** |
+| [结构剪枝](generative-models/inference-acceleration/pruning.md) | [F³-Pruning](https://doi.org/10.1609/aaai.v38i5.28300)、[MobileVD](https://openaccess.thecvf.com/content/ICCV2025/html/Yahia_Mobile_Video_Diffusion_ICCV_2025_paper.html) | 剪除的是权重、通道、网络块还是时间模块？参数量、单次前向 FLOPs、单次前向时延与端到端时延是否分别报告？ | **A·AAAI 2024 / ICCV 2025** |
+| [量化](generative-models/inference-acceleration/quantization.md) | [ViDiT-Q](https://proceedings.iclr.cc/paper_files/paper/2025/hash/a4a1ee071ce0fe63b83bce507c9dc4d7-Abstract-Conference.html)、[QuantSparse](https://proceedings.iclr.cc/paper_files/paper/2026/hash/94359ca6e248af69b8b6854668ae9782-Abstract-Conference.html) | 权重、激活与缓存分别采用多少位？结果来自模拟量化还是真实底层算子？校准是否覆盖不同时间步、帧数和提示词分布？ | **A·ICLR 2025 / 2026** |
+| [Token / 注意力稀疏化](generative-models/inference-acceleration/sparsity.md) | [ADAPTOR](https://openaccess.thecvf.com/content/CVPR2025W/EDGE/papers/Peruzzo_ADAPTOR_Adaptive_Token_Reduction_for_Video_Diffusion_Transformers_CVPRW_2025_paper.pdf)、[Sparse Video-Gen](https://proceedings.mlr.press/v267/xi25c.html) | 选择、聚合/分散、重排和底层算子的耗时是否计入？小物体、快速运动和远距离关系是否单独测试？ | **A·CVPRW / ICML 2025** |
+| [跨去噪步缓存](generative-models/inference-acceleration/caching.md) | [TeaCache](https://openaccess.thecvf.com/content/CVPR2025/html/Liu_Timestep_Embedding_Tells_Its_Time_to_Cache_for_Video_Diffusion_CVPR_2025_paper.html)、[FasterCache](https://proceedings.iclr.cc/paper_files/paper/2025/hash/518046d86bbc41a0707727c38301ad8e-Abstract-Conference.html)、[AdaCache](https://openaccess.thecvf.com/content/ICCV2025/html/Kahatapitiya_Adaptive_Caching_for_Faster_Video_Generation_with_Diffusion_Transformers_ICCV_2025_paper.html) | 缓存跨越去噪步还是视频帧？阈值、命中率、重置规则与镜头切换时的失效如何报告？ | **A·CVPR / ICLR / ICCV 2025** |
+| [系统与在线服务](generative-models/inference-acceleration/systems.md) | [xDiT](https://arxiv.org/abs/2411.01738)、[StreamDiffusionV2](https://proceedings.mlsys.org/paper_files/paper/2026/hash/698cfaf72a208aef2e78bcac55b74328-Abstract-Conference.html) | 多卡用于降低单请求时延还是提高吞吐？是否报告通信、TTFF、逐帧时限、抖动和 p95/p99？ | **B·作者预印本 / A·MLSys 2026** |
+
+建议根据所研究的方法，分别整理固定模型权重的推理优化记录，或涉及蒸馏、量化和剪枝的模型压缩记录。只有当输出设置、模型权重、NFE、数值精度、硬件、预热方式和计时范围一致时，加速比才具有可比性；当主要耗时转移到其他模块后，还应重新测量端到端性能。
 
 ### 主干阅读问题
 
