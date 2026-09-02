@@ -2,7 +2,7 @@
 
 > **资料冻结：2026-08-30。** 本章把论文机制、单个 checkpoint、模型家族、产品系统和托管 API 分开陈述。动态开放状态均以该日期的官方仓库、模型卡、许可证或产品页为准；作者 benchmark 和产品能力不是独立复现结论。
 
-视频基础模型不是“一个更大的 T2V 网络”，而是一条可复用、可后训练、可部署且可审计的链：数据治理产生训练语料，captioner 把视觉事实和创作语言对齐，tokenizer 决定学习空间，generator 学习条件分布，后训练与蒸馏改变行为和成本，超分、插帧、音频、安全及 API 再把 checkpoint 变成服务。Foundation model 的判据是广泛预训练后可跨任务适配，而非固定参数门槛 [[1]](#ref-1)。
+视频基础模型不是“一个更大的 T2V 网络”，而是一条可复用、可后训练、可部署且可审计的链：数据治理产生训练语料，captioner 把视觉事实和创作语言对齐，tokenizer 决定学习空间，generator 学习条件分布，后训练与蒸馏改变行为和成本，超分、插帧、音频、安全及 API 再把 checkpoint 变成服务。Foundation model 的判据是广泛预训练后可跨任务适配，而非固定参数门槛 [[1]](#ref-1)。若问题是“模型会什么”，先读[基础模型能力地图](foundation-model-capabilities.md)：物理一致性属于能力，后训练属于能力获得方式，可适配性才是相应的元能力。
 
 本章回答“一个视频基础模型系统怎样成立、证据应归因给哪一层”。表示、factorization、objective、backbone 与 deployment 的正交机制见[生成模型路线](generative-models.md)，其中连续 latent、离散 token、量化与生成式压缩的表示合同见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)，Video DiT 的 token 预算、attention topology、条件融合、3D 位置、noise-time MoE、并行与 cache 见[骨干扩展专章](generative-models/video-dit-backbones.md)，causal codec→generator→commit→SLO 的部署合同见[因果、流式与实时](generative-models/causal-streaming-generation.md)；SFT/reward/DPO/RL 的细分见[视频后训练与对齐](generative-models/video-post-training-alignment.md)，相机/轨迹/姿态/几何条件见[细粒度可控生成](tasks/controllable-video-generation.md)，相机 × 世界时间、多视角网格与可渲染动态状态见[多视角与 4D](tasks/multiview-4d-generation.md)，联合声画合同见[原生音视频生成](tasks/native-audio-video-generation.md)，逐年节点见[技术时间线](timeline.md)，动作条件、状态与规划证据见[World Model 专章](world-models.md)。
 
@@ -86,7 +86,7 @@ tokenizer 的验收必须同时覆盖：静态纹理、快速运动、镜头切�
 
 架构命名也不能替代机制分解。例如 Wan2.2-A14B 的 MoE 专家按去噪时间 $\tau$ 阶段路由，而 TI2V-5B 使用更紧凑的 VAE 表示；两者属于同一产品家族，但不是同一 checkpoint 的两个开关 [[11]](#ref-11)。Expert AdaLN、MMDiT/dual→single stream 和 noise-time MoE 也分别属于模态归一化、条件融合与专家路由，不能因都出现“expert/stream”就合并。详细五轴分类与公式见[生成模型路线](generative-models.md)，表示层的量化与 codec 边界见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)，骨干内部与执行层分账见[Video DiT 专章](generative-models/video-dit-backbones.md)。
 
-## 5. 预训练之后：行为、成本与最终画面来自不同阶段
+## 5. 从基础 checkpoint 到模型家族：行为、成本与输出形态来自不同层
 
 ### 5.1 后训练与偏好优化
 
@@ -176,7 +176,7 @@ API 验收还应冻结 endpoint、模型版本、seed 语义、上传/保留政�
 
 这些方向多数仍以预印本、技术报告或官方 release 为主。2026 的“前沿”表示证据新、系统影响大，不表示已经通过多年同行检验。
 
-## 9. 里程碑：进入下一阶段的判据与未解决项
+## 9. 系统成熟度与发布面：进入下一阶段的判据与未解决项
 
 | 里程碑 | 通过判据 | 仍未解决 |
 |---|---|---|

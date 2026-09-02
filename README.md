@@ -38,10 +38,11 @@ and reference metadata is checked in CI.
 
 ## 🎯 项目定位
 
-视频生成正在从“根据条件合成一段画面”，走向能够持续保持状态、接受复杂控制、理解动作后果并服务真实任务的通用视频系统。本仓库围绕五个层面组织内容：
+视频生成正在从“根据条件合成一段画面”，走向能够持续保持状态、接受复杂控制、理解动作后果并服务真实任务的通用视频系统。本仓库围绕六个层面组织内容：
 
 - **生成基础**：视频怎样被表示，时间与运动怎样被建模，生成过程怎样训练和加速
-- **系统能力**：模型怎样扩展到多条件、多模态、长视频、流式生成与后训练
+- **基础模型能力**：模型具备哪些视觉、时间、语义、控制、物理、推理与行动能力
+- **系统构建**：这些能力怎样经预训练、后训练、蒸馏、编排与部署形成可用系统
 - **可控创作**：怎样完成个性化、编辑、多视角、故事、多模态音视频与细粒度控制
 - **世界理解**：怎样从视觉合成进一步走向推理、物理一致性、动作条件预测与交互环境
 - **证据体系**：怎样通过评测、复现、反事实测试和闭环实验判断能力是否真实成立
@@ -60,14 +61,15 @@ _Coding Agent 扩展研究覆盖面，研究者对结论与证据负责。_
 |---|---|---|
 | 第一次接触视频生成 | [零基础入门](docs/getting-started.md) | 用直观例子理解视频如何从条件与噪声中生成 |
 | 希望建立完整技术框架 | [生成模型路线](docs/generative-models.md) | 串起表示、时序、生成机制、骨干网络与推理系统 |
-| 关注模型能力与创作控制 | [视频基础模型](docs/foundation-models.md) | 理解规模化、多条件、多模态与可控生成系统 |
+| 关注模型会什么 | [基础模型能力地图](docs/foundation-model-capabilities.md) | 区分生成、控制、物理、推理、行动能力与后训练机制 |
+| 关注模型怎样构建 | [视频基础模型系统](docs/foundation-models.md) | 理解数据、checkpoint、后训练、部署与产品归因 |
 | 准备选择研究问题 | [任务地图](docs/taxonomy.md) · [World Action Model](docs/world-action-model.md) | 从输入、输出、约束、行动后果与证据定位研究方向 |
 | 希望追踪领域演进 | [技术时间线](docs/timeline.md) | 观察不同路线如何长期并行、汇合与分化 |
 | 关注落地与可靠性 | [应用地图](docs/applications.md) · [评测指南](docs/evaluation.md) | 把模型能力映射到真实任务与可验证标准 |
 
 ## 🗺️ 知识全景
 
-仓库以“原理 → 系统 → 能力 → 世界 → 应用”为主轴，并让评测与治理贯穿每一层。
+仓库以“原理 → 能力 → 系统 → 世界 → 应用”为主轴，并让评测与治理贯穿每一层。
 
 ![图 001：Video Generation 101 知识全景](assets/imagegen-diagrams/001/diagram.png)
 ### 内容导航
@@ -75,7 +77,7 @@ _Coding Agent 扩展研究覆盖面，研究者对结论与证据负责。_
 | 板块 | 核心入口 | 延伸专题 |
 |---|---|---|
 | 生成原理 | [生成模型路线](docs/generative-models.md) | [视频 Tokenizer](docs/generative-models/video-tokenizers.md) · [Video DiT](docs/generative-models/video-dit-backbones.md) · [后训练与对齐](docs/generative-models/video-post-training-alignment.md) · [因果与流式生成](docs/generative-models/causal-streaming-generation.md) |
-| 基础模型与控制 | [视频基础模型](docs/foundation-models.md) | [个性化](docs/tasks/personalized-video-generation.md) · [细粒度控制](docs/tasks/controllable-video-generation.md) · [多视角/4D](docs/tasks/multiview-4d-generation.md) · [原生音视频](docs/tasks/native-audio-video-generation.md) |
+| 基础模型能力 | [能力地图](docs/foundation-model-capabilities.md) · [基础模型系统](docs/foundation-models.md) | [个性化](docs/tasks/personalized-video-generation.md) · [细粒度控制](docs/tasks/controllable-video-generation.md) · [多视角/4D](docs/tasks/multiview-4d-generation.md) · [原生音视频](docs/tasks/native-audio-video-generation.md) |
 | 编辑与时序任务 | [视频编辑](docs/tasks/video-to-video.md) | [视频补全](docs/tasks/video-inpainting.md) · [视频修复](docs/tasks/video-restoration.md) · [视频虚拟试衣](docs/tasks/video-virtual-try-on.md) · [故事与多镜头](docs/tasks/story-multishot.md) |
 | 推理与世界模型 | [Video Reasoning](docs/video-reasoning.md) · [World Model](docs/world-models.md) · [World Action Model](docs/world-action-model.md) | [物理一致性](docs/physical-consistency.md) · [动作条件预测](docs/tasks/action-conditioned-prediction.md) · [交互式世界生成](docs/tasks/interactive-world-generation.md) |
 | 应用与研究资源 | [应用地图](docs/applications.md) · [评测指南](docs/evaluation.md) | [精选阅读](docs/reading-list.md) · [开放模型](resources/open-models.md) · [数据集](resources/datasets.md) |
@@ -85,7 +87,7 @@ _Coding Agent 扩展研究覆盖面，研究者对结论与证据负责。_
 | 路径 | 建议顺序 |
 |---|---|
 | 建立直觉 | [零基础入门](docs/getting-started.md) → [应用地图](docs/applications.md) → [任务地图](docs/taxonomy.md) |
-| 掌握技术体系 | [生成模型](docs/generative-models.md) → [基础模型](docs/foundation-models.md) → [评测](docs/evaluation.md) |
+| 掌握技术体系 | [生成模型](docs/generative-models.md) → [能力地图](docs/foundation-model-capabilities.md) → [基础模型系统](docs/foundation-models.md) → [评测](docs/evaluation.md) |
 | 开展研究 | [任务地图](docs/taxonomy.md) → [World Action Model](docs/world-action-model.md) → [技术时间线](docs/timeline.md) → [精选阅读](docs/reading-list.md) → 具体专题 |
 | 面向系统与应用 | 选择任务专题 → [开放模型](resources/open-models.md) → [数据集](resources/datasets.md) → [评测指南](docs/evaluation.md) |
 | 按身份获得完整路线 | [分读者阅读指引](docs/reader-guides.md) → 选择通识、创作/产品、工程、研究、世界模型或教学路线 → 完成对应阶段产出 |
@@ -103,7 +105,8 @@ Video-Generation-101/
 │   ├── getting-started.md       # 零基础导览
 │   ├── reader-guides.md         # 分读者阅读顺序与阶段产出
 │   ├── generative-models.md     # 生成机制主线
-│   ├── foundation-models.md     # 视频基础模型
+│   ├── foundation-model-capabilities.md # 基础模型能力地图
+│   ├── foundation-models.md     # 视频基础模型系统
 │   ├── video-reasoning.md       # 视频推理
 │   ├── world-models.md          # 世界模型
 │   ├── world-action-model.md    # 世界—动作模型

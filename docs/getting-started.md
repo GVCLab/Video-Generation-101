@@ -244,6 +244,8 @@
 
 ### 路线 C：我是工程师，想知道模型内部怎样实现
 
+开始前可先看[基础模型能力地图](foundation-model-capabilities.md)，把“模型会什么”与“模型怎样实现”分开；下列路线再沿实现栈逐层深入。
+
 1. [生成模型路线](generative-models.md)：先分清 representation、factorization、objective、backbone 与 deployment 五个正交层，不把 VAE、Transformer、Diffusion 和 Flow 当成互斥整机标签。
 2. [视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)：理解连续 latent、离散 token、量化、时空预算与真实 bitstream 的边界。
 3. [变分随机视频生成](generative-models/variational-generation.md)：分清 future-aware posterior、history-only prior、tokenizer VAE 与 diffusion noise，并理解多未来校准。
@@ -257,6 +259,8 @@
 建议先理解每种方法解决了什么问题，再进入公式和代码。
 
 ### 路线 D：我是研究生，想寻找研究问题
+
+先用[基础模型能力地图](foundation-model-capabilities.md)确定要研究的能力族，再用任务、机制和证据三个轴收窄问题。
 
 1. [技术时间线](timeline.md)：理解这个领域为什么从运动预测走向 Diffusion 和 world model。
 2. [精选阅读列表](reading-list.md)：从最小阅读集开始，不要一开始追求读完所有论文。
@@ -276,4 +280,4 @@
 4. 画面真实、时间连贯、物理正确和动作可控是不同层次的能力。
 5. 阅读本仓库时，先按自己的问题选择路线，不需要从所有算法和论文开始。
 
-下一步，建议完全外行直接进入 [视频生成的任务地图](taxonomy.md)。在那里，你会看到这个领域究竟包含哪些输入、输出和具体任务。
+下一步，建议完全外行先看[基础模型能力地图](foundation-model-capabilities.md)，理解模型可能具备哪些能力，再进入[视频生成的任务地图](taxonomy.md)，查看这些能力通过哪些输入、输出和具体任务被调用。
