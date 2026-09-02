@@ -1,8 +1,8 @@
 # Video Reasoning：从 Zero-Shot Learners 到可验证闭环
 
-> 综述与引用核验截至 **2026 年 8 月 30 日（Asia/Shanghai）**。本章以 2025 年 9 月的 *Video models are zero-shot learners and reasoners* 为叙事原点：先还原它观察到了什么、Chain-of-Frames 假说如何提出、证据到哪里为止；再向前追溯视觉思维与受控世界模型前史，向后展开 benchmark、监督训练、RLVR、去噪机制、推理时优化与闭环系统。VBVR 是其中的规模化基础设施节点，而不是整章中心。
+> 综述与引用核验截至 **2026 年 9 月 2 日（Asia/Shanghai）**。本章以 2025 年 9 月的 *Video models are zero-shot learners and reasoners* 为叙事原点：先还原它观察到了什么、Chain-of-Frames 假说如何提出、证据到哪里为止；再向前追溯视觉思维与受控世界模型前史，向后展开 benchmark、监督训练、RLVR、去噪机制、推理时优化与闭环系统。VBVR 是其中的规模化基础设施节点，而不是整章中心。
 
-2026 年夏季新增工作的标题、版本、代码、数据口径、venue 更正、图片生成记录与纳排边界，见[本轮增量检索审计](../sources/research_20260830_video_reasoning_refresh.md)；VBVR 的前后向引用核验仍见[专项审计](../sources/research_20260829_video_reasoning_vbvr.md)。
+2026 年夏季新增工作的标题、版本、代码、数据口径、venue 更正、图片生成记录与纳排边界，见[本轮增量检索审计](../sources/research_20260830_video_reasoning_refresh.md)；VBVR 的前后向引用核验仍见[专项审计](../sources/research_20260829_video_reasoning_vbvr.md)。GVCLab 早期维护的 [Awesome-Reasoning-via-VDM](https://github.com/GVCLab/Awesome-Reasoning-via-VDM) 清单已按条目级别融入本章，完整的 9/9 去向、别名和许可边界见[融合审计](../sources/integration_20260902_awesome_reasoning_via_vdm.md)。
 
 ## 1. 原点论文：Video models are zero-shot learners and reasoners
 
@@ -122,6 +122,8 @@ Wiedemer 等人的核心问题是：大语言模型从任务专用系统演变�
 
 VChain 用外部多模态模型生成关键视觉思维，再适配视频生成器，属于前者与后者之间的混合系统 [[4]](#ref-4)；VR-Bench、VBVR 和 VGI-Bench 更直接地追问视频生成本身能否成为问题求解轨迹 [[9]](#ref-9) [[19]](#ref-19) [[36]](#ref-36)。
 
+DiffThinker 提供了一个相邻但不能混同的对照：它把多模态推理写成原生的 image-to-image diffusion 任务，在迷宫、FrozenLake、TSP、Sudoku 和拼图等视觉问题上生成解题状态 [[60]](#ref-60)。这支持“生成状态可以承担推理介质”的更广假说，但其输出协议不是连续视频，因此不能把它计作视频生成模型已经获得 Chain-of-Frames 能力的证据。
+
 ---
 
 ## 4. 从展示性行为到可验证定义
@@ -195,6 +197,8 @@ R=\alpha R_{\text{answer}}+\beta R_{\text{process}}+\gamma R_{\text{generalizati
 - RULER-Bench 转向规则执行，VIPER 开始检查过程而不只检查最后一帧 [[13]](#ref-13) [[15]](#ref-15)；
 - NewtonRewards 用可验证的物理奖励进行后训练，代表“不是只测，而是直接教模型遵守结构”的路线 [[12]](#ref-12)。
 - VANS 把“答案”定义为下一个视频事件，以 VLM、视频 diffusion 与 Joint-GRPO 训练 Video-as-Answer 系统，是生成式答案而非单纯 benchmark 的另一支 [[11]](#ref-11)。
+- MiniVeo3-Reasoner 用程序化迷宫和 LoRA 微调 Wan2.2-TI2V-5B，形成早期开放工程复现；它证明窄域 Chain-of-Frames 可以被直接训练，但当时只有代码、数据生成器与权重，没有技术报告 [[59]](#ref-59)。
+- DiffThinker 同期把扩散推理推进到 image-to-image 任务，属于生成式视觉推理的相邻路线，而不是视频 benchmark [[60]](#ref-60)。
 
 这一阶段确认了两个事实：强视频模型存在非零的视觉问题求解能力；但得分高度依赖任务长度、提示方式、采样预算和评分器。
 
@@ -284,6 +288,8 @@ VBVR 将 100 万训练 clips、任务专用规则 scorer、ID/OOD 拆分和 scal
 ### 8.1 程序化监督微调
 
 最直接的方法是用程序生成问题、初始状态、合法中间状态和答案视频，然后对视频扩散/flow 模型监督微调。VR-Bench 在迷宫上证明 SFT 可以显著唤起路径行为 [[9]](#ref-9)；VBVR 则把任务种类和样本规模同时放大，研究任务多样性、数据规模与 OOD 泛化 [[19]](#ref-19)。
+
+MiniVeo3-Reasoner 给出了这条路线的开放工程切片：以 Wan2.2-TI2V-5B 为底座，用 LoRA 学习程序生成的 3×3 至 6×6 迷宫视频，并公开数据生成、训练、推理、轨迹解析和 EM/Progress Rate 评测脚本 [[59]](#ref-59)。官方仓库报告 3×3 至 5×5 的 EM 为 100%、6×6 为 98.4%，但 OOD 长路径降到 53.6%，8×8 降到 60.4%。这些是项目方结果，尚无技术报告或独立复现；它最能支持的是“窄域、固定渲染协议下可以训练出可执行视觉轨迹”，而不是通用视觉规划已经解决。
 
 这种路线的优势是数据无限、标签准确、scorer 可执行；风险是模型记住渲染模板或局部运动模式，而没有学到可组合算法。可靠的 split 应同时隔离：
 
@@ -651,7 +657,7 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 11. **OpenCoF 与 Hierarchical Denoising**：看统一 token 和层级搜索的架构方向 [[33]](#ref-33) [[34]](#ref-34)。
 12. **VGI-Bench 与 VBVR-Pro**：用最新综合评测和多任务扩展回看原始愿景 [[36]](#ref-36) [[48]](#ref-48)。
 
-完整检索、版本核验和前后向引用审计见 [video reasoning 文献与引用审计](../sources/research_20260829_video_reasoning_vbvr.md)。持续更新的社区目录可参考 Awesome Video Reasoning [![GitHub: Video-Reason/Awesome-Video-Reasoning](https://img.shields.io/github/stars/Video-Reason/Awesome-Video-Reasoning?style=social)](https://github.com/Video-Reason/Awesome-Video-Reasoning)，但目录用于发现文献，具体数字仍应回到论文正文和官方代码核验 [[38]](#ref-38)。
+完整检索、版本核验和前后向引用审计见 [video reasoning 文献与引用审计](../sources/research_20260829_video_reasoning_vbvr.md)。GVCLab 的早期清单 [Awesome-Reasoning-via-VDM](https://github.com/GVCLab/Awesome-Reasoning-via-VDM) 已完成内容迁移：六项工作由本章既有条目承接，VMEvalKit 按历史别名归入 VBVR-EvalKit，MiniVeo3-Reasoner 与 DiffThinker 作为新增或相邻路线补入；逐项映射见[融合审计](../sources/integration_20260902_awesome_reasoning_via_vdm.md)。持续更新的社区目录可参考 Awesome Video Reasoning [![GitHub: Video-Reason/Awesome-Video-Reasoning](https://img.shields.io/github/stars/Video-Reason/Awesome-Video-Reasoning?style=social)](https://github.com/Video-Reason/Awesome-Video-Reasoning)，但目录用于发现文献，具体数字仍应回到论文正文和官方代码核验 [[38]](#ref-38)。
 
 ---
 
@@ -703,7 +709,7 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 
 <a id="ref-18"></a>[18] [RISE-Video: Can Video Generators Decode Implicit World Rules?](https://arxiv.org/abs/2602.05986). Mingxin Liu, Shuran Ma, Shibei Meng, Xiangyu Zhao, Zicheng Zhang, Shaofeng Zhang, et al. arXiv preprint. 2026.
 
-<a id="ref-19"></a>[19] [A Very Big Video Reasoning Suite](https://arxiv.org/abs/2602.20159). Maijunxian Wang, Ruisi Wang, Juyi Lin, Ran Ji, Thaddäus Wiedemer, Qingying Gao, et al. arXiv preprint. 2026. See also the [official benchmark](https://video-reason.com/bench/) and EvalKit [![GitHub: Video-Reason/VBVR-EvalKit](https://img.shields.io/github/stars/Video-Reason/VBVR-EvalKit?style=social)](https://github.com/Video-Reason/VBVR-EvalKit).
+<a id="ref-19"></a>[19] [A Very Big Video Reasoning Suite](https://arxiv.org/abs/2602.20159). Maijunxian Wang, Ruisi Wang, Juyi Lin, Ran Ji, Thaddäus Wiedemer, Qingying Gao, et al. arXiv preprint. 2026. See also the [official benchmark](https://video-reason.com/bench/) and EvalKit [![GitHub: Video-Reason/VBVR-EvalKit](https://img.shields.io/github/stars/Video-Reason/VBVR-EvalKit?style=social)](https://github.com/Video-Reason/VBVR-EvalKit), formerly linked as VMEvalKit.
 
 <a id="ref-20"></a>[20] [From Perception to Action: An Interactive Benchmark for Vision Reasoning](https://arxiv.org/abs/2602.21015). Yuhao Wu, Maojia Song, Yihuai Lan, Lei Wang, Zhiqiang Hu, Yao Xiao, et al. arXiv preprint. 2026.
 
@@ -782,3 +788,7 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 <a id="ref-57"></a>[57] [Thinking in Video: Can Video Generators Really Reason About the Real World?](https://arxiv.org/abs/2607.17523). Yongheng Zhang, Guang Yang, Ruihan Hou, Qiguang Chen, Ziang Liu, Xiaolong Liu, et al. arXiv preprint. 2026. See also the official repository [![GitHub: BRZ911/Thinking-in-Video](https://img.shields.io/github/stars/BRZ911/Thinking-in-Video?style=social)](https://github.com/BRZ911/Thinking-in-Video).
 
 <a id="ref-58"></a>[58] [Rule-Compliant Visual Spatial Planning for Multimodal Large Language Models](https://arxiv.org/abs/2608.20237). Yu Chen, Ting Lei, Yaoyi Li, Jia Cai, Zhecen Wu, Yang Liu. arXiv preprint. 2026. See also the official repository [![GitHub: oceanflowlab/RuleMaze](https://img.shields.io/github/stars/oceanflowlab/RuleMaze?style=social)](https://github.com/oceanflowlab/RuleMaze) and [dataset card](https://huggingface.co/datasets/Fish-03/RuleMaze).
+
+<a id="ref-59"></a>[59] [MiniVeo3-Reasoner: Thinking with Videos from Open-Source Priors](https://github.com/thuml/MiniVeo3-Reasoner). Jialong Wu, Tianhao Huang, Changjing He, Mingsheng Long. GitHub engineering release, 2025; no technical report as of 2026-09-02. See also the [released LoRA weights](https://huggingface.co/thuml/MiniVeo3-Reasoner-Maze-5B).
+
+<a id="ref-60"></a>[60] [DiffThinker: Towards Generative Multimodal Reasoning with Diffusion Models](https://arxiv.org/abs/2512.24165). Zefeng He, Xiaoye Qu, Yafu Li, Tong Zhu, Siyuan Huang, Yu Cheng. ICML. 2026; first posted in 2025. See also the [project page](https://diffthinker-project.github.io/) and [official repository](https://github.com/lcqysl/DiffThinker).
