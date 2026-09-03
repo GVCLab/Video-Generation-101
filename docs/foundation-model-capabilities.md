@@ -25,7 +25,7 @@
 
 | 要继续回答的问题 | 对应主表 | 两张表怎样连接 |
 |---|---|---|
-| 哪些任务会调用这项能力？ | [任务—能力矩阵](taxonomy.md#task-capability-matrix) | 每个任务合同反链其主要 C 编号 |
+| 哪些任务会调用这项能力？ | [任务—能力矩阵](taxonomy.md#task-capability-matrix) | 每项任务都链接到其主要 C 编号 |
 | 哪种后训练可能改善它？ | [后训练—目标能力矩阵](generative-models/video-post-training-alignment.md#post-training-capability-matrix) | 训练路线只表示常见目标，不保证能力提升 |
 | 应该用什么实验验证？ | [能力—评测矩阵](evaluation.md#capability-evaluation-matrix) | 每种评测单位对应可支持的能力声明 |
 | 真实场景需要组合哪些能力？ | [应用—能力矩阵](applications.md#application-capability-matrix) | 能力标签与任务接口、系统组件分列 |
@@ -140,7 +140,7 @@ VideoDPO 用多维偏好构造视频生成的 DPO 训练 [[13]](#ref-13)；Video
 建议每篇模型或产品报告都附一张最小 claim card：
 
 ```text
-能力族 C? → 任务合同 → base / post-trained / system
+能力族 C? → 任务定义 → base / post-trained / system
 → checkpoint 与预算 → 最低证据 → 失败条件 → 不能推出的结论
 ```
 

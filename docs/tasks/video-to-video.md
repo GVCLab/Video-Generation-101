@@ -6,7 +6,7 @@
 
 检索式、纳排规则、正式 venue、2025–2026 release surface、负面核验、图片记录与验证命令见[配套研究记录](../../sources/research_20260830_video_to_video.md)。
 
-## 1. 先写任务合同，再选择模型
+## 1. 先明确编辑目标，再选择模型
 
 ### 1.1 严格输入、输出与区域合同
 
@@ -69,7 +69,7 @@ T_{\mathrm{V2V}}=(X,U,M,R,C,H)\rightarrow(Y,\Delta,D),
 
 ## 2. 方法选择器：控制越强，证据合同越具体
 
-![视频到视频任务合同选择器：从同一源视频与可选 instruction、mask、domain、reference、audio 或 pose 条件出发，先把图中的广义 restoration 或 completion 入口继续拆成全帧退化修复与缺失支持补全，再与外观翻译、语义编辑和重定时分流，并分别检查编辑成功、源保真、局部性、时间一致和身份或运动守恒。](../../assets/diagrams/video-to-video-method-selector.png)
+![视频到视频编辑任务选择器：从同一源视频与可选 instruction、mask、domain、reference、audio 或 pose 条件出发，先把图中的广义 restoration 或 completion 入口继续拆成全帧退化修复与缺失支持补全，再与外观翻译、语义编辑和重定时分流，并分别检查编辑成功、源保真、局部性、时间一致和身份或运动守恒。](../../assets/diagrams/video-to-video-method-selector.png)
 
 **图注：** 四条路线先写“允许改变什么”和“必须保留什么”，再交付输出视频与 edit ledger。A 路是邻接任务入口，图中的 `restoration / completion` 必须继续拆成[全帧退化逆问题](video-restoration.md)与[mask 缺失支持补全](video-inpainting.md)，不能共用一份验收；B–D 分别扩大到外观、语义与时间/运动结构。右侧五个验收轴彼此独立，不能用 edit success 掩盖整帧重绘。未来预测与首帧动画不修改完整源时间轴，属于不同合同。
 
@@ -83,7 +83,7 @@ T_{\mathrm{V2V}}=(X,U,M,R,C,H)\rightarrow(Y,\Delta,D),
 6. 所有路线都输出 edit ledger，并分别验收 edit success、source fidelity、locality、temporal consistency 和 identity/motion preservation。
 
 ![图 075：视频编辑方法主线选择器](../../assets/imagegen-diagrams/075/diagram.png)
-**顺序化文字替代：** 先由 mask 外是否需要像素级锁定决定是否使用 mask-aware 路线。没有专用训练数据时优先考虑 inversion 与测试时注入；大幅语义变化优先原生编辑模型；首帧或关键帧驱动的小改动可走对应传播。运动、相机和材质分解需要更具体的 2D / 3D / RGBX 控制。最后按离线、多轮长视频或因果流式选择状态管理。上方 PNG 用于快速识别输出关系；本 Mermaid 保留“任务合同 → 控制自由度 → 时序形态”的可编辑精确分支。
+**顺序化文字替代：** 先由 mask 外是否需要像素级锁定决定是否使用 mask-aware 路线。没有专用训练数据时优先考虑 inversion 与测试时注入；大幅语义变化优先原生编辑模型；首帧或关键帧驱动的小改动可走对应传播。运动、相机和材质分解需要更具体的 2D / 3D / RGBX 控制。最后按离线、多轮长视频或因果流式选择状态管理。上方 PNG 用于快速识别输出关系；本 Mermaid 保留“编辑目标 → 控制自由度 → 时序形态”的可编辑精确分支。
 
 ## 3. 八条机制路线及各自的守恒假设
 

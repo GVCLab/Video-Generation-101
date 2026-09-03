@@ -165,7 +165,7 @@ Inference-Time Scaling for Joint Audio-Video Generation 已发表于 TMLR 2026�
 |---|---|---|---|
 | 2023 | TPoS / MM-Diffusion | A2V 对照 / 联合扩散起点 | 低分辨率与窄域，不代表开放域 frontier |
 | 2024 | VideoPoet / Seeing and Hearing / Movie Gen | 统一 token、多任务；推理耦合；staged V2A | 三者均不能仅凭“多模态”写成原生联合 backbone |
-| 2025 | MMAudio / AV-Link / JointDiT | V2A、双向条件框架、I2SV 联合 DiT 分流 | 任务合同优先于题名中的 joint/unified |
+| 2025 | MMAudio / AV-Link / JointDiT | V2A、双向条件框架、I2SV 联合 DiT 分流 | 任务定义优先于题名中的 joint/unified |
 | 2025–2026 | JavisDiT / Ovi / LTX-2 | 双支路联合主干 | 正式论文、预印本与持续更新仓库分开记账 |
 | 2026 | Harmony / NAVA / OmniVAE / H3 | 跨任务监督、align-then-fuse、对齐 codec、单流 packed | NAVA/OmniVAE 为预印本；H3 为官方发布 |
 | 2026 | ITS / Ripple / VABench | 搜索扩展、流式记忆、系统化评测 | ITS 为正式 TMLR；Ripple 为未开放预印本 |
@@ -387,7 +387,7 @@ ITS 论文在其协议中发现：只用文本—视频 verifier 会提高文本
 
 原生音视频生成的核心不是“声音更像”，而是两种时间信号能否在可审计的同一生成过程中共同决定彼此。判断顺序应固定为：**先看因子化，再看轨迹内交互，再看表示和真实时间轴，最后用不可互相抵消的评测门与干预实验验收。**
 
-截至 2026-08-30，领域已从 MM-Diffusion 的早期耦合 U-Net，发展到 Ovi/LTX-2/JavisDiT 的双支路交互、NAVA 的 align-then-fuse、H3 的单流 packed sequence、OmniVAE 的 codec 对齐，以及 Ripple/ITS 的系统与推理扩展；但预印本、官方发布、开放 checkpoint 和完整产品链仍是四种不同证据。真正可靠的 frontier 结论，必须同时写清任务合同、版本、release surface、计算预算与失败样例。
+截至 2026-08-30，领域已从 MM-Diffusion 的早期耦合 U-Net，发展到 Ovi/LTX-2/JavisDiT 的双支路交互、NAVA 的 align-then-fuse、H3 的单流 packed sequence、OmniVAE 的 codec 对齐，以及 Ripple/ITS 的系统与推理扩展；但预印本、官方发布、开放 checkpoint 和完整产品链仍是四种不同证据。真正可靠的 frontier 结论，必须同时写清任务定义、版本、release surface、计算预算与失败样例。
 
 ## 参考文献
 

@@ -60,7 +60,7 @@
 
 ### 为什么先读这条主干
 
-八个前沿分支常把不同层级的词混在一起：tokenizer 是表示，autoregressive/masked 是概率 factorization，diffusion/flow 是 objective 与采样路径，DiT 是骨干，causal 是信息访问约束，DPO 是后训练，restoration 是观测逆问题，personalization 是开放集主体绑定与适配合同，4D 是相机—时间查询/状态合同，world model 是动作—状态任务合同。主干的作用是先把这些坐标拆开，否则读新论文时很容易把“换了 objective”误写成“换了整个系统”。
+八个前沿分支常把不同层级的词混在一起：tokenizer 是表示，autoregressive/masked 是概率 factorization，diffusion/flow 是 objective 与采样路径，DiT 是骨干，causal 是信息访问约束，DPO 是后训练，restoration 是观测逆问题，personalization 是开放集主体绑定与适配任务，4D 是相机—时间查询与状态表示任务，world model 是动作—状态预测与决策任务。主干的作用是先把这些坐标拆开，否则读新论文时很容易把“换了 objective”误写成“换了整个系统”。
 
 ### 阅读顺序
 

@@ -142,7 +142,7 @@ flowchart TB
 <details markdown="1">
 <summary><strong>横向专题（可选）：2017–2026 视频退化修复谱系</strong></summary>
 
-这条谱系不等同于视频编辑：输入 $Y$ 是同一真实视频 $X$ 经未知或已知退化算子后的观测，目标是恢复 $X$，不是按指令改变事件。它也不等同于 inpainting：全帧通常仍有低质证据，并不存在一张天然的 mask 外硬保护区。下表只保留改变任务合同或系统边界的节点；逐篇 paper review、公式、指标和 RestorationFork-1 见[专章](tasks/video-restoration.md)。
+这条谱系不等同于视频编辑：输入 $Y$ 是同一真实视频 $X$ 经未知或已知退化算子后的观测，目标是恢复 $X$，不是按指令改变事件。它也不等同于 inpainting：全帧通常仍有低质证据，并不存在一张天然的 mask 外硬保护区。下表只保留改变任务定义或系统边界的节点；逐篇 paper review、公式、指标和 RestorationFork-1 见[专章](tasks/video-restoration.md)。
 
 | 阶段 | 代表节点 | 合同变化 | 仍未解决 |
 |---|---|---|---|
@@ -438,7 +438,7 @@ flowchart TB
 
 ### 2021–2026 多视角与 4D：从动态重建到 camera × time 生成
 
-这条谱系有两条不能混写的起点：动态场景重建从已捕获观测恢复可渲染状态，4D generation 则要为未见视角、时间或整段动态生成内容。普通 camera-controlled video 只覆盖 camera–time 平面的一条路径；同刻多视角、完整 query grid 和显式状态需要额外几何证据。详细任务合同、五条技术路线和 `GridFork-1` 见[多视角与 4D 专章](tasks/multiview-4d-generation.md)。
+这条谱系有两条不能混写的起点：动态场景重建从已捕获观测恢复可渲染状态，4D generation 则要为未见视角、时间或整段动态生成内容。普通 camera-controlled video 只覆盖 camera–time 平面的一条路径；同刻多视角、完整 query grid 和显式状态需要额外几何证据。详细的任务定义、五条技术路线和 `GridFork-1` 见[多视角与 4D 专章](tasks/multiview-4d-generation.md)。
 
 | 首次公开 → 正式状态 | 节点 | 合同转折 | 未解决与证据边界 |
 |---|---|---|---|

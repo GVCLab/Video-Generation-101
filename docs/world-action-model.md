@@ -120,7 +120,7 @@ WAM 评测应沿着能力声明逐级升级，而不是用单一视频指标替�
 
 ## 7. 推荐阅读顺序
 
-1. 先读[动作条件预测](tasks/action-conditioned-prediction.md)，理解“动作改变未来”的最小合同；
+1. 先读[动作条件预测](tasks/action-conditioned-prediction.md)，理解“动作改变未来”这一基本要求；
 2. 再读[世界模型](world-models.md)，比较 latent dynamics、想象、规划和策略学习；
 3. 阅读[交互式世界生成](tasks/interactive-world-generation.md)，把动作频率、状态持久性和环境接口放入系统视角；
 4. 最后回到[视频推理](video-reasoning.md)与[物理一致性](physical-consistency.md)，检查视觉推理和物理主张所需的额外证据。
