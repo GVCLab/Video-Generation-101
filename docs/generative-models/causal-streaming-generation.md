@@ -9,7 +9,7 @@
 3. **长期记忆**：全历史 KV cache 会持续增长，短窗口又会忘记身份、布局和早期事件；
 4. **系统期限**：平均 FPS 足够不等于流畅；首帧时间、尾延迟、抖动和 deadline miss 同样重要。
 
-本章证据核验截至 **2026-08-30**，重点解释这四条路线怎样汇合，以及论文中的“流式”“长视频”“实时”和“交互式”为什么不能互换。Video DiT 的 full/factorized/window/sparse/linear topology、3D 位置、noise-time MoE、distributed parallelism 与 inter-step cache 由[骨干扩展专章](video-dit-backbones.md)负责；本章只接收其真实 information mask、state/cache 更新和执行成本，再验证 commit 与 SLO。
+本章证据核验截至 **2026-08-30**，重点解释这四条路线怎样汇合，以及论文中的“流式”“长视频”“实时”和“交互式”为什么不能互换。fixed-long、length extrapolation、open-horizon、整段/分层/滑窗路线和长期质量曲线由[长视频生成专章](long-video-generation.md)负责；Video DiT 的 full/factorized/window/sparse/linear topology、3D 位置、noise-time MoE、distributed parallelism 与 inter-step cache 由[骨干扩展专章](video-dit-backbones.md)负责；本章只接收其真实 information mask、state/cache 更新和执行成本，再验证 commit 与 SLO。
 
 ![离线双向视频扩散与因果流式视频扩散的对比。左侧整段联合去噪并在完成后解码；右侧按块生成，复用有界滚动记忆，逐块解码并接受新条件。](../../assets/diagrams/causal-streaming-video-generation.png)
 

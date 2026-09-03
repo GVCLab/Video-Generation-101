@@ -176,8 +176,8 @@ flowchart TB
 
 ### 4.7 长视频与多镜头叙事
 
-- 延长单镜头主要测试对象存在、持续运动和误差累积。
-- 多镜头允许切镜，但必须保持人物、道具、地点、事件顺序和镜头意图。
+- [长视频生成](generative-models/long-video-generation.md)先区分 fixed-long、length extrapolation 与 open-horizon；延长单镜头主要测试对象存在、持续运动、事件进展、误差累积和资源曲线。
+- [故事与多镜头](tasks/story-multishot.md)允许切镜，但必须保持人物、道具、地点、事件顺序和镜头意图。
 - 将独立短片拼接起来不构成多镜头叙事，除非系统能记录跨镜头状态并处理冲突。
 
 ### 4.8 原生联合音视频与视频后配音
@@ -331,6 +331,7 @@ DreamGen 的价值不在“生成机器人视频”本身，而在把生成、�
 | 同时刻多相机或可查询动态状态 | [多视角与 4D](tasks/multiview-4d-generation.md) | 一条相机路径 |
 | 同步生成画面和声音 | [原生音视频](tasks/native-audio-video-generation.md) | 视频后配音 |
 | 生成人物表演或重演 | [数字人](tasks/digital-human.md) | 个性化、虚拟试衣 |
+| 生成超出原生窗口的连续长视频 | [长视频生成](generative-models/long-video-generation.md) | 流式/实时、多镜头、视频预测 |
 | 生成跨镜头叙事 | [故事与多镜头](tasks/story-multishot.md) | 延长单镜头 |
 
 使用顺序：

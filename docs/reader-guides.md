@@ -55,9 +55,11 @@
 1. [任务地图](taxonomy.md) —— 先把需求表达成“输入 → 输出 → 约束”。
 2. 按你的任务选择一个专章：
    - 从文字创作： [文生视频](tasks/text-to-video.md)
+   - 超出模型原生窗口并保持长期状态： [长视频生成](generative-models/long-video-generation.md)
    - 让图片动起来： [图生视频](tasks/image-to-video.md)
    - 重剪、风格化或修改素材： [视频到视频](tasks/video-to-video.md)
    - 人物口播与角色呈现： [数字人](tasks/digital-human.md)
+   - 连续故事、角色回归与电影化切镜： [故事与多镜头](tasks/story-multishot.md)
    - 更精确的镜头、轨迹、姿态或对象约束： [细粒度可控生成](tasks/controllable-video-generation.md)
    - 修复、补全既有视频： [视频退化修复](tasks/video-restoration.md) 或 [视频补全](tasks/video-inpainting.md)
    - 多视角动态资产： [多视角与 4D](tasks/multiview-4d-generation.md)
@@ -91,14 +93,15 @@
 4. [视频扩散压缩与推理加速综述导航](generative-models/inference-acceleration.md) —— 分开核算 NFE、每次前向、低 bit/访存、缓存复用与硬件执行，再按瓶颈进入[蒸馏](generative-models/inference-acceleration/distillation.md)、[量化](generative-models/inference-acceleration/quantization.md)、[剪枝](generative-models/inference-acceleration/pruning.md)、[稀疏](generative-models/inference-acceleration/sparsity.md)、[缓存](generative-models/inference-acceleration/caching.md)或[系统](generative-models/inference-acceleration/systems.md)综述。
 5. [视频后训练与对齐](generative-models/video-post-training-alignment.md) —— 区分 SFT、偏好优化、强化学习、guidance 与少步蒸馏。
 6. [Test-Time Scaling](generative-models/test-time-scaling.md) —— 统计候选生成、验证、在线优化和外部模型调用的总成本，并检查质量—成本曲线。
-7. [因果与流式生成](generative-models/causal-streaming-generation.md) —— 如果目标是低首帧延迟、连续生成或中途修改条件。
-8. [开放模型](../resources/open-models.md) → [数据集](../resources/datasets.md) → [评测指南](evaluation.md) —— 据此选择可实际运行的模型，并制定可复现的实验方案。
+7. [长视频生成](generative-models/long-video-generation.md) —— 区分固定长片、长度外推与开放时域，检查长期状态和资源曲线。
+8. [因果与流式生成](generative-models/causal-streaming-generation.md) —— 如果目标是低首帧延迟、连续生成或中途修改条件。
+9. [开放模型](../resources/open-models.md) → [数据集](../resources/datasets.md) → [评测指南](evaluation.md) —— 据此选择可实际运行的模型，并制定可复现的实验方案。
 
 ### 按需分支
 
 | 系统问题 | 优先阅读 |
 |---|---|
-| 长视频、上下文与记忆 | [视频预测](tasks/video-prediction.md) · [因果与流式生成](generative-models/causal-streaming-generation.md) |
+| 长视频、上下文与记忆 | [长视频生成](generative-models/long-video-generation.md) · [因果与流式生成](generative-models/causal-streaming-generation.md) · [视频预测](tasks/video-prediction.md) · [故事与多镜头](tasks/story-multishot.md) |
 | 少步、高吞吐与部署成本 | [推理加速综述导航](generative-models/inference-acceleration.md) · [蒸馏](generative-models/inference-acceleration/distillation.md) · [量化](generative-models/inference-acceleration/quantization.md) · [剪枝](generative-models/inference-acceleration/pruning.md) · [稀疏](generative-models/inference-acceleration/sparsity.md) · [缓存](generative-models/inference-acceleration/caching.md) · [系统](generative-models/inference-acceleration/systems.md) · [Flow / consistency](generative-models/flow-consistency-models.md) · [视频后训练与对齐](generative-models/video-post-training-alignment.md) |
 | 用额外推理预算换质量或约束满足 | [Test-Time Scaling](generative-models/test-time-scaling.md) · [视频后训练与对齐](generative-models/video-post-training-alignment.md) · [评测指南](evaluation.md) |
 | 控制接口与多条件融合 | [细粒度可控生成](tasks/controllable-video-generation.md) · [视频基础模型](foundation-models.md) |
@@ -126,6 +129,7 @@
    - 表示与压缩： [视频 Tokenizer](generative-models/video-tokenizers.md)
    - 随机未来与不确定性： [变分随机视频生成](generative-models/variational-generation.md)
    - 架构与效率： [Video DiT](generative-models/video-dit-backbones.md)
+   - 长度外推与长期记忆： [长视频生成](generative-models/long-video-generation.md)
    - 实时与流式： [因果与流式生成](generative-models/causal-streaming-generation.md)
    - 控制、4D、个性化、修复、音视频或世界模型：按[任务地图](taxonomy.md)进入对应专题
 5. [引用与代码索引](bibliography.md) —— 回到一手论文、官方代码、数据和基线。

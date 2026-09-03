@@ -2,7 +2,7 @@
 
 > 本章冻结于 **2026-08-30（Asia/Shanghai）**。这里的 multi-shot video 指输出中存在至少两个由硬切或设计转场分隔的镜头；跨镜头允许时空不连续，但人物、场景、道具、剧情和电影语言必须服从同一个可检查的故事状态。精选样片不是完成证明，论文、正式 venue、代码、权重、数据与端到端复现面在本章中分别记录。
 
-检索日期、arXiv/OpenAlex/官方 proceedings/官方项目与仓库入口、纳排规则、逐条证据和链接检查见[配套研究记录](../../sources/research_20260830_story_multishot.md)。
+检索日期、arXiv/OpenAlex/官方 proceedings/官方项目与仓库入口、纳排规则、逐条证据和链接检查见[配套研究记录](../../sources/research_20260830_story_multishot.md)。连续长镜头、长度外推和开放时域的统一合同见[长视频生成专章](../generative-models/long-video-generation.md)；本章只接管显式镜头边界之后的故事状态与回滚。
 
 ## 学习目标
 

@@ -2,7 +2,7 @@
 
 这不是按年份堆论文的 awesome list，而是一门可以执行、留痕和被证伪的路线式课程。目标不是“读过多少篇”，而是最终能回答四个问题：模型表示了什么、怎样沿时间生成、证据真正支持什么、下一次实验怎样推翻自己的判断。
 
-本页证据冻结于 **2026-08-30（Asia/Shanghai）**，推理基础设施专题补充核验于 **2026-09-02**。检索式、纳入排除、正式发表状态和关键断言见[阅读路线研究日志](../sources/research_20260830_reading_routes.md)，新增结构性技术轴的选择依据见[缺口审计](../sources/research_20260830_missing_subfields_integration.md)、[视频扩散基础设施研究记录](../sources/research_20260902_video_diffusion_infrastructure.md)、[Video DiT / backbone 研究日志](../sources/research_20260830_video_dit_backbones.md)、[多视角/4D 研究日志](../sources/research_20260830_multiview_4d_generation.md)与[退化修复研究日志](../sources/research_20260830_video_restoration.md)。完整书目信息与仓库索引仍见[引用与代码索引](bibliography.md)；专题细节分别见[生成模型](generative-models.md)、[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)、[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)、[视频扩散压缩与推理加速](generative-models/inference-acceleration.md)、[视频后训练与对齐](generative-models/video-post-training-alignment.md)、[因果流式生成](generative-models/causal-streaming-generation.md)、[原生音视频](tasks/native-audio-video-generation.md)、[开放集视频个性化](tasks/personalized-video-generation.md)、[细粒度可控生成](tasks/controllable-video-generation.md)、[多视角/4D 生成](tasks/multiview-4d-generation.md)、[视频退化修复](tasks/video-restoration.md)、[评测](evaluation.md)、[World Model](world-models.md)与 [JEPA](jepa.md)。
+本页证据冻结于 **2026-08-30（Asia/Shanghai）**，长视频与推理基础设施专题补充核验于 **2026-09-02**。检索式、纳入排除、正式发表状态和关键断言见[阅读路线研究日志](../sources/research_20260830_reading_routes.md)，新增结构性技术轴的选择依据见[缺口审计](../sources/research_20260830_missing_subfields_integration.md)、[长视频研究日志](../sources/research_20260902_long_video_generation.md)、[视频扩散基础设施研究记录](../sources/research_20260902_video_diffusion_infrastructure.md)、[Video DiT / backbone 研究日志](../sources/research_20260830_video_dit_backbones.md)、[多视角/4D 研究日志](../sources/research_20260830_multiview_4d_generation.md)与[退化修复研究日志](../sources/research_20260830_video_restoration.md)。完整书目信息与仓库索引仍见[引用与代码索引](bibliography.md)；专题细节分别见[生成模型](generative-models.md)、[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)、[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)、[视频扩散压缩与推理加速](generative-models/inference-acceleration.md)、[长视频生成](generative-models/long-video-generation.md)、[视频后训练与对齐](generative-models/video-post-training-alignment.md)、[因果流式生成](generative-models/causal-streaming-generation.md)、[原生音视频](tasks/native-audio-video-generation.md)、[开放集视频个性化](tasks/personalized-video-generation.md)、[细粒度可控生成](tasks/controllable-video-generation.md)、[多视角/4D 生成](tasks/multiview-4d-generation.md)、[视频退化修复](tasks/video-restoration.md)、[评测](evaluation.md)、[World Model](world-models.md)与 [JEPA](jepa.md)。
 
 ## 0. 课程规则与证据标签
 
@@ -47,6 +47,7 @@
 
 | 你真正想回答的问题 | 主修 | 建议交叉分支 |
 |---|---|---|
+| 怎样超出训练/原生窗口，并知道视频何时开始漂移？ | [长视频专题](generative-models/long-video-generation.md) | A 因果/流式或故事/多镜头 |
 | 怎样边生成边播放，并接受中途条件变化？ | A 因果/流式 | B 少步/蒸馏 |
 | 怎样减少网络调用，同时避免奖励投机与多样性坍缩？ | B 少步/后训练 | A 因果/流式 |
 | 声音是否与画面共同生成，而不是事后配音？ | C 原生音视频 | B 后训练 |
@@ -151,11 +152,23 @@
 
 **反证条件：** 如果你无法仅凭方法和实验部分填完七轴，或把重建误差当成生成质量、把 attention FLOPs 当成端到端 latency，就不能进入分支。主干通关产物不是排行榜，而是一张能容纳后续所有论文的比较表。
 
+### 长时域加深单元：先分长度合同，再谈最长演示
+
+长视频横跨 backbone、外推、滚动生成、记忆和评测，不另算第九条任务分支。先读[长视频生成专章](generative-models/long-video-generation.md)，把 fixed-long、length extrapolation 与 open-horizon 分开，再按研究问题进入分支 A 或[故事与多镜头](tasks/story-multishot.md)。
+
+| 问题 | 建议阅读 | 必须带着的反证 |
+|---|---|---|
+| 长序列怎样表示和分层 | [TATS](https://www.ecva.net/papers/eccv_2022/papers_ECCV/html/5950_ECCV_2022_paper.php)、[NUWA-XL](https://aclanthology.org/2023.acl-long.73/) | 千帧或关键帧层级是否只在受控数据成立；局部渲染会不会改写全局事件 |
+| 短模型怎样免训练外推 | [FreeNoise](https://proceedings.iclr.cc/paper_files/paper/2024/hash/15ce8e7afe5ee95bad56e3b9be28d3d1-Abstract-Conference.html)、[LongDiff](https://openaccess.thecvf.com/content/CVPR2025/html/Li_LongDiff_Training-Free_Long_Video_Generation_in_One_Go_CVPR_2025_paper.html) | 接缝/位置改善是否被误写成长期语义或开放时域 |
+| 滚动和长期记忆怎样成立 | [FIFO-Diffusion](https://proceedings.neurips.cc/paper_files/paper/2024/hash/a397986e0f34d4b1f0b640686ceaeff7-Abstract.html)、[Self Forcing](https://proceedings.neurips.cc/paper_files/paper/2025/hash/f4823f831af67a3ef15e41a85434422a-Abstract-Conference.html)、[Mixture of Contexts](https://proceedings.iclr.cc/paper_files/paper/2026/hash/94bbcb744bbada8808fda05b9d9290d6-Abstract-Conference.html) | sampler 可继续、self-history 训练和内容检索是否分别通过非重复、召回、首次失败与资源曲线 |
+
+**通关产物：** 一份包含原生/训练窗口、绝对时长、外推倍率、非重复帧、quality–time、first-failure/survival 和 GPU/CPU/外存斜率的长度合同。没有这份合同，不用“分钟级”“小时级”或 “infinite” 作能力结论。
+
 ## 4. 分支 A：因果、流式与实时视频
 
 **入口依赖：** 完成主干，并能解释 causal attention、teacher forcing、KV cache、denoising step 和端到端播放 deadline。
 
-**为什么读：** 这条线不是把全片 diffusion 的 mask 改成三角形，而是同时处理信息因果性、自生成历史、少步采样、长期记忆和在线 serving。论文之间的速度数字不能直接横比；真正的研究对象是质量—延迟—时长—交互四者的耦合。
+**为什么读：** [长视频生成专章](generative-models/long-video-generation.md)先回答固定长片、长度外推与开放时域；本分支再处理信息因果性、自生成历史、少步采样、commit 与在线 serving。它不是把全片 diffusion 的 mask 改成三角形。论文之间的速度数字不能直接横比；真正的研究对象是质量—延迟—时长—交互四者的耦合。
 
 ### 阅读顺序
 

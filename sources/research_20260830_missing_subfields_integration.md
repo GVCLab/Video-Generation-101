@@ -76,3 +76,16 @@ The repository integration therefore requires links from the task taxonomy, mech
 ## 6. Evidence boundary
 
 This batch is a literature, artifact and documentation audit. It does not independently train or reproduce the cited large models. Mermaid rendering, image inspection, link closure and metadata checks can prove that the educational artifacts are internally sound; they cannot convert author-reported quality, latency, synchronization or controllability into independently verified performance.
+
+## 7. Follow-up: long video promoted on 2026-09-02
+
+The 2026-08-30 decision above is preserved as historical context, but it was superseded after a dedicated user request and a fresh primary-source audit. Splitting continuous long generation between causal-streaming and story/multi-shot left three contracts without one owner: fixed-long generation, test-time length extrapolation and open-horizon generation. It also hid non-causal one-go, hierarchical and training-free-window routes that do not belong in a streaming chapter.
+
+The follow-up therefore adds [`docs/generative-models/long-video-generation.md`](../docs/generative-models/long-video-generation.md) as a horizontal mechanism chapter. It owns:
+
+- fixed-long / length-extrapolation / open-horizon definitions;
+- one-go, hierarchical, overlapping-window, causal-rolling and bounded-memory route comparison;
+- non-repetition, local quality, long-range state, event progress and resource-curve evidence;
+- a 2022–2026 primary-source timeline and the proposed, not executed, `LongHorizon-1` protocol.
+
+The prior boundaries remain intact: causal-streaming owns information access, commit and SLO; story/multi-shot owns explicit cuts, narrative facts and rollback; video prediction owns futures conditioned on real history; interactive world generation owns action-conditioned closed loops. The new evidence ledger is [`research_20260902_long_video_generation.md`](research_20260902_long_video_generation.md).

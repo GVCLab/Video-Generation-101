@@ -4,7 +4,7 @@
 
 视频基础模型不是“一个更大的 T2V 网络”，而是一条可复用、可后训练、可部署且可审计的链：数据治理产生训练语料，captioner 把视觉事实和创作语言对齐，tokenizer 决定学习空间，generator 学习条件分布，后训练与蒸馏改变行为和成本，超分、插帧、音频、安全及 API 再把 checkpoint 变成服务。Foundation model 的判据是广泛预训练后可跨任务适配，而非固定参数门槛 [[1]](#ref-1)。若问题是“模型会什么”，先读[基础模型能力地图](foundation-model-capabilities.md)：物理一致性属于能力，后训练属于能力获得方式，可适配性才是相应的元能力。
 
-本章回答“一个视频基础模型系统怎样成立、证据应归因给哪一层”。表示、factorization、objective、backbone 与 deployment 的正交机制见[生成模型路线](generative-models.md)，其中连续 latent、离散 token、量化与生成式压缩的表示合同见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)，Video DiT 的 token 预算、attention topology、条件融合、3D 位置、noise-time MoE、并行与 cache 见[骨干扩展专章](generative-models/video-dit-backbones.md)，causal codec→generator→commit→SLO 的部署合同见[因果、流式与实时](generative-models/causal-streaming-generation.md)；SFT/reward/DPO/RL 的细分见[视频后训练与对齐](generative-models/video-post-training-alignment.md)，相机/轨迹/姿态/几何条件见[细粒度可控生成](tasks/controllable-video-generation.md)，相机 × 世界时间、多视角网格与可渲染动态状态见[多视角与 4D](tasks/multiview-4d-generation.md)，联合声画合同见[原生音视频生成](tasks/native-audio-video-generation.md)，逐年节点见[技术时间线](timeline.md)，动作条件、状态与规划证据见[World Model 专章](world-models.md)。
+本章回答“一个视频基础模型系统怎样成立、证据应归因给哪一层”。表示、factorization、objective、backbone 与 deployment 的正交机制见[生成模型路线](generative-models.md)，其中连续 latent、离散 token、量化与生成式压缩的表示合同见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)，Video DiT 的 token 预算、attention topology、条件融合、3D 位置、noise-time MoE、并行与 cache 见[骨干扩展专章](generative-models/video-dit-backbones.md)，fixed-long、length extrapolation、open-horizon 与长期退化见[长视频生成](generative-models/long-video-generation.md)，causal codec→generator→commit→SLO 的部署合同见[因果、流式与实时](generative-models/causal-streaming-generation.md)；SFT/reward/DPO/RL 的细分见[视频后训练与对齐](generative-models/video-post-training-alignment.md)，相机/轨迹/姿态/几何条件见[细粒度可控生成](tasks/controllable-video-generation.md)，相机 × 世界时间、多视角网格与可渲染动态状态见[多视角与 4D](tasks/multiview-4d-generation.md)，联合声画合同见[原生音视频生成](tasks/native-audio-video-generation.md)，逐年节点见[技术时间线](timeline.md)，动作条件、状态与规划证据见[World Model 专章](world-models.md)。
 
 ## 1. 先固定研究对象与证据单位
 
@@ -225,7 +225,7 @@ M0–M7 不是按年份自动升级：一个闭源产品可能先达到系统部
 1. 先读第 1、2 节，建立“checkpoint ≠ family ≠ product ≠ API”的证据单位。
 2. 再读第 3–6 节，沿数据→caption→tokenizer→generator→post-train→部署→治理追踪因果链。
 3. 用第 7 节定位官方 artifact，再到[开放模型索引](../resources/open-models.md)核对权重与许可证。
-4. 用第 9、10 节设计验收；表示与 codec 转到[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)，生成机制总图转到[生成模型路线](generative-models.md)，block/attention/MoE/并行与 cache 转到[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)，commit/backpressure/open horizon 转到[因果、流式与实时](generative-models/causal-streaming-generation.md)，行为优化转到[视频后训练与对齐](generative-models/video-post-training-alignment.md)，创作控制转到[细粒度可控生成](tasks/controllable-video-generation.md)，相机—时间网格与可渲染状态转到[多视角与 4D](tasks/multiview-4d-generation.md)，动作与规划声明转到[World Model 专章](world-models.md)。
+4. 用第 9、10 节设计验收；表示与 codec 转到[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)，生成机制总图转到[生成模型路线](generative-models.md)，block/attention/MoE/并行与 cache 转到[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)，长度外推/长期状态/资源曲线转到[长视频生成](generative-models/long-video-generation.md)，commit/backpressure/SLO 转到[因果、流式与实时](generative-models/causal-streaming-generation.md)，行为优化转到[视频后训练与对齐](generative-models/video-post-training-alignment.md)，创作控制转到[细粒度可控生成](tasks/controllable-video-generation.md)，相机—时间网格与可渲染状态转到[多视角与 4D](tasks/multiview-4d-generation.md)，动作与规划声明转到[World Model 专章](world-models.md)。
 
 本章的检索、筛选、证据分级和 release-surface 逐项记录见[研究日志](../sources/research_20260830_video_foundation_models.md)。
 
