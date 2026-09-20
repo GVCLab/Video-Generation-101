@@ -146,10 +146,7 @@ markdown_extensions:
         # The chapters write display equations as ```math fences (GitHub style).
         - name: math
           class: arithmatex
-          format: !!python/object/apply:pymdownx.arithmatex.arithmatex_fenced_format
-            kwds:
-              mode: generic
-              tag: pre
+          format: !!python/name:scripts.math_fences.format_math
         # Material for MkDocs initializes Mermaid diagrams from this class.
         - name: mermaid
           class: mermaid
@@ -157,7 +154,7 @@ markdown_extensions:
 
 extra_javascript:
   - assets/js/mathjax.js
-  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  - https://unpkg.com/mathjax@3/es5/tex-chtml.js
 
 extra:
   social:

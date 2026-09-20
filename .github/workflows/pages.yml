@@ -28,6 +28,8 @@ jobs:
       - run: pip install -r requirements-docs.txt
       - name: Check manual validators
         run: python3 -m unittest discover -s scripts/tests -p 'test_manual*.py'
+      - name: Check math HTML escaping
+        run: python3 -m unittest discover -s scripts/tests -p 'test_math*.py'
       - name: Check citation URL metadata
         run: python3 scripts/verify_citations.py --offline
       - name: Build

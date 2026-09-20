@@ -73,3 +73,16 @@ resources: add official model repository
 ```
 
 提交贡献即表示你有权提供相关内容，并同意新增的原创文本按仓库许可证发布。
+
+### 公式渲染检查
+
+公式使用行内 `$...$` 或块级 `math` 代码围栏。构建时会对围栏中的 HTML 特殊字符转义；不要手动把 TeX 中的 `<` 改成 HTML 标签或实体。发布前执行：
+
+```bash
+python3 -m unittest discover -s scripts/tests -p 'test_math*.py'
+python3 scripts/build_site.py --strict
+python3 scripts/build_math_audit.py --output /tmp/vg101-math-audit
+python3 -m http.server 8766 --bind 127.0.0.1 --directory /tmp/vg101-math-audit
+```
+
+在浏览器打开 `http://127.0.0.1:8766/audit.html`，等待状态显示“完成”。检查覆盖所有已构建页面，在 1280 px 和 390 px 宽度下核对公式数量、MathJax 错误、残留源码和不可滚动的越界内容。`problemPages` 必须为 0；结果 JSON 可从页面保存。另需抽查复杂公式的视觉显示，并点击站内链接确认即时导航后仍正确渲染。此检查验证网站渲染，不替代公式数学含义的审校。

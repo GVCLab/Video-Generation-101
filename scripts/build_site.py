@@ -95,7 +95,9 @@ def main() -> int:
            "-f", str(ROOT / "mkdocs.yml")]
     if args.strict:
         cmd.append("--strict")
-    return subprocess.call(cmd, cwd=ROOT)
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(ROOT) + os.pathsep + env.get("PYTHONPATH", "")
+    return subprocess.call(cmd, cwd=ROOT, env=env)
 
 
 if __name__ == "__main__":

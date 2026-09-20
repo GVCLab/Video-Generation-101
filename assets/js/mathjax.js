@@ -9,15 +9,20 @@ window.MathJax = {
     processEnvironments: true,
   },
   options: {
-    ignoreHtmlClass: ".*|",
+    ignoreHtmlClass: ".*",
+    skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code",
+                   "annotation", "annotation-xml", "mjx-container"],
     processHtmlClass: "arithmatex",
   },
 };
 
+// Serialize navigation typesetting after initial startup; clearing while startup
+// is active can append a second rendered container to each equation.
 document$.subscribe(() => {
-  if (!window.MathJax || !window.MathJax.typesetPromise) return;
-  MathJax.startup.output.clearCache();
-  MathJax.typesetClear();
-  MathJax.texReset();
-  MathJax.typesetPromise();
+  if (!window.MathJax?.startup?.promise) return;
+  MathJax.startup.promise = MathJax.startup.promise.then(() => {
+    MathJax.typesetClear();
+    MathJax.texReset();
+    return MathJax.typesetPromise();
+  });
 });
