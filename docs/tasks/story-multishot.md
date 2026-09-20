@@ -4,6 +4,8 @@
 
 检索日期、arXiv/OpenAlex/官方 proceedings/官方项目与仓库入口、纳排规则、逐条证据和链接检查见[配套研究记录](../../sources/research_20260830_story_multishot.md)。连续长镜头、长度外推和开放时域的统一合同见[长视频生成专章](../generative-models/long-video-generation.md)；本章只接管显式镜头边界之后的故事状态与回滚。
 
+若关注谁来制定分镜、调用生成工具，并根据实际候选决定是否返工，见 [Agentic Video Generation](../agentic-video-generation.md)。本章仍聚焦多镜头输出应保持的叙事状态。
+
 ## 学习目标
 
 读完本章，应能完成六件事：

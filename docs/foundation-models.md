@@ -6,6 +6,8 @@
 
 本章回答“一个视频基础模型系统怎样成立、证据应归因给哪一层”。表示、factorization、objective、backbone 与 deployment 的正交机制见[生成模型路线](generative-models.md)，其中连续 latent、离散 token、量化与生成式压缩的表示合同见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)，Video DiT 的 token 预算、attention topology、条件融合、3D 位置、noise-time MoE、并行与 cache 见[骨干扩展专章](generative-models/video-dit-backbones.md)，fixed-long、length extrapolation、open-horizon 与长期退化见[长视频生成](generative-models/long-video-generation.md)，causal codec→generator→commit→SLO 的部署合同见[因果、流式与实时](generative-models/causal-streaming-generation.md)；SFT/reward/DPO/RL 的细分见[视频后训练与对齐](generative-models/video-post-training-alignment.md)，相机/轨迹/姿态/几何条件见[细粒度可控生成](tasks/controllable-video-generation.md)，相机 × 世界时间、多视角网格与可渲染动态状态见[多视角与 4D](tasks/multiview-4d-generation.md)，联合声画合同见[原生音视频生成](tasks/native-audio-video-generation.md)，逐年节点见[技术时间线](timeline.md)，动作条件、状态与规划证据见[World Model 专章](world-models.md)。
 
+智能体如何在生成工具之上组织规划、检查和返工，见 [Agentic Video Generation](agentic-video-generation.md)；该章区分制作系统收益与基础模型能力。
+
 ## 1. 先固定研究对象与证据单位
 
 同一产品名常同时指模型、模型家族和服务。比较之前必须先固定实体，否则“支持 2K”“原生音频”或“已开源”都可能错误落到一个 checkpoint 上。
