@@ -1,6 +1,11 @@
-# 视频生成应用：从能力主张到可部署证据
+# 视频生成应用设计
 
-> 一手来源复核截至 **2026-08-30**。本章不按公司或产品排名，而是把能力映射为系统需求、验收协议、风险门槛和回滚条件。检索与图像生成记录见[研究日志](../sources/research_20260830_task_application_taxonomy.md)。
+说明如何把用户需求转化为模型选择、工作流程和部署指标。
+
+**前置知识：** 任务分类、基础模型能力。
+
+**使用步骤：** 列出输入、输出与必须保留的内容 → 选择模型及后处理流程 → 用代表性任务测量完成率、时延和人工修改成本。
+
 
 一段演示视频只能证明“某次生成可能成功”。一个真实应用还必须证明：目标用户能稳定控制结果、错误可发现、成本和延迟可承受、素材权利可追溯、失败时能够停止或回滚。
 
@@ -20,16 +25,16 @@
 
 本章关注系统落地；若要追踪能力来自哪里，行为偏好与奖励优化见[视频后训练与对齐](generative-models/video-post-training-alignment.md)，相机、对象轨迹、姿态与几何条件见[细粒度可控生成](tasks/controllable-video-generation.md)，声画在生成过程中的耦合与同步见[原生音视频生成](tasks/native-audio-video-generation.md)。三者都必须按照本章的任务要求和部署门槛分别验收。
 
-## 1. 一张图看懂“模型能力”为什么还不是“应用”
+## 1. 应用系统架构
 
-![从能力主张到部署证据的六阶段流程。流程依次定义使用合同、输入与控制、模型工作流、人工选择与版本、验收协议，以及部署监测；验收与部署之间有通过或停止门。下方分别列出创意媒体、数字人、交互世界和物理智能需要的领域证据。](../assets/diagrams/capability-to-deployment-evidence.png)
+![从能力主张到部署证据的六阶段流程。流程依次定义使用规格、输入与控制、模型工作流、人工选择与版本、验收协议，以及部署监测；验收与部署之间有通过或停止门。下方分别列出创意媒体、数字人、交互世界和物理智能需要的领域证据。](../assets/diagrams/capability-to-deployment-evidence.png)
 
 **图 1：部署是带硬门槛的证据链。** 四条领域证据并不是四个排行榜，而是说明同一个生成模型进入不同场景时，必须换一套成功标准。创作关心可控、连续与可改；数字人增加同意、身份与音画同步；交互世界要求动作响应、状态记忆和 deadline；Physical AI 最终要看反事实、闭环成功和安全。图中没有性能数字，避免把示意值误读成 benchmark 结果。
 
-![图 002：从使用合同到部署与回滚](../assets/imagegen-diagrams/002/diagram.png)
+![图 002：从使用规格到部署与回滚](../assets/imagegen-diagrams/002/diagram.png)
 顺序化文字替代：先写用户、决策和伤害，再写允许使用的文字、图像、视频、音频或动作条件；把基础模型与编辑、音频、安全和版本工具组装成工作流；人工选择和修订后，以多个随机种子、分项指标和压力测试验收。任何硬门槛失败都停止上线。通过后仍需监测服务等级、成本、隐私、来源、事故和分布漂移，并保留回滚入口。
 
-## 2. 五种证据对象不能混用
+## 2. 模型与系统的比较单位
 
 | 对象 | 它能证明什么 | 它不能自动证明什么 |
 |---|---|---|
@@ -41,9 +46,9 @@
 
 “论文展示了 720p”“官方页面写实时”“仓库开放了代码”分别是不同证据。Genie 3 官方页面把 720p、20–24 FPS 和持续交互列为产品/机构能力主张；在没有公开论文、checkpoint 与独立 SLO 复现时，应保留这一证据边界 [[4]](#ref-4)。
 
-## 3. 先写使用合同，而不是先挑模型
+## 3. 需求规格
 
-一个最小应用合同至少包含：
+一个最小应用规格至少包含：
 
 | 字段 | 必答问题 | 例子 |
 |---|---|---|
@@ -59,13 +64,13 @@ NIST AI 600-1 把生成式 AI 风险管理组织为面向生命周期的 govern�
 
 <a id="application-capability-matrix"></a>
 
-## 4. 场景 → 能力链 → 验收门槛
+## 4. 应用场景与功能配置
 
 “需验收的 C1–C9 能力族”均反链[能力地图](foundation-model-capabilities.md#capability-cross-table-index)；任务接口、超分、renderer 与低延迟等系统组件另列，避免把“模型会什么”和“系统怎样交付”混为一类。[C8](foundation-model-capabilities.md#capability-c8) / [C9](foundation-model-capabilities.md#capability-c9) 若由外部规划器、控制器或闭环环境提供，还必须按模块归因，不能直接记在 base checkpoint 名下。
 
 | 场景 | 需验收的 C1–C9 能力族 | 任务 / 系统组件 | 系统级验收 | 硬失败 / 安全门 |
 |---|---|---|---|---|
-| 影视、广告与动态分镜 | [C1](foundation-model-capabilities.md#capability-c1) · [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C5](foundation-model-capabilities.md#capability-c5) · [C6](foundation-model-capabilities.md#capability-c6) · [C7](foundation-model-capabilities.md#capability-c7) | T2V / I2V、相机控制、角色参考、多镜头、局部编辑、超分与音频 | 指令遵循、角色/道具连续、镜头可改率、人工分钟/成片秒、版本可重放 | 未授权素材、品牌/人物误用、无法定位生成来源 |
+| 影视、广告与动态分镜 | [C1](foundation-model-capabilities.md#capability-c1) · [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C5](foundation-model-capabilities.md#capability-c5) · [C6](foundation-model-capabilities.md#capability-c6) · [C7](foundation-model-capabilities.md#capability-c7) | T2V / I2V、相机控制、角色参考、[故事与多镜头](tasks/story-multishot.md)、局部编辑、超分与音频 | 指令遵循、角色/道具连续、镜头可改率、人工分钟/成片秒、版本可重放 | 未授权素材、品牌/人物误用、无法定位生成来源 |
 | 虚拟制作、AR/VR 与动态资产 | [C1](foundation-model-capabilities.md#capability-c1) · [C3](foundation-model-capabilities.md#capability-c3) · [C4](foundation-model-capabilities.md#capability-c4) · [C5](foundation-model-capabilities.md#capability-c5) · [C7](foundation-model-capabilities.md#capability-c7) | 多视角视频、4D 重建/生成、相机—时间查询、显式动态状态与实时 renderer | 同刻跨视角、重投影、遮挡、loop closure、未见区域不确定性、构建/查询成本 | 一条相机路径冒充 4D；生成背面冒充真实重建；渲染 FPS 冒充构建实时 |
 | 后期、修复与本地化 | [C1](foundation-model-capabilities.md#capability-c1) · [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C5](foundation-model-capabilities.md#capability-c5) · [C6](foundation-model-capabilities.md#capability-c6) | V2V、退化修复、inpainting、插帧、重定时、口型/语音、本地字幕 | 观测保真、时间闪烁、生成幻觉、mask 外误差、边界 seam、口型偏移、文字正确率、往返编辑损失 | 未编辑区域被改、生成细节冒充真实证据、来源链丢失 |
 | 数字人和虚拟主播 | [C1](foundation-model-capabilities.md#capability-c1) · [C2](foundation-model-capabilities.md#capability-c2) · [C3](foundation-model-capabilities.md#capability-c3) · [C5](foundation-model-capabilities.md#capability-c5) · [C6](foundation-model-capabilities.md#capability-c6) · [C7](foundation-model-capabilities.md#capability-c7) | 身份参考、音频/文字/动作驱动、长时/流式人体动画 | 身份、口型、表情、身体、语义和延迟分项；多人和遮挡压力测试 | 无同意身份、冒用、声音克隆、未成年人或敏感人物风险 |
@@ -77,11 +82,11 @@ NIST AI 600-1 把生成式 AI 风险管理组织为面向生命周期的 govern�
 
 统一模型可以降低部署与交互成本，但不能用“all-in-one”替代分任务验收。VACE 通过 Video Condition Unit 组织 reference、editing 和 mask 条件，并在 12 类任务上做作者实验；部署时仍须分别测试参考保持、编辑泄漏和 mask 外保护 [[1]](#ref-1)。
 
-“修复”还必须拆成两个不同合同：若每帧仍有全帧观测、目标是逆转 blur、downsample、noise 或 compression，进入[视频退化修复](tasks/video-restoration.md)，分别检查 fidelity、时间稳定、感知细节与生成幻觉；若未知支持由时空 mask 指定，进入[视频补全](tasks/video-inpainting.md)，把 mask 外像素保护设为硬门槛。锐利的生成细节不能自动作为档案、新闻、医疗或取证中的真实证据。
+“修复”还必须拆成两个不同规格：若每帧仍有全帧观测、目标是逆转 blur、downsample、noise 或 compression，进入[视频退化修复](tasks/video-restoration.md)，分别检查 fidelity、时间稳定、感知细节与生成幻觉；若未知支持由时空 mask 指定，进入[视频补全](tasks/video-inpainting.md)，把 mask 外像素保护设为硬门槛。锐利的生成细节不能自动作为档案、新闻、医疗或取证中的真实证据。
 
 空间内容还要区分普通 camera-controlled video、多视角视频与可渲染 4D state：它们分别覆盖一条 camera-time 路径、一个视角—时间网格和可重复查询的动态状态。对应的几何与系统验收见[多视角与 4D 生成](tasks/multiview-4d-generation.md)。
 
-## 5. 四类高影响应用的证据边界
+## 5. 高影响应用的适用限制
 
 ### 5.1 创意媒体：价值来自“可改”，不只来自“可生成”
 
@@ -112,7 +117,9 @@ OmniHuman-1.5 用结构化语义条件和 Multimodal DiT 推进“语义表演�
 
 数字人验收必须用真实业务分布分层：近景/半身/全身、静态/剧烈运动、单人/多人、普通话/方言/跨语言、短句/长段、遮挡/出画再入画。任何平均同步分都不能抵消未经授权的身份生成。
 
-### 5.3 交互世界：平均 FPS 不是交互性
+<a id="53-fps"></a>
+
+### 5.3 交互世界的响应与状态验收
 
 交互系统第 $k$ 轮接收动作 $a_k$ 与当前状态/观测 $s_k,o_k$，在 deadline $d$ 内返回：
 
@@ -154,7 +161,7 @@ Genie 在 ICML 2024 通过无标签互联网视频学习 latent action space，�
 
 DreamGen 把适配后的 I2V 世界模型、latent action / inverse dynamics 和 policy training 串联，并报告 DreamGen Bench 与下游策略的相关性；这比只比较视频分数更接近应用证据，但收益仍是作者在特定机器人、数据和任务设置下的结果 [[6]](#ref-6)。Cosmos 平台把数据管线、tokenizer、预训练 world foundation model 与下游 post-training 组织成 Physical AI 平台 [[7]](#ref-7)；Cosmos 3 又把语言、图像、视频、音频和动作合并到 omnimodal 技术报告中 [[8]](#ref-8)。两者都不能替代真实设备的独立闭环安全测试。
 
-### 5.5 合成数据：生成指标不是最终指标
+### 5.5 合成数据的下游效果评价
 
 合成数据应报告四层结果：
 
@@ -175,7 +182,7 @@ DreamGen 把适配后的 I2V 世界模型、latent action / inverse dynamics 和
 - 让领域专家审阅高影响结论，并保留可访问文字替代；
 - 概念视频不得冒充工程验证、临床证据或合规证明。
 
-## 6. 验收不是一个加权总分
+## 6. 功能验收
 
 对应用 $u$，把门槛写成布尔合取而不是平均：
 
@@ -218,7 +225,7 @@ C_{\text{accepted}}
 - 编码、模型、解码、安全检查和网络的分项时延；
 - 并发量、硬件、精度、缓存、分辨率和帧率。
 
-## 7. 来源、权利与安全必须贯穿工作流
+## 7. 来源与权限管理
 
 C2PA 2.4 提供可加密验证的来源与编辑历史结构，适合记录创作、修改和发布链；规范本身明确不对内容“好或坏、真或假”作价值判断，只验证声明与资产的关联、格式和防篡改属性 [[9]](#ref-9)。因此：
 
@@ -230,7 +237,9 @@ C2PA 2.4 提供可加密验证的来源与编辑历史结构，适合记录创�
 
 建议资产账本记录：来源 URI / hash、权利主体、允许用途、地域与期限、同意与撤回、模型/数据版本、编辑动作、审核者和发布去向。高风险人物内容还要有阻断、申诉和快速撤回流程。
 
-## 8. 2024–2026 的应用路线变化
+<a id="8-20242026"></a>
+
+## 8. 代表应用路线
 
 | 方向 | 代表进展 | 应用意义 | 证据边界 |
 |---|---|---|---|
@@ -239,10 +248,10 @@ C2PA 2.4 提供可加密验证的来源与编辑历史结构，适合记录创�
 | 生成式交互环境 | Genie，ICML 2024；Genie 3 官方页面 [[3]](#ref-3) [[4]](#ref-4) | latent action 学习和实时交互把 open-loop clip 推向 closed-loop | 论文与产品声明必须分开；当前页面规格非独立复现 |
 | 统一 action-in/video-out 模拟 | UniSim，ICLR 2024 [[5]](#ref-5) | 多数据域可通过统一接口支持规划器、代理与 VLM 训练 | “universal”有限定，不包含所有模态或现实规律 |
 | 神经轨迹训练机器人 | DreamGen，2025 预印本 [[6]](#ref-6) | 生成视频经伪动作恢复进入 policy training | 级联误差与真实迁移仍需逐层审计 |
-| Physical AI 平台 | Cosmos 2025；Cosmos 3 2026 [[7]](#ref-7) [[8]](#ref-8) | 数据、tokenizer、world model、post-training 与 action 逐步合并 | 机构技术报告与开放发布面，不等于通用闭环成功 |
+| Physical AI 平台 | Cosmos 2025；Cosmos 3 2026 [[7]](#ref-7) [[8]](#ref-8) | 数据、tokenizer、world model、post-training 与 action 逐步合并 | 机构技术报告与开放发布内容，不等于通用闭环成功 |
 | 风险与来源基础设施 | NIST AI 600-1；C2PA 2.4 [[10]](#ref-10) [[9]](#ref-9) | 风险管理和媒体来源进入系统设计，不再是发布后补丁 | 通用框架仍需转译为场景硬门槛 |
 
-## 9. 可直接复制的应用验收卡
+## 9. 应用验收记录模板
 
 ~~~text
 Use case:
@@ -275,6 +284,11 @@ Rollback target and recovery time:
 ~~~
 
 填写后再进入[任务地图](taxonomy.md)选择专章；用[评测指南](evaluation.md)补全统计与证据等级；动作与现实决策场景继续阅读[World Model](world-models.md)和[物理一致性](physical-consistency.md)。
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 

@@ -1,5 +1,5 @@
 site_name: Video Generation 101
-site_description: 从生成原理、系统能力、世界理解到真实应用与验证的视频生成知识体系
+site_description: 视频生成技术手册：原理、任务接口、训练与推理、数据处理和评测
 site_author: Xiaodong Cun, GVC Lab, Great Bay University
 site_url: https://gvclab.github.io/Video-Generation-101/
 repo_url: https://github.com/GVCLab/Video-Generation-101
@@ -16,6 +16,73 @@ use_directory_urls: false
 
 not_in_nav: |
   sources/*
+
+nav:
+  - 使用与索引:
+      - "手册首页": README.md
+      - "使用说明": docs/manual-guide.md
+      - "视频生成入门": docs/getting-started.md
+      - "阅读指南": docs/reader-guides.md
+      - "视频生成任务分类": docs/taxonomy.md
+  - 生成原理:
+      - "视频生成模型分类与基础": docs/generative-models.md
+      - "视频对抗生成": docs/generative-models/adversarial-generation.md
+      - "自回归视频生成": docs/generative-models/autoregressive-generation.md
+      - "因果与流式视频生成": docs/generative-models/causal-streaming-generation.md
+      - "视频扩散模型": docs/generative-models/diffusion-models.md
+      - "流匹配与一致性模型": docs/generative-models/flow-consistency-models.md
+      - "长视频生成": docs/generative-models/long-video-generation.md
+      - "掩码视频生成": docs/generative-models/masked-generation.md
+      - "递归视频预测": docs/generative-models/recurrent-prediction.md
+      - "视频生成的推理时计算扩展": docs/generative-models/test-time-scaling.md
+      - "变分视频生成": docs/generative-models/variational-generation.md
+      - "Video DiT 骨干网络": docs/generative-models/video-dit-backbones.md
+      - "视频后训练与对齐": docs/generative-models/video-post-training-alignment.md
+      - "视频表示、Tokenizer 与编码": docs/generative-models/video-tokenizers.md
+  - 系统与优化:
+      - "视频基础模型能力": docs/foundation-model-capabilities.md
+      - "视频基础模型系统": docs/foundation-models.md
+      - "智能体视频生成": docs/agentic-video-generation.md
+      - "视频生成推理优化": docs/generative-models/inference-acceleration.md
+      - "视频生成特征缓存": docs/generative-models/inference-acceleration/caching.md
+      - "视频生成蒸馏": docs/generative-models/inference-acceleration/distillation.md
+      - "视频生成模型剪枝": docs/generative-models/inference-acceleration/pruning.md
+      - "视频生成模型量化": docs/generative-models/inference-acceleration/quantization.md
+      - "视频生成稀疏计算": docs/generative-models/inference-acceleration/sparsity.md
+      - "视频生成推理系统": docs/generative-models/inference-acceleration/systems.md
+  - 任务与应用:
+      - "动作条件视频预测": docs/tasks/action-conditioned-prediction.md
+      - "可控视频生成": docs/tasks/controllable-video-generation.md
+      - "数字人与说话人物生成": docs/tasks/digital-human.md
+      - "视频帧插值": docs/tasks/frame-interpolation.md
+      - "图像到视频生成": docs/tasks/image-to-video.md
+      - "交互式世界生成": docs/tasks/interactive-world-generation.md
+      - "多视角与 4D 生成": docs/tasks/multiview-4d-generation.md
+      - "联合音视频生成": docs/tasks/native-audio-video-generation.md
+      - "个性化视频生成": docs/tasks/personalized-video-generation.md
+      - "故事与多镜头视频生成": docs/tasks/story-multishot.md
+      - "文本到视频生成": docs/tasks/text-to-video.md
+      - "无条件视频生成": docs/tasks/unconditional-video-generation.md
+      - "视频补全": docs/tasks/video-inpainting.md
+      - "视频预测": docs/tasks/video-prediction.md
+      - "视频修复与超分辨率": docs/tasks/video-restoration.md
+      - "视频编辑与变换": docs/tasks/video-to-video.md
+      - "视频虚拟试衣": docs/tasks/video-virtual-try-on.md
+      - "视频生成应用设计": docs/applications.md
+  - 世界模型与推理:
+      - "世界模型与基于模型的决策": docs/world-models.md
+      - "世界—动作模型（WAM）": docs/world-action-model.md
+      - "联合嵌入预测架构（JEPA）": docs/jepa.md
+      - "视频生成的物理一致性": docs/physical-consistency.md
+      - "视频生成与视觉推理": docs/video-reasoning.md
+  - 评测与资源:
+      - "视频生成评测": docs/evaluation.md
+      - "视频数据集与数据处理": resources/datasets.md
+      - "开放视频模型的选择与复现": resources/open-models.md
+      - "视频生成技术发展索引": docs/timeline.md
+      - "论文阅读与练习": docs/reading-list.md
+      - "文献索引": docs/bibliography.md
+      - "贡献指南": CONTRIBUTING.md
 
 theme:
   name: material

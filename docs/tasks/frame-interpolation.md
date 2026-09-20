@@ -1,10 +1,15 @@
-# 视频帧插值：对应关系、生成式路径与可比证据
+# 视频帧插值
 
-> 本章冻结于 **2026-08-30（Asia/Shanghai）**。Video Frame Interpolation（VFI）不是“在两张图之间随便生成一段视频”：它首先是带已知前后端点和目标时间的条件重建问题；只有当遮挡、非线性运动或中间路径本来就不唯一时，生成式分布建模才成为必要补充。
+介绍从已知端点估计中间帧的运动、遮挡、采样与生成方法。
+
+**前置知识：** 光流、图像采样。
+
+**使用步骤：** 定义端点、目标时间和曝光条件 → 选择运动估计与合成方式 → 按遮挡、快速运动和镜头切换检查误差。
+
 
 检索式、初筛数量、纳入/排除、arXiv 首发时间、正式 venue、官方代码与证据等级见[配套研究记录](../../sources/research_20260830_frame_interpolation.md)。
 
-## 🎯 学习目标
+## 学习目标
 
 读完本章，应能完成五件事：
 
@@ -14,7 +19,7 @@
 4. 判断一个方法究竟支持 midpoint、任意时刻，还是只用递归 midpoint 近似多帧插值；
 5. 建立同时覆盖失真、感知、时间一致性、时延、显存与失败尾部的可复核实验。
 
-## 📐 1. 任务定义：已知两个端点，查询中间时间
+## 1. 任务定义
 
 给定两帧
 
@@ -29,7 +34,7 @@ I_0,I_1\in[0,1]^{B\times3\times H\times W}
 ```
 
 若一次输出 $K$ 帧，则查询集合为
-$`\mathcal T=\lbrace\tau_1,\ldots,\tau_K\rbrace`$，模型可逐时刻运行，也可联合生成
+$\mathcal T=\lbrace\tau_1,\ldots,\tau_K\rbrace$，模型可逐时刻运行，也可联合生成
 $\hat I_{\mathcal T}$。这里的“前后”只是时间位置；两帧都已知，不存在测试时偷看未来的问题。
 
 ### 1.1 五个容易混淆的邻接任务
@@ -66,7 +71,9 @@ Super SloMo 通过时间相关的流组合和 visibility map 支持多个查询�
 5. 两条路线都检查端点忠实度、运动与时间一致性、感知细节、端到端时延和峰值显存。
 6. 遮挡、大运动、重复纹理与曝光变化会同时破坏两条路线，只是失败形态不同：重建路线更易出现洞、重影或错误复制，生成路线更易出现身份/纹理漂移或不受端点支持的内容。
 
-## 🧩 2. 一条可检查形状的 tensor/data flow
+<a id="2-tensordata-flow"></a>
+
+## 2. 张量与数据流
 
 ![图 049：双帧视频插值的张量数据流](../../assets/imagegen-diagrams/049/diagram.png)
 最低限度应在实现文档里写出三件事：flow 的方向、坐标单位和 `align_corners`/边界采样约定。只写“warp 两帧”而不写 $F_{\tau\rightarrow0}$ 还是 $F_{0\rightarrow\tau}$，复现时很容易得到符号相反但仍能运行的代码。
@@ -106,12 +113,12 @@ Softmax Splatting 用可学习的重要性 $Z(x)$ 对碰撞做指数归一化 [[
 
 其中 $b$ 是双线性 footprint。$Z$ 加上常数不会改变归一化结果；缩放 $Z$ 却会使操作从近似平均逐渐接近 z-buffer。它解决的是**碰撞聚合**，不是自动解决错误 flow、空洞或不可见内容。
 
-## 🗺️ 3. 机制地图：不要按网络名字硬分家
+## 3. 方法分类
 
 ![图 050：视频帧插值技术路线与可组合模块](../../assets/imagegen-diagrams/050/diagram.png)
 这张图纠正两个常见误分类：**IFRNet 是 encoder–decoder CNN，不是 Transformer**；**AMT 的 Transforms 不是 Transformer**，官方摘要明确称其为 convolution-based model [[9]](#ref-9), [[13]](#ref-13)。
 
-## 🌊 4. 显式运动、遮挡与局部采样
+## 4. 运动估计与遮挡
 
 ### 4.1 传统 optical flow 是物理代理，不是 VFI 目标本身
 
@@ -133,7 +140,9 @@ SepConv 为每个输出像素预测两组可分离一维核，以低于完整二
 
 Kernel、flow 与 deformable convolution 不是互斥类别：都在学习“从哪里取哪些源特征、怎样聚合”。区别是对应被参数化为稠密向量、投影操作，还是带 offset 的局部混合核。
 
-## ⚡ 5. 高效卷积路线：RIFE、IFRNet、FILM 与 AMT
+<a id="5-rifeifrnetfilm-amt"></a>
+
+## 5. 卷积方法
 
 ### 5.1 RIFE：直接估计 intermediate flow
 
@@ -165,7 +174,7 @@ AMT 首先构建端点特征间的**双向 all-pairs correlation volumes**，用
 
 名称中的 `T` 是 Transforms。论文明确将 AMT 与 Transformer 方法对比，并称自身为卷积模型；因此它应放在“相关体驱动的高效 flow”路线，而非 attention 路线。
 
-## 🧠 6. Transformer 与状态空间路线：扩大交互，不消灭对应歧义
+## 6. Transformer 与状态空间方法
 
 ### 6.1 两个 CVPR 2022 Transformer 容易混名
 
@@ -178,7 +187,9 @@ Transformer 的优势是长程匹配与内容自适应聚合；代价取决于 t
 
 MGMVFI 把 optical flow 用作 Motion-Guided Serialization：先把两端特征采样到运动对齐的中间网格，再让选择性状态空间模型沿更符合轨迹的一维顺序扫描，并以 contextual synthesis 缓解错误 flow [[21]](#ref-21)。截至冻结日，该工作为 2026-08-24 arXiv v1，作者标注 ECCV 2026；在正式 proceedings 可独立核验前，应写成“最新预印本/作者 venue 声明”，不写成已建立共识。
 
-## 🌫️ 7. 生成式 VFI：从单帧条件分布到整段路径
+<a id="7-vfi"></a>
+
+## 7. 生成式插值
 
 当中间帧存在 disoccluded content、复杂非线性运动或多条同样合理的路径时，最小像素误差倾向于条件均值；diffusion 改为学习
 
@@ -218,7 +229,9 @@ LDF-VFI 以自回归 diffusion transformer 处理完整插值序列，在 chunk 
 
 最新工作共同表明：未来不是“flow 或生成模型二选一”，而是用 flow 提供密集对应与置信度，用生成先验处理不可见区域，再以专用架构降低 diffusion 成本。
 
-## 🧪 8. 训练目标：每个 loss 约束的变量不同
+<a id="8-loss"></a>
+
+## 8. 训练目标
 
 一套可能的组合写成
 
@@ -245,7 +258,7 @@ LDF-VFI 以自回归 diffusion transformer 处理完整插值序列，在 chunk 
 
 做消融时至少分开改变：表示空间（pixel/latent）、骨干（CNN/attention/DiT）、条件（端点/时间/flow）、采样步数与训练数据。否则“diffusion 更好”可能只是数据、tokenizer 或解码器更强。
 
-## ⚠️ 9. 六类失败机制：先问哪条假设破了
+## 9. 故障诊断
 
 | 场景 | 被破坏的假设 | 重建路线典型伪影 | 生成路线典型伪影 | 应加的诊断 |
 |---|---|---|---|---|
@@ -258,7 +271,9 @@ LDF-VFI 以自回归 diffusion transformer 处理完整插值序列，在 chunk 
 
 BiM-VFI 用由相对距离与方向描述的 bidirectional motion field 缓解非匀速训练中的 time-to-location ambiguity，并在 fixed-time 与 arbitrary-time 协议分别评测 [[14]](#ref-14)。它没有消除不可观测性：若中间物体从两端都不可见，仍需要先验或额外帧。
 
-## 📊 10. Benchmark 不是一个名字，而是一组数据协议
+<a id="10-benchmark"></a>
+
+## 10. 数据集与评测设置
 
 ![图 051：可复核的视频帧插值评测协议](../../assets/imagegen-diagrams/051/diagram.png)
 ### 10.1 常用数据集的正确用途
@@ -300,7 +315,7 @@ FloLPIPS 用端点/插值视频的 flow distortion 对 LPIPS feature difference 
 
 参数少不必然快：correlation volume、warp/splat kernel、attention、VAE decode 与多步 sampler 的 memory traffic 可能主导。不同论文表中的毫秒数不能直接拼成排行榜。
 
-## 🗓️ 11. 经首发与正式页双重核验的里程碑
+## 11. 代表工作
 
 | 首发 → 正式出版 | 工作 | 可准确归因的里程碑 |
 |---|---|---|
@@ -322,7 +337,7 @@ FloLPIPS 用端点/插值视频的 flow distortion 对 LPIPS feature difference 
 
 表中“首发”取 arXiv v1 日期，“正式出版”只取官方 proceedings/期刊页；arXiv comment 中的接收声明若未独立找到正式页，则只留在“预印本”行。这样不会把 2020 首发的 RIFE 错写成 2022 才提出，也不会把 2023 首发的 LDMVFI 错写成 2023 正式 AAAI 论文。
 
-## 🧭 12. 选择路线与验收
+## 12. 方法选择
 
 | 需求 | 首选起点 | 为什么 | 上线前必须补测 |
 |---|---|---|---|
@@ -335,7 +350,7 @@ FloLPIPS 用端点/插值视频的 flow distortion 对 LPIPS feature difference 
 
 一个可接受的论文/产品结论应按以下顺序给证据：先冻结任务和数据协议；再给与最强同类的等训练/等分辨率比较；然后做机制消融；最后报告失败分桶、系统账本与独立复现。单个 demo、单个平均 PSNR 或作者自报 FPS 都不足以证明“最先进”。
 
-## 🔭 13. 尚未解决的问题
+## 13. 开放问题
 
 1. **多解但有 GT：** 真实拍摄只记录一条中间路径，怎样同时评价参考忠实与合理的其他路径？
 2. **可校准的不确定性：** confidence 应反映 flow 冲突、不可见内容与生成分布，而不只是一个方便融合的 mask。
@@ -343,6 +358,11 @@ FloLPIPS 用端点/插值视频的 flow distortion 对 LPIPS feature difference 
 4. **生成先验的守恒：** 怎样允许补全新显露区域，同时禁止端点身份、文字、几何和物体数量漂移？
 5. **真正的端侧成本：** 一步 diffusion、轻量 CNN、window attention 和定制 CUDA splat 应在相同编译栈、功耗与热约束下比较。
 6. **可拒答 VFI：** 对镜头切换或无连续物理路径的端点，系统应检测并切换到 transition generation，而不是强制输出伪“插值”。
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 

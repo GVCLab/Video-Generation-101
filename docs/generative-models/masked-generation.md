@@ -1,10 +1,16 @@
-# 掩码生成：目标、采样器与时间因果不能混为一谈
+# 掩码视频生成
+
+介绍掩码条件预测、吸收态离散扩散及迭代并行解码。
+
+**前置知识：** 条件概率、离散 token。
+
+**使用步骤：** 定义掩码单元和训练分布 → 检查解码顺序与置信度调度 → 评估串行深度、质量和训练推理差异。
 
 掩码生成不是一种单独的概率模型。它至少包含四个可分别选择的层：怎样遮挡数据、用什么目标学习条件分布、推理时怎样决定下一批 token、视频帧之间是否因果。MaskGIT 式迭代解码、吸收态离散扩散、next-set 自回归和“帧间 AR + 帧内掩码”可能共享部分公式，却不因此成为同一种算法。
 
 本章截至 **2026-08-30**，聚焦离散视频 token；连续 latent 中“遮帧规划、扩散渲染”的方法会作为边界案例单列。正文所说的“并行”均指同一轮网络调用内可并行预测多个位置，不等于单次前向、低总计算量或实时生成。
 
-## 1. 先按四层拆开
+## 1. 方法分类
 
 ![图 023：掩码生成的四层关系](../../assets/imagegen-diagrams/023/diagram.png)
 顺序化文字替代：第一，训练端可以只做随机缺失条件预测，也可以先定义 clean token 逐渐进入 `[MASK]` 吸收态的前向过程；第二，前者常接置信度排序的 MaskGIT 式采样，后者有由时间或转移速率定义的概率化反向过程；第三，在特定吸收态参数化下，扩散目标可化成加权 masked 交叉熵，但采样器仍未因此相同；第四，若每轮提交的 token 集合形成有序分区，采样可用 next-set AR 语言描述，不过动态选择策略也是生成过程的一部分；第五，以上任一采样器还可选择整段双向注意力，或“帧间因果、帧内双向”的视频时间结构。
@@ -18,7 +24,9 @@
 
 只写“masked model”无法回答后面三个问题。
 
-## 2. Masked modeling 只定义条件预测任务
+<a id="2-masked-modeling"></a>
+
+## 2. 掩码条件预测
 
 设视频经 tokenizer 得到 $N$ 个离散 token：
 
@@ -26,7 +34,7 @@
 y^0=(y_1^0,\ldots,y_N^0)\in\{1,\ldots,K\}^N,
 ```
 
-$c$ 是文本、首帧、动作等条件，$`M\subseteq\lbrace1,\ldots,N\rbrace`$ 是被遮挡位置。最常见的目标是
+$c$ 是文本、首帧、动作等条件，$M\subseteq\lbrace1,\ldots,N\rbrace$ 是被遮挡位置。最常见的目标是
 
 ```math
 \mathcal L_{\mathrm{mask}}
@@ -44,9 +52,11 @@ $c$ 是文本、首帧、动作等条件，$`M\subseteq\lbrace1,\ldots,N\rbrace`
 
 因此，VideoMAE 的 tube masking 是视频表征预训练证据，不是一个视频生成 sampler。它用 90%–95% 的高比例 tube mask 学表征，不能据此推出生成时也应采用同样比例或 schedule [[4]](#ref-4)。反过来，MAGVIT 的 masked token objective 与 COMMIT 解码共同构成生成系统；只复现 loss 而不复现 condition embedding、调度与采样规则，不是同一个方法 [[6]](#ref-6)。
 
-## 3. 吸收态离散扩散：何时能化成 masked 交叉熵
+<a id="3-masked"></a>
 
-### 3.1 前向过程必须先被定义
+## 3. 吸收态离散扩散
+
+### 3.1 前向过程定义
 
 令 $m$ 是额外的 `[MASK]` 吸收态，$\tau\in[0,1]$ 是**噪声时间**，不是视频帧索引。由吸收态马尔可夫链导出的单位置前向边缘可写为
 
@@ -70,7 +80,7 @@ q_\tau(y_i^\tau\mid y_i^0)
 
 其中权重 $\lambda(\tau)$ 由前向 schedule 与所选目标决定。NeurIPS 2024 的 *Simplified and Generalized Masked Diffusion for Discrete Data* 明确给出这一“加权交叉熵积分”桥，并允许状态相关 masking schedule [[9]](#ref-9)；同年的 MDLM 把 Rao–Blackwellized 目标写成经典 masked-language-modeling losses 的混合 [[8]](#ref-8)。这些结果主要来自离散文本与像素建模，支持的是**目标层关系**，不是视频质量的外推。
 
-### 3.2 等价到哪一层，必须逐条限定
+### 3.2 不同目标的等价条件
 
 | 命题 | 结论 | 成立所需条件 | 不能推出 |
 |---|---|---|---|
@@ -85,7 +95,9 @@ ICLR 2025 的 time-agnostic 分析还发现，常见低温 categorical sampling 
 
 最后，URSA 从均匀类别噪声出发，对整段离散时空 token 做全局迭代 refinement，是 ICLR 2026 的视频离散扩散实例，却不是 absorbing-mask diffusion [[18]](#ref-18)。“离散扩散”与“掩码扩散”不能互作同义词。
 
-## 4. MaskGIT 式迭代解码究竟做了什么
+<a id="4-maskgit"></a>
+
+## 4. 迭代解码
 
 MaskGIT 在训练时随机 mask 图像 token，在推理时从全 mask 开始，每轮并行预测当前未知位置，采样候选 token，再按置信度与剩余-mask schedule 决定保留哪些候选。原论文比较多种 schedule，并在其图像实验中选择 cosine；这是一项经验设计，不是所有 masked model 的定律 [[2]](#ref-2)。Phenaki 把相似的双向 masked transformer 用到视频 token，并报告通常使用 12–48 个采样步骤；其 tokenizer 则在时间上因果，这是 tokenizer 可变长能力与生成器双向补全的组合 [[5]](#ref-5)。
 
@@ -103,9 +115,11 @@ n_j=\left\lceil \gamma(j/J)N\right\rceil
 - **训练 mask-ratio 分布** $\rho\sim\pi_{\mathrm{train}}(\rho)$ 决定训练样本看见哪些缺失率；
 - **推理 remaining-mask schedule** $\gamma(j/J)$ 决定每轮保留多少未知位置。
 
-二者可以采用同一函数族，但角色不同。训练覆盖 $`5\%`$–$`95\%`$ 的随机 mask，不保证模型见过“由自己错误且按置信度筛选”的上下文。
+二者可以采用同一函数族，但角色不同。训练覆盖 $5\%$–$95\%$ 的随机 mask，不保证模型见过“由自己错误且按置信度筛选”的上下文。
 
-### 4.1 Confidence 不是 correctness
+<a id="41-confidence-correctness"></a>
+
+### 4.1 预测置信度与正确率
 
 常用候选分数
 
@@ -125,7 +139,9 @@ c_i=p_\theta(\tilde y_i\mid y^{(j)},c)
 
 Token-Critic 另训判别器识别真实与采样 token，并用它接受、拒绝和重采样，是“可以重新质疑生成 token”的独立 image-side 方案 [[3]](#ref-3)。它证明 remasking policy 可以学习，但不是视频收益或概率校准的自动保证。
 
-## 5. Mask unit 决定模型学到哪一种缺失结构
+<a id="5-mask-unit"></a>
+
+## 5. 掩码单元
 
 | Mask unit | 遮挡方式 | 适合的问题 | 主要风险与证据边界 |
 |---|---|---|---|
@@ -140,9 +156,11 @@ MAGVIT 用 3D tokenizer 和 COMMIT 条件掩码在同一个模型中统一多种
 
 Lumos-1 针对另一种问题：它采用帧内双向、帧间因果的 mask-based discrete diffusion，并指出空间冗余会造成 frame-wise loss imbalance；Autoregressive Discrete Diffusion Forcing 在训练中加入 temporal tube masking，并配套推理 masking policy [[17]](#ref-17)。这里 tube mask 的作用是平衡帧级学习与推理兼容性，不能与 VideoMAE 的表示学习动机合并成一条未经限定的结论。
 
-## 6. “Masked AR”至少有三种含义
+<a id="6-masked-ar"></a>
 
-### 6.1 Next-set AR：先声明有序集合
+## 6. 掩码预测与自回归
+
+### 6.1 Next-set AR 的有序集合
 
 令 $S_1,\ldots,S_J$ 是位置集合的一个有序分区，则
 
@@ -175,7 +193,7 @@ Lumos-1 同样采用帧间 causal、帧内 bidirectional masked discrete diffusi
 
 MarDini 的 “MAR” 在低分辨率连续 VAE latent 上遮掉整帧，让大规划器预测每帧 planning signal；随后轻量 continuous diffusion model 负责高分辨率空间生成 [[11]](#ref-11)。它说明“masked autoregressive video”也可能只是外层时间规划，内层既不是离散 CE，也不是 absorbing mask reverse process。该工作于 2025 年 5 月正式发表于 TMLR。
 
-## 7. 并行度要报告串行深度，而不只写“并行生成”
+## 7. 并行度与串行深度
 
 设视频共有 $N$ 个 token、$T$ 帧，masked sampler 每个生成单元用 $J$ 轮，长视频分成 $C$ 个因果 chunk。忽略 guidance 与额外 critic 前向时：
 
@@ -192,7 +210,7 @@ MarDini 的 “MAR” 在低分辨率连续 VAE latent 上遮掉整帧，让大�
 
 MaskFlow 很好地展示了这个权衡：它用逐帧独立 mask ratio 的训练支持 full-sequence 与 chunk/frame AR 两种 rollout，并可用 MGM-style sampling；更小 stride 往往更稳，却需要更多 NFE [[16]](#ref-16)。该工作截至截止日是 arXiv 预印本，且其核心是 discrete flow matching，不应自动归入 absorbing D3PM。
 
-## 8. 训练—推理错配：六个独立来源
+## 8. 训练推理差异
 
 | 错配 | 训练端 | 推理端 | 可审计的缓解方式 |
 |---|---|---|---|
@@ -205,7 +223,9 @@ MaskFlow 很好地展示了这个权衡：它用逐帧独立 mask ratio 的训�
 
 CTF 只修正其中“历史帧的形态”一项，不能消除模型历史从真值变成自生成所带来的 exposure bias。Lumos-1 的 temporal tube masking 主要针对 frame-wise loss imbalance 与兼容推理策略，也不能被概括成解决了全部 train–test gap。
 
-## 9. 2021–2026 的一手路线与正确边界
+<a id="9-20212026"></a>
+
+## 9. 代表方法
 
 | 年份 | 工作与状态 | 这条路线真正增加了什么 | 不应误写成 |
 |---:|---|---|---|
@@ -228,7 +248,7 @@ CTF 只修正其中“历史帧的形态”一项，不能消除模型历史从�
 
 MAGVIT-v2 特别容易被误读。论文的核心贡献是 tokenizer，并用它支持 language-model-style visual generation；它不是对 MAGVIT 的 COMMIT/MaskGIT sampler 做“第二版” [[7]](#ref-7)。同理，MotionAura 的 codec 训练含 full-frame masking，而生成器采用 vector-quantized discrete diffusion；两个 mask 出现在不同模块，不能合并成一个算法描述 [[13]](#ref-13)。
 
-## 10. 实验与复现最低清单
+## 10. 实现与评测配置
 
 ### 10.1 训练配置
 
@@ -254,7 +274,7 @@ MAGVIT-v2 特别容易被误读。论文的核心贡献是 tokenizer，并用它
 - 对 confidence 做 held-out calibration；对 categorical sampler 检查数值精度与有效温度。
 - 进行 mask-unit、训练比例、推理 schedule、可否 reopen、frame/chunk stride 消融。
 
-## 11. 与其他章节的关系
+## 11. 相关专题
 
 - [自回归生成](autoregressive-generation.md)讨论固定 token 顺序与 teacher forcing；本章补充 next-set 和帧级混合分解。
 - [扩散模型](diffusion-models.md)以连续状态为主；本章只在 absorbing 或 uniform categorical 转移已定义时使用“离散扩散”。

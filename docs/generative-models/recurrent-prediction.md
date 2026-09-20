@@ -1,10 +1,16 @@
-# 递归/循环视频预测：状态更新、随机未来与闭环证据
+# 递归视频预测
+
+介绍像素、运动变换和潜在状态递归，以及训练与自由滚动的误差。
+
+**前置知识：** 序列模型、条件概率。
+
+**使用步骤：** 定义递归状态和预测头 → 区分真实历史与生成历史 → 按预测长度评测准确性、多样性和误差累积。
 
 > 本章资料与会场状态核验截至 **2026-08-30**。这里的 recurrent 首先指跨时间单元反复更新状态或反馈输出；它可以与自回归概率分解、diffusion/flow 条件头、因果访问和流式部署组合，但这些概念不是同义词。
 
 检索式、筛选/排除、OpenAlex 去重、官方 artifact 与证据等级见[配套研究记录](../../sources/research_20260830_recurrent_video_prediction.md)。
 
-## 📋 1. 先分清四个问题
+## 1. 术语与任务范围
 
 给定已观测历史 $x_{1:C}$、条件 $c$ 与可选动作 $a_t$，典型递归预测器写成
 
@@ -19,7 +25,7 @@ $h_t$ 可以是 LSTM feature map、Transformer KV、deterministic–stochastic s
 | 问题 | 最小判据 | 常见实现 | 不能由它推出 |
 |---|---|---|---|
 | **递归状态更新** | 同一更新器反复把旧状态与新输入变成新状态 | ConvLSTM、RSSM、rolling KV、压缩历史 | 不必显式给出概率分解，也不保证因果正确 |
-| **自回归概率分解** | $`p(y_{1:K}\mid c)=\prod_k p(y_k\mid y_{\lt k},c)`$ | token、frame、set 或 chunk AR | 不要求 RNN；当前单元内部仍可双向联合去噪 |
+| **自回归概率分解** | $p(y_{1:K}\mid c)=\prod_k p(y_k\mid y_{\lt k},c)$ | token、frame、set 或 chunk AR | 不要求 RNN；当前单元内部仍可双向联合去噪 |
 | **因果访问** | 提交第 $k$ 个单元前不读取未来的干净单元 | causal mask、只保留已提交 KV | 只是信息约束，不等于因果推断、可干预动力学或流式服务 |
 | **流式与 deadline** | 全片结束前持续发出结果；每个 deadline 前完成生成、解码与传输 | rolling window、KV cache、异步 VAE | 平均 FPS、论文中的 causal 或“无限长”都不能单独证明 |
 
@@ -31,7 +37,9 @@ $h_t$ 可以是 LSTM feature map、Transformer KV、deterministic–stochastic s
 
 **图的顺序化文字替代：** 数据流先经权利治理、清洗与 caption，编码为连续 causal-VAE latent 或离散视觉 token；共享生成骨干选择全序列双向去噪，或以状态和已提交上下文滚动生成下一帧/块；后训练可加入偏好/奖励、self/causal forcing、teacher–student 蒸馏与对抗分布匹配；生成结果再经 decoder、超分/插帧和可选音频同步，最后按离线 API 或因果流式方式部署，并报告首帧、FPS/deadline、内存、能耗和安全评测。GAN 作为完整生成器、codec 中的对抗重建损失、以及加速 diffusion/flow student 的对抗蒸馏，是三种不可折叠的角色。
 
-## 🧭 2. 一套 rollout 外壳，多种预测机制
+<a id="2-rollout"></a>
+
+## 2. 递归预测接口
 
 ![图 026：递归视频预测的共同 rollout 外壳与四类条件头](../../assets/imagegen-diagrams/026/diagram.png)
 **图的顺序化文字替代：**
@@ -43,7 +51,7 @@ $h_t$ 可以是 LSTM feature map、Transformer KV、deterministic–stochastic s
 
 因此“递归 VAE”“递归 GAN”“逐帧 diffusion”并不矛盾：递归规定外层状态和反馈，VAE/GAN/flow/diffusion 规定每步怎样表示或学习条件分布。以下路线按这个机制层组织，而不是把论文名称排成互斥家族。
 
-## 🖼️ 3. 确定性像素与运动变换：先解决下一帧是什么
+## 3. 像素预测与运动变换
 
 ### 3.1 直接像素回归
 
@@ -70,7 +78,9 @@ Finn、Goodfellow 与 Levine 不要求网络重绘整帧，而让 action-conditi
 
 它们把“短期可见运动”作为强归纳偏置，复制纹理通常比重新合成锐利；遮挡后新显露区域、非刚体外观变化和长期离开视野的对象仍需要生成或记忆。论文使用机器人动作条件数据，证明动作能改善该设置中的预测与规划，不等于仅凭视频相关性恢复了真实物理因果结构。
 
-## 🧠 4. 空间递归状态：ConvLSTM、PredNet 与 PredRNN
+<a id="4-convlstmprednet-predrnn"></a>
+
+## 4. 空间递归状态
 
 ### 4.1 ConvLSTM：把门控状态留在二维网格上
 
@@ -86,7 +96,9 @@ PredRNN 的 Spatiotemporal LSTM 同时维护沿时间传播的 cell state 与跨
 
 这三类网络的共同贡献是把 $U_\theta$ 做得更适合空间序列。它们与输出头是正交的：ConvLSTM 可以连接确定性 warp、VAE latent、GAN 判别器或 diffusion head。
 
-## 🎲 5. 随机未来：SV2P、SVG-LP、SAVP 与 VideoFlow
+<a id="5-sv2psvg-lpsavp-videoflow"></a>
+
+## 5. 随机未来建模
 
 观测历史通常不能唯一决定未来。随机递归模型在第 $t$ 步引入潜变量：
 
@@ -121,7 +133,7 @@ I_q(z_t;x_t\mid x_{<t})\approx 0.
 
 这就是视频随机预测中的 latent under-use / posterior collapse 风险 [[23]](#ref-23)。最低限度应同时报告：逐时间步 KL 与 active units；固定历史时重采样 $z$ 的输出变化；prior 与 posterior rollout 的差距；屏蔽或置换 $z$ 后的退化；必要时估计条件互信息。KL 非零也可能只编码无关细节，视觉多样性也可能只是闪烁，因此 latent intervention 必须与语义事件和时间一致性一起看。
 
-## 🪐 6. 潜在状态空间：预测是为了决策，不只是还原像素
+## 6. 潜在状态空间
 
 状态空间路线把确定性记忆与随机状态分开。例如 PlaNet 的 recurrent state-space model 可抽象为
 
@@ -137,7 +149,9 @@ x_t\sim p_\theta(x_t\mid h_t,z_t).
 
 需要区分三种条件：被动视频只观察相关性；动作条件数据记录 $a_t$；真正的 intervention evidence 还要求从相同或可匹配初始状态主动改变动作。一个 state-space model 即使闭环任务成功，也只在测试环境、动作分布和规划器范围内得到支持。
 
-## 🌫️ 7. Diffusion 成为逐帧/滚动条件头
+<a id="7-diffusion"></a>
+
+## 7. 递归扩散预测
 
 ### 7.1 MCVD：blockwise 条件 diffusion，不是 ConvLSTM 的同义替代
 
@@ -166,7 +180,9 @@ Diffusion Forcing 为序列中各 token 独立采样噪声等级，把 next-toke
 
 FramePack、SkyReels-V2 和 MAGI-1 说明“现代递归”常由**重选历史、缓存或 segment/chunk feedback**实现，而非一个显式 LSTM cell。它们也说明为什么长视频演示不能代替 open-loop 证据：可能有首尾锚点、重叠帧、重编码、prompt 重复或隐藏重置。必须公开这些操作，才知道模型在何处真正承受自身误差。
 
-## 🎓 8. 五种 forcing 改的是不同层
+<a id="8-forcing"></a>
+
+## 8. 训练历史策略
 
 | 名称 | 训练时后续单元看到的历史 | 主要改变 | 没有解决什么 |
 |---|---|---|---|
@@ -180,7 +196,9 @@ FramePack、SkyReels-V2 和 MAGI-1 说明“现代递归”常由**重选历史�
 
 Self Forcing 则真正把生成结果提交为下一步训练历史，但论文同时改变少步采样、DMD 与梯度传播，消融时要分栏。Causal Forcing 的专名更窄：用 autoregressive teacher 满足 frame-level flow-map 初始化所需的结构条件，再做 DMD；其 causal 指生成架构，不是 Pearl 式干预因果。更完整的训练—推理时序和蒸馏细节分别见[自回归生成](autoregressive-generation.md)与[因果流式生成](causal-streaming-generation.md)。
 
-## 📉 9. Open-loop 漂移：把误差来源拆开再测
+<a id="9-open-loop"></a>
+
+## 9. 滚动预测误差
 
 自由 rollout 的误差不只有 exposure bias。至少要分解：
 
@@ -204,7 +222,9 @@ Self Forcing 则真正把生成结果提交为下一步训练历史，但论文�
 
 “能生成 240 秒”只说明某个样例或设置完成了 240 秒；“在 240 秒内错误曲线仍受控”才是长期稳定证据。对于开放时长主张，应报告到测试上限的 survival curve，并明确上限之外是未测量，不把未观察到终止写成数学上的无限。
 
-## ⚖️ 10. 多样性—准确性与 latent usage 的联合协议
+<a id="10-latent-usage"></a>
+
+## 10. 准确性、多样性与潜变量使用
 
 随机未来没有单一“准确答案”。只报 PSNR/SSIM 会奖励接近条件均值的保守预测；只报 FVD 或挑最好样本会隐藏条件错误与低概率失败。建议固定每个历史的采样数 $N$，同时报告：
 
@@ -217,7 +237,9 @@ Self Forcing 则真正把生成结果提交为下一步训练历史，但论文�
 
 所有模型必须用相同 $N$、相同条件与相同筛选规则。若 GAN 路线只展示人工选择样本、VAE 路线只报 best-of-100、flow 路线只报 likelihood，三者没有进入同一个比较问题。
 
-## 🎮 11. 动作干预与 closed-loop planning：从“会续写”到“可用模型”
+<a id="11-closed-loop-planning"></a>
+
+## 11. 动作条件与规划
 
 ![图 027：动作干预与闭环规划的最小证据循环](../../assets/imagegen-diagrams/027/diagram.png)
 **图的顺序化文字替代：**
@@ -232,7 +254,7 @@ Self Forcing 则真正把生成结果提交为下一步训练历史，但论文�
 
 Closed-loop 应与 open-loop action script、model-free/无模型 baseline、oracle dynamics（若有）和不使用不确定性的 planner 对照。尤其要记录 **model exploitation**：规划器可能找到在模型里高回报、真实环境中失败的动作序列。闭环新观测能纠错，也可能掩盖模型长期 rollout 很差，因此 open-loop 动力学曲线与 closed-loop 任务成功率必须同时报告。
 
-## 🗓️ 12. 机制里程碑：判据与仍未解决的问题
+## 12. 代表方法
 
 这里把“里程碑”定义为改变了可复用的机制或证据接口，不按榜单分数排序。
 
@@ -252,7 +274,7 @@ Closed-loop 应与 open-loop action script、model-free/无模型 baseline、ora
 
 这条路线没有从 RNN “替换”为 diffusion；更准确的演进是：状态结构、条件分布、训练历史来源、commit 粒度、记忆策略和 serving deadline 逐层叠加。新论文只有明确改变其中一层并用相应协议验收，才应被称为该层的里程碑。
 
-## ✅ 13. 最小复现与报告清单
+## 13. 复现配置
 
 - **状态**：$h_t$ 是显式 recurrent tensor、stochastic state、KV、窗口还是重新打包的帧？何时更新和清空？
 - **提交**：frame、latent block 或 chunk 多大？块内是否双向？overlap、重绘和锚点是否访问未来？
@@ -264,7 +286,7 @@ Closed-loop 应与 open-loop action script、model-free/无模型 baseline、ora
 - **系统**：分辨率、FPS、NFE、guidance、VAE、精度、硬件、batch、首帧、p50/p95 延迟、deadline miss 和内存随时长曲线。
 - **主张**：causal、streaming、real-time、interactive、world model、open-ended/infinite 分别给证据；未测量区间明确写未测。
 
-## 🔍 14. 常见误读
+## 14. 常见问题
 
 - **“递归 = RNN。”** Transformer KV、context packing 与 segment feedback 也可实现递归 rollout。
 - **“AR = 逐帧。”** 提交单元可为 token、set、frame 或 chunk；块内可联合去噪。
@@ -275,7 +297,9 @@ Closed-loop 应与 open-loop action script、model-free/无模型 baseline、ora
 - **“固定 context = 总成本常数。”** 它可使每次 commit 的工作量有界；生成更多 commits 的总时间仍增加。
 - **“能继续生成 = 长期稳定。”** 必须看无重置 horizon curve、失败尾部和真实测量上限。
 
-## 🔗 15. 参考文献
+<a id="15"></a>
+
+## 参考文献
 
 <a id="ref-1"></a>[1] [Deep Multi-Scale Video Prediction beyond Mean Square Error](https://arxiv.org/abs/1511.05440). Michael Mathieu, Camille Couprie, Yann LeCun. ICLR. 2016.
 

@@ -1,6 +1,13 @@
-# 视频对抗生成：从完整 GAN 到解码器与少步生成
+<a id="gan"></a>
 
-> 本章证据冻结日为 2026-08-30。“对抗”在本章指可学习 critic 在对抗分类或评分目标下，区分 reference/positive distribution（真实数据或 teacher/self-teacher 输出）与 student/generated distribution，而 student 反向迎合该 critic；因此，名字里有 distribution matching、consistency 或 one-step，并不自动等于使用对抗目标。
+# 视频对抗生成
+
+介绍视频判别器、对抗生成器、对抗重建和对抗蒸馏的训练机制。
+
+**前置知识：** GAN、视频表示。
+
+**使用步骤：** 确定判别器比较的分布 → 检查时空采样与训练损失 → 同时测量画质、运动、多样性和训练稳定性。
+
 
 视频 GAN 的历史不是“先成功，后被 diffusion 取代”的单线故事。到 2026 年，对抗学习至少有三种彼此独立的角色：
 
@@ -8,7 +15,7 @@
 2. **video tokenizer/decoder 的重建判别器**：判别器帮助 $D_{\mathrm{dec}}(E(x))$ 恢复感知上真实的细节，但上层 diffusion、flow、自回归或 masked model 才学习 latent 先验。此时“用了 GAN loss”不等于“整个系统是 GAN” [[13]](#ref-13) [[14]](#ref-14)。
 3. **diffusion/flow 的对抗蒸馏或后训练**：预训练教师供应轨迹、score 或初始化，对抗目标则帮助少步学生的输出分布靠近真实数据或教师分布。ADD 是图像侧前驱；OSV、Seaweed-APT、ADM、ASD、V-PAE 与 AAD-1 提供了直接视频证据 [[18]](#ref-18) [[24]](#ref-24) [[27]](#ref-27) [[28]](#ref-28) [[29]](#ref-29) [[30]](#ref-30) [[31]](#ref-31)。
 
-![现代视频基础模型的六阶段系统图：第一阶段 Data and Governance 将图像、视频、音频和动作流变成去重、标注且受治理的数据；第二阶段 Representation 并列展示连续 causal-VAE latent 与离散视觉 token，并标明 codec 瓶颈与 generator objective 分开；第三阶段 Foundation Generator 接收文本、图像、视频、音频或动作条件，并对照全序列双向去噪与由状态和已提交上下文驱动的滚动帧或块递归；第四阶段 Post-train and Accelerate 包含偏好或奖励对齐、self或causal forcing 和教师到学生蒸馏，只在选中方法确有对抗目标时才有训练期判别器反馈；第五阶段 Decode and Polish 解码并可超分、插帧或音频同步，第二个仅训练期判别器提供感知或对抗重建损失；第六阶段 Deploy and Verify 包含护栏、来源、离线 API 或因果流式服务、系统指标与任务安全评测。底部图例分开完整 GAN、tokenizer或decoder的 GAN loss 和对抗蒸馏；两个 badge 分别提醒产品能力不等于单 checkpoint 能力，以及公开代码、权重、数据与可复现 recipe 是不同发布面](../../assets/diagrams/modern-video-foundation-system-stack.png)
+![现代视频基础模型的六阶段系统图：第一阶段 Data and Governance 将图像、视频、音频和动作流变成去重、标注且受治理的数据；第二阶段 Representation 并列展示连续 causal-VAE latent 与离散视觉 token，并标明 codec 瓶颈与 generator objective 分开；第三阶段 Foundation Generator 接收文本、图像、视频、音频或动作条件，并对照全序列双向去噪与由状态和已提交上下文驱动的滚动帧或块递归；第四阶段 Post-train and Accelerate 包含偏好或奖励对齐、self或causal forcing 和教师到学生蒸馏，只在选中方法确有对抗目标时才有训练期判别器反馈；第五阶段 Decode and Polish 解码并可超分、插帧或音频同步，第二个仅训练期判别器提供感知或对抗重建损失；第六阶段 Deploy and Verify 包含护栏、来源、离线 API 或因果流式服务、系统指标与任务安全评测。底部图例分开完整 GAN、tokenizer或decoder的 GAN loss 和对抗蒸馏；两个 badge 分别提醒产品能力不等于单 checkpoint 能力，以及公开代码、权重、数据与可复现 recipe 是不同发布内容](../../assets/diagrams/modern-video-foundation-system-stack.png)
 
 *图 1：这是从 Data & Governance、Representation、Foundation Generator、Post-train & Accelerate、Decode & Polish 到 Deploy & Verify 的组合式系统地图，不是所有系统都必须遵循的通用架构，也不是年代顺序。底部三行明确区分：完整 GAN 用 critic 训练主生成器；codec discriminator 只改善 tokenizer/decoder 重建；对抗蒸馏/后训练则在 diffusion 或 flow 教师后约束少步 student。两个 release-boundary badge 另外限定产品与 checkpoint、开源表面与可复现性的归因。图的证据、构图规则与生成过程见 [现代视频系统示意图研究记录](../../sources/research_20260830_modern_video_system_schematic.md)。*
 
@@ -25,7 +32,7 @@
 ![图 010：对抗学习在视频生成中的三种角色](../../assets/imagegen-diagrams/010/diagram.png)
 图 2 顺序化文字替代：路径一把噪声和条件送入完整 GAN 生成器，再用真实与生成视频训练视频判别器；路径二把真实视频经编码器和解码器重建，判别器只约束重建，latent 的生成由另一个先验完成；路径三先有 diffusion 或 flow 教师，再用蒸馏信号训练少步学生，仅当方法确实训练了区分真假的 critic 时才进入“对抗”分支。三条路径可在同一系统中同时出现，但它们的优化对象和证据不能混用。
 
-## 1. 什么才算对抗目标
+## 1. 对抗训练目标
 
 ### 1.1 操作性判据
 
@@ -59,7 +66,7 @@
 * **fake-score model 不自动是二元判别器**。DMD 从真实与学生分布的 score 差构造梯度，其 fake-score 网络通过去噪 score matching 更新，原始目标没有二元真假 GAN loss [[19]](#ref-19)。DMD2 后来另外加入 GAN loss，所以两者必须分开 [[20]](#ref-20)。
 * **consistency 不自动是对抗**。一个方法可以同时有 consistency、score/distillation 和 adversarial 三项损失，也可以只有其中一项。应按优化式和更新算法分类，不按论文标题分类。
 
-## 2. 视频判别器究竟看到什么
+## 2. 视频判别器
 
 判别器并不直接约束“整个真实世界分布”；它只约束自己的输入视野、下采样和条件接口能表达的统计量。因此需把“判别器数量”与“观测设计”分开。
 
@@ -83,7 +90,7 @@ StyleGAN-V 另一种做法是在连续时间生成器中抽取稀疏帧集合，
 
 条件 critic 必须检查两件事：视频本身是否真实，以及视频是否与 $c$ 匹配。只把文本或首帧送入生成器，但让判别器只看无条件视频，会留下“高真实感但忽略条件”的逃生路径。实现可使用 projection、cross-attention、匹配/不匹配样本或联合嵌入；但仍应分开报告真实感和条件遵循，不用单一总分遮蔽取舍。
 
-## 3. 完整视频 GAN：设计问题如何演化
+## 3. 视频 GAN
 
 下表的“里程碑”不以发布时间为唯一标准，而以是否引入了一个可复用的新观测或生成设计为判据。数据集上的局部领先不单独构成里程碑。
 
@@ -103,7 +110,9 @@ StyleGAN-V 另一种做法是在连续时间生成器中抽取稀疏帧集合，
 
 这条路线的重要贡献是把**生成器时间表示**与**判别器时间视野**变成可单独设计的轴。但“可查询任意时间”、“训练时看完整 clip”与“长期有意义地发展”是三个不同命题。
 
-## 4. 角色迁移一：对抗重建的 video tokenizer/decoder
+<a id="4-video-tokenizerdecoder"></a>
+
+## 4. 对抗重建与视频解码器
 
 视频 tokenizer 常用组合损失训练编解码器：
 
@@ -125,7 +134,9 @@ $\mathcal L_{\mathrm{perc}}$ 比较固定特征，$\mathcal L_{\mathrm{adv}}$ �
 
 实验上应固定上层 generator，扫描 $\lambda_{\mathrm{adv}}$，同时报告重建忠实性、感知真实感、时间闪烁与下游生成质量。否则很容易把 decoder 的“合理幻觉”误当成信息恢复。
 
-## 5. 角色迁移二：diffusion/flow 少步学生的对抗训练
+<a id="5-diffusionflow"></a>
+
+## 5. 对抗蒸馏
 
 从 2024 年起，“对抗”更多出现在已有 diffusion/flow 教师之后：学生希望用一次或少数几次网络调用产生视频，而 critic 补充回归、consistency 或 score 差在输出分布上的不足。这是**教师家族 + student objective**的组合，不是将 student 一概改名为经典 GAN。其与 [Flow、Consistency 与 Few-Step 生成](./flow-consistency-models.md) 中的场、流映射与分布目标是正交分类轴。
 
@@ -150,7 +161,7 @@ $\mathcal L_{\mathrm{perc}}$ 比较固定特征，$\mathcal L_{\mathrm{adv}}$ �
 
 这个表格说明“对抗蒸馏”不是单一算法。critic 可以看解码后 RGB、视频 latent、预训练 diffusion 特征或不同噪声等级的扰动样本。它与教师回归、consistency、DMD 梯度和 reward 可以累加；分类时应逐项阅读 loss 和更新步骤。SnapGen-V 还表明了一个不同于“完整 GAN”和“一步教师蒸馏”的部署路线：先压缩架构，再用对抗微调把多步 denoiser 降到少步 [[26]](#ref-26)。
 
-## 6. 为什么对抗训练仍然难
+## 6. 训练稳定性
 
 ### 6.1 覆盖度与“精选样本陷阱”
 
@@ -168,7 +179,7 @@ $\mathcal L_{\mathrm{perc}}$ 比较固定特征，$\mathcal L_{\mathrm{adv}}$ �
 
 多 critic 系统还要报告每个 critic 的梯度范数或损失曲线。只看总损失无法发现“帧 critic 完全主导，时序 critic 几乎不工作”的失衡。
 
-## 7. FVD 应如何报告，又不能证明什么
+## 7. FVD 评测
 
 FVD 将真实与生成 clip 送入视频特征提取器，用两个高斯近似的 Fréchet 距离比较分布 [[16]](#ref-16)：
 
@@ -190,7 +201,7 @@ FVD 将真实与生成 clip 送入视频特征提取器，用两个高斯近似�
 
 若一篇论文报告 $\mathrm{FVD}_{16}$ 而另一篇报告 $\mathrm{FVD}_{128}$，两者已经在不同时间视野上测量，不应混成一个排名。后续对 FVD 的受控研究还表明，它对空间内容的敏感性可以压过对时间变化的敏感性，甚至出现静态样本改善 FVD 的反直觉情况 [[17]](#ref-17)。因此必须加上运动幅度/光流统计、闪烁、条件遵循、precision/recall、人类盲评与长时段事件检查。
 
-## 8. 长视频为什么仍会失败
+## 8. 长视频生成限制
 
 对抗损失只会惩罚 critic 看得见的错误。对一个训练视野为 $L$ 帧的 critic，两个相隔远大于 $L$ 的局部片段可以各自真实，整条故事却互相矛盾。常见长期失败包括：
 
@@ -202,7 +213,9 @@ FVD 将真实与生成 clip 送入视频特征提取器，用两个高斯近似�
 
 因此“任意时间戳可查询”要用随时长增长的运动多样性、身份保持与事件进展验收；“一步视频生成”要另外报告单次输出时长、是否解码计入 wall-clock、是否可连续提交帧以及多 chunk 后的质量。LongVideoGAN 将长时问题明确化，但没有使这些验收项失效 [[11]](#ref-11)。
 
-## 9. 2024–2026 的里程碑判据与开放问题
+<a id="9-20242026"></a>
+
+## 9. 代表工作与开放问题
 
 一个新方法只有在改变了角色、可验收能力或效率边界时，才应被称为里程碑。下表将判据与尚未解决的问题并列。
 
@@ -216,7 +229,7 @@ FVD 将真实与生成 clip 送入视频特征提取器，用两个高斯近似�
 
 所以，更准确的 2026 结论是：**对抗学习从单一的端到端生成范式，迁移为可插入完整生成器、表示解码器和少步学生的分布约束**。它在锐利感知质量和少步学习上仍有价值，但训练稳定、mode coverage、条件忠实、长时因果和可比评测仍没有被一个 critic 或一个 FVD 数字解决。
 
-## 10. 阅读一篇新论文时的最小核对表
+## 10. 实现检查表
 
 1. **角色**：critic 是完整 generator、codec decoder，还是蒸馏 student 的训练组件？
 2. **对手**：是否有用真实/生成样本反向更新的可学习 critic？还是固定 reward、score difference 或 consistency target？
@@ -228,6 +241,11 @@ FVD 将真实与生成 clip 送入视频特征提取器，用两个高斯近似�
 8. **长时和系统边界**：训练视野多长，测试 rollout 多长；one-step 是一次网络调用还是一个包含 CFG/解码的模糊标签？
 
 本章的检索式、筛选流程、排除原因、证据等级与逐条主张边界见 [2026-08-30 视频对抗生成研究记录](../../sources/research_20260830_adversarial_video_generation.md)。
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 

@@ -26,8 +26,14 @@ jobs:
           cache-dependency-path: requirements-docs.txt
       - uses: actions/configure-pages@v6
       - run: pip install -r requirements-docs.txt
+      - name: Check manual validators
+        run: python3 -m unittest discover -s scripts/tests -p 'test_manual*.py'
+      - name: Check citation URL metadata
+        run: python3 scripts/verify_citations.py --offline
       - name: Build
         run: python3 scripts/build_site.py --strict
+      - name: Check rendered manual links and search
+        run: python3 scripts/check_manual.py --site _site
       - uses: actions/upload-pages-artifact@v5
         with:
           path: _site

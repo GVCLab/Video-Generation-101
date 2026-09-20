@@ -1,13 +1,18 @@
 <!-- markdownlint-disable MD033 -->
 
-# 技术时间线
+按首次公开时间整理生成机制、视频基础模型和世界模型的代表工作。
+
+**前置知识：** 生成模型分类。
+
+**使用步骤：** 按技术问题定位历史节点 → 区分首发与正式发表时间 → 通过原始论文进入机制和实验细节。
+
+# 视频生成技术发展索引
 
 本页不把视频生成史排成一条“旧模型被新模型替代”的队伍，而是追踪三条长期并行、彼此借力的技术主线：**表示与生成机制、视频基础模型与创作、World Model 与行动闭环**。应用层承接三条主线的成果，验证框架则横向检查每个能力主张是否站得住。
 
 资料核查截止：**2026-08-30**
 
 > **30 秒读法**
->
 > 1. 先在下方泳道图中选择你关心的主线。
 > 2. 再沿同名章节阅读节点卡片，关注“机制改变了什么”，而不是只记模型名。
 > 3. 最后查看节点的四项标签，区分首次公开、正式发表、本页定位和当前开放状态。
@@ -119,7 +124,7 @@ flowchart TB
 | Genie 3 | 2025-08-05 官方研究发布；未找到论文或正式发表记录 | 实时可交互生成世界的前沿观察（暂定） | Project Genie 是可访问的实验性托管原型；无公开代码/权重 |
 | Matrix-Game 2.0 | 2025-08-18 arXiv v1；预印本，未找到正式发表记录 | 少步 causal diffusion 流式交互的研究里程碑 | 官方仓库仍保留 2.0 实现与权重入口；主线已更新到 3.0 |
 | Marble | 2025-11-12 官方产品发布；未找到论文或正式发表记录 | 显式 3D 世界表示与导出的产品/研究前沿观察（暂定） | 官方称已普遍可用，需账号；无公开代码/权重 |
-| Sora 2 | 2025-09-30 官方发布与系统卡；不是同行评议论文 | 音视频、多镜头和安全治理的历史节点 | 官方确认 Sora 产品已于 2026-04-26 下线；无公开代码/权重 |
+| Sora 2 | 2025-09-30 官方发布与系统卡；不是同行评议论文 | 音视频、多镜头和安全治理的历史节点 | 截至 2026-09-20：Web/app 已于 2026-04-26 停用；API 计划于 2026-09-24 停用；无公开代码/权重 |
 | GWM-1 | 2025-12-11 官方研究/产品发布；未找到论文或正式发表记录 | 共享底座、独立后训练世界模型家族的前沿观察（暂定） | Worlds/Robotics 仍为申请式 early access；Characters 分支已提供 Web/API；无公开权重 |
 | Cosmos 3 | 2026-06-01 arXiv v1；官方称 technical report，未找到正式发表记录 | Omnimodal 世界模型家族的前沿观察（暂定） | 官方代码、模型卡/权重和托管 demo 可访问 |
 | V-JEPA 2.1 | 2026-03-15 arXiv v1；预印本，未找到正式发表记录 | dense 时空表示的前沿观察（暂定） | 官方代码与预训练 checkpoints 可访问 |
@@ -142,15 +147,15 @@ flowchart TB
 <details markdown="1">
 <summary><strong>横向专题（可选）：2017–2026 视频退化修复谱系</strong></summary>
 
-这条谱系不等同于视频编辑：输入 $Y$ 是同一真实视频 $X$ 经未知或已知退化算子后的观测，目标是恢复 $X$，不是按指令改变事件。它也不等同于 inpainting：全帧通常仍有低质证据，并不存在一张天然的 mask 外硬保护区。下表只保留改变任务定义或系统边界的节点；逐篇 paper review、公式、指标和 RestorationFork-1 见[专章](tasks/video-restoration.md)。
+这条谱系不等同于视频编辑：输入 $Y$ 是同一真实视频 $X$ 经未知或已知退化算子后的观测，目标是恢复 $X$，不是按指令改变事件。它也不等同于 inpainting：全帧通常仍有低质证据，并不存在一张天然的 mask 外硬保护区。下表只保留改变任务定义或系统边界的节点；逐篇 代表方法分析、公式、指标和 退化恢复对照实验 见[专章](tasks/video-restoration.md)。
 
-| 阶段 | 代表节点 | 合同变化 | 仍未解决 |
+| 阶段 | 代表节点 | 规格变化 | 仍未解决 |
 |---|---|---|---|
 | 2017–2020：利用跨帧证据 | [Deep Video Deblurring](https://openaccess.thecvf.com/content_cvpr_2017/html/Su_Deep_Video_Deblurring_CVPR_2017_paper.html)、[EDVR](https://openaccess.thecvf.com/content_CVPRW_2019/html/NTIRE/Wang_EDVR_Video_Restoration_With_Enhanced_Deformable_Convolutional_Networks_CVPRW_2019_paper.html)、[FastDVDnet](https://openaccess.thecvf.com/content_CVPR_2020/html/Tassano_FastDVDnet_Towards_Real-Time_Deep_Video_Denoising_Without_Flow_Estimation_CVPR_2020_paper.html) | 邻帧不再独立处理；对齐、遮挡权重与时空融合成为一等组件 | 合成 blur/noise 与真实 shutter、codec、ISP 的距离仍大 |
 | 2021–2022：传播、盲退化与 Transformer | [BasicVSR](https://openaccess.thecvf.com/content/CVPR2021/html/Chan_BasicVSR_The_Search_for_Essential_Components_in_Video_Super-Resolution_and_CVPR_2021_paper.html)、[RealBasicVSR](https://openaccess.thecvf.com/content/CVPR2022/html/Chan_Investigating_Tradeoffs_in_Real-World_Video_Super-Resolution_CVPR_2022_paper.html)、[RVRT](https://proceedings.neurips.cc/paper_files/paper/2022/hash/02687e7b22abc64e651be8da74ec610e-Abstract-Conference.html) | 建立传播/对齐/聚合/上采样组件表，把真实退化和 clip 内并行、clip 间递归纳入统一诊断 | 双向方法依赖未来帧；长视频仍有传播漂移与显存债务 |
 | 2023–2024：图像生成先验获得时间能力 | [SATeCo](https://openaccess.thecvf.com/content/CVPR2024/html/Chen_Learning_Spatial_Adaptation_and_Temporal_Coherence_in_Diffusion_Models_for_CVPR_2024_paper.html)、[Upscale-A-Video](https://openaccess.thecvf.com/content/CVPR2024/html/Zhou_Upscale-A-Video_Temporal-Consistent_Diffusion_Model_for_Real-World_Video_Super-Resolution_CVPR_2024_paper.html)、[MGLD-VSR](https://eccv.ecva.net/virtual/2024/poster/2534) | 冻结或适配图像 diffusion prior，以 latent/pixel、local/global 与 flow guidance 补足视频时间约束 | 感知细节可能没有观测支持；锐利不能替代 re-degradation、OCR/ID 与多 seed 审计 |
 | 2024–2025：高倍率、高分辨率、复杂退化与少步 | [VideoGigaGAN](https://openaccess.thecvf.com/content/CVPR2025/html/Xu_VideoGigaGAN_Towards_Detail-rich_Video_Super-Resolution_CVPR_2025_paper.html)、[PatchVSR](https://openaccess.thecvf.com/content/CVPR2025/html/Du_PatchVSR_Breaking_Video_Diffusion_Resolution_Limits_with_Patch-wise_Video_Super-Resolution_CVPR_2025_paper.html)、[DiffVSR](https://openaccess.thecvf.com/content/ICCV2025/html/Li_DiffVSR_Revealing_an_Effective_Recipe_for_Taming_Robust_Video_Super-Resolution_ICCV_2025_paper.html)、[TurboVSR](https://openaccess.thecvf.com/content/ICCV2025/html/Wang_TurboVSR_Fantastic_Video_Upscalers_and_Where_to_Find_Them_ICCV_2025_paper.html) | 分别把生成细节、patch 条件、复杂退化 curriculum 与压缩/少步效率推到系统层 | 结果绑定各自数据、倍率、硬件与计时边界，不能直接拼成“最佳模型” |
-| 2026：一步、streaming 与证据守恒分叉 | [SeedVR2](https://proceedings.iclr.cc/paper_files/paper/2026/hash/444d69470b24ded080183c907b711bbf-Abstract-Conference.html)、[FlashVSR](https://openaccess.thecvf.com/content/CVPR2026/html/Zhuang_FlashVSR_Towards_Real-time_Diffusion-Based_Streaming_Video_Super_Resolution_CVPR_2026_paper.html)、[DGAF-VSR](https://openaccess.thecvf.com/content/CVPR2026/html/Xu_Rethinking_Diffusion_Model-Based_Video_Super-Resolution_Leveraging_Dense_Guidance_from_Aligned_CVPR_2026_paper.html)、[STCDiT](https://openaccess.thecvf.com/content/CVPR2026/html/Chen_STCDiT_Spatio-Temporally_Consistent_Diffusion_Transformer_for_High-Quality_Video_Super-Resolution_CVPR_2026_paper.html)、[DTG-Restore](https://openaccess.thecvf.com/content/CVPR2026/html/Yesiltepe_DTG-Restore_Training-Free_Diffusion_Refinement_for_Generative_Video_Super-Resolution_CVPR_2026_paper.html) | 将 adversarial 一步、只读历史的 streaming、dense aligned evidence、anchor-frame structure 与无训练 refinement 分成不同系统合同 | “一步”“实时”“training-free”和“忠实”仍是四个独立主张，需分别验证 |
+| 2026：一步、streaming 与证据守恒分叉 | [SeedVR2](https://proceedings.iclr.cc/paper_files/paper/2026/hash/444d69470b24ded080183c907b711bbf-Abstract-Conference.html)、[FlashVSR](https://openaccess.thecvf.com/content/CVPR2026/html/Zhuang_FlashVSR_Towards_Real-time_Diffusion-Based_Streaming_Video_Super_Resolution_CVPR_2026_paper.html)、[DGAF-VSR](https://openaccess.thecvf.com/content/CVPR2026/html/Xu_Rethinking_Diffusion_Model-Based_Video_Super-Resolution_Leveraging_Dense_Guidance_from_Aligned_CVPR_2026_paper.html)、[STCDiT](https://openaccess.thecvf.com/content/CVPR2026/html/Chen_STCDiT_Spatio-Temporally_Consistent_Diffusion_Transformer_for_High-Quality_Video_Super-Resolution_CVPR_2026_paper.html)、[DTG-Restore](https://openaccess.thecvf.com/content/CVPR2026/html/Yesiltepe_DTG-Restore_Training-Free_Diffusion_Refinement_for_Generative_Video_Super-Resolution_CVPR_2026_paper.html) | 将 adversarial 一步、只读历史的 streaming、dense aligned evidence、anchor-frame structure 与无训练 refinement 分成不同系统规格 | “一步”“实时”“training-free”和“忠实”仍是四个独立主张，需分别验证 |
 
 </details>
 
@@ -250,7 +255,7 @@ flowchart TB
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2017-video-pixel-networks.jpg" alt="Video Pixel Networks 原始像素自回归概念图"></td>
-<td><strong>2017 — <a href="https://proceedings.mlr.press/v70/kalchbrenner17a.html">Video Pixel Networks</a></strong> <code>像素自回归</code><br><strong>表示/机制：</strong>直接分解原始视频像素的联合概率，以卷积 LSTM 与 PixelCNN 式解码逐像素建模。<br><strong>控制/任务：</strong>给定前缀帧预测后续视频，并提供显式 likelihood。<br><strong>意义/边界：</strong>补齐了“概率可处理”的路线，但逐像素串行采样极慢，也难扩展到高分辨率长视频。<br><strong>资源：</strong><a href="https://proceedings.mlr.press/v70/kalchbrenner17a.html">Paper</a> · Project：— · Code：未公开 · Weights：未公开 · Demo：—</td>
+<td><strong>2016 / ICML 2017 — <a href="https://proceedings.mlr.press/v70/kalchbrenner17a.html">Video Pixel Networks</a></strong> <code>像素自回归</code><br><strong>表示/机制：</strong>直接分解原始视频像素的联合概率，以卷积 LSTM 与 PixelCNN 式解码逐像素建模。<br><strong>控制/任务：</strong>给定前缀帧预测后续视频，并提供显式 likelihood。<br><strong>意义/边界：</strong>补齐了“概率可处理”的路线，但逐像素串行采样极慢，也难扩展到高分辨率长视频。<br><strong>资源：</strong><a href="https://proceedings.mlr.press/v70/kalchbrenner17a.html">Paper</a> · Project：— · Code：未公开 · Weights：未公开 · Demo：—</td>
 </tr>
 </table>
 
@@ -324,7 +329,7 @@ flowchart TB
 
 这条支线没有在 2018 停止，但也不能把所有带 latent/VAE 的新系统收进来。direct stochastic-future 节点需要 future-aware posterior、不看未来的 deployment prior 与 KL/ELBO；相邻 RSSM/world-model 支线则用新观测校正 posterior、用 action-conditioned prior 想象，并另验 action/reward/return 与 model exploitation。LPWM 是对象粒子与 latent action 的桥接节点。
 
-| 首次公开 / 正式状态 | 节点 | 合同改变 | 证据边界 |
+| 首次公开 / 正式状态 | 节点 | 规格改变 | 证据边界 |
 |---|---|---|---|
 | 2019 / ICCV 2019 | [Improved Conditional VRNNs](https://openaccess.thecvf.com/content_ICCV_2019/html/Castrejon_Improved_Conditional_VRNNs_for_Video_Prediction_ICCV_2019_paper.html) | deep latent hierarchy + higher-capacity likelihood | hierarchy 与 capacity 效应缠绕；frame metric 多为 best-of-100 |
 | 2020 / ICML 2020 | [SRVP](https://proceedings.mlr.press/v119/franceschi20a.html) | fully latent residual dynamics，frame synthesis 与 dynamics 解耦 | 一阶 residual 是结构限制；oracle frame metric 与 FVD 协议不同 |
@@ -337,13 +342,13 @@ flowchart TB
 | 2026 / ICLR 2026 Oral | [LPWM](https://openreview.net/forum?id=lTaPtGiUUc) | object particles + inverse-action posterior/policy prior + dynamics ELBO | 对象中心前沿，仍受 identity、对象数和相机运动限制 |
 | 2026 / Neural Networks | [Implicit hierarchical temporal–spatial residual model](https://doi.org/10.1016/j.neunet.2026.108732) | prior–posterior residual + spatial hierarchy | 3 数据集作者协议；不证明 VAE 重回开放域 foundation-model 主干 |
 
-纠错：2018 的 [Hierarchical Long-term Video Prediction without Supervision](https://proceedings.mlr.press/v80/wichers18a.html) 是高层 feature predictor + feature-space adversarial loss，没有上述 q/p/ELBO 合同，不能写成“分层随机 latent”。完整纳入/排除表和实验阈值见[变分随机视频生成](generative-models/variational-generation.md)。
+纠错：2018 的 [Hierarchical Long-term Video Prediction without Supervision](https://proceedings.mlr.press/v80/wichers18a.html) 是高层 feature predictor + feature-space adversarial loss，没有上述 q/p/ELBO 规格，不能写成“分层随机 latent”。完整纳入/排除表和实验阈值见[变分随机视频生成](generative-models/variational-generation.md)。
 
 ---
 
 ## 生成机制 → 视频基础模型｜2017–2026：视觉 Token 与视频语言模型
 
-早期节点主要把视频编码为离散符号，再使用语言模型式自回归或 masked prediction；2024 年后又出现连续兼容 latent、自适应预算和结构化表示。需要特别注意：连续/离散/结构化属于 **representation**，autoregressive/masked 属于 **factorization**，diffusion/flow/重建损失属于 **objective 或 decoder 路径**；MAGVIT 的离散 code 与 Sora/DiT 的连续 latent patch 并不是同一种“token”。完整术语和记账合同见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)。
+早期节点主要把视频编码为离散符号，再使用语言模型式自回归或 masked prediction；2024 年后又出现连续兼容 latent、自适应预算和结构化表示。需要特别注意：连续/离散/结构化属于 **representation**，autoregressive/masked 属于 **factorization**，diffusion/flow/重建损失属于 **objective 或 decoder 路径**；MAGVIT 的离散 code 与 Sora/DiT 的连续 latent patch 并不是同一种“token”。完整术语和记账规格见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)。
 
 <table>
 <tr>
@@ -421,9 +426,9 @@ flowchart TB
 
 自回归模型具有统一概率形式，但串行采样昂贵；masked generation 提高并行度，却仍需多轮迭代。两者都受视频 token 数量、tokenizer 重建损失和长程状态一致性制约。
 
-### 2024–2026 因果、流式与实时：四层合同怎样汇合
+### 2024–2026 因果、流式与实时：四层规格怎样汇合
 
-这条谱系横跨 factorization、训练历史、architecture、cache 与 serving，不是新的单一 objective。causal codec、causal generator、streaming commit 与 real-time SLO 也不能相互继承；详细的逐位置噪声、commit/backpressure、开放时长、作者速度口径和 `StreamFork-1` 见[因果流式专章](generative-models/causal-streaming-generation.md)。
+这条谱系横跨 factorization、训练历史、architecture、cache 与 serving，不是新的单一 objective。causal codec、causal generator、streaming commit 与 real-time SLO 也不能相互继承；详细的逐位置噪声、commit/backpressure、开放时长、作者速度口径和 流式生成对照实验 见[因果流式专章](generative-models/causal-streaming-generation.md)。
 
 | 首次公开 → 正式状态 | 节点 | 改变的层 | 证据边界 |
 |---|---|---|---|
@@ -438,9 +443,9 @@ flowchart TB
 
 ### 2021–2026 多视角与 4D：从动态重建到 camera × time 生成
 
-这条谱系有两条不能混写的起点：动态场景重建从已捕获观测恢复可渲染状态，4D generation 则要为未见视角、时间或整段动态生成内容。普通 camera-controlled video 只覆盖 camera–time 平面的一条路径；同刻多视角、完整 query grid 和显式状态需要额外几何证据。详细的任务定义、五条技术路线和 `GridFork-1` 见[多视角与 4D 专章](tasks/multiview-4d-generation.md)。
+这条谱系有两条不能混写的起点：动态场景重建从已捕获观测恢复可渲染状态，4D generation 则要为未见视角、时间或整段动态生成内容。普通 camera-controlled video 只覆盖 camera–time 平面的一条路径；同刻多视角、完整 query grid 和显式状态需要额外几何证据。详细的任务定义、五条技术路线和 视角与时间网格实验 见[多视角与 4D 专章](tasks/multiview-4d-generation.md)。
 
-| 首次公开 → 正式状态 | 节点 | 合同转折 | 未解决与证据边界 |
+| 首次公开 → 正式状态 | 节点 | 规格转折 | 未解决与证据边界 |
 |---|---|---|---|
 | 2020 → CVPR/ICCV 2021 | [D-NeRF](https://openaccess.thecvf.com/content/CVPR2021/html/Pumarola_D-NeRF_Neural_Radiance_Fields_for_Dynamic_Scenes_CVPR_2021_paper.html)；[Nerfies](https://openaccess.thecvf.com/content/ICCV2021/html/Park_Nerfies_Deformable_Neural_Radiance_Fields_ICCV_2021_paper.html) | canonical state + deformation 支持 novel view/time | per-scene optimization、pose 与 topology |
 | 2023 → ICML 2023 | [MAV3D](https://proceedings.mlr.press/v202/singer23a.html) | T2V score distillation 首次把文字提升为 dynamic 3D state | SDS 成本、教师偏置与工件边界 |
@@ -601,9 +606,9 @@ flowchart TB
 
 ### 开放集视频个性化支线｜2022–2026：从每主体适配到多参考绑定
 
-这条支线的参考图**不占输出时间轴**：目标是让测试时未见主体在新场景、动作和组合中保持身份，而不是复制首帧或修改既有视频。下表只标合同转折；完整论文、正式年份、开放工件与反证协议见[开放集视频个性化](tasks/personalized-video-generation.md)。
+这条支线的参考图**不占输出时间轴**：目标是让测试时未见主体在新场景、动作和组合中保持身份，而不是复制首帧或修改既有视频。下表只标规格转折；完整论文、正式年份、开放工件与反证协议见[开放集视频个性化](tasks/personalized-video-generation.md)。
 
-| 时间 | 代表节点 | 合同转折 | 仍需保留的边界 |
+| 时间 | 代表节点 | 规格转折 | 仍需保留的边界 |
 |---|---|---|---|
 | 2022–2023 | Textual Inversion、DreamBooth → AnimateDiff | 先学新图像概念/主体，再用通用 motion module 把个性化图像先验视频化 | 图像身份证据不等于时序、动作或绑定证据 |
 | 2023–2024 | VideoDreamer、VideoBooth、DreamVideo、CustomVideo、DisenStudio、Magic-Me | 进入直接视频定制，并分化为逐主体优化、identity/motion adapter 和 feed-forward 图像提示 | 免调优不自动意味 open-set；多主体样例不等于 binding 定量 |
@@ -776,7 +781,7 @@ Sora 在生成路线中提出“视频生成可能通向世界模拟器”的研
 <table>
 <tr>
 <td width="42%"><img src="../assets/timeline/2025-sora2.jpg" alt="Sora 2 多镜头音视频与安全概念图"></td>
-<td><strong>2025 — <a href="https://openai.com/index/sora-2/">Sora 2</a></strong> <code>官方产品发布</code> <code>前沿观察（暂定）</code> <code>可用性：已下线</code><br><strong>表示/机制：</strong>官方发布称相较前代改进物理结果、多镜头控制和状态延续，并原生生成对白、环境声和音效。<br><strong>控制/任务：</strong>复杂镜头指令、参考主体与同步音视频。<br><strong>意义/边界：</strong><a href="https://openai.com/index/sora-2-system-card/">系统卡</a>仍记录物理、控制、肖像同意、误导性媒体与来源风险；上述改进为官方自述，不是独立能力证据。官方页面注明 Sora 产品自 2026-04-26 起不再提供，但这不改变其历史节点地位。<br><strong>资源：</strong><a href="https://openai.com/index/sora-2-system-card/">System Card</a> · <a href="https://openai.com/index/sora-2/">Project</a> · Code：未公开 · Weights：未公开 · Demo：已下线</td>
+<td><strong>2025 — <a href="https://openai.com/index/sora-2/">Sora 2</a></strong> <code>官方产品发布</code> <code>前沿观察（暂定）</code> <code>可用性：Web/app 已停用；API 待停用</code><br><strong>表示/机制：</strong>官方发布称相较前代改进物理结果、多镜头控制和状态延续，并原生生成对白、环境声和音效。<br><strong>控制/任务：</strong>复杂镜头指令、参考主体与同步音视频。<br><strong>意义/边界：</strong><a href="https://openai.com/index/sora-2-system-card/">系统卡</a>仍记录物理、控制、肖像同意、误导性媒体与来源风险；上述改进为官方自述，不是独立能力证据。截至 2026-09-20，官方帮助页确认 Web/app 已于 2026-04-26 停用，API 计划于 2026-09-24 停用。<a href="https://help.openai.com/en/articles/20001152-what-to-know-about-the-sora-discontinuation">停用时间表</a>区分两类服务。<br><strong>资源：</strong><a href="https://openai.com/index/sora-2-system-card/">System Card</a> · <a href="https://openai.com/index/sora-2/">Project</a> · Code：未公开 · Weights：未公开 · Demo：已下线</td>
 </tr>
 </table>
 

@@ -1,8 +1,13 @@
-# 故事与多镜头视频生成：从“拼接片段”到可回滚的叙事状态机
+# 故事与多镜头视频生成
 
-> 本章冻结于 **2026-08-30（Asia/Shanghai）**。这里的 multi-shot video 指输出中存在至少两个由硬切或设计转场分隔的镜头；跨镜头允许时空不连续，但人物、场景、道具、剧情和电影语言必须服从同一个可检查的故事状态。精选样片不是完成证明，论文、正式 venue、代码、权重、数据与端到端复现面在本章中分别记录。
+介绍显式切镜条件下的分镜规划、参考传递、状态更新和叙事连续性。
 
-检索日期、arXiv/OpenAlex/官方 proceedings/官方项目与仓库入口、纳排规则、逐条证据和链接检查见[配套研究记录](../../sources/research_20260830_story_multishot.md)。连续长镜头、长度外推和开放时域的统一合同见[长视频生成专章](../generative-models/long-video-generation.md)；本章只接管显式镜头边界之后的故事状态与回滚。
+**前置知识：** 条件生成、图像到视频。
+
+**使用步骤：** 建立镜头计划和角色场景参考 → 配置联合生成或逐镜头状态传递 → 检查镜头边界、事件顺序和跨镜头连续性。
+
+
+检索日期、arXiv/OpenAlex/官方 proceedings/官方项目与仓库入口、纳排规则、逐条证据和链接检查见[配套研究记录](../../sources/research_20260830_story_multishot.md)。连续长镜头、长度外推和开放时域的统一规格见[长视频生成专章](../generative-models/long-video-generation.md)；本章只接管显式镜头边界之后的故事状态与回滚。
 
 若关注谁来制定分镜、调用生成工具，并根据实际候选决定是否返工，见 [Agentic Video Generation](../agentic-video-generation.md)。本章仍聚焦多镜头输出应保持的叙事状态。
 
@@ -11,15 +16,15 @@
 读完本章，应能完成六件事：
 
 1. 区分长单镜头、视频续写、V2V、story visualization/storyboard 与真正的 multi-shot video；
-2. 写出故事、镜头计划、参考、输出视频和跨镜头状态的 tensor/state contract；
+2. 写出故事、镜头计划、参考、输出视频和跨镜头状态的 张量与状态规格；
 3. 比较 pipeline、整段联合生成、逐镜头记忆、storyboard anchoring、流式因果生成与训练免方法；
 4. 把“角色一致”拆成身份、外观、空间、道具、事实和剧情进度等可单独失败的约束；
 5. 依据正式发表、公开资产和可证伪评测判断 2025–2026 年工作的证据强度；
 6. 设计包含状态改写、长间隔召回、冲突与回滚的可复现实验。
 
-## 1. 先判任务：长不等于多镜头
+## 1. 任务定义
 
-“长视频”“多个事件”“多个场景”和“多镜头”不是同义词。一个连续长镜头可以经过多个房间；同一房间内也可以从全景硬切到人物特写。真正的判断变量是：**输出是否包含显式镜头边界，以及边界两侧是否仍属于一个叙事合同**。
+“长视频”“多个事件”“多个场景”和“多镜头”不是同义词。一个连续长镜头可以经过多个房间；同一房间内也可以从全景硬切到人物特写。真正的判断变量是：**输出是否包含显式镜头边界，以及边界两侧是否仍属于一个叙事规格**。
 
 | 任务 | 部署时主要输入 | 输出与边界 | 必须保持什么 | 不能据此声称什么 |
 |---|---|---|---|---|
@@ -31,12 +36,14 @@
 | [开放集视频个性化](personalized-video-generation.md) | 主体参考 + prompt，可附控制 | 新时间轴的单片段或候选镜头 | 新情境中的主体身份、属性与绑定 | 自动证明跨镜头事实、道具状态或回滚 |
 | Multi-shot video | 故事、镜头表或逐镜头 prompt，可加参考 | 至少两个镜头，含硬切/转场及镜头内运动 | 镜头内动态 + 镜头间叙事状态 + 边界语法 | 自动证明长程因果或电影质量 |
 
-StoryDALL-E 与 Make-A-Story 都属于静态 story visualization/continuation：前者从源图与故事生成后续图像，后者用视觉记忆维持多图一致性 [[2]](#ref-2) [[3]](#ref-3)。Phenaki 能按连续文本生成可变长度视频，但其核心证据是长时间 token 建模，不是显式切镜合同 [[4]](#ref-4)。SEINE 处理首尾条件下的转场/补间，适合连接两个片段，却也不自动成为多镜头叙事器 [[6]](#ref-6)。
+StoryDALL-E 与 Make-A-Story 都属于静态 story visualization/continuation：前者从源图与故事生成后续图像，后者用视觉记忆维持多图一致性 [[2]](#ref-2) [[3]](#ref-3)。Phenaki 能按连续文本生成可变长度视频，但其核心证据是长时间 token 建模，不是显式切镜规格 [[4]](#ref-4)。SEINE 处理首尾条件下的转场/补间，适合连接两个片段，却也不自动成为多镜头叙事器 [[6]](#ref-6)。
 
 ![图 061：故事与多镜头任务边界判定树](../../assets/imagegen-diagrams/061/diagram.png)
 **顺序化文字替代：** 先看输出是否真的有运动；静态输出是故事图或 storyboard。若有运动，再排除由源视频时间轴约束的 V2V 和只延续一个前缀的 continuation。剩余输出若没有可定位镜头边界，是长单镜头；有边界但没有共享叙事状态，只是 montage；同时有边界与共享状态，才是本章所称 multi-shot narrative video。
 
-### 1.1 一个重要纠错：SVD 不是 LLM storyboard 证据
+<a id="11-svd-llm-storyboard"></a>
+
+### 1.1 SVD 与分镜规划的适用范围
 
 Stable Video Diffusion（SVD）论文讨论的是从图像预训练到 image-to-video 的数据与模型缩放 [[5]](#ref-5)。它可以充当“关键帧动画化”的 I2V 基座，但论文没有提出 LLM 剧本分解、镜头表、角色 bible 或跨镜头状态管理。因此：
 
@@ -44,7 +51,7 @@ Stable Video Diffusion（SVD）论文讨论的是从图像预训练到 image-to-
 - SVD 本身只能支持 I2V 子模块的事实；
 - 若没有规划器、边界定义和跨镜头记忆的独立证据，不能把 SVD 引作多镜头故事生成方法。
 
-## 2. 输入、输出与状态合同
+## 2. 输入输出与状态
 
 设批大小为 $B$，计划镜头数为 $K$。全局故事输入为 token
 
@@ -71,7 +78,7 @@ X_i\in[-1,1]^{B\times n_i\times3\times h_i\times w_i},\qquad
 X=\mathrm{Edit}(X_{1:K},\tau_{2:K}).
 ```
 
-若方法同时生成音频，还必须另写 $A_i\in\mathbb R^{B\times C_a\times L_i^a}$、采样率与音画对齐规则；不能把“后配音”与联合音视频生成混成同一个输出合同。UnityShots 把 opening-shot 长期记忆与前一镜头 tail 短期记忆用于多镜头音视频生成，但截至冻结日其训练代码、权重和 agent 系统仍标为待发布 [[26]](#ref-26)。
+若方法同时生成音频，还必须另写 $A_i\in\mathbb R^{B\times C_a\times L_i^a}$、采样率与音画对齐规则；不能把“后配音”与联合音视频生成混成同一个输出规格。UnityShots 把 opening-shot 长期记忆与前一镜头 tail 短期记忆用于多镜头音视频生成，但截至冻结日其训练代码、权重和 agent 系统仍标为待发布 [[26]](#ref-26)。
 
 ### 2.1 可审计状态不是“一张参考图”
 
@@ -93,7 +100,7 @@ Z_i=(E_i,G_i,O_i,F_i,M_i,D_i,v_i),
 - $D_i$：镜头依赖与生成 provenance，包括模型、权重、seed、prompt；
 - $v_i$：计划版本。
 
-部署时的逐镜头因果合同是
+部署时的逐镜头因果规格是
 
 ```math
 X_i\sim p_\theta(\cdot\mid S,p_{1:K},R_{\le i},Z_{i-1}),\qquad
@@ -102,11 +109,11 @@ Z_i=U(Z_{i-1},X_i,p_i,V_i),
 
 其中验证结果 $V_i$ 必须为“接受”后才允许更新 $Z_i$。真实未来镜头像素不得进入因果系统；holistic 方法可以同时读取所有镜头 prompt 和参考，但不能把测试集未来真值当条件。论文若只说“用了 memory”而不报告存什么、保留多少、何时清除、是否 stop-gradient、拒绝样本是否写入，长程结果就无法复现。
 
-## 3. 机制路线：先看条件如何跨过镜头边界
+## 3. 跨镜头条件传递
 
 ### 3.1 规划器 + 独立镜头生成器
 
-VideoStudio 用大语言模型把用户描述变成多场景脚本，抽取共享实体、生成参考图，再逐场景合成 [[7]](#ref-7)。VideoGen-of-Thought（VGoT）进一步把一句话扩写为带人物、背景、关系、相机和 HDR 属性的动态 storyline，经关键帧与 I2V 生成镜头，并处理相邻 latent 边界 [[9]](#ref-9)。其正式发布面是 arXiv、官方仓库及 NeurIPS 2025 NextVid workshop oral，不应写成 NeurIPS 主会论文；arXiv:2503.15138 是作者注明误作新论文提交的重复版本，本章只引用规范记录 arXiv:2412.02259。
+VideoStudio 用大语言模型把用户描述变成多场景脚本，抽取共享实体、生成参考图，再逐场景合成 [[7]](#ref-7)。VideoGen-of-Thought（VGoT）进一步把一句话扩写为带人物、背景、关系、相机和 HDR 属性的动态 storyline，经关键帧与 I2V 生成镜头，并处理相邻 latent 边界 [[9]](#ref-9)。其正式发布内容是 arXiv、官方仓库及 NeurIPS 2025 NextVid workshop oral，不应写成 NeurIPS 主会论文；arXiv:2503.15138 是作者注明误作新论文提交的重复版本，本章只引用规范记录 arXiv:2412.02259。
 
 这一路线的优点是可替换规划器、T2I 与 I2V 子模块，失败也容易定位；缺点是语言计划、关键帧和运动之间存在三次分布转换，人物参考“看起来相同”不等于道具状态或剧情事实被执行。
 
@@ -148,13 +155,13 @@ ShotStream 以双向 next-shot teacher 蒸馏因果 student，分开全局跨镜
 
 CausalCine 用内容感知历史 KV memory routing 与少步蒸馏做在线导演式生成，但截至冻结日只核验到论文/项目页，未核验到官方代码或权重 [[24]](#ref-24)。CineWeaver 不再训练新模型，而是操纵位置编码和 attention 实现切镜、shot-routed reference conditioning 与 anchor memory；同样只有论文/项目面，尚不能声称公开可复现 [[25]](#ref-25)。
 
-## 4. 规划—生成—记忆—冲突—回滚
+## 4. 规划、生成与状态更新
 
-下面是本综述综合现有路线提出的**工程验收状态机**，不是任何一篇论文已经完整实现的功能。它把影片生成视为带版本的事务：只有通过验证的镜头才能提交到长期状态。
+下面是本章综合现有路线提出的**工程验收状态机**，不是任何一篇论文已经完整实现的功能。它把影片生成视为带版本的事务：只有通过验证的镜头才能提交到长期状态。
 
-![多镜头故事生成从故事规划、镜头合同、镜头生成、状态提取、记忆更新到冲突检查；检查通过进入下一镜头，身份、场景、时间或因果冲突则回滚并重生成。](../../assets/diagrams/story-multishot-memory-conflict.png)
+![多镜头故事生成从故事规划、镜头规格、镜头生成、状态提取、记忆更新到冲突检查；检查通过进入下一镜头，身份、场景、时间或因果冲突则回滚并重生成。](../../assets/diagrams/story-multishot-memory-conflict.png)
 
-**图 1：把跨镜头一致性变成可检查的循环。** 图中“通过”只表示候选镜头满足当前合同，不代表整部影片已经正确；“冲突”路径必须回到受影响的生成步骤，而不能把失败结果写入长期记忆。下方 Mermaid 给出带版本、依赖和失效传播的规范版本。
+**图 1：把跨镜头一致性变成可检查的循环。** 图中“通过”只表示候选镜头满足当前规格，不代表整部影片已经正确；“冲突”路径必须回到受影响的生成步骤，而不能把失败结果写入长期记忆。下一张图给出带版本、依赖和失效传播的规范版本。
 
 ![图 062：可回滚的多镜头故事生成事务](../../assets/imagegen-diagrams/062/diagram.png)
 **顺序化文字替代：** 故事先编译为角色、场景、道具设定和带依赖的镜头 DAG；每个镜头只从最近一次已接受状态取条件。候选通过身份、事实、动作、相机和切点验证后才原子提交。局部画质失败只重试当前镜头；若发现设定或上游事实错误，则回到最早受影响镜头，撤销它及所有后继镜头与记忆，升级计划版本后重算。被拒绝结果永不污染长期状态。
@@ -170,7 +177,7 @@ CausalCine 用内容感知历史 KV memory routing 与少步蒸馏做在线导�
 
 现有论文多处理“相似性记忆”，很少公开这种依赖级 rollback；因此这应作为系统里程碑，而不是默认已有能力。
 
-## 5. 里程碑：能力、证据与发布面必须同时过线
+## 5. 代表工作
 
 一个工作只有在满足以下判据时，才应被写成“领域里程碑”，而非仅列为新论文：
 
@@ -178,7 +185,7 @@ CausalCine 用内容感知历史 KV memory routing 与少步蒸馏做在线导�
 2. **机制与增量对应**：消融能区分 boundary token、memory、reference routing 或 distillation 的作用；
 3. **评价不偷换任务**：不能只用逐帧美学证明叙事，也不能只用身份相似度证明状态正确；
 4. **证据级别明确**：正式 proceedings、arXiv、项目页、代码、权重和数据分别标注；
-5. **复现合同足够**：输入格式、镜头时长、采样、seed、memory 预算、硬件和评价器版本可重跑；
+5. **复现规格足够**：输入格式、镜头时长、采样、seed、memory 预算、硬件和评价器版本可重跑；
 6. **失败可见**：至少报告长间隔、遮挡、换装、多人交互、道具状态和切镜边界中的失败。
 
 ### 5.1 按可检验能力重排的时间线
@@ -190,15 +197,17 @@ CausalCine 用内容感知历史 KV memory routing 与少步蒸馏做在线导�
 | 2024–2025 | VGoT [[9]](#ref-9) | 自动 storyline→关键帧→I2V→边界处理 | arXiv + workshop + 开源 pipeline |
 | 2025 | ShotAdapter [[10]](#ref-10) | 直接多镜头扩散、transition token 与局部注意 | CVPR 2025；正式 venue 已核验 |
 | 2025 | Corgi、EchoShot、CineTrans、AnimeShooter [[11]](#ref-11) [[12]](#ref-12) [[13]](#ref-13) [[14]](#ref-14) | 缓存记忆、人物参考、转场控制、层级动漫数据 | 任务范围各异，不能混成一个通用系统 |
-| 2026 CVPR | HoloCine、OneStory、MultiShotMaster、STAGE、ShotDirector [[15]](#ref-15) [[16]](#ref-16) [[17]](#ref-17) [[18]](#ref-18) [[20]](#ref-20) | holistic、适应性记忆、直接可控、首尾 storyboard、导演式相机/剪辑 | 同一 venue，不同输入/输出合同与发布面 |
+| 2026 CVPR | HoloCine、OneStory、MultiShotMaster、STAGE、ShotDirector [[15]](#ref-15) [[16]](#ref-16) [[17]](#ref-17) [[18]](#ref-18) [[20]](#ref-20) | holistic、适应性记忆、直接可控、首尾 storyboard、导演式相机/剪辑 | 同一 venue，不同输入/输出规格与发布内容 |
 | 2026 流式 | ShotStream、CausalCine [[23]](#ref-23) [[24]](#ref-24) | 因果 cache、在线 prompt、低步生成 | 前者有公开实现但数据不完全；后者尚无公开实现 |
 | 2026 训练免 | CineWeaver [[25]](#ref-25) | 在既有模型中以位置/attention 操纵切镜和参考 | 论文/项目面；代码未核验 |
 | 2026 评测 | MuSS、MSVBench、EntityBench、PersonaShot [[27]](#ref-27) [[28]](#ref-28) [[29]](#ref-29) [[30]](#ref-30) | 电影数据、层级诊断、长间隔实体与人物叙事评测 | 多数仍为预印本，指标需人类校准 |
 | 2026-08 | LogiShot、SEAM [[31]](#ref-31) [[32]](#ref-32) | 上下文视频逻辑条件、prompt 层记忆图/回写 | 最新预印本；后者主要是 storyboarding/prompt 系统 |
 
-2025–2026 的 frontier 不是单一排行榜，而是三条互相牵制的轴：一次生成能否全局协调、逐镜头系统能否维护可更新状态、流式系统能否在低延迟下避免 exposure drift。PoCo 还把多参考与多镜头放到同一位置条件接口，提示“参考属于谁、在何时生效”本身就是核心建模问题 [[33]](#ref-33)；参考槽、绑定与身份泄漏验收见[开放集视频个性化](personalized-video-generation.md)，本章仍以跨镜头状态为最终合同。
+2025–2026 的 frontier 不是单一排行榜，而是三条互相牵制的轴：一次生成能否全局协调、逐镜头系统能否维护可更新状态、流式系统能否在低延迟下避免 exposure drift。PoCo 还把多参考与多镜头放到同一位置条件接口，提示“参考属于谁、在何时生效”本身就是核心建模问题 [[33]](#ref-33)；参考槽、绑定与身份泄漏验收见[开放集视频个性化](personalized-video-generation.md)，本章仍以跨镜头状态为最终规格。
 
-## 6. 数据、评测与最常见的证据错位
+## 6. 数据与评测
+
+AnimeShooter 是多镜头动画数据集，配套生成基线名为 AnimeShooterGen。前者提供故事级、镜头级与参考角色标注，后者通过多模态语言模型编码参考图像和已有镜头，再条件化视频扩散模型。使用时分别评估数据和生成器的贡献 [[14]](#ref-14)。
 
 ### 6.1 公开数据/benchmark 不能只报规模
 
@@ -224,7 +233,7 @@ CausalCine 用内容感知历史 KV memory routing 与少步蒸馏做在线导�
 
 身份相似度高可能只是把参考正面照复制到每个镜头；这会提高 consistency，却降低动作、构图和叙事变化。MuSS 因而同时设计 reference-subject、inter-shot consistency 与 anti-copy/paste 指标，强调 fidelity 与变化要一起看 [[27]](#ref-27)。
 
-## 7. 失败模式：先定位是计划错、渲染错还是记忆错
+## 7. 故障诊断
 
 | 失败 | 可见症状 | 可能机制原因 | 最小诊断 |
 |---|---|---|---|
@@ -238,7 +247,9 @@ CausalCine 用内容感知历史 KV memory routing 与少步蒸馏做在线导�
 | 错误累积 | 第一个小错在后续变成新“事实” | 生成帧无验证即写入 memory | 对照 accept-gated 与 unconditional update |
 | 评估器幻觉 | LMM 给高分但人物/动作明显错误 | 低帧采样、身份盲区、语言偏置 | 人工逐帧 adjudication + evaluator 置信区间 |
 
-## 8. 一个可复现、可证伪的实验
+## 8. 实验设计示例
+
+本节是可按任务调整的实验设计示例，尚未在本仓库运行；参数与阈值是示例设置，不是已发布基准或实测结果。
 
 ### 8.1 研究问题
 
@@ -252,9 +263,9 @@ CausalCine 用内容感知历史 KV memory routing 与少步蒸馏做在线导�
 - 4 个双人物故事：所有权交换、座位互换、情绪改变；
 - 4 个场景故事：开/关门、昼夜/天气变化、物体移动。
 
-每个故事都提供角色正面/侧面参考、场景参考、8 条镜头 prompt、硬切/溶解标记、景别与相机意图。把关键实体在间隔 $`g\in\lbrace1,3,6\rbrace`$ 后重新召回；每个条件运行 4 个固定 seeds。原始 prompt、编译后 prompt、负面条件、模型 commit、权重哈希和随机种子全部保存。
+每个故事都提供角色正面/侧面参考、场景参考、8 条镜头 prompt、硬切/溶解标记、景别与相机意图。把关键实体在间隔 $g\in\lbrace1,3,6\rbrace$ 后重新召回；每个条件运行 4 个固定 seeds。原始 prompt、编译后 prompt、负面条件、模型 commit、权重哈希和随机种子全部保存。
 
-### 8.3 分轨比较，不强行伪装成同合同排行榜
+### 8.3 分轨比较，不强行伪装成同规格排行榜
 
 1. **直接多镜头轨**：MultiShotMaster 公开 1.3B 权重，固定总帧数和 shot allocation；
 2. **逐镜头记忆轨**：StoryMem 公开 MI2V/MM2V LoRA，固定 `max_memory_size`，另做 2/5/10 的消融；
@@ -262,7 +273,7 @@ CausalCine 用内容感知历史 KV memory routing 与少步蒸馏做在线导�
 4. **规划 pipeline 轨**：VGoT 固定 LLM 输出而不在每个 seed 重新规划；
 5. **storyboard 子任务轨**：STAGE 只评价 STEP² 首尾帧，不把未公开完整 pipeline 的结果混入视频轨。
 
-不同基座、分辨率与计算预算不能汇成一个“总冠军”。应同时报告原生设置和预算配平设置，并把不兼容合同留空而不是插值造分。
+不同基座、分辨率与计算预算不能汇成一个“总冠军”。应同时报告原生设置和预算配平设置，并把不兼容规格留空而不是插值造分。
 
 ### 8.4 指标与判定
 
@@ -276,13 +287,18 @@ CausalCine 用内容感知历史 KV memory routing 与少步蒸馏做在线导�
 
 最小成功标准应在实验前固定：相对无记忆基线，$g=6$ 的状态正确率显著提高；同时动作/构图遵循不下降到预注册非劣界以下；错误镜头被拒绝后，后继污染率下降；结论在至少三个 seed 和逐故事 bootstrap 区间下成立。若只提高脸部相似度、却复制构图或漏掉剧情，不算故事一致性成功。
 
-## 9. 截至冻结日的结论
+## 9. 使用建议
 
 1. **多镜头的独特难点是“允许视觉不连续，却要求状态连续”**；长视频或高画质都不能代替这项证据。
 2. 2025 的 ShotAdapter 把切镜结构写进扩散 backbone；2026 的 HoloCine、MultiShotMaster、OneStory、STAGE 与 ShotStream 分别推进 holistic、直接控制、选择性记忆、storyboard anchoring 与流式因果生成。
 3. 目前没有一条路线同时解决全局规划、角色/场景 bible、可编辑镜头生成、结构化状态更新、冲突检测和依赖级回滚；把它们画成一个系统时必须标明哪些是综述综合设计。
-4. 发布面高度不均：MultiShotMaster、StoryMem、ShotStream 与 STAGE 子模块有实际公开资产；OneStory、CausalCine、CineWeaver 主要是论文/项目；MuSS 只先发数据构建代码。论文中的“will release”不等于已发布。
+4. 发布内容高度不均：MultiShotMaster、StoryMem、ShotStream 与 STAGE 子模块有实际公开资产；OneStory、CausalCine、CineWeaver 主要是论文/项目；MuSS 只先发数据构建代码。论文中的“will release”不等于已发布。
 5. 下一阶段最有价值的 benchmark 不是再评一遍美学，而是测试状态改写、长间隔召回、不可逆事实、边界污染、错误写入与回滚。
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 
@@ -310,9 +326,9 @@ CausalCine 用内容感知历史 KV memory routing 与少步蒸馏做在线导�
 
 <a id="ref-12"></a>[12] [EchoShot: Multi-Shot Portrait Video Generation](https://proceedings.neurips.cc/paper_files/paper/2025/hash/1fe6f635fe265292aba3987b5123ae3d-Abstract-Conference.html); official repository [![GitHub: D2I-ai/EchoShot](https://img.shields.io/github/stars/D2I-ai/EchoShot?style=social)](https://github.com/D2I-ai/EchoShot). NeurIPS. 2025.
 
-<a id="ref-13"></a>[13] [CineTrans: Towards Cinematic Text-to-Video Generation via Multi-Shot Transition](https://arxiv.org/abs/2508.11484). arXiv. 2025.
+<a id="ref-13"></a>[13] [CineTrans: Learning to Generate Videos with Cinematic Transitions via Masked Diffusion Models](https://arxiv.org/abs/2508.11484). arXiv. 2025.
 
-<a id="ref-14"></a>[14] [AnimeShooter: A Unified Framework for Story-to-Anime Video Generation](https://arxiv.org/abs/2506.03126). arXiv. 2025.
+<a id="ref-14"></a>[14] [AnimeShooter: A Multi-Shot Animation Dataset for Reference-Guided Video Generation](https://arxiv.org/abs/2506.03126). arXiv. 2025.
 
 <a id="ref-15"></a>[15] [HoloCine: Holistic Generation of Cinematic Multi-Shot Long Video Narratives](https://openaccess.thecvf.com/content/CVPR2026/html/Meng_HoloCine_Holistic_Generation_of_Cinematic_Multi-Shot_Long_Video_Narratives_CVPR_2026_paper.html); official repository [![GitHub: yihao-meng/HoloCine](https://img.shields.io/github/stars/yihao-meng/HoloCine?style=social)](https://github.com/yihao-meng/HoloCine). Yihao Meng et al. CVPR. 2026.
 
@@ -332,23 +348,23 @@ CausalCine 用内容感知历史 KV memory routing 与少步蒸馏做在线导�
 
 <a id="ref-23"></a>[23] [ShotStream: Streaming Multi-Shot Video Generation for Interactive Storytelling](https://arxiv.org/abs/2603.25746); official repository [![GitHub: KlingAIResearch/ShotStream](https://img.shields.io/github/stars/KlingAIResearch/ShotStream?style=social)](https://github.com/KlingAIResearch/ShotStream); [official weights](https://huggingface.co/KlingTeam/ShotStream). Yawen Luo et al. ECCV 2026 accepted / arXiv. 2026.
 
-<a id="ref-24"></a>[24] [CausalCine: Causal Streaming Multi-Shot Video Generation via In-Context Directing](https://arxiv.org/abs/2605.12496); [project page](https://yihao-meng.github.io/CausalCine/). arXiv. 2026.
+<a id="ref-24"></a>[24] [CausalCine: Real-Time Autoregressive Generation for Multi-Shot Video Narratives](https://arxiv.org/abs/2605.12496); [project page](https://yihao-meng.github.io/CausalCine/). arXiv. 2026.
 
-<a id="ref-25"></a>[25] [CineWeaver: Cinematic Narrative Synthesis via Training-Free Multi-Shot Video Generation](https://arxiv.org/abs/2607.26529); [project page](https://cineweaver.github.io/). arXiv. 2026.
+<a id="ref-25"></a>[25] [CineWeaver: Training-Free Reference-Controllable Multi-Shot Long Video Generation for Cinematic Storytelling](https://arxiv.org/abs/2607.26529); [project page](https://cineweaver.github.io/). arXiv. 2026.
 
-<a id="ref-26"></a>[26] [UnityShots: Unified Multi-shot Audio-Video Generation](https://arxiv.org/abs/2606.21661); official repository [![GitHub: JIA-Lab-research/UnityShots](https://img.shields.io/github/stars/JIA-Lab-research/UnityShots?style=social)](https://github.com/JIA-Lab-research/UnityShots). arXiv. 2026.
+<a id="ref-26"></a>[26] [UnityShots: Memory-Driven Multi-Shot Audio-Video Generation with Boundary-Aware Gating](https://arxiv.org/abs/2606.21661); official repository [![GitHub: JIA-Lab-research/UnityShots](https://img.shields.io/github/stars/JIA-Lab-research/UnityShots?style=social)](https://github.com/JIA-Lab-research/UnityShots). arXiv. 2026.
 
 <a id="ref-27"></a>[27] [MuSS: A Large-Scale Dataset and Cinematic Narrative Benchmark for Multi-Shot Subject-to-Video Generation](https://arxiv.org/abs/2604.23789); official repository [![GitHub: zhang-haojie/MuSS](https://img.shields.io/github/stars/zhang-haojie/MuSS?style=social)](https://github.com/zhang-haojie/MuSS). Haojie Zhang et al. arXiv. 2026.
 
-<a id="ref-28"></a>[28] [MSVBench: Benchmarking Multi-Shot Video Generation](https://arxiv.org/abs/2602.23969). arXiv. 2026.
+<a id="ref-28"></a>[28] [MSVBench: Towards Human-Level Evaluation of Multi-Shot Video Generation](https://arxiv.org/abs/2602.23969). arXiv. 2026.
 
-<a id="ref-29"></a>[29] [EntityBench: Benchmarking Long-Horizon Entity Consistency in Multi-Shot Video Generation](https://arxiv.org/abs/2605.15199); official repository [![GitHub: Catherine-R-He/EntityBench](https://img.shields.io/github/stars/Catherine-R-He/EntityBench?style=social)](https://github.com/Catherine-R-He/EntityBench/). arXiv. 2026.
+<a id="ref-29"></a>[29] [EntityBench: Towards Entity-Consistent Long-Range Multi-Shot Video Generation](https://arxiv.org/abs/2605.15199); official repository [![GitHub: Catherine-R-He/EntityBench](https://img.shields.io/github/stars/Catherine-R-He/EntityBench?style=social)](https://github.com/Catherine-R-He/EntityBench/). arXiv. 2026.
 
-<a id="ref-30"></a>[30] [PersonaShot: Evaluating Physical, Affective, and Cinematic Continuity in Multi-Shot Character-Centric Video](https://arxiv.org/abs/2608.16717). arXiv. 2026.
+<a id="ref-30"></a>[30] [PersonaShot: Benchmarking Person-Centric Narrative Continuity in Multi-Shot Video Generation](https://arxiv.org/abs/2608.16717). arXiv. 2026.
 
-<a id="ref-31"></a>[31] [LogiShot: Long-Horizon Multi-Shot Video Generation with Logical Context Conditioning](https://arxiv.org/abs/2608.08820). arXiv. 2026.
+<a id="ref-31"></a>[31] [LogiShot: Logically Coherent Cross-Shot Video Generation](https://arxiv.org/abs/2608.08820). arXiv. 2026.
 
-<a id="ref-32"></a>[32] [SEAM: Structured Episodic Agent Memory for Long-Horizon Storyboarding](https://arxiv.org/abs/2608.22725); [SEAM-Bench](https://huggingface.co/datasets/Jackyqq/SEAM-Bench). arXiv. 2026.
+<a id="ref-32"></a>[32] [SEAM: Shot Entity-Attribute Memory for Consistent Short-Drama Generation at Scale](https://arxiv.org/abs/2608.22725); [SEAM-Bench](https://huggingface.co/datasets/Jackyqq/SEAM-Bench). arXiv. 2026.
 
 <a id="ref-33"></a>[33] [Rethinking Position Embedding as a Context Controller for Multi-Reference and Multi-Shot Video Generation](https://openaccess.thecvf.com/content/CVPR2026/html/Huang_Rethinking_Position_Embedding_as_a_Context_Controller_for_Multi-Reference_and_CVPR_2026_paper.html). CVPR, 2026.
 

@@ -1,4 +1,12 @@
-# 从视频生成器到 World Action Model：机制、闭环与证据
+<a id="world-action-model"></a>
+
+# 世界模型与基于模型的决策
+
+介绍潜在状态、随机动力学、动作条件预测和规划的主要方法。
+
+**前置知识：** 状态空间模型、强化学习基础。
+
+**使用步骤：** 选择观测、状态、动作和奖励表示 → 训练预测器并接入规划或策略 → 检查长期误差、策略利用模型误差和现实迁移。
 
 本章讨论的不是“哪一个视频模型看起来最像世界”，而是一个更严格的问题：**模型能否在动作干预下维护状态、预测多种可能未来，并让真实环境中的决策变得更好？** 资料检索与发布状态核验截止到 **2026-08-30**；检索式、纳排规则、证据等级和图稿记录见[研究日志](../sources/research_20260830_video_world_action_models.md)。
 
@@ -13,7 +21,7 @@
 5. 设计包含 action verifier、persistent state、反事实、不确定性和 receding-horizon feedback 的闭环。
 6. 用分层协议评价画质、状态/动作忠实度、决策效用和现实迁移，而不是只看一段 demo。
 
-## 1. 六个容易混用的概念
+## 1. 基本概念
 
 先固定符号。观测为 $o_t$，不可直接观测的环境状态为 $s_t$，动作或动作块为 $a_t$，目标为 $g$，内部记忆为 $m_t$。一个动作条件预测器近似：
 
@@ -40,7 +48,9 @@ p(o_{t+1:t+H},s_{t+1:t+H}\mid o_{\leq t},a_{t:t+H-1},g,m_t).
 - **联合输出不是因果证明。** 同一 backbone 同时生成视频与动作，可以改善表示对齐，却仍可能复现数据中的相关性。
 - **交互 demo 不是决策效用。** 键鼠能改变画面只证明接口存在；规划价值要在独立环境或真实机器人中验证。
 
-## 2. 从确定性动力学到 stochastic latent state
+<a id="2-stochastic-latent-state"></a>
+
+## 2. 状态与动力学
 
 ### 2.1 Deterministic latent dynamics
 
@@ -101,7 +111,7 @@ _图 1：RSSM 的“先验想象—后验校正”结构。实线表示有观测
 
 因此，world model 没有唯一正确的输出空间。若用途是控制，只需保留 reward-relevant state；若用途是人可检查的交互环境，就还要生成视觉与声音；若用途是训练通用机器人，动作、接触、对象状态和语言目标都可能是必要变量。
 
-## 3. 三条历史支流怎样汇合
+## 3. 主要技术路线
 
 ### 3.1 动作条件预测：先回答“做了之后会怎样”
 
@@ -131,7 +141,9 @@ GameNGen、DIAMOND 和 Oasis 的意义不只是“会玩游戏”。它们把 **
 
 开放域 video generator 是另一条重要支流：Sora 技术报告把大规模视频生成表述为 world-simulator 研究方向，但没有公开动作接口或规划实验 [[16]](#ref-16)；Cosmos 把 tokenizer、生成模型、数据处理和后训练组织为 Physical AI 平台，却也不能让每个 checkpoint 自动获得闭环控制能力 [[31]](#ref-31)。它们提供 world prior 与工程底座，不应仅凭命名升级为 WAM。
 
-## 4. World Action Model：未来预测怎样参与动作生成
+<a id="4-world-action-model"></a>
+
+## 4. 预测与动作生成
 
 WAM 不是给普通 policy 加一个“world”名字。最低条件是：**未来预测在推理阶段参与动作产生或选择** [[1]](#ref-1)。按耦合位置，可以得到四种范式：
 
@@ -144,7 +156,7 @@ WAM 不是给普通 policy 加一个“world”名字。最低条件是：**未�
 
 实践中还可按系统拓扑归并为两条主路线：**级联路线**让预测器、planner/verifier、policy 保持模块化；**联合路线**在共享模型中同时预测未来和动作。
 
-## 5. 两条路线：级联与联合
+## 5. 级联与联合建模
 
 ![一张双路线科学示意图。左侧是级联路线：观测与目标进入世界或视频预测器，产生多个候选未来，经 planner、reward、inverse-dynamics 与 verifier 选择动作块；预测器还可离线生成轨迹供 policy 训练。右侧是联合路线：观测、目标与本体感觉进入共享 video-action backbone，同时输出未来状态或视频和可执行动作块。两条路线都进入底部 receding-horizon 回路，只执行首个动作块，再用真实观测校正近期上下文、实体/空间记忆与不确定性。](../assets/diagrams/world-action-model-dual-route.png)
 
@@ -163,7 +175,7 @@ _图 2：World–Action Modeling 的两条系统路线。AI-generated scientific
 
 **在线 imagine–evaluate–act。** 世界模型针对候选动作生成 future rollouts；reward/value、约束、IDM 或 verifier 对候选打分；MPC 只执行第一个动作或短 action chunk。PlaNet、TD-MPC2、DINO-WM 与 V-JEPA 2-AC 都可放在这条谱系中，尽管它们预测 pixel、feature 或 task latent 的方式不同 [[5]](#ref-5) [[9]](#ref-9) [[17]](#ref-17) [[18]](#ref-18)。
 
-**离线 imagine–label–train。** DreamGen 先后训练可由机器人动作控制的 video world model，用它生成大量新颖交互视频，再通过 inverse dynamics/latent pseudo-action 标注轨迹，最后训练通用 policy [[19]](#ref-19)。它的主证据是**合成数据改善 policy**，不是在线 planner 延迟。官方代码现已公开 world-model finetune、视频生成、动作恢复和 policy 训练四阶段；这比只有演示视频的发布面更强，但仍需分别核对所用 checkpoint、真实数据比例和任务成功率。
+**离线 imagine–label–train。** DreamGen 先后训练可由机器人动作控制的 video world model，用它生成大量新颖交互视频，再通过 inverse dynamics/latent pseudo-action 标注轨迹，最后训练通用 policy [[19]](#ref-19)。它的主证据是**合成数据改善 policy**，不是在线 planner 延迟。官方代码现已公开 world-model finetune、视频生成、动作恢复和 policy 训练四阶段；这比只有演示视频的发布内容更强，但仍需分别核对所用 checkpoint、真实数据比例和任务成功率。
 
 World Action Verifier（WAV）提供了一个可插入这两种级联系统的验证器 [[20]](#ref-20)。其核心不是问整段视频“像不像”，而是把转移检查拆成：
 
@@ -201,7 +213,7 @@ World Action Verifier（WAV）提供了一个可插入这两种级联系统的�
 
 图 2 中的 IDM 不是 planner 的同义词：在 DreamGen 类离线管线中，它主要把合成视觉变化恢复成伪动作；在部分在线级联系统中，它可检查候选转移是否能由某个动作解释。候选搜索、任务价值优化与约束处理仍由 planner/reward/verifier 承担。
 
-## 6. 闭环的四个必要部件
+## 6. 规划系统组成
 
 ### 6.1 Action verifier：检查“状态像真”与“动作可达”
 
@@ -260,7 +272,9 @@ _图 3：带 verifier、不确定性和 persistent state 的 receding-horizon �
 
 闭环总延迟为感知、候选生成、评分、控制通信和执行等待之和。渲染 20 FPS 不代表 20 Hz action rate，更不代表 50 ms 以内的 sense-to-act latency。
 
-## 7. Persistent state：长上下文不等于长期世界
+<a id="7-persistent-state"></a>
+
+## 7. 长期状态
 
 长期交互需要至少三种状态：
 
@@ -300,13 +314,15 @@ WorldPack 当前 arXiv v3 的标题是 _Dynamic Frame Compression for Long-conte
 
 报告首次不可恢复错误的时间、loop-closure error、entity identity switches 和 event-state accuracy，比只报最长样片更有诊断力。
 
-## 8. 一套从运行规格到现实效用的 WM 报告栈
+<a id="8-wm"></a>
+
+## 8. 系统与能力报告
 
 单个总分会掩盖“画面好但动作错”或“短时准但规划会利用漏洞”。建议按层报告，上一层通过不代表下一层通过。这里使用 **WM0–WM6** 作为本章的局部报告栈，避免与[评测指南](evaluation.md)中面向能力主张的全局 **L0–L7 证据阶梯**混淆：WM0–WM1 是发布与系统前提，不是能力等级；WM2–WM6 才逐步对应全局证据。
 
 | 本章 WM 报告栈 | 对应的全局 L0–L7 | 解释 |
 |---|---|---|
-| WM0 发布面 | 不对应能力等级 | 只说明结论来自哪里、artifact 是否可得 |
+| WM0 发布内容 | 不对应能力等级 | 只说明结论来自哪里、artifact 是否可得 |
 | WM1 系统规格 | 不对应能力等级 | 只说明速度、延迟、动作频率与内存边界 |
 | WM2 open-loop 感知 | L0–L2 | 从渲染质量到时间、语义与物理诊断 |
 | WM3 状态与动作 | L3 | 给定动作后的状态转移是否正确 |
@@ -314,7 +330,7 @@ WorldPack 当前 arXiv v3 的标题是 _Dynamic Frame Compression for Long-conte
 | WM5 规划与决策 | L5–L6 | 先验证闭环 rollout，再验证策略排序与决策收益 |
 | WM6 现实迁移 | L7 | 是否在独立真实系统中改善成功率、安全或数据效率 |
 
-### WM0：发布面与证据来源
+### WM0：发布内容与证据来源
 
 对每一个结论记录：
 
@@ -388,7 +404,9 @@ WorldGym 把 action-conditioned video model 当作 policy evaluation environment
 | WM5 决策 | ranking、regret、exploitation gap | ✓ | ✓ | ✓ | ✓ |
 | WM6 现实 | success、safety、transfer gap | ✓ | ✓ | ✓ | ✓ |
 
-## 9. 2025–2026 重点工作的证据地图
+<a id="9-20252026"></a>
+
+## 9. 代表方法
 
 | 工作 | 在本章中的角色 | Paper | Project / code | 截止 2026-08-30 的证据等级 |
 |---|---|---|---|---|
@@ -406,7 +424,7 @@ WorldGym 把 action-conditioned video model 当作 policy evaluation environment
 
 等级定义：A = 正式同行评审入口 + 可定位的一手 artifact；B = arXiv + 作者项目或代码；C = 机构发布/demo；D = 二手发现线索。等级描述的是**可核查面**，不是模型质量排名。
 
-## 10. 研究与工程上的停止规则
+## 10. 使用限制
 
 如果出现下列情况，应停止扩大能力声明：
 
@@ -423,7 +441,7 @@ WorldGym 把 action-conditioned video model 当作 policy evaluation environment
 
 > 在【指定数据、任务、动作空间和硬件】下，该系统以【级联/联合】方式把未来预测用于【数据生成/规划/动作输出】，通过【WM2–WM6 中的具体证据】支持【有限结论】；其【长期状态、反事实、OOD、不确定性或现实迁移】仍未被相应实验验证。能力结论另按全局 L0–L7 标注。
 
-## 11. 推荐阅读路径
+## 11. 延伸阅读
 
 1. 从 World Models、PlaNet、Dreamer、MuZero 理解“完整像素”与“对决策充分”的区别。
 2. 从 TD-MPC2、DINO-WM、V-JEPA 2 理解 latent planning 与 receding horizon。

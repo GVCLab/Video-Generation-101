@@ -1,14 +1,19 @@
-# 视频退化修复：从观测模型到生成先验与证据守恒
+# 视频修复与超分辨率
 
-> **冻结日期：2026-08-30。** 本页讨论 degradation inverse restoration：输入通常仍在每个时空位置保留观测，但这些观测被降采样、模糊、噪声、压缩、低照度、恶劣天气或复合退化污染；目标是在不改写事件、文字、身份与几何的前提下恢复高质量视频。它不等同于以 mask 指定缺失支持的[视频补全](video-inpainting.md)，也不等同于允许语义变化的[视频编辑](video-to-video.md)。
+介绍退化观测、多帧信息利用和生成先验在视频恢复中的应用。
+
+**前置知识：** 成像退化、光流与条件生成。
+
+**使用步骤：** 定义退化和参考真值 → 选择对齐、传播或生成恢复方法 → 分别测量保真、感知质量与时间稳定性。
+
 
 本章的检索式、纳排规则、正式发表状态、关键断言和图片验收见[配套研究记录](../../sources/research_20260830_video_restoration.md)。
 
-## 1. 先明确修复任务
+## 1. 任务定义
 
 ### 1.1 从干净视频到退化观测
 
-令高质量视频为 $`X=\lbrace x_t\rbrace_{t=1}^{T}`$，观测视频为 $`Y=\lbrace y_t\rbrace_{t=1}^{T'}`$。通用前向模型可写成
+令高质量视频为 $X=\lbrace x_t\rbrace_{t=1}^{T}$，观测视频为 $Y=\lbrace y_t\rbrace_{t=1}^{T'}$。通用前向模型可写成
 
 ```math
 Y=\mathcal C_q\!\left(\mathcal S_r\!\left(\mathcal B_k(X)\right)+N;\,m\right),
@@ -32,7 +37,7 @@ restorer 接收 $(Y,\widehat\phi,C)$，输出
 
 ### 1.2 五类相邻任务不能只靠“输入也是视频”合并
 
-| 任务 | 观测合同 | 允许模型做什么 | 一票否决式错误 |
+| 任务 | 观测规格 | 允许模型做什么 | 一票否决式错误 |
 |---|---|---|---|
 | 退化逆问题修复 | $Y=\mathcal D_\phi(X)+N$；通常全帧有观测 | 去噪、去模糊、去压缩、超分、复合恢复 | 改写文字、身份、物体数量或事件；逐帧闪烁 |
 | Inpainting / completion | $Y=M\odot X$；缺失支持由 mask 给出或估计 | 在缺失区生成合理内容，保留已知区 | mask 外变化、边界 seam、对象残留 |
@@ -44,14 +49,14 @@ restorer 接收 $(Y,\widehat\phi,C)$，输出
 
 ### 1.3 三个验收轴必须独立
 
-![视频退化修复合同：干净视频经模糊、降采样、噪声和压缩成为退化观测；恢复系统可采用对齐融合、传播注意或生成先验；输出分别接受证据保真、时间稳定和感知细节检查。缺失支持的 inpainting 被画成独立支路，强调修复观测证据而不是发明新场景。](../../assets/diagrams/video-restoration-contract.png)
+![视频退化修复规格：干净视频经模糊、降采样、噪声和压缩成为退化观测；恢复系统可采用对齐融合、传播注意或生成先验；输出分别接受证据保真、时间稳定和感知细节检查。缺失支持的 inpainting 被画成独立支路，强调修复观测证据而不是发明新场景。](../../assets/diagrams/video-restoration-contract.png)
 
 **图注：** restoration 的目标不是单纯“变清晰”。传统回归路线容易过平滑；GAN/diffusion 路线能补出锐利纹理，却可能稳定地生成从未存在的文字、牙齿、窗格或人脸细节。合格协议必须同时报告 evidence fidelity、temporal stability 与 perceptual detail，任何一项都不能替代另外两项。
 
-![图 072：视频退化修复合同与补全边界](../../assets/imagegen-diagrams/072/diagram.png)
-**顺序化文字替代：** 干净视频先经过明确的退化算子形成观测；系统再从对齐融合、时序传播/注意力或生成先验中选择路线；恢复结果同时通过证据保真、时间稳定和感知细节三道门。若输入是由 mask 定义的缺失像素，则转入独立的视频补全合同。
+![图 072：视频退化修复规格与补全边界](../../assets/imagegen-diagrams/072/diagram.png)
+**顺序化文字替代：** 干净视频先经过明确的退化算子形成观测；系统再从对齐融合、时序传播/注意力或生成先验中选择路线；恢复结果同时通过证据保真、时间稳定和感知细节三道门。若输入是由 mask 定义的缺失像素，则转入独立的视频补全规格。
 
-## 2. 退化不是一个标签，而是一份可复现协议
+## 2. 退化模型
 
 | 退化族 | 必须声明的参数 | 最容易被忽略的现实因素 | 反事实压力测试 |
 |---|---|---|---|
@@ -65,7 +70,7 @@ restorer 接收 $(Y,\widehat\phi,C)$，输出
 
 同一组网络结构在 bicubic $\times4$ 上的结论，不能自动迁移到 unknown blur + compression + noise。RealBasicVSR 的贡献之一正是指出长程传播会把真实退化和伪影一起放大，并在传播前加入 cleaning module [[8]](#ref-8)。DiffVSR 则把复杂退化下的学习负担拆成渐进训练阶段，而不是只换更大的架构 [[21]](#ref-21)。
 
-## 3. 多帧为什么有用，也为什么会害人
+## 3. 多帧信息利用
 
 ### 3.1 信息来自亚像素位移与互补可见性
 
@@ -92,7 +97,9 @@ W_{s\rightarrow t}(\psi(y_s)),
 
 BasicVSR 把传统 VSR 归纳成 propagation、alignment、aggregation、upsampling 四个组件 [[4]](#ref-4)；BasicVSR++ 用二阶网格传播与 flow-guided deformable alignment 加强前两项 [[7]](#ref-7)。RVRT 不是简单“Transformer 取代 recurrence”，而是在局部 clip 内并行、clip 间递归，并用 guided deformable attention 对齐 [[9]](#ref-9)。这些路线仍可与 GAN、diffusion 或不同退化训练器组合。
 
-## 4. 技术路线与 paper review
+<a id="4-paper-review"></a>
+
+## 4. 代表方法
 
 ### 4.1 2017–2020：从逐帧处理到显式时空信息利用
 
@@ -130,7 +137,7 @@ DiffVSR 用 progressive learning 拆解复杂退化、内容和时间建模负�
 
 “实时”“training-free”“一步”分别描述服务速度、参数更新和 NFE，三者不能互换。FlashVSR 是训练后的一步模型；DTG-Restore 不训练新模型但仍要运行外部 restoration 与 diffusion refinement。
 
-## 5. 评测：清晰、稳定、真实不是一个数
+## 5. 评测方法
 
 ### 5.1 合成退化与真实退化必须分开
 
@@ -167,14 +174,18 @@ PSNR 高可能对应过平滑；感知分高可能来自合理但错误的纹理
 4. **Temporal spectrum**：检查高频细节是在物体坐标中稳定，还是黏在屏幕坐标或逐帧闪烁；
 5. **Downstream counterfactual**：若恢复让 detector/OCR 结果变化，必须与 GT 或人工核验比较，不能把“更自信”当“更正确”。
 
-## 6. 离线、双向、因果与 streaming
+<a id="6-streaming"></a>
+
+## 6. 离线与流式处理
 
 双向传播和 full-clip attention 可以读取未来帧，因此通常不适合低延迟直播。在线系统在时刻 $t$ 只能使用 $Y_{\le t+b}$，其中 $b$ 是公开缓冲区；必须报告 first-frame latency、steady-state throughput、window seam、状态增长和 scene-cut reset。
 
 ![图 073：视频退化修复部署路线选择](../../assets/imagegen-diagrams/073/diagram.png)
 **顺序化文字替代：** 若允许未来帧，可选双向传播或整段注意；否则使用因果状态和有界缓冲。已知退化优先 fidelity-first 重建，未知退化需估计或测试时适配。当观测不足才引入生成先验并报告不确定性；在线 deadline 还要求少步、稀疏注意和端到端延迟验收。
 
-## 7. Milestone：按任务定义变化，而不是按宣传画质排序
+<a id="7-milestone"></a>
+
+## 7. 技术发展
 
 | 首次公开 → 正式发表 | 工作 | 真正改变了什么 | 证据边界 |
 |---|---|---|---|
@@ -192,7 +203,7 @@ PSNR 高可能对应过平滑；感知分高可能来自合理但错误的纹理
 | 2025 预印本 | SeedVR [[24]](#ref-24) | diffusion Transformer 的通用/任意长度与分辨率主张 | 截止冻结日仍按预印本，不写成正式发表 |
 | 2026 → ICLR/CVPR 2026 | SeedVR2、FlashVSR、DGAF-VSR、STCDiT、DTG-Restore [[25]](#ref-25)–[[28]](#ref-28) [[30]](#ref-30) | adversarial 一步、streaming、dense aligned guidance、结构锚定、training-free refinement | 作者协议结果，尚非同一公开 benchmark 下的独立排名 |
 
-## 8. 失败诊断表
+## 8. 故障诊断
 
 | 症状 | 优先怀疑 | 最小定位实验 | 不充分的“修复” |
 |---|---|---|---|
@@ -205,7 +216,11 @@ PSNR 高可能对应过平滑；感知分高可能来自合理但错误的纹理
 | 速度数字很好但不可播 | 只计 denoiser、忽略 VAE/I/O | 端到端 cold/warm p95 | 只报单帧平均 FPS |
 | AIGC 人体“修好”但动作变 | 结构先验改写事件 | pose/track/action before–after | 只做人像偏好评分 |
 
-## 9. 最小可复现实验：RestorationFork-1
+<a id="9-restorationfork-1"></a>
+
+## 9. 实验设计示例
+
+本节是可按任务调整的实验设计示例，尚未在本仓库运行；参数与阈值是示例设置，不是已发布基准或实测结果。
 
 ### 9.1 固定变量
 
@@ -240,7 +255,7 @@ peak memory / hardware:
 
 只有当 generative route 在感知质量上改善，同时没有显著增加 OCR/身份错误、时间闪烁和 re-degradation error，才可支持“更好的 restoration”；否则只能写“更受偏好的 enhancement”。
 
-## 10. 研究与工程停止规则
+## 10. 使用限制
 
 1. 只在 bicubic 或单一 Gaussian noise 上测试：不能写“真实世界修复”。
 2. 只报 PSNR/SSIM：不能写“感知质量最好”；只报 no-reference VQA：不能写“忠实恢复”。
@@ -249,18 +264,23 @@ peak memory / hardware:
 5. “任意长度”只表示接口能继续跑：没有 drift、memory 与 seam 曲线时不能写“长期稳定”。
 6. “实时”必须包含 I/O、预处理、VAE、restorer、后处理和编码的端到端 p95；单个 kernel FPS 不够。
 7. 训练代码或模型未公开：只能写作者报告，不写“已复现”。
-8. 同名 restoration / enhancement / inpainting 未拆合同：停止横向排名，先重建任务表。
+8. 同名 restoration / enhancement / inpainting 未拆规格：停止横向排名，先重建任务表。
 
-## 11. 推荐阅读路线
+## 11. 延伸阅读
 
 1. 用 BasicVSR 理解 propagation、alignment、aggregation、upsampling 四个基本组件。
 2. 用 BasicVSR++、RealBasicVSR 与 RVRT 比较传播增强、真实退化和 hybrid Transformer。
 3. 用 SATeCo、Upscale-A-Video、MGLD-VSR 比较图像 diffusion prior 怎样获得时间能力。
 4. 用 VideoGigaGAN、PatchVSR、DiffVSR 与 TurboVSR理解细节、分辨率、复杂退化和效率的四方权衡。
 5. 用 SeedVR2、DGAF-VSR、STCDiT、FlashVSR 与 DTG-Restore 核验 2026 的“一步后训练、观测证据、结构锚、streaming、AIGC refinement”分叉。
-6. 最后执行 RestorationFork-1；没有幻觉审计和真实退化层，就不要把 enhancement 写成 recovery。
+6. 最后执行 退化恢复对照实验；没有幻觉审计和真实退化层，就不要把 enhancement 写成 recovery。
 
 相邻章节：[视频补全](video-inpainting.md)、[帧插值](frame-interpolation.md)、[视频编辑](video-to-video.md)、[图像到视频](image-to-video.md)、[因果流式生成](../generative-models/causal-streaming-generation.md)与[评测指南](../evaluation.md)。
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 

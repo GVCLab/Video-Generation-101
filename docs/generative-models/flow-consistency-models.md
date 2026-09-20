@@ -1,8 +1,15 @@
-# Flow、Consistency 与 Few-Step 生成：从概率流到分布蒸馏
+<a id="flowconsistency-few-step"></a>
 
-> 本章截至 2026-08-30，依据正式会议论文与作者官方材料整理。核心目标不是背方法名，而是判断一个方法究竟在学习什么、依赖谁提供监督、采样时真正调用网络多少次，以及它是否真的解决了视频的时间因果与在线服务问题。
+# 流匹配与一致性模型
 
-## 📋 1. 先建立正确坐标系
+介绍速度场学习、整流流、一致性模型与分布匹配蒸馏。
+
+**前置知识：** 扩散模型、常微分方程。
+
+**使用步骤：** 区分训练目标与轨迹求解 → 识别教师和学生的训练信号 → 在一致规格下比较步数、质量和总成本。
+
+
+## 1. 术语与方法分类
 
 Flow matching（FM）、rectified flow（RF）、consistency model（CM）、MeanFlow 与 distribution matching distillation（DMD）常被统称为“少步生成”，但它们优化的对象并不相同：
 
@@ -27,7 +34,9 @@ Flow matching（FM）、rectified flow（RF）、consistency model（CM）、Mea
 
 “无外部教师”也不等于“没有监督目标”。FM 有解析的条件速度，Shortcut 有自举的一致性目标，MeanFlow 有平均速度恒等式；reflow 则使用前一代模型生成的耦合。反过来，“一步采样”也不等于一步训练：训练往往仍需随机时间、Jacobian-vector product（JVP）、额外判别器或教师 score。
 
-## 🔗 2. Diffusion、score 与 PF-ODE 是理解 flow 的桥
+<a id="2-diffusionscore-pf-ode-flow"></a>
+
+## 2. 扩散、得分与概率流 ODE
 
 ### 2.1 从 DDPM 到连续时间 score
 
@@ -79,7 +88,9 @@ f(x,\tau)-\frac{1}{2}g(\tau)^2s_\tau(x).
 
 两者在 score 精确、方程求解精确的理想条件下共享各时刻边缘分布，但样本路径不同：前者随机，后者确定。DDIM [[3]](#ref-3) 与 DPM-Solver [[4]](#ref-4) 主要改变**已有 diffusion/score 模型的采样器**；它们本身不是 FM 训练目标。
 
-### 2.2 一张图看清从 score 到 flow
+<a id="22-score-flow"></a>
+
+### 2.2 得分模型与流模型的联系
 
 ![图 020：Diffusion 到连续运输的桥梁](../../assets/imagegen-diagrams/020/diagram.png)
 **图的顺序化文字替代：**
@@ -92,7 +103,7 @@ f(x,\tau)-\frac{1}{2}g(\tau)^2s_\tau(x).
 6. 对条件变量取后验期望得到边缘速度场，再用回归学习它。
 7. 对学习场做数值积分才得到模型轨迹；PF-ODE 与该轨迹都是 ODE，但训练来源不同。
 
-### 2.3 必须分开的三层
+### 2.3 目标、动力学与求解器
 
 设条件变量 $Z$ 包含端点或数据条件。第一层是人为选择、且通常可采样的**条件路径**
 
@@ -125,9 +136,11 @@ v_\theta(\hat X_s,s),
 
 <a id="five-layer-map"></a>
 
-### 2.4 五层地图：不要把 objective、dynamics、solver、student 和 serving 画成一条线
+<a id="24-objectivedynamicssolverstudent-serving"></a>
 
-最容易误读的地方不是某个公式，而是同一篇论文可能同时改动多个层次。一个方法至少要回答五个互相独立的问题：网络在训练时拟合什么统计量；该统计量定义或参数化什么连续过程；推理时是否只换数值求解器；是否另训练少步 student；视频数据时间上是否因果、分块并持续交付。下面的 PNG 用五行矩阵帮助记忆，随后 Mermaid 才给出可编辑、可审计的谱系关系。
+### 2.4 训练目标、动力学、求解器、学生模型与服务
+
+最容易误读的地方不是某个公式，而是同一篇论文可能同时改动多个层次。一个方法至少要回答五个互相独立的问题：网络在训练时拟合什么统计量；该统计量定义或参数化什么连续过程；推理时是否只换数值求解器；是否另训练少步 student；视频数据时间上是否因果、分块并持续交付。下面的 PNG 用五行矩阵帮助记忆，随后 流程图及文字说明 才给出方法之间的关系。
 
 ![Diffusion、Flow 与少步生成的五层分类矩阵：训练统计量、连续过程、不重训求解器、需训练的少步学生和部署轴分别列出，并强调 v-prediction 不等于 flow velocity、PF-ODE 不等于 Flow Matching、few-step 不等于 streaming。](../../assets/diagrams/diffusion-flow-few-step-five-layers.png)
 
@@ -148,7 +161,9 @@ v_\theta(\hat X_s,s),
 
 这张谱系图的边只表示**常见构造或监督来源**，不是唯一依赖关系。例如 CM 既可做 consistency distillation，也可 standalone consistency training [[7]](#ref-7)；FACM 把 FM 锚点与 shortcut objective 组合，$\alpha$-Flow 则把 trajectory FM、Shortcut 与 MeanFlow 放进统一目标族 [[14]](#ref-14) [[15]](#ref-15)。这类 2026 汇合工作说明边界可以被联合优化，但没有让五个层次变成同义词。
 
-## 📚 3. Flow Matching、Rectified Flow 与 reflow
+<a id="3-flow-matchingrectified-flow-reflow"></a>
+
+## 3. 流匹配与整流流
 
 ### 3.1 Flow Matching：回归条件速度，隐式学到边缘场
 
@@ -167,7 +182,7 @@ v_\theta(X_s,s)-u_s(X_s\mid Z)
 
 在合适的可积条件下，平方损失的最优解就是上一节的条件期望 $u_s(x)$。这里“simulation-free training”只表示训练每个样本时无需先解完整 ODE；生成时仍要积分学习场，通常需要多次 NFE。
 
-### 3.2 Rectified Flow：直线条件桥，不是“语义线性”
+### 3.2 Rectified Flow 的直线条件路径
 
 RF 选择先验样本 $A$ 与数据样本 $B$ 的耦合，并用直线条件路径 [[6]](#ref-6)
 
@@ -194,7 +209,9 @@ u_s(X_s\mid A,B)=B-A.
 | 初始 RF | 常用独立端点的直线桥 | 瞬时边缘速度场 | 不需要 | ODE 多步，可少步化 |
 | Reflow | 旧模型诱导的端点耦合 | 更易积分的速度场 | 无外部教师，但依赖旧模型 | 视训练与求解器而定 |
 
-## 🔄 4. 轨迹与 flow-map 家族
+<a id="4-flow-map"></a>
+
+## 4. 轨迹与流映射
 
 ### 4.1 CM：同一参考轨迹上的点应映射到同一终点
 
@@ -280,15 +297,19 @@ z_r=z_t-(t-r)u_\theta(z_t,r,t).
 
 MeanFlow 的正式 NeurIPS 2025 论文强调无需预训练、蒸馏或课程学习，并在 ImageNet 256×256 上给出 1-NFE 证据；这是图像证据，不能直接改写成视频一步生成结论。
 
-### 4.6 FACM 与 AlphaFlow：不要把 2026 方法混成同一条支线
+<a id="46-facm-alphaflow-2026"></a>
+
+### 4.6 FACM 与 AlphaFlow 的方法区别
 
 Flow-Anchored Consistency Model（FACM）以一个 FM 轨迹锚点结合流匹配监督与一致性捷径，直接学习当前状态到锚点的平均速度 [[14]](#ref-14)。其公开实验主要蒸馏预训练 LightningDiT，在图像/文本到图像上验证 1–2 NFE；因此“公式可训练”与“论文最强实验依赖教师”必须分开表述。
 
 AlphaFlow 则分析 MeanFlow 训练中轨迹 FM 与轨迹 consistency 两部分的负梯度相关，提出分解与课程策略，并报告从头训练的 1–2 NFE 图像结果 [[15]](#ref-15)。它与 FACM 的共同点是学习跨区间的运输信息；不同点是理论分解、训练配方与公开教师依赖。两者截至本章日期都没有与 rCM 同等级的直接大规模视频证据。
 
-## 🎯 5. DMD 与 DMD2：分布层蒸馏
+<a id="5-dmd-dmd2"></a>
 
-### 5.1 DMD 优化的是学生分布，不是参考轨迹逐点一致
+## 5. 分布匹配蒸馏
+
+### 5.1 DMD 的学生分布优化
 
 DMD 令一步生成器 $G_\theta(z)$ 的分布 $p_\theta$ 逼近预训练 diffusion 教师的分布 $p_{\mathrm T}$ [[8]](#ref-8)。其分布匹配梯度可概念化为
 
@@ -330,7 +351,9 @@ CausVid 把 50-step 双向视频 diffusion 教师蒸馏为 4-step 因果自回�
 
 因此，CausVid 的实时性不能只归因于 DMD；因果注意力、KV cache、chunk 设计、硬件与流水线也共同决定吞吐和首帧延迟。
 
-## 📊 6. 教师、训练信号、NFE 与覆盖横向比较
+<a id="6-nfe"></a>
+
+## 6. 训练信号与计算成本比较
 
 ### 6.1 训练监督对照
 
@@ -373,12 +396,14 @@ CausVid 把 50-step 双向视频 diffusion 教师蒸馏为 4-step 因果自回�
 
 **模式覆盖也不能由单个 FID/FVD 代替。** 至少应联合 precision/recall、density/coverage、类别或文本长尾、多随机种子，以及视频中的运动幅度、对象/身份持久性和罕见事件。DMD 的 mode-seeking 分析与 rCM 的 mode-covering 分析是目标层解释，不是跨数据集的统一实证结论。
 
-## 🔀 7. Few-step objective 与 causal / streaming 是正交轴
+<a id="7-few-step-objective-causal-streaming"></a>
+
+## 7. 少步与因果流式生成
 
 “少步”“因果”“流式”“实时”回答四个不同问题：
 
 - **Few-step**：一个样本或 chunk 在噪声/运输时间上需要多少次网络评估？
-- **Causal**：第 $k$ 帧能否只依赖过去帧 $`x_{\lt k}`$，而不访问未来？
+- **Causal**：第 $k$ 帧能否只依赖过去帧 $x_{\lt k}$，而不访问未来？
 - **Streaming**：系统能否边接收条件、边生成、边交付，并维持跨 chunk 状态？
 - **Real-time**：在明确硬件与服务级目标（SLO）下，首帧、截止期与抖动是否达标？
 
@@ -401,7 +426,9 @@ CausVid 把 50-step 双向视频 diffusion 教师蒸馏为 4-step 因果自回�
 
 更完整的因果注意力、KV memory、rollout 分布偏移与服务管线讨论见[因果、流式与实时视频生成专章](causal-streaming-generation.md)。
 
-## 📍 8. 2023–2026 里程碑与视频证据边界
+<a id="8-20232026"></a>
+
+## 8. 代表工作
 
 ### 8.1 方法里程碑
 
@@ -424,7 +451,7 @@ CausVid 把 50-step 双向视频 diffusion 教师蒸馏为 4-step 因果自回�
 
 不同论文的 NFE、分辨率、视频长度、guidance、教师、VAE 与硬件不一致，表中数字不可直接横比。本章只把它们当作各自论文设置中的证据，不据此给出统一排行榜。
 
-## ✅ 9. 如何选择与怎样做可信评测
+## 9. 方法选择与评测
 
 ### 9.1 选型路径
 
@@ -452,7 +479,14 @@ CausVid 把 50-step 双向视频 diffusion 教师蒸馏为 4-step 因果自回�
 4. **看到 1 step 就判定为 1 NFE、低延迟**：求解器、CFG、视频长度、缓存和解码都影响真实调用与延迟。
 5. **看到 few-step 视频就判定为 streaming**：整段一次生成仍可能访问未来帧，也可能无法持续交付。
 
-## 🔗 10. 参考文献
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
+
+<a id="10"></a>
+
+## 参考文献
 
 <a id="ref-1"></a>[1] [Denoising Diffusion Probabilistic Models](https://proceedings.neurips.cc/paper/2020/hash/4c5bcfec8584af0d967f1ab10179ca4b-Abstract.html). Jonathan Ho, Ajay Jain, Pieter Abbeel. NeurIPS. 2020.
 

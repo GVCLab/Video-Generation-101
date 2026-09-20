@@ -1,8 +1,15 @@
-# 视频 Tokenizer、Codec 与生成式压缩：表示接口、位流边界与生成上限
+<a id="tokenizercodec"></a>
 
-> 本章资料核验截至 **2026-08-30**。正式论文构成主干；V-RAE、VideoRAE、KVAE 与 VidTok 保留预印本标签。这里的“压缩”先指 latent/token 表示变小，只有量化、概率模型、熵编码、位流语法与独立解码合同全部闭合时，才上升为实际 codec 主张。
+# 视频表示、Tokenizer 与编码
 
-## 1. 先看输出形式：交付张量、符号，还是位流
+介绍连续潜变量、离散代码、视频编解码和实际码率的区别。
+
+**前置知识：** 神经网络、视频张量。
+
+**使用步骤：** 确定表示形状、时间压缩及因果性 → 分别测量重建误差和生成效果 → 只有存在实际位流时再报告码率。
+
+
+## 1. 输出表示与编码接口
 
 视频 tokenizer 的最小接口是
 
@@ -20,7 +27,7 @@ z=E(x),\qquad \hat x=D(z),
 | **learned codec** | tokenizer + 量化 + 概率模型 + entropy coder + bitstream syntax | 实际文件大小、bpp/bitrate、rate–distortion | 随机访问、标准兼容或生成质量，除非另测 |
 | **generative codec / compression** | learned codec + 感知、对抗或生成式先验补偿被丢信息 | rate–distortion–perception、时间稳定、幻觉率 | “补出的细节就是原始事实” |
 
-因此：continuous VAE 没有量化与熵编码时只是 latent 压缩接口；VQGAN 有离散代码和感知/对抗 decoder，也不自动成为可传输 codec [[2]](#ref-2)；Divot 的 diffusion de-tokenizer 是生成式反解码机制，但没有位流合同就仍不是 learned codec [[11]](#ref-11)。
+因此：continuous VAE 没有量化与熵编码时只是 latent 压缩接口；VQGAN 有离散代码和感知/对抗 decoder，也不自动成为可传输 codec [[2]](#ref-2)；Divot 的 diffusion de-tokenizer 是生成式反解码机制，但没有位流规格就仍不是 learned codec [[11]](#ref-11)。
 
 若任务是“同一历史之后采样多个合理未来”，latent 表达的是未来不确定性，应转到[变分视频生成](variational-generation.md)。两者都可能有 Gaussian latent 和 KL，却不是同一个问题。
 
@@ -28,7 +35,7 @@ z=E(x),\qquad \hat x=D(z),
 
 ![三条视频 token 生成路线：连续 latent 路线将 RGB 视频编码为连续时空 latent，再由 diffusion、flow 或 continuous autoregressive head 建模并解码；离散 token 路线先量化为 code IDs，再用 categorical AR 或 masked generator 预测；masked/discrete diffusion 路线对离散格点做遮盖或离散噪声恢复。图中强调 representation、factorization、training head 与 deployment claim 不等价。](../../assets/diagrams/video-token-generation-routes.png)
 
-图的阅读顺序是：先确定 representation 是 continuous latent、discrete code ID 还是 patch token；再确定联合分布由 AR、masked、diffusion 或 flow 怎样分解；随后看 training objective；最后才讨论 latency、streaming 和 codec。一个 tokenizer 可以接多个 generator，一个 generator family 也可以换 tokenizer。
+图的阅读顺序是：先确定表示采用连续潜变量、离散代码还是图像块；再确定预测顺序及可访问上下文，例如因果自回归或双向掩码；随后确定分类、去噪或流匹配等训练目标。扩散和流匹配描述生成动力学及目标，并不等同于沿视频时间轴的概率因子分解。最后分别检查延迟、流式推理与编码能力。一个 tokenizer 可以接多个 generator，一个 generator family 也可以换 tokenizer。
 
 本章固定三个术语，避免把所有单元都叫 token：
 
@@ -36,7 +43,9 @@ z=E(x),\qquad \hat x=D(z),
 - **discrete code / token ID**：来自有限状态集合的离散符号；
 - **patch token**：Transformer 接收的序列单元，可能承载连续向量，也可能承载离散 code embedding。
 
-## 2. 表示谱系：连续、离散与真正的 hybrid
+<a id="2-hybrid"></a>
+
+## 2. 连续、离散与混合表示
 
 ### 2.1 Continuous latent
 
@@ -80,7 +89,7 @@ j^*=\arg\min_j\lVert z_e(x)-e_j\rVert_2^2,
 
 MAGVIT-v2 用 LFQ 支撑更大隐式词表与 LM 视觉生成 [[5]](#ref-5)，但论文标题不构成“任意 LM 普遍胜过 diffusion”的定理。BSQ-ViT 是本章目标集合中唯一明确跨到实验性实际位流层的正式论文：约 300M 的 AR 概率模型加 adaptive arithmetic coding，并报告实际 bpp / rate–distortion [[9]](#ref-9)。这仍不等于已定义标准容器、随机访问和跨实现兼容。
 
-### 2.4 Hybrid 必须发生在同一个样本合同内
+### 2.4 Hybrid 必须发生在同一个样本规格内
 
 真正的 hybrid 至少要求一个样本同时传递两类互补表示：
 
@@ -89,7 +98,9 @@ MAGVIT-v2 用 LFQ 支撑更大隐式词表与 LM 视觉生成 [[5]](#ref-5)，�
 
 VidTok、OmniTokenizer、Cosmos 或 VideoRAE 各自提供 continuous/discrete 模式时，应按具体 checkpoint 判断；两种模式并列发布不是 hybrid。
 
-## 3. 四本压缩账：从 shape 到真实位流
+<a id="3-shape"></a>
+
+## 3. 表示大小与实际码率
 
 设 RGB 视频、连续 latent 和离散 code map 分别为
 
@@ -130,20 +141,22 @@ N_{token}=T'H'W'.
 
 这里的 **BS0–BS3** 只描述 bitstream maturity，不等于全书[评测证据 L0–L7](../evaluation.md)梯度。
 
-| 等级 | 合同 | 能否叫实际 codec |
+| 等级 | 规格 | 能否叫实际 codec |
 |---|---|---|
 | BS0 | 只缩小 continuous tensor | 否；只能报 shape、elements、dtype/storage |
 | BS1 | 产生 discrete symbols/bits，只报 token 数、词表位数或 nominal bpp | 否；还没有真实 entropy-coded 文件 |
 | BS2 | 有概率模型、entropy/arithmetic coder 和实际 bpp–RD 实验 | 可称实验性 learned codec，但仍需核开放 artifact |
-| BS3 | 可交换 bitstream、header、随机访问、版本语法与独立 decoder | 可审计部署合同；本章目标列表中无完整 BS3 证据 |
+| BS3 | 可交换 bitstream、header、随机访问、版本语法与独立 decoder | 可审计部署规格；本章目标列表中无完整 BS3 证据 |
 
 InfoTok 的 $\mathrm{BPP}_{16}$ 是 token 数乘 nominal bits 并加 mask cost，不是 entropy-coded bitstream；其 FSQ levels 为 $8^3 5^3=64{,}000$，也不严格等于 $2^{16}=65{,}536$ [[17]](#ref-17)。MAGVIT-v2 的 entropy penalty 是正则项，不是 coder。只有把 `.bin` 交给另一个进程，后者仅凭位流与公开 decoder 恢复视频，才闭合真实 codec 验收。
 
-## 4. 时间合同：causal codec 不推出 streaming 系统
+<a id="4-causal-codec-streaming"></a>
+
+## 4. 时间压缩与因果性
 
 ### 4.1 四种不能混写的时间边界
 
-| 合同 | 当前输出可看什么 | 代表性提醒 |
+| 规格 | 当前输出可看什么 | 代表性提醒 |
 |---|---|---|
 | noncausal / full-clip | 整段过去与未来 | LARP 的 holistic queries 读完整视频；AR prior 只描述 latent 次序 [[13]](#ref-13) |
 | frame-causal | 当前和更早帧 | 需用任意未来扰动做 prefix-invariance |
@@ -164,18 +177,20 @@ T'=1+\left\lfloor\frac{T-1}{f_t}\right\rfloor
 
 ### 4.2 Prefix-invariance 是最小因果证据
 
-构造 $x,x'$，让二者在时间块 $b$ 之前完全相同、未来任意不同。frame-causal 合同要求
+构造 $x,x'$，让二者在时间块 $b$ 之前完全相同、未来任意不同。frame-causal 规格要求
 
 ```math
 E(x)_{\le b}=E(x')_{\le b},\qquad
 D(E(x))_{\le b}=D(E(x'))_{\le b}.
 ```
 
-block-causal 只在块边界验收。还要比较 full-clip 与不同 chunk size/cache 策略的输出；任何前缀变化或 full/chunk 不一致，都否定对应 causal/streaming 合同。
+block-causal 只在块边界验收。还要比较 full-clip 与不同 chunk size/cache 策略的输出；任何前缀变化或 full/chunk 不一致，都否定对应 causal/streaming 规格。
 
 VidTwin 的 backbone temporal attention 有 causal mask，但 structure Q-Former 查询整段时间序列，不能据此声称端到端 prefix-causal [[15]](#ref-15)。KVAE 的 attention-free causal Conv3D 和公开 cache/chunk 接口是较强实现证据，但并发 cache、chunk 等价性、reset seam 与延迟仍需实测 [[22]](#ref-22)。
 
-## 5. Reconstruction ceiling：输入忠实上限与生成可学性是两件事
+<a id="5-reconstruction-ceiling"></a>
+
+## 5. 重建与生成质量
 
 固定 $E,D$ 后，$D(E(x))$ 决定输入中的哪些差异还能被可靠恢复。如果文字、小物体、高速运动或微小视差在 latent 中不可区分，上层 generator 无法从同一个 latent 稳定恢复原事实。这是 tokenizer 对**输入忠实度**的表示上限。
 
@@ -190,7 +205,9 @@ VidTwin 的 backbone temporal attention 有 causal mask，但 structure Q-Former
 
 更高 reconstruction 分数也不保证更好 generation：latent 可能尺度不稳、几何不规则、序列过长或含上层难以预测的局部细节。正确归因必须固定 generator 架构、训练数据、训练 FLOPs、sampling protocol 与 latent budget，只替换 tokenizer，并同时报告 reconstruction 与 downstream generation。
 
-## 6. 2023–2026 技术路线：四条正交分支
+<a id="6-20232026"></a>
+
+## 6. 表示方法
 
 ### 6.1 Fixed-grid 与量化仍是主干
 
@@ -219,11 +236,11 @@ VidTwin 的 backbone temporal attention 有 causal mask，但 structure Q-Former
 
 2026 的 V-RAE 与 VideoRAE 进一步用 frozen video foundation features 或 representation alignment，让 latent 同时保留感知与语义结构 [[24]](#ref-24) [[25]](#ref-25)。两者截至核验日均是预印本：
 
-- V-RAE 的时间合同依 encoder variant 而变；DINO/SigLIP/EUPE 变体是 chunk-causal，V-JEPA2.1 变体非因果，chunk 内仍可双向；
-- VideoRAE 分别提供 continuous 与 multi-codebook SimVQ 模式，不是一个 hybrid latent；其完整视频 encoder 没有提出 causal 合同；
+- V-RAE 的时间规格依 encoder variant 而变；DINO/SigLIP/EUPE 变体是 chunk-causal，V-JEPA2.1 变体非因果，chunk 内仍可双向；
+- VideoRAE 分别提供 continuous 与 multi-codebook SimVQ 模式，不是一个 hybrid latent；其完整视频 encoder 没有提出 causal 规格；
 - 两者的受控 generation 实验支持“更可生成的表示”假设，但尚不能写成社区共识。
 
-## 7. 里程碑与正式状态
+## 7. 代表工作
 
 | 首次公开 / 正式状态 | 节点 | 真正改变的轴 | 位流级别 | 不能越界的结论 |
 |---|---|---|---|---|
@@ -241,7 +258,9 @@ VidTwin 的 backbone temporal attention 有 causal mask，但 structure Q-Former
 
 “首次公开年 / 正式发表年”双列避免时间线漂移：例如 MAGVIT 是 2022 arXiv / CVPR 2023，MAGVIT-v2 是 2023 arXiv / ICLR 2024。专题比较优先使用正式状态；全书[时间线](../timeline.md)按首次公开定位并附 venue。
 
-## 8. 代表开放实现：artifact 也要分层
+<a id="8-artifact"></a>
+
+## 8. 开放实现
 
 | 实现 | 截止日状态 | 可核验内容 | 不应据此推断 |
 |---|---|---|---|
@@ -254,7 +273,11 @@ VidTwin 的 backbone temporal attention 有 causal mask，但 structure Q-Former
 
 有推理代码不等于有训练代码；有权重不等于训练数据与配方公开；代码许可证、模型许可证和依赖许可证也可能不同。
 
-## 9. TokenizerFork-1：一套实验，拆开五种主张
+<a id="9-tokenizerfork-1"></a>
+
+## 9. 实验设计示例
+
+本节是可按任务调整的实验设计示例，尚未在本仓库运行；参数与阈值是示例设置，不是已发布基准或实测结果。
 
 ### 9.1 冻结清单
 
@@ -268,7 +291,7 @@ VidTwin 的 backbone temporal attention 有 causal mask，但 structure Q-Former
 | 分叉 | 只改变什么 | 必须报告 | 证伪条件 |
 |---|---|---|---|
 | **量化器替换** | VQ / LFQ / FSQ / BSQ | 匹配 nominal bits 与经验 symbol entropy；重建、usage、吞吐、生成 | 优势在同码长同算力下消失，就不能归因量化机制 |
-| **因果合同** | full、frame/block causal、chunk/cache | prefix-invariance、full/chunk 等价、reset seam | 未来扰动改变前缀，或 chunk 输出不等价 |
+| **因果规格** | full、frame/block causal、chunk/cache | prefix-invariance、full/chunk 等价、reset seam | 未来扰动改变前缀，或 chunk 输出不等价 |
 | **adaptive 成本** | fixed、adaptive、oracle，在同平均/最坏预算下 | router/search/ILP、packing、p95、VRAM、质量尾部 | token 少但 wall-clock/VRAM 不降，或尾部质量崩坏 |
 | **生成/语义对齐** | 只换 tokenizer | reconstruction、semantic probe、gFVD/VBench、收敛 AUC | 匹配 generator/FLOPs 后收益消失 |
 | **structured 干预** | plane/branch 删除、置换、跨视频 swap | 身份/运动 probe、选择性迁移、重建与生成 | 各分支同样携带全部属性，强解耦主张失败 |
@@ -285,7 +308,7 @@ codec 分支必须额外交付：
 
 若数字只能由 $N\log_2K$、latent tensor bytes 或“compression ratio”推算，就停留在 BS0/BS1，不能称 actual bitrate。
 
-## 10. 失败定位与停止规则
+## 10. 故障诊断
 
 | 症状 | 优先怀疑 | 最小诊断 | 不应立即下的结论 |
 |---|---|---|---|
@@ -299,7 +322,7 @@ codec 分支必须额外交付：
 
 停止继续堆 tokenizer 容量的条件：若在相同 latent budget 与 generator 下，连续两轮只提高感知锐度，却不改善 OCR/身份/运动忠实、下游生成或端到端成本，应先定位 encoder 信息损失、decoder 幻觉、latent 几何和系统 packing，而不是继续扩大 decoder。
 
-## 11. 与其他章节的接口
+## 11. 相关专题
 
 - continuous latent 常接[扩散模型](diffusion-models.md)或 [Flow / Consistency](flow-consistency-models.md)；
 - discrete code ID 常接[自回归生成](autoregressive-generation.md)或[掩码生成](masked-generation.md)；
@@ -309,6 +332,11 @@ codec 分支必须额外交付：
 - 全局评测预算、人工评测与证据梯度见[评测指南](../evaluation.md)。
 
 建议阅读顺序：第 1 节先确定交付物，第 3 节核四本账，第 4 节做因果边界测试，第 5–7 节理解生成上限和技术分叉，最后用第 9–10 节写可证伪实验。完整检索式、纳排、证据等级和实现快照见[研究日志](../../sources/research_20260830_video_representation_tokenizers.md)。
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 

@@ -1,4 +1,12 @@
-# 因果、流式与实时视频生成：从 Diffusion Forcing 到可交互长视频
+<a id="diffusion-forcing"></a>
+
+# 因果与流式视频生成
+
+介绍因果训练、少步采样、历史缓存和流式输出的协同设计。
+
+**前置知识：** 自回归生成、扩散模型。
+
+**使用步骤：** 定义可见历史与输出提交时刻 → 检查训练历史和推理历史的一致性 → 测量首帧延迟、稳态速度及长期质量。
 
 离线视频扩散通常先确定一整段 clip，在所有时间位置之间反复交换信息，全部去噪完成后才解码。它适合追求整段一致性，却不适合“画面一边播放，用户一边改变指令”的场景。因果流式生成把视频拆成帧或时间块，只依赖已经生成的历史与当前待生成块，因而可以逐步输出、复用 KV cache，并在未知终止时间下继续生成。
 
@@ -15,7 +23,7 @@
 
 > 图中右侧是抽象机制，不代表所有模型都严格逐帧。很多方法在块与块之间保持因果性，却在当前块内部联合去噪多帧；这通常称为 **chunk-causal** 或 rolling-window generation。
 
-## 1. 先把容易混用的概念分开
+## 1. 术语与适用范围
 
 | 概念 | 最小定义 | 它不自动保证什么 |
 |---|---|---|
@@ -39,9 +47,9 @@ $c_k$ 可以是固定文本，也可以是在生成过程中更新的 prompt、�
 
 这里的“因果”首先是 **信息访问约束**，不是“模型已经学会因果规律”。一个只能看过去的模型仍可能让物体穿墙；一个动作条件模型也仍需反事实和闭环测试，才能证明其 world-model 能力。
 
-### 1.1 四层合同：上一层成立，不会自动推出下一层
+### 1.1 四层规格：上一层成立，不会自动推出下一层
 
-“因果视频系统”至少要冻结四份可分别证伪的合同。第一层的实现细节由[视频 Tokenizer 与生成式压缩](video-tokenizers.md)专章负责；本章只检查它交给生成器的接口。
+“因果视频系统”至少要冻结四份可分别证伪的规格。第一层的实现细节由[视频 Tokenizer 与生成式压缩](video-tokenizers.md)专章负责；本章只检查它交给生成器的接口。
 
 | 层 | 必须声明 | 最小反证测试 | 常见错误推论 |
 |---|---|---|---|
@@ -62,7 +70,7 @@ $c_k$ 可以是固定文本，也可以是在生成过程中更新的 prompt、�
 \text{real-time SLO}.
 ```
 
-### 1.2 四个时钟必须分别记账
+### 1.2 四类时间与成本
 
 - **数据时间 $k$**：正在生成第几帧、token 或 chunk；
 - **噪声时间 $\tau$**：当前活动单元沿 diffusion/flow 路径走到哪里；
@@ -71,7 +79,7 @@ $c_k$ 可以是固定文本，也可以是在生成过程中更新的 prompt、�
 
 一个 chunk 的 $\tau$ 走完四次网络调用，只能说明该 chunk 使用 4 NFE；它既不表示提交了 4 帧，也不说明四个播放 deadline 都满足。后文所有“步数”“帧率”“首帧”和“持续输出”都按这四个时钟解释。
 
-## 2. 为什么双向视频扩散难以流式输出
+## 2. 双向扩散的流式限制
 
 标准双向全片 **global dense-attention** DiT 令所有时空 token 互相注意。若每次去噪都重新处理 $N$ 个视频 token，attention 主项约为 $O(N^2d)$；window、sparse、linear 或 hybrid mixer 会改变这笔账，但只要旧 token 仍可读取未来，新增未来帧就可能改变旧上下文，旧计算也不能仅凭“attention 更省”而安全提交。更关键的是：双向模型在第一帧表示中使用了未来位置，完整未来不存在时，第一帧的计算图尚未闭合。
 
@@ -83,12 +91,12 @@ M_{KV}\propto L\,N_{history}\,d,
 
 其中 $L$ 是带缓存的层数，$N_{history}$ 是历史 token 数，$d$ 是每层保存的 key/value 宽度。因此“能用 cache”只是起点；窗口、压缩、检索或递归状态决定系统能否在几分钟后继续运行。
 
-## 3. 一张技术栈图：实时不是单个算法
+## 3. 流式生成系统架构
 
 ![图 014：因果流式视频生成的五层技术栈](../../assets/imagegen-diagrams/014/diagram.png)
 这五层可独立变化。评测发现的暴露偏移、漂移、冻结、遗忘或 deadline miss，应分别反馈到 on-policy 训练、memory policy 或 serving 层。一个论文可能只改训练范式，一个只压缩 KV cache，另一个只做 serving scheduler；比较时必须指出增益来自哪一层，否则容易把多卡系统吞吐误写成生成模型本身的质量进步。
 
-## 4. 训练路线一：Diffusion Forcing 改变“哪些位置有多噪”
+## 4. Diffusion Forcing
 
 传统 next-token 模型把历史视为完全确定、只预测下一个 token；全序列 diffusion 则通常让整段处于统一或相关的噪声阶段。**Diffusion Forcing** 为每个序列 token 采样独立噪声等级，允许历史接近干净、近未来部分去噪、远未来仍很噪 [[1]](#ref-1)。
 
@@ -129,7 +137,7 @@ z_i(\tau_i)=\alpha(\tau_i)z_i^0+\sigma(\tau_i)\epsilon_i,
 
 SCD 说明 causal computation 不一定要在每个 denoising step 的每一层重复；FlowCache 则说明 serving 侧加速也不一定改训练目标。它们补的是原有“forcing + KV cache”叙事遗漏的两个正交方向，而不是给现有方法换名字。
 
-## 5. 训练路线二：从双向教师蒸馏因果少步学生
+## 5. 因果少步蒸馏
 
 ### 5.1 CausVid：把 50 步双向模型变成 4 步因果学生
 
@@ -155,7 +163,7 @@ Teacher Forcing 训练第 $k$ 块时使用真实历史：
 \hat b_k=f_\theta(\hat b_{<k},\epsilon_k,c).
 ```
 
-即使每一步只产生很小误差，$`b_{\lt k}`$ 与 $`\hat b_{\lt k}`$ 的分布差异也会随 rollout 放大。这就是 exposure bias。它在视频里表现为身份渐变、背景漂移、色调累积、运动冻结或边界处突然跳变。
+即使每一步只产生很小误差，$b_{\lt k}$ 与 $\hat b_{\lt k}$ 的分布差异也会随 rollout 放大。这就是 exposure bias。它在视频里表现为身份渐变、背景漂移、色调累积、运动冻结或边界处突然跳变。
 
 ### 5.3 Self Forcing：训练时就活在自己的历史中
 
@@ -167,7 +175,9 @@ Self Forcing 在训练阶段进行带 KV cache 的自回归 rollout，让后续�
 - 被 stop-gradient 的历史虽然更真实，却不能从未来损失学习“应该怎样写入更有用的记忆”；
 - 若早期 student 太差，on-policy rollout 可能提供低质量上下文。
 
-### 5.4 Causal Forcing：先修正 teacher–student 架构缝隙
+<a id="54-causal-forcing-teacherstudent"></a>
+
+### 5.4 Causal Forcing 的教师与学生结构
 
 Causal Forcing 指出，用双向 teacher 的 PF-ODE 直接初始化逐帧因果 student 需要 frame-level injectivity；双向 teacher 依赖未来帧时，这一条件不成立，student 可能学到条件期望而非 teacher 的真实 flow map [[7]](#ref-7)。它改为先用 **autoregressive teacher** 做 ODE 初始化，再沿用 Self Forcing 式 DMD。
 
@@ -180,7 +190,9 @@ Causal Forcing 指出，用双向 teacher 的 PF-ODE 直接初始化逐帧因果
 
 这些结果表明，实时质量不只由最终 DMD 决定；student 怎样初始化、teacher 是否与 causal factorization 对齐、前后两阶段优化的散度方向，都会决定少步极限。
 
-## 6. 训练路线三：长期误差不只是 exposure bias
+<a id="6-exposure-bias"></a>
+
+## 6. 长时训练与误差累积
 
 截至 2026 年，研究开始把长期漂移拆成至少四种不同缝隙：
 
@@ -197,7 +209,7 @@ Causal Forcing 指出，用双向 teacher 的 PF-ODE 直接初始化逐帧因果
 
 **Video-Mirai** 则只在训练时引入非因果 foresight encoder：完整 rollout 的未来信息作为 stopped-gradient representation target，监督当前 causal state 保留未来有用的身份、布局和运动线索；推理时丢弃 foresight 模块，计算图仍严格 causal [[20]](#ref-20)。一句话概括：**因果性约束推理输入，不必禁止未来帧参与训练监督。**
 
-## 7. 记忆路线：长期一致性与固定资源的真正矛盾
+## 7. 历史与记忆管理
 
 一个流式模型必须回答两个问题：保留哪些历史，以及用什么表示保留。主流方案不是互斥的。
 
@@ -211,7 +223,7 @@ Causal Forcing 指出，用双向 teacher 的 PF-ODE 直接初始化逐帧因果
 | **Retrieval memory** | 将全部或压缩历史做可搜索外存，按内容取回 | 能跳过已经漂移的最近窗口，找回非局部事件 | 检索错误、索引和一致性成本 | LongLive-RAG [[19]](#ref-19) |
 | **Recurrent / SSM state** | 用固定大小递归状态汇总全历史，局部窗口补细节 | 时间线性、内存固定 | 固定状态可能成为信息瓶颈 | VideoSSM、ARL2 [[16]](#ref-16), [[25]](#ref-25) |
 
-把“显存固定”写成可审计合同，应同时记录 GPU working set 与外部存储：
+把“显存固定”写成可审计规格，应同时记录 GPU working set 与外部存储：
 
 ```math
 M_{recent}+M_{anchor}+M_{persistent}+M_{compressed}
@@ -221,7 +233,7 @@ M_{recent}+M_{anchor}+M_{persistent}+M_{compressed}
 
 而 $M_{ext}(k)$ 可以随已提交时长 $k$ 增长。把检索索引放到 CPU 或磁盘，只证明 resident GPU memory 有界，不能写成总系统成本恒定。
 
-![图 016：长时生成的有界记忆合同](../../assets/imagegen-diagrams/016/diagram.png)
+![图 016：长时生成的有界记忆规格](../../assets/imagegen-diagrams/016/diagram.png)
 顺序文字替代：已提交块先进入 recent window；过期后可以固定为锚点、选择为持久块、经过有损压缩、汇总进递归状态、写入外部索引或彻底丢弃。下一块只读取 GPU 预算内的 working set，并可按 query 从外存取回 top-$r$ 块；生成、提交后再写回窗口。对象离场回归、场景切换、小快物体和错误块四个 probe 分别检查遗忘、锚点污染、压缩损失和 cache poisoning。窗口恒定但回归身份失败，只能证明 fixed resident memory，不能证明长期记忆。
 
 几条 2026 年路线说明“压 cache”也不是单一问题：
@@ -236,9 +248,13 @@ M_{recent}+M_{anchor}+M_{persistent}+M_{compressed}
 
 这些方法的公平比较至少要固定基础模型、有效历史范围、分辨率、精度和输出时长。只在 5 秒视频上测峰值显存，不能证明几分钟后的内存仍然有界。
 
-## 8. 系统路线：先定义提交，再谈实时 SLO
+<a id="8-slo"></a>
 
-### 8.1 Streaming 是提交合同，不是“循环能一直跑”
+## 8. 输出提交与实时性能
+
+<a id="81-streaming"></a>
+
+### 8.1 流式输出提交规则
 
 令 $h$ 为最高已提交索引，$s_{h+1:h+w}$ 为活动的 speculative window。一个实现至少要声明：
 
@@ -293,7 +309,9 @@ StreamDiffusionV2 将问题明确写成 serving SLO：使用 SLO-aware batching�
 
 一个更诚实的实时报告应包含：冷启动和热启动 TTFF、逐帧延迟分布、连续 1 分钟以上的 deadline miss、端到端 VAE/传输时间、batch size、精度、编译与量化、GPU 型号与数量、功耗，以及质量随步数变化的曲线。
 
-## 9. 里程碑：技术转折、正式状态与 artifact 分开记
+<a id="9-artifact"></a>
+
+## 9. 代表方法
 
 下面只选改变问题定义、训练范式、记忆机制或部署协议的节点。首次预印本、正式发表和可运行 artifact 是三条不同时间轴；论文接收不能代替代码、权重或独立复现。
 
@@ -304,17 +322,17 @@ StreamDiffusionV2 将问题明确写成 serving SLO：使用 SLO-aware batching�
 | 2025-06 → NeurIPS 2025 | Self Forcing [[3]](#ref-3) | 训练时进入自身 rollout 分布，显式处理 exposure bias | 代码、训练配置与 checkpoint [![GitHub: guandeh17/Self-Forcing](https://img.shields.io/github/stars/guandeh17/Self-Forcing?style=social)](https://github.com/guandeh17/Self-Forcing)公开 | 历史 KV 可从未来损失端到端学习 |
 | 2025-09 → ICLR 2026 | Rolling Forcing [[4]](#ref-4) | 活动窗口联合去噪、sink 与 train-long-test-long；不再要求相邻帧严格串行完成 | 代码、训练与 checkpoint [![GitHub: TencentARC/RollingForcing](https://img.shields.io/github/stars/TencentARC/RollingForcing?style=social)](https://github.com/TencentARC/RollingForcing)公开 | 0.76 s steady-state 是 TTFF，或窗口内严格 frame-causal |
 | 2025-09 → ICLR 2026 | LongLive [[5]](#ref-5) | frame sink、短窗口、self-history 长训与 prompt KV-recache 汇合 | 代码与权重 [![GitHub: NVlabs/LongLive](https://img.shields.io/github/stars/NVlabs/LongLive?style=social)](https://github.com/NVlabs/LongLive)公开；论文数字应对应 v1.0 | 240 s 展示全程稳定或任意时长无损 |
-| 2025-10/11 → MLSys 2026 | StreamDiffusionV2 [[6]](#ref-6) | 把 TTFF、deadline、jitter、batching 与多卡 pipeline 放到核心系统合同 | 推理代码、PyPI 与 checkpoint [![GitHub: chenfengxu714/StreamDiffusionV2](https://img.shields.io/github/stars/chenfengxu714/StreamDiffusionV2?style=social)](https://github.com/chenfengxu714/StreamDiffusionV2)公开；训练与部分 scheduler 仍未齐 | 多卡 aggregate FPS 等于单流延迟 |
+| 2025-10/11 → MLSys 2026 | StreamDiffusionV2 [[6]](#ref-6) | 把 TTFF、deadline、jitter、batching 与多卡 pipeline 放到核心系统规格 | 推理代码、PyPI 与 checkpoint [![GitHub: chenfengxu714/StreamDiffusionV2](https://img.shields.io/github/stars/chenfengxu714/StreamDiffusionV2?style=social)](https://github.com/chenfengxu714/StreamDiffusionV2)公开；训练与部分 scheduler 仍未齐 | 多卡 aggregate FPS 等于单流延迟 |
 | 2026-02 → ICML 2026 accepted | Causal Forcing [[7]](#ref-7) | 用 AR teacher 修正双向 teacher → 因果 student 的 flow-map 缝隙，再做 self-forcing DMD | 代码、配置与 checkpoint [![GitHub: thu-ml/Causal-Forcing](https://img.shields.io/github/stars/thu-ml/Causal-Forcing?style=social)](https://github.com/thu-ml/Causal-Forcing)公开；截至冻结日未定位 PMLR 页面 | 原生 81-frame 配置自动支持开放长视频 |
 | 2026-02 → CVPR 2026 | Separable Causal Diffusion [[26]](#ref-26) | once-per-frame causal encoder 与 multi-step frame renderer 解耦 | 正式论文、补充材料与项目页公开；未定位可核验官方代码/checkpoint | causal computation 可分离就等于 self-forcing 或 1-step |
 | 2026-02 → ICLR 2026 | FlowCache [[27]](#ref-27) | 每个 AR chunk 独立 feature-cache policy，并联合压缩 KV | MAGI-1 / SkyReels-V2 代码 [![GitHub: mikeallen39/FlowCache](https://img.shields.io/github/stars/mikeallen39/FlowCache?style=social)](https://github.com/mikeallen39/FlowCache)公开 | 2.38×/6.7× 离线加速已达到实时 SLO |
 | 2025-11 → ICLR 2026 | MotionStream [[28]](#ref-28) | 在线轨迹/相机控制、Self Forcing、sink 与固定滑窗汇合 | 官方仓库 [![GitHub: alex4727/motionstream](https://img.shields.io/github/stars/alex4727/motionstream?style=social)](https://github.com/alex4727/motionstream)仍说明代码在内部审核；无可运行权重 | prompt/trajectory 遵循等于物理动作因果 |
 | 2026-05/06 → 预印本/技术报告 | Causal Forcing++ / Causal-rCM [[8]](#ref-8), [[9]](#ref-9) | 相邻时间点 consistency 初始化与统一 TF→SF recipe，把 step/NFE 口径推到核心 | 共享仓库已有部分代码与 checkpoint；正式 venue 未核验 | 名义 1 step 等于 1 NFE 或端到端首帧 1 step |
-| 2026 → 混合正式接收与预印本 | memory / sparse / recurrent frontier [[10]](#ref-10)–[[21]](#ref-21), [[25]](#ref-25) | 从 recent window 扩展到量化、低秩、持久块、分层、检索、递归状态与未来表示监督 | release surface 必须逐项查，不能整体继承“开放” | fixed resident memory 等于完整长期记忆 |
+| 2026 → 混合正式接收与预印本 | memory / sparse / recurrent frontier [[10]](#ref-10)–[[21]](#ref-21), [[25]](#ref-25) | 从 recent window 扩展到量化、低秩、持久块、分层、检索、递归状态与未来表示监督 | 发布内容 必须逐项查，不能整体继承“开放” | fixed resident memory 等于完整长期记忆 |
 
-Stream4D、MV-Forcing 与 JoyAI-Video-Edit [[22]](#ref-22)–[[24]](#ref-24) 是动态 4D 奖励、多视角和源视频编辑的相邻任务扩展。它们可以复用 causal/streaming backbone，却不应与生成器提交合同混成一张主里程碑表；相应质量还要分别检查几何、跨视角或源视频保持。相机 × 世界时间、像素网格与可渲染状态的完整边界见[多视角与 4D 专章](../tasks/multiview-4d-generation.md)。
+Stream4D、MV-Forcing 与 JoyAI-Video-Edit [[22]](#ref-22)–[[24]](#ref-24) 是动态 4D 奖励、多视角和源视频编辑的相邻任务扩展。它们可以复用 causal/streaming backbone，却不应与生成器提交规格混成一张主里程碑表；相应质量还要分别检查几何、跨视角或源视频保持。相机 × 世界时间、像素网格与可渲染状态的完整边界见[多视角与 4D 专章](../tasks/multiview-4d-generation.md)。
 
-## 10. “长视频”不等于“实时”：四个常见误读
+## 10. 流式部署限制
 
 ### 10.1 展示几分钟，不代表几分钟都稳定
 
@@ -349,7 +367,7 @@ Stream4D、MV-Forcing 与 JoyAI-Video-Edit [[22]](#ref-22)–[[24]](#ref-24) 是
 
 公平报告应把“尚未失败”的 rollout 作为右删失样本进入 survival curve，而不是把最长一个 demo 当成平均寿命。固定窗口可以让系统一直被调用，但若第 40 秒后身份已丢失，它只证明程序没有退出，不证明内容仍然有效。
 
-## 11. 长时流式生成的八类失败
+## 11. 故障诊断
 
 1. **Exposure bias**：自身误差进入下一步条件，逐块放大；
 2. **Identity / layout drift**：人物、物体和背景慢慢变成另一个状态；
@@ -362,7 +380,7 @@ Stream4D、MV-Forcing 与 JoyAI-Video-Edit [[22]](#ref-22)–[[24]](#ref-24) 是
 
 Stream4D 还指出一个更隐蔽的训练捷径：用静态 3D reconstruction critic 奖励动态视频时，真实运动会被当成重建误差，模型反而可通过冻结画面取得高分；其 4D reconstruction reward、motion prior 与 perceptual anchor 尝试让几何一致与自然运动不再互相惩罚 [[22]](#ref-22)。
 
-## 12. 最小公平评测协议
+## 12. 评测配置
 
 ### 12.1 生成质量
 
@@ -396,9 +414,11 @@ Stream4D 还指出一个更隐蔽的训练捷径：用静态 3D reconstruction c
 - 分开记录 GPU resident memory、CPU/外存、索引大小与 retrieval latency；
 - 同时给单卡与多卡结果，不能用多卡 aggregate FPS 替代单流延迟。
 
-### 12.5 `StreamFork-1`：把四层合同变成可运行的反证实验
+<a id="125-streamfork-1"></a>
 
-`StreamFork-1` 是本仓库提出的**预注册实验草案，尚未实际运行**。它不构成独立复现，也不提高本章 coverage 深度；其作用是把“以后复现一下”变成明确的失败条件。
+### 12.5 流式生成对照实验：把四层规格变成可运行的反证实验
+
+以下流式生成对照实验是**建议设计，尚未运行**。执行前应固定配置、对照和失败条件；结果用于检验输出因果性、连续提交、资源占用和响应时限。
 
 **冻结 manifest：**
 
@@ -416,14 +436,14 @@ load_profile: "batch=1 plus declared concurrent arrival process"
 
 **四组最小实验：**
 
-1. **未来泄漏与 commit。** 相同 prefix、seed 与当前条件，只改变隐藏 suffix、未来 prompt 或 padding；保存每个 decoded commit 的 hash。$j\le h-R$ 仍发生变化即证伪声明的 causal/commit 合同。
+1. **未来泄漏与 commit。** 相同 prefix、seed 与当前条件，只改变隐藏 suffix、未来 prompt 或 padding；保存每个 decoded commit 的 hash。$j\le h-R$ 仍发生变化即证伪声明的 causal/commit 规格。
 2. **history exposure。** 在同 backbone、teacher、cache、有效 NFE 下对比 GT/noised-GT、self-rollout 与混合 rollout；在 1×/2×/6×/12× 训练窗上记录首次不可恢复失败。self-history 比例未记录，或外推 survival 无改善，就不能把收益归因于 exposure matching。
 3. **内存与长期回忆。** 连续生成 5 s、1 min、4 min，记录 GPU/CPU/外存斜率，并放入对象离场—回归、场景切换、小快物体和错误块。显存上升证伪 fixed-resident-memory；显存恒定但身份回归失败，则不能声称无损长期记忆。
 4. **端到端实时性。** 计入 text encoder、DiT、codec/VAE、queue、传输与 display，分别测 cold/warm、单流/并发、条件到可见响应、p50/p95/p99、jitter、miss、功耗和断流恢复。平均 FPS 达标但预注册 deadline miss 超限，即证伪实时 SLO。
 
 **必须交付的证据包：** `manifest.yaml`、环境锁、完整命令、`trace.jsonl` 原始时间戳、`commits.csv` 与 hashes、全部视频和失败样本、NFE hook 日志、quality–time/survival/memory/latency 图，以及 evaluator 版本。若只交精选 demo、平均 FPS 或作者表格，实验判定为未完成。
 
-## 13. 研究路线怎样选
+## 13. 方法选择
 
 | 如果你的核心问题是 | 优先复现 | 必做对照 |
 |---|---|---|
@@ -438,7 +458,7 @@ load_profile: "batch=1 plus declared concurrent arrival process"
 | 流式编辑 | JoyAI-Video-Edit | 源视频保持、编辑成功、长时漂移、端到端 720p 延迟 |
 | 几何与动态一致 | Stream4D / MV-Forcing | 4D reconstruction、motion collapse、多视角/长时联合测试 |
 
-## 14. 最小阅读路径
+## 14. 延伸阅读
 
 1. **Diffusion Forcing**：理解独立噪声日程怎样连接 next-token 与全序列 diffusion；
 2. **CausVid**：理解双向 teacher 到少步 causal student；
@@ -451,7 +471,7 @@ load_profile: "batch=1 plus declared concurrent arrival process"
 9. **MotionStream + Video-Mirai + Self Gradient Forcing**：进入在线控制、“为未来写表示”和补历史梯度；
 10. **Stream4D / MV-Forcing / JoyAI-Video-Edit**：把 4D、多视角和编辑视作使用同类 backbone 的相邻任务，而非主线能力自动升级。
 
-## 15. 证据边界与调研方法
+## 15. 资料范围
 
 - 本章的速度、分数与最长时长均标为**作者报告**；除正式会议页面外，不把预印本主张写成社区共识。
 - 不跨硬件、分辨率、模型规模、步数或是否含 VAE 解码直接排名。

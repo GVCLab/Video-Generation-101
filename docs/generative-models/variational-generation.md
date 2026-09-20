@@ -1,10 +1,17 @@
-# 变分随机视频生成：从 learned prior 到对象粒子世界模型
+<a id="learned-prior"></a>
 
-> 本章资料核验截至 **2026-08-30**。这里的 VAE 指用训练 posterior 与部署 prior 建模**同一历史之后的随机未来**；把已知完整视频压缩成 latent、供 diffusion / flow / AR 使用的“video VAE”属于[视频 Tokenizer、Codec 与生成式压缩](video-tokenizers.md)，不是本章同一个概率合同。
+# 变分视频生成
+
+介绍随机潜变量、时序条件 ELBO、后验坍塌与多未来建模。
+
+**前置知识：** 变分推断、条件概率。
+
+**使用步骤：** 区分训练后验与推理先验 → 设计潜变量位置和随机性 → 检查潜变量利用率、未来覆盖与概率校准。
+
 
 本章先回答一个比“模型名里有没有 latent/VAE”更严格的问题：**部署时，随机变量究竟从哪里来？** 若它来自不看未来的 generative prior（可固定，也可由历史和合法条件学习），并在训练中由能看真实未来的 posterior 通过 KL/ELBO 对齐，才进入严格主线。
 
-## 1. 先明确任务：预测未知未来，不是编码已知视频
+## 1. 任务定义
 
 给定相同历史 $h=x_{1:C}$，真实世界可能出现多个合理未来 $y=x_{C+1:K}$。本章研究
 
@@ -17,7 +24,7 @@ p_\psi(z\mid h,c)\,\mathrm dz,
 
 其中 $c$ 可包含合法动作、语言或目标，$z$ 表达历史和条件仍未唯一决定的未来因素。训练时可以用真实未来形成 posterior $q_\phi(z\mid h,y,c)$；部署时未来尚不存在，只能从 $p_\psi(z\mid h,c)$ 采样。固定标准先验是 $p_\psi$ 的特例；图 1 展示的是信息利用更充分的 learned-prior 版本。
 
-![变分随机视频训练与部署信息合同：训练时历史与真实未来进入 posterior，部署时只有历史进入 learned prior，二者经 KL 对齐并由共享 decoder 产生左转、右转或停止三种未来；右侧依次检查 latent 是否改变事件、prior 与 posterior 是否匹配、是否覆盖有效模式以及事件频率是否校准；底部警告 best-of-100 锐利样本不等于校准分布](../../assets/diagrams/variational-future-contract.png)
+![变分随机视频训练与部署信息规格：训练时历史与真实未来进入 posterior，部署时只有历史进入 learned prior，二者经 KL 对齐并由共享 decoder 产生左转、右转或停止三种未来；右侧依次检查 latent 是否改变事件、prior 与 posterior 是否匹配、是否覆盖有效模式以及事件频率是否校准；底部警告 best-of-100 锐利样本不等于校准分布](../../assets/diagrams/variational-future-contract.png)
 
 _图 1：future-aware posterior 只属于训练；history-only prior 才是部署接口。生成“左/右/停”三个样本还不够，必须继续检查 latent 使用、prior gap、有效覆盖和频率校准。_
 
@@ -46,7 +53,9 @@ _图 1：future-aware posterior 只属于训练；history-only prior 才是部�
 ![图 028：latent 系统的严格分类门](../../assets/imagegen-diagrams/028/diagram.png)
 顺序化文字替代：遇到 latent/VAE 名称，先找能看真实未来的训练 posterior；再找固定或只看历史与合法条件、绝不看未来的部署 prior；再核对 KL/ELBO；最后确认测试确实从 prior 采样。四项都成立才进入严格随机未来主线。缺任一项时分别检查 tokenizer、diffusion/flow、确定性层级、latent action 或 posterior oracle。
 
-## 2. 从不可算 posterior 到顺序条件 ELBO
+<a id="2-posterior-elbo"></a>
+
+## 2. 时序条件 ELBO
 
 ### 2.1 静态 VAE 只是起点
 
@@ -131,7 +140,9 @@ VRNN 给出逐步 latent 的通用序列框架 [[2]](#ref-2)；SV2P 将其用于
 - adversarial/perceptual loss 可提高锐利度，但会改变 likelihood 解释；SAVP 正是 VAE + GAN 的代表 [[5]](#ref-5)。
 - masked、flow、landmark、reward 等辅助目标能改变 representation；下游收益必须和未来分布校准分开。
 
-### 2.4 五种 gap 必须分账
+<a id="24-gap"></a>
+
+### 2.4 五类训练与部署偏差
 
 | gap | 定义 | 最小诊断 | 常见误判 |
 |---|---|---|---|
@@ -143,7 +154,9 @@ VRNN 给出逐步 latent 的通用序列框架 [[2]](#ref-2)；SV2P 将其用于
 
 Improved Conditional VRNNs 将一部分模糊定位为 hierarchy 与 likelihood capacity 不足 [[7]](#ref-7)；PlaNet 的 latent overshooting 则直接针对多步 prior 对齐 [[9]](#ref-9)。二者修的不是同一个 gap。
 
-## 3. latent 放在哪里：六条技术路线
+<a id="3-latent"></a>
+
+## 3. 潜变量设计
 
 ### 3.1 结构与验证方式
 
@@ -159,9 +172,11 @@ Improved Conditional VRNNs 将一部分模糊定位为 hierarchy 与 likelihood 
 SRVP 把完整时序演化移到 latent residual process，frame generator 只负责渲染 [[10]](#ref-10)。这不是“再堆一层 latent”，而是把动力学和像素回灌解耦。
 
 ![图 029：变分随机视频生成的机制演化](../../assets/imagegen-diagrams/029/diagram.png)
-顺序化文字替代：VRNN 建立逐步随机状态，SV2P 将未来 posterior 与固定 prior 接到视频，SVG-LP 改为历史条件 learned prior。随后一支提升容量和 latent 深度，一支把 dynamics 完全移入 latent；再分别发展成贪心深层、固定/事件时间抽象和 object/module 结构。DDLP 在 2023/2024 把粒子 posterior 与 Transformer dynamics prior 接成直接对象粒子预测，LPWM 在 2026 再加入 latent action 与多条件控制。PlaNet–Dreamer 则把同类数学接到 action/reward/return。开放域高保真生成的另一主流转向表示 VAE/VQ 加 diffusion/flow/AR，那是不同合同。
+顺序化文字替代：VRNN 建立逐步随机状态，SV2P 将未来 posterior 与固定 prior 接到视频，SVG-LP 改为历史条件 learned prior。随后一支提升容量和 latent 深度，一支把 dynamics 完全移入 latent；再分别发展成贪心深层、固定/事件时间抽象和 object/module 结构。DDLP 在 2023/2024 把粒子 posterior 与 Transformer dynamics prior 接成直接对象粒子预测，LPWM 在 2026 再加入 latent action 与多条件控制。PlaNet–Dreamer 则把同类数学接到 action/reward/return。开放域高保真生成的另一主流转向表示 VAE/VQ 加 diffusion/flow/AR，那是不同规格。
 
-### 3.2 prior 不是只有“固定或 learned”两档
+<a id="32-prior-learned"></a>
+
+### 3.2 先验分布的设计维度
 
 | prior 家族 | 优点 | 风险 | 公平比较 |
 |---|---|---|---|
@@ -174,7 +189,9 @@ SRVP 把完整时序演化移到 latent residual process，frame generator 只�
 
 “learned prior”只证明参数依赖历史，不证明它覆盖 posterior，更不证明 rollout 频率正确。
 
-## 4. 不确定性：aleatoric、epistemic 与 partial observability
+<a id="4-aleatoricepistemic-partial-observability"></a>
+
+## 4. 不确定性分类
 
 | 类型 | 来源 | 单 checkpoint 重采样能否充分测到 | 推荐证据 |
 |---|---|---|---|
@@ -186,7 +203,9 @@ NUQ 用层级变分网络从 latent variance 构造 predictive uncertainty 并�
 
 最低报告要求：把**同一 checkpoint 内 seed 方差**与**不同数据重采样/训练 seed/模型成员方差**分开。前者主要反映 learned stochasticity，后者才更接近 epistemic component。
 
-## 5. Posterior collapse：因果图、诊断与修复
+<a id="5-posterior-collapse"></a>
+
+## 5. 后验坍塌
 
 posterior collapse 指 decoder 或 deterministic recurrence 能绕过 $z$，使 $q\approx p$、KL 接近零、改变 $z$ 也不改变有意义的未来。Lagging Inference Networks 说明强生成网络与滞后 inference network 可能形成不利训练动力学 [[6]](#ref-6)。
 
@@ -218,7 +237,9 @@ posterior collapse 指 decoder 或 deterministic recurrence 能绕过 $z$，使 
 
 停止条件不是“KL 变大”，而是：$z$ 干预产生可解释且持续的事件变化，prior 样本符合历史，覆盖提升没有靠事实错误或噪声换取。
 
-## 6. 2015–2026 milestone：首次公开、正式状态与边界
+<a id="6-20152026-milestone"></a>
+
+## 6. 代表工作
 
 | 首次公开 / 正式状态 | 节点 | 核心变化 | 协议锚点 | 不可越界的结论 |
 |---|---|---|---|---|
@@ -247,15 +268,19 @@ posterior collapse 指 decoder 或 deterministic recurrence 能绕过 $z$，使 
 | 2026 / ICLR 2026 Oral | LPWM [[23]](#ref-23) | particles + latent action + variational dynamics | 多个机器人/游戏数据，开放代码/权重 | 对象粒子前沿，不是通用 camera-motion 解法 |
 | 2026 / Neural Networks | Implicit hierarchical temporal–spatial residual model [[24]](#ref-24) | prior–posterior residual + spatial hierarchy | 3 个长预测数据集，作者协议 | 正式延续不等于重回 foundation-model 主干 |
 
-一个重要纠错：**Hierarchical Long-term Video Prediction without Supervision** 使用高层 feature prediction、feature-space adversarial loss 和 decoder/mask，没有上述 q/p/ELBO 合同 [[25]](#ref-25)。它仍是层级长预测历史节点，但必须从“分层随机 latent”表中移出。
+一个重要纠错：**Hierarchical Long-term Video Prediction without Supervision** 使用高层 feature prediction、feature-space adversarial loss 和 decoder/mask，没有上述 q/p/ELBO 规格 [[25]](#ref-25)。它仍是层级长预测历史节点，但必须从“分层随机 latent”表中移出。
 
-## 7. 详细 paper review：按问题而非排行榜阅读
+<a id="7-paper-review"></a>
 
-### 7.1 SV2P → SVG-LP → SAVP：先解决部署随机接口
+## 7. 方法比较
+
+<a id="71-sv2p-svg-lp-savp"></a>
+
+### 7.1 SV2P、SVG-LP 与 SAVP 的随机预测接口
 
 **SV2P** 的价值是承认给定同一过去时未来多峰，并让 posterior 在训练解释实际未来；其 fixed $N(0,I)$ prior 简单，却容易与聚合 posterior 错配。论文图 6 从 100 个样本中按最高 PSNR 选择 oracle 样本，并报告该样本的 PSNR/SSIM；这只能回答“样本集合里是否有一个接近记录真值”，不能分别把两项都解释成校准指标。
 
-**SVG-LP** 将 $p(z_t)$ 改为 $`p(z_t\mid x_{\lt t})`$，让历史改变未来 latent 分布。它把 deterministic path 与 stochastic residual 接在逐步预测上，但 teacher-forced 对齐不保证 long open-loop prior 仍校准。
+**SVG-LP** 将 $p(z_t)$ 改为 $p(z_t\mid x_{\lt t})$，让历史改变未来 latent 分布。它把 deterministic path 与 stochastic residual 接在逐步预测上，但 teacher-forced 对齐不保证 long open-loop prior 仍校准。
 
 **SAVP** 为 prior sample 加 video discriminator，尝试同时保留 VAE coverage 与 GAN sharpness。论文还展示远超训练 future=10 的长 rollout；这类质性外推可用于发现失败，不能当作 500-step 定量保证。
 
@@ -275,7 +300,9 @@ CW-VAE 让高层按 $k^{l-1}$ 的慢时钟更新，非活跃时刻 copy latent�
 
 VPR 不使用固定 clock，而由 latent change detection 触发 renewal，适合事件边界不均匀的序列。它补的是**何时更新高层**，不是提高开放域像素 fidelity 的直接证据。
 
-### 7.4 S3VAE、SLAMP、G-SWM、VIM：结构先验必须接受反事实
+<a id="74-s3vaeslampg-swmvim"></a>
+
+### 7.4 结构先验与反事实验证
 
 S3VAE 将 sequence latent 拆成 static $z_f$ 与 dynamic $z_{1:T}$，加光流/landmark/audio 等自监督信号；SLAMP 则以 appearance 与 flow/motion 两个随机分支生成并融合。两者的分支名称都是假设，只有 swap、counterfactual、probe 与 OOD 才能证明各分支稳定承载预期因素。
 
@@ -291,7 +318,9 @@ PlaNet 将 deterministic recurrent state 与 stochastic state 组合，posterior
 
 这条路线把“视频是否好看”降为中间证据，最终看 reward、continue、policy return 和 model exploitation。Nature 论文展示 5 context frames + actions 后预测 45 frames，但 150+ task return 才是主证据 [[22]](#ref-22)。因此它应在本章讲变分接口，在 [World Models](../world-models.md) 讲控制效用。
 
-### 7.7 2024–2026：分流而不是“VAE 消失”
+<a id="77-20242026vae"></a>
+
+### 7.7 2024–2026 年的变分方法分支
 
 RSP 在 Kinetics-400 上用 32×32 categorical future latent 与 masked-image objective 学表示，作者明确承认生成质量不高、只预测单个 future frame、未扩到大模型/多帧 [[21]](#ref-21)。这是“随机预测作为 representation learning signal”的复兴，不是高保真视频生成里程碑。
 
@@ -301,9 +330,9 @@ LPWM 在 2026 重新把显式 stochastic ELBO、对象粒子和 latent action �
 
 同年 Neural Networks 的 implicit hierarchical temporal–spatial residual model 直接建模 prior–posterior residual 并做 spatial hierarchy [[24]](#ref-24)。它说明 direct variational long-term prediction 仍在发展；目前证据不足以声称其重新成为通用视频 foundation model 的主 backbone/objective。
 
-## 8. 多未来评测：不同、正确、频率正确必须同时成立
+## 8. 多未来评测
 
-### 8.1 四种样本汇总必须分栏
+### 8.1 四种样本汇总方式
 
 设 $d(\hat y,y)$ 越小越好：
 
@@ -317,7 +346,7 @@ $\text{Best}_K$ 随 $K$ 增大天然更容易改善；它不是 proper scoring r
 
 ### 8.2 事件级 proper score
 
-对可枚举事件 $`m\in\lbrace1,\ldots,M\rbrace`$，模型概率为 $\pi$，真实 one-hot 为 $o$，Brier score：
+对可枚举事件 $m\in\lbrace1,\ldots,M\rbrace$，模型概率为 $\pi$，真实 one-hot 为 $o$，Brier score：
 
 ```math
 \mathrm{Brier}(\pi,o)=\sum_{m=1}^{M}(\pi_m-o_m)^2.
@@ -361,14 +390,18 @@ statistics: training seeds; sample seeds; bootstrap unit; CI; multiple compariso
 compute: params; active FLOPs; train FLOPs; wall-clock; hardware; memory
 ```
 
-## 9. `LatentFork-1`：有真分布、等预算和否证阈值的实验
+<a id="9-latentfork-1"></a>
+
+## 9. 实验设计示例
 
 > 状态：**协议草案，尚未运行**。下述阈值用于 private test 前预注册，不是论文结果或领域公认标准。
 
-### 9.1 机制集 `Forking-Squares-v1`
+<a id="91-forking-squares-v1"></a>
+
+### 9.1 机制集 合成分叉方块数据示例
 
 - 64×64；8 context + 24 future。
-- 同一 prefix 的 64 个重复未来完全共享前 8 帧；prefix 中有可见 cue $`g\in\lbrace\text{cyan},\text{amber},\text{violet}\rbrace`$，对应 **left/right/stop** 真分布分别为 $(0.6,0.3,0.1)$、$(0.2,0.7,0.1)$、$(0.1,0.2,0.7)$。三种 cue 在 split 内平衡，模型不得读取未来随机数。
+- 同一 prefix 的 64 个重复未来完全共享前 8 帧；prefix 中有可见 cue $g\in\lbrace\text{cyan},\text{amber},\text{violet}\rbrace$，对应 **left/right/stop** 真分布分别为 $(0.6,0.3,0.1)$、$(0.2,0.7,0.1)$、$(0.1,0.2,0.7)$。三种 cue 在 split 内平衡，模型不得读取未来随机数。
 - 按初始状态分组切分 10,000 train / 2,000 val / 2,000 test，禁止同一初始参数跨 split。
 - 每个 test prefix 由 simulator 生成 64 个真实 futures，并保存 mode、概率、轨迹、identity 和 validity。
 - generator、manifest、split 与输出 hash 在训练前冻结；隐藏未来被替换时，部署 prior 输出不得变化。
@@ -416,7 +449,7 @@ compute: params; active FLOPs; train FLOPs; wall-clock; hardware; memory
 - 控制收益只来自更多 planner rollouts；
 - 把同一 checkpoint 的 aleatoric sampling 当成 epistemic uncertainty。
 
-## 10. 失败定位、停止规则与现代接口
+## 10. 故障诊断
 
 | 症状 | 优先怀疑 | 最小诊断 | 不应立即下的结论 |
 |---|---|---|---|
@@ -435,19 +468,24 @@ compute: params; active FLOPs; train FLOPs; wall-clock; hardware; memory
 - stochastic future $z$ 表达**未知未来**；tokenizer latent 表达**已知视频**。
 - diffusion/flow 在 tokenizer latent 上生成，不会把 tokenizer KL 与 score/flow objective 合成一个 posterior。
 - RSSM 的变分接口可在本章复用；action/reward/value、planning 和 return 留在 [World Models](../world-models.md)。
-- latent action 只有在 inverse posterior 与 deployment policy/generative prior 有变分对齐时，才进入本章的交叉区域；PlaySlot 这类无该合同的方法应留在可控路线 [[29]](#ref-29)。
+- latent action 只有在 inverse posterior 与 deployment policy/generative prior 有变分对齐时，才进入本章的交叉区域；PlaySlot 这类无该规格的方法应留在可控路线 [[29]](#ref-29)。
 - causal/streaming 还需独立验收 cache、commit、latency 与 SLO，见 [Causal / Streaming](causal-streaming-generation.md)。
 
-## 11. 阅读与复现顺序
+## 11. 延伸阅读
 
 1. 用第 1 节五问门判断“latent”属于哪一角色。
 2. 用第 2 节写出训练 posterior 和部署 prior 的可见信息，不先看模型图。
 3. 用第 3–5 节定位 latent placement、uncertainty type 与 collapse/gap。
 4. 按第 7 节的问题链读 paper，而不是按 best-of-100 排榜。
 5. 用第 8 节重建 protocol manifest；协议不同的数字不横排。
-6. 先跑 `Forking-Squares-v1` 证伪接口，再决定是否进入 VP² 或真实视频。
+6. 先跑 合成分叉方块数据示例 证伪接口，再决定是否进入 VP² 或真实视频。
 
 检索式、首次公开/正式状态、作者协议、近似项排除与教学图生成记录见[专项研究轨迹](../../sources/research_20260830_variational_video_generation.md)。
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 

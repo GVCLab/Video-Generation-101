@@ -1,10 +1,17 @@
-# 自回归视频生成：表示、提交粒度与串行代价
+# 自回归视频生成
 
-> 本章截至 2026-08-30，依据正式会议论文、作者论文与官方发布面整理。阅读主线是：先判断联合分布按什么单位分解，再判断每个条件分布用 categorical、diffusion、flow 还是 masked refinement 实现，最后才讨论 KV cache、few-step 与 streaming。
+说明视频联合分布的顺序分解、生成粒度、条件预测头和缓存机制。
+
+**前置知识：** 条件概率、序列模型。
+
+**使用步骤：** 确定 token、帧或块的生成顺序 → 区分教师强制与自生成历史 → 测量串行开销、缓存占用和长期误差。
+
 
 “自回归视频生成”不是“离散 tokenizer + 交叉熵”的同义词。生成变量可以是原始像素、离散视觉码或连续 latent；一次提交可以是一个 token、一组 token、一帧或一个时间块；单个条件分布还可以由 diffusion/flow head 建模。反过来，使用 causal attention、少步去噪或流式服务，也不自动使系统成为严格的 next-token AR。
 
-## 📋 1. 先定义：AR 是 factorization，不是模型品牌
+<a id="1-ar-factorization"></a>
+
+## 1. 自回归分解
 
 ### 1.1 严格自回归：每个变量都有一个全序
 
@@ -58,7 +65,9 @@ p(Y_k\mid Y_{<k},c).
 4. 单个错误会以多大单位进入未来上下文；
 5. “一步”究竟指 token、refinement round、noise-time NFE，还是一次外层 frame/chunk commit。
 
-### 1.4 一张图定位一个 AR 系统
+<a id="14-ar"></a>
+
+### 1.4 自回归系统组成
 
 ![图 012：自回归视频生成的三层选择](../../assets/imagegen-diagrams/012/diagram.png)
 **图的顺序化文字替代：**
@@ -68,11 +77,13 @@ p(Y_k\mid Y_{<k},c).
 3. 然后确定每个条件分布由 categorical head、逐 token diffusion/flow head、masked refinement 或完整视频 backbone 的去噪过程实现。
 4. VideoGPT、NOVA、Lumos-1 与 CausVid 是这些轴的不同组合，不是四个互斥 objective。
 
-## 🧱 2. Pixel AR：定义最纯粹，视频代价最直接
+<a id="2-pixel-ar"></a>
+
+## 2. 像素自回归
 
 PixelRNN 将图像像素按固定扫描顺序分解，证明深度网络可以直接学习离散像素通道的条件分布 [[1]](#ref-1)。Video Pixel Networks 把这种思路扩展到视频，在时间、高度、宽度与颜色通道上建立四维依赖链 [[2]](#ref-2)。
 
-若视频 $`v\in\lbrace0,\ldots,255\rbrace^{T\times H\times W\times C}`$ 被展平为 $v_{1:N}$，其中 $N=THWC$，则
+若视频 $v\in\lbrace0,\ldots,255\rbrace^{T\times H\times W\times C}$ 被展平为 $v_{1:N}$，其中 $N=THWC$，则
 
 ```math
 p(v\mid c)
@@ -85,7 +96,9 @@ p(v_i\mid v_{<i},c).
 
 Pixel AR 还暴露了一个通用事实：**表示长度与提交粒度共同决定串行下界**。更强的并行硬件可以加速每一步，却不能让第 $i+1$ 个严格条件在第 $i$ 个尚未采样时成立。
 
-## 📦 3. 离散 token AR：tokenizer、顺序与生成目标要分开
+<a id="3-token-artokenizer"></a>
+
+## 3. 离散 token 自回归
 
 ### 3.1 两阶段概率模型
 
@@ -158,7 +171,9 @@ InfinityStar 在统一离散时空表示上把 next-scale prediction 扩展为 s
 | VideoPoet | 多模态离散 token | decoder-only next-token | 是 | 正式 ICML 2024；项目页不等于开放权重 |
 | InfinityStar | 统一离散时空 token | spacetime-pyramid next-scale AR | 否；scale-level generalized AR | 正式 NeurIPS 2025；速度为作者特定配置报告 |
 
-## 🔄 4. 连续 latent AR：条件 head 不必是 softmax
+<a id="4-latent-ar-head-softmax"></a>
+
+## 4. 连续潜变量自回归
 
 ### 4.1 从 categorical head 换成条件密度 head
 
@@ -215,7 +230,7 @@ v_\phi(u_{i,s},s,h_i),
 u_{i,1}=x_i.
 ```
 
-外层仍满足 $`p(x_{1:N}\mid c)=\prod_i p(x_i\mid x_{\lt i},c)`$；变化的只是每个 $p(x_i\mid\cdot)$ 的学习目标和采样器。MAR 与 NOVA 给出的直接一手证据是 **diffusion head**，不是 flow head。若某实现改用 flow matching，必须另报其条件路径、solver 与真实 NFE，不能仅凭连续输出就把它写成 flow。
+外层仍满足 $p(x_{1:N}\mid c)=\prod_i p(x_i\mid x_{\lt i},c)$；变化的只是每个 $p(x_i\mid\cdot)$ 的学习目标和采样器。MAR 与 NOVA 给出的直接一手证据是 **diffusion head**，不是 flow head。若某实现改用 flow matching，必须另报其条件路径、solver 与真实 NFE，不能仅凭连续输出就把它写成 flow。
 
 ### 4.3 NOVA：frame-by-frame 与 set-by-set 的嵌套分解
 
@@ -249,7 +264,9 @@ p(\mathbf S_{f,k}\mid
 
 官方 NOVA 推理接口分别暴露这两类步数，正好说明不能只报一个模糊的“采样步数”。MAR 的主要实验证据来自图像；NOVA 才是该连续条件 head 在视频上的直接正式证据。
 
-## 🧩 5. Token、set、scale、frame 与 chunk：谁先被提交
+<a id="5-tokensetscaleframe-chunk"></a>
+
+## 5. 生成顺序与提交粒度
 
 | 提交单位 | 外层因果关系 | 单元内部可能机制 | 严格性 | 主要收益 | 主要代价 |
 |---|---|---|---|---|---|
@@ -291,7 +308,9 @@ CausVid 把双向视频 diffusion teacher 蒸馏成 causal autoregressive studen
 
 因此，MAR/NOVA 的 per-token diffusion head 与 CausVid/Self Forcing 的 video diffusion backbone 必须分栏；仅凭 “autoregressive diffusion” 四个字无法判断成本。
 
-## 🎓 6. Teacher forcing、complete teacher forcing 与 self forcing
+<a id="6-teacher-forcingcomplete-teacher-forcing-self-forcing"></a>
+
+## 6. 训练历史与推理历史
 
 ### 6.1 训练前缀与推理前缀来自不同分布
 
@@ -313,7 +332,7 @@ CausVid 把双向视频 diffusion teacher 蒸馏成 causal autoregressive studen
 p_\theta(\cdot\mid\hat x_{<k},c).
 ```
 
-训练看到的是 $`x_{\lt k}`$，部署看到的是 $`\hat x_{\lt k}`$。后者可能包含前面生成造成的身份偏移、色调漂移、几何错误、运动冻结与 chunk 接缝；这些状态在纯 teacher-forced 训练中概率很低。这一 history-distribution gap 才是 exposure bias 的核心。
+训练看到的是 $x_{\lt k}$，部署看到的是 $\hat x_{\lt k}$。后者可能包含前面生成造成的身份偏移、色调漂移、几何错误、运动冻结与 chunk 接缝；这些状态在纯 teacher-forced 训练中概率很低。这一 history-distribution gap 才是 exposure bias 的核心。
 
 ### 6.2 MAGI 的 CTF 修正的是哪一层
 
@@ -343,7 +362,7 @@ CausVid 依赖高质量双向 teacher，并使用 distribution matching distilla
 - 50-step 到 4-step 等数字必须绑定论文设置；
 - causal factorization、DMD objective 与 streaming KV cache 是三个不同贡献层。
 
-### 6.5 一张时序图看训练—推理差异
+### 6.5 训练与推理的数据流
 
 ![图 013：Teacher forcing 与 self forcing 的历史来源](../../assets/imagegen-diagrams/013/diagram.png)
 **图的顺序化文字替代：**
@@ -354,7 +373,9 @@ CausVid 依赖高质量双向 teacher，并使用 distribution matching distilla
 4. 已提交单元进入 rollout 状态与 KV cache，成为下一单元的真实训练上下文。
 5. 完整自生成序列接受视频级监督；实际方法可用 few-step 与梯度截断控制成本。
 
-## ⚙️ 7. 串行复杂度与 KV cache：缓存减少重算，不删除依赖
+<a id="7-kv-cache"></a>
+
+## 7. 串行复杂度与 KV 缓存
 
 ### 7.1 strict token decoding 的注意力工作
 
@@ -426,7 +447,9 @@ LongLive 采用 frame-level causal AR，并加入 prompt 切换时的 KV-recache
 
 更完整的长期 memory、TTFF、deadline、jitter 与 SLO 讨论见[因果、流式与实时视频生成](causal-streaming-generation.md)。
 
-## 🔀 8. AR、causal、few-step、streaming 与 real-time 是五个问题
+<a id="8-arcausalfew-stepstreaming-real-time"></a>
+
+## 8. 因果性、步数与流式输出
 
 | 术语 | 它真正规定什么 | 它不自动保证什么 |
 |---|---|---|
@@ -454,7 +477,9 @@ StreamDiffusionV2 则是 training-free streaming system，组合 rolling KV、no
 | FlowCache | 继承基础模型 | 继承基础模型 | 不改训练 objective | chunkwise reuse + bounded KV compression |
 | StreamDiffusionV2 | 继承基础模型 | 继承基础模型 | training-free serving | scheduler + rolling KV + pipeline |
 
-## 🗓️ 9. 2016–2026 里程碑：按概念变化，不按榜单排序
+<a id="9-20162026"></a>
+
+## 9. 代表工作
 
 | 年份 | 工作 | 正式状态 | 里程碑 | 必须保留的边界 |
 |---:|---|---|---|---|
@@ -481,7 +506,7 @@ StreamDiffusionV2 则是 training-free streaming system，组合 rolling KV、no
 
 这张表中的质量、速度与分辨率数字没有被做成横向排行榜，因为数据、条件任务、时长、分辨率、tokenizer、模型规模、NFE、guidance、硬件和计时边界均不同。
 
-## ✅ 10. 训练、推理与评测的最小报告协议
+## 10. 训练与评测配置
 
 ### 10.1 Representation
 
@@ -521,7 +546,7 @@ StreamDiffusionV2 则是 training-free streaming system，组合 rolling KV、no
 - 对 interactive 系统报告 prompt/action 改变后的响应延迟，而不仅是平均吞吐；
 - 不把 causal attention 写成物理因果、可干预性或 world-model 正确性的证明。
 
-## 🔍 11. 常见误读与快速修正
+## 11. 常见问题
 
 - **“离散 token 就是 AR。”** 离散 token 也可用于 MaskGIT、discrete diffusion；先查 factorization。
 - **“Phenaki 是 causal AR generator。”** 它的 tokenizer 时间因果，上层 token generator 是 bidirectional masked Transformer。
@@ -533,7 +558,14 @@ StreamDiffusionV2 则是 training-free streaming system，组合 rolling KV、no
 - **“CTF 已解决 exposure bias。”** CTF 修正 ground-truth 历史的完整性；self-generated history gap 仍需 on-policy rollout 等方法。
 - **“causal = streaming = real-time。”** causal 是信息约束，streaming 是交付方式，real-time 是绑定硬件与 SLO 的实测结论。
 
-## 🔗 12. 参考文献
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
+
+<a id="12"></a>
+
+## 参考文献
 
 <a id="ref-1"></a>[1] [Pixel Recurrent Neural Networks](https://proceedings.mlr.press/v48/oord16.html). van den Oord et al. ICML. 2016.
 

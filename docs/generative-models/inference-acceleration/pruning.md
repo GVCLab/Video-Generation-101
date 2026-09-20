@@ -1,12 +1,17 @@
-# 视频扩散模型剪枝与轻量化综述：从权重稀疏到结构化学生模型
+# 视频生成模型剪枝
 
-> **文献更新至 2026-09-02（Asia/Shanghai）。** 本文讨论视频扩散模型和 flow-matching 生成器中的模型剪枝与轻量化。资料以正式会议论文、作者预印本和官方项目页为主。文中的参数量、FLOPs、延迟和质量数据均沿用原论文的模型、任务、输出规格、硬件及计时设置；由于尚未在统一环境中复现，本文不对不同工作的速度进行直接排名。
+介绍层、通道和结构裁剪，以及敏感性分析与部署实现。
 
-## 1. 研究范围与基本概念
+**前置知识：** 神经网络结构、推理性能分析。
+
+**使用步骤：** 测量各组件敏感性和成本 → 选择可由部署后端支持的裁剪结构 → 验证质量恢复及实际运行收益。
+
+
+## 1. 基本概念
 
 模型剪枝通过移除预训练生成器中的部分参数或结构，降低模型的存储与计算开销。对于视频生成模型，需要区分以下四类操作：
 
-| 对象 | 操作 | checkpoint 是否变小 | 是否可直接降低 dense kernel 开销 | 本文处理方式 |
+| 对象 | 操作 | checkpoint 是否变小 | 是否可直接降低 dense kernel 开销 | 本章处理方式 |
 |---|---|---:|---:|---|
 | 单个权重 | 置零、掩码或稀疏重训练 | 仅在稀疏格式中 | 通常不能 | 作为非结构权重剪枝讨论 |
 | channel / head / block / layer | 物理删除宽度或深度 | 是 | 较可能，但需重建 tensor shape | 重点讨论 |
@@ -23,7 +28,7 @@ r_P=1-\frac{P_S}{P_T}.
 
 不过，`mask 后非零参数比例`、序列化文件大小、dense tensor shape 和运行时 resident memory 分别反映不同性质。只有实际缩小矩阵维度、降低网络深度，或采用硬件支持的稀疏 kernel，参数压缩才可能稳定转化为时延收益。
 
-## 2. 方法演进：从时间冗余分析到结构化压缩与部署
+## 2. 剪枝方法
 
 ### 2.1 2024：时间冗余的初步研究
 
@@ -41,7 +46,7 @@ MobileVD 以 Stable Video Diffusion 的时空 U-Net 为基础，综合采用较�
 
 V.I.P. 重点研究剪枝后的性能恢复：该方法在 VideoCrafter2 中删除完整 U-Net block，在 AnimateDiff 中仅剪除 motion module，并通过分阶段数据筛选以及结合 DPO/SFT 的 ReDPO，优先恢复退化最明显的属性 [[4]](#ref-4)。作者在两种模型上分别报告 36.2% 和 67.5% 的参数缩减，同时在若干指标上维持或超过完整模型。该结果并不意味着小模型通常优于教师模型，而是说明单纯采用 feature matching 或 SFT 可能使容量有限的学生模型牺牲原本表现较好的维度；偏好恢复本身也可能受到 reward model 和数据筛选偏差的影响。
 
-Mobile Video DiT 将结构化剪枝扩展到 DiT 的 block、attention head 和 FFN channel，并利用知识蒸馏指导 sensitivity-aware pruning [[5]](#ref-5)。截至本文资料截止日期，该工作的主要依据仍是作者预印本与项目页。论文报告的约 15 FPS 移动端结果还结合了高压缩 VAE、四步 adversarial distillation 和移动端实现，因而不能视为 attention-head 剪枝的独立收益。
+Mobile Video DiT 将结构化剪枝扩展到 DiT 的 block、attention head 和 FFN channel，并利用知识蒸馏指导 sensitivity-aware pruning [[5]](#ref-5)。截至本章资料截止日期，该工作的主要依据仍是作者预印本与项目页。论文报告的约 15 FPS 移动端结果还结合了高压缩 VAE、四步 adversarial distillation 和移动端实现，因而不能视为 attention-head 剪枝的独立收益。
 
 ### 2.4 2026：模型规模与采样步数的联合优化
 
@@ -51,7 +56,7 @@ FastLightGen 面向 HunyuanVideo-ATI2V 和 WanX-TI2V，在同一训练框架中�
 
 PARE 在固定学生模型之外进一步引入 width pruning 和 input/timestep-adaptive depth routing：根据不同 head 的空间或时间作用保留 motion-critical head，并由轻量 router 决定各去噪步需要执行的 block [[8]](#ref-8)。这一 2026 年预印本展示了动态结构的潜力，但动态执行会引入控制流、batch divergence 和 router 开销，其收益仍需在实际 serving 设置中验证。
 
-## 3. 剪枝粒度与可部署性
+## 3. 剪枝粒度与部署
 
 ### 3.1 非结构权重剪枝
 
@@ -71,7 +76,9 @@ Channel/FFN 剪枝直接降低投影维度，从而缩小 dense matrix。实际�
 
 删除完整 residual block 或 transformer layer 能够直接降低网络深度，是 ICMD、V.I.P.、NeoDragon 和 FastLightGen 共同采用的思路 [[2]](#ref-2) [[4]](#ref-4) [[6]](#ref-6) [[7]](#ref-7)。但完整 block 的删除会同时移除 attention、MLP、norm 和条件注入，误差还可能在后续 denoising step 中累积。因此，中等及以上比例的结构剪枝通常需要配合 fine-tuning、feature matching、consistency、adversarial 或 preference recovery。
 
-## 4. 模型剪枝与尺寸蒸馏（Size Distillation）的关系
+<a id="4-size-distillation"></a>
+
+## 4. 剪枝与尺寸蒸馏
 
 参数量较小的学生模型并不一定由剪枝获得。根据学生模型的构建与训练方式，可区分为三类：
 
@@ -81,7 +88,9 @@ Channel/FFN 剪枝直接降低投影维度，从而缩小 dense matrix。实际�
 
 Step distillation 主要减少 denoiser 的调用次数 $N_{\mathrm{NFE}}$，结构剪枝则降低单次调用的成本。联合使用两者时，应至少比较 `full/many-step`、`pruned/many-step`、`full/few-step` 和 `pruned/few-step` 四种设置。若缺少这一消融，只能报告组合方法的 Pareto 结果，无法确定各模块对总加速比的独立贡献。
 
-## 5. 视频生成模型中的层敏感性（Layer Sensitivity）
+<a id="5-layer-sensitivity"></a>
+
+## 5. 层敏感性
 
 ICMD 在特定 U-Net 和任务上观察到 shallow-content/deep-motion 的层级差异 [[2]](#ref-2)；FastLightGen 在两个大规模 DiT 上发现首尾层较为重要，而部分中间层存在较多冗余 [[7]](#ref-7)；PARE 则将 sensitivity 建模为随 timestep 和输入变化的动态函数 [[8]](#ref-8)。这些观察为研究层级功能提供了依据，但尚不足以形成适用于所有视频生成模型的统一结论。
 
@@ -89,7 +98,7 @@ ICMD 在特定 U-Net 和任务上观察到 shallow-content/deep-motion 的层级
 
 V.I.P. 还指出一项评测问题：较高的 dynamic degree 可能掩盖 consistency 的下降，而静态 prompt 本身也不要求明显运动 [[4]](#ref-4)。VBench 的多维指标适合分析不同能力，但不宜仅保留单一总分 [[9]](#ref-9)；I3D-FVD 存在 content bias，也不能单独证明时间建模能力得到保留 [[10]](#ref-10)。
 
-## 6. 代表工作比较
+## 6. 代表方法
 
 | 工作 | 发表状态 | Backbone / 任务 | 主要压缩对象 | 恢复机制 | 实验结果及适用范围 |
 |---|---|---|---|---|---|
@@ -102,7 +111,7 @@ V.I.P. 还指出一项评测问题：较高的 dynamic degree 可能掩盖 consi
 | FastLightGen [[7]](#ref-7) | CVPR 2026 | HunyuanVideo/WanX TI2V | DiT layer + sampling step | probabilistic pruning + distribution matching | 4-step + 30% pruning；约 35.71× 为理论组合估计 |
 | PARE [[8]](#ref-8) | 2026 预印本 | Wan2.1-14B T2V/I2V | head width + routed depth | progressive distillation + router | 动态执行需计 router、负载分歧与真实 batch latency |
 
-## 7. 评测原则与报告规范
+## 7. 性能测试
 
 比较不同剪枝设置时，至少应固定 teacher/student hash、任务、prompt 集、seed、帧数、分辨率、FPS、sampler、名义 step、实际 NFE、CFG、dtype、batch、硬件、编译器和 kernel 版本。若 text encoder、VAE、offload 或后处理发生变化，应将其作为系统配置差异单独说明。
 
@@ -117,7 +126,7 @@ V.I.P. 还指出一项评测问题：较高的 dynamic degree 可能掩盖 consi
 
 基本消融应比较 `teacher → prune-only → prune+recovery`。若同时采用少步生成，还需加入完整模型与剪枝模型在多步和少步设置下的四组对照。进一步加入参数量相当、从头设计的小模型作为基线，有助于区分剪枝所利用的预训练冗余与重新训练小型模型带来的收益。
 
-## 8. 典型失效现象
+## 8. 故障诊断
 
 - **运动塌缩**：画面清晰但主体不动、周期动作消失，或 prompt 要求的相机运动被削弱。
 - **时间抖动**：单帧指标稳定，但纹理、手部、身份或背景在帧间跳变。
@@ -128,7 +137,7 @@ V.I.P. 还指出一项评测问题：较高的 dynamic degree 可能掩盖 consi
 - **Kernel 失配**：非结构零值缺少相应的稀疏 kernel，或 channel/head 维度破坏 tile 对齐，使理论 FLOPs 降幅无法转化为实际加速。
 - **恢复过拟合**：student 只适配蒸馏 prompt、reward model 或 teacher 常见模式，多样性下降。
 
-## 9. 共识、争议与证据强度
+## 9. 适用限制
 
 现有研究较为一致地表明：与任意非结构稀疏相比，结构化删除 channel、block 或 layer 更容易在 dense hardware 上取得实际收益；中高比例的压缩通常需要恢复训练；视频质量评估应分别考察 appearance 与 motion；模型尺寸压缩和少步蒸馏的贡献需要独立分析。这些认识已见于多种 U-Net 和 DiT，但相关证据仍主要来自各方法论文，尚缺少统一 benchmark 下的系统比较。
 
@@ -136,7 +145,7 @@ V.I.P. 还指出一项评测问题：较高的 dynamic degree 可能掩盖 consi
 
 现有证据的分布并不均衡。2024—2026 年的相关方法主要集中于少数开放 U-Net/DiT、短 clip 和作者自定的硬件环境。F³-Pruning、ICMD、MobileVD、V.I.P.、NeoDragon 和 FastLightGen 已正式发表；截至 2026-09-02，PARE 和 Mobile Video DiT 仍主要依据作者预印本。正式发表有助于资料追溯，但其中的速度数据并不等同于独立复现结果。
 
-## 10. 研究空白与未来方向
+## 10. 开放问题
 
 1. **建立统一的运动—外观敏感性图谱**：在 U-Net、联合时空 Video DiT、T2V/I2V、不同时间步和视频长度上，系统发布逐网络块、注意力头和通道的干预曲线。
 2. **面向底层算子的剪枝目标**：在结构搜索阶段考虑计算块对齐、N:M 或分块稀疏模式、显存带宽和通信开销，使所得结构能够直接适配目标硬件。
@@ -146,7 +155,7 @@ V.I.P. 还指出一项评测问题：较高的 dynamic degree 可能掩盖 consi
 6. **动态深度模型的在线服务评估**：报告路由开销、批内执行分歧、尾延迟和多请求调度结果，以判断输入自适应方法是否优于固定学生模型。
 7. **全生命周期成本**：将敏感性扫描、恢复训练、模型转换和部署能耗纳入成本分析，而不仅考察单次推理。
 
-## 11. 推荐阅读顺序
+## 11. 延伸阅读
 
 1. 先读 F³-Pruning，理解 temporal redundancy 的早期观察，同时识别它与参数剪枝的边界 [[1]](#ref-1)。
 2. 再读 ICMD/VDMini，理解结构敏感性与 appearance/motion 双恢复目标 [[2]](#ref-2)。
@@ -154,6 +163,11 @@ V.I.P. 还指出一项评测问题：较高的 dynamic degree 可能掩盖 consi
 4. 阅读 Mobile Video DiT 和 Neodragon，考察 channel/head/block 剪枝与 NPU 部署 [[5]](#ref-5) [[6]](#ref-6)。
 5. 最后阅读 FastLightGen 与 PARE，了解 size×step 联合优化和动态结构的最新进展 [[7]](#ref-7) [[8]](#ref-8)。
 6. 评测时同时阅读 VBench 与 FVD content-bias 分析，不以总分替代失败诊断 [[9]](#ref-9) [[10]](#ref-10)。
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-09-02。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 

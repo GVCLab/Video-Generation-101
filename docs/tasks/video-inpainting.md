@@ -1,21 +1,27 @@
-# 视频补全与对象移除：从可见像素传播到世界效应消除
+# 视频补全
 
-> 本章资料与 venue / artifact 状态核验截至 **2026-08-30**。这里的 video inpainting 指：给定源视频、逐帧缺失区域及可选语义条件，在保护已知区域的同时补全未知区域。对象移除、扩画幅、V2V 编辑和产品中的 generative fill 与它相邻，但验收合同并不相同。若全帧仍有观测、目标是逆转 blur、downsample、noise 或 compression，则属于[视频退化修复](video-restoration.md)，不使用本章的 mask 外硬保护合同。
+介绍已知区域约束下的时空缺失恢复、内容移除和生成补全。
+
+**前置知识：** 光流、条件生成。
+
+**使用步骤：** 定义缺失区域和已知信息 → 选择传播、检索或生成方法 → 检查已知区域保持、遮挡、时序与副作用。
+
+> 本章资料与 venue / artifact 状态核验截至 **2026-08-30**。这里的 video inpainting 指：给定源视频、逐帧缺失区域及可选语义条件，在保护已知区域的同时补全未知区域。对象移除、扩画幅、V2V 编辑和产品中的 generative fill 与它相邻，但验收规格并不相同。若全帧仍有观测、目标是逆转 blur、downsample、noise 或 compression，则属于[视频退化修复](video-restoration.md)，不使用本章的 mask 外硬保护规格。
 
 检索式、纳入/排除、证据等级、图像生成记录和冻结日验证见[配套研究记录](../../sources/research_20260830_video_inpainting.md)。
 
-## 🎯 1. 学习目标
+## 学习目标
 
 读完本章，应能：
 
 1. 区分 video inpainting、object removal、completion / outpainting、masked V2V editing 与 generative fill；
 2. 解释为什么可靠系统通常先传播可见像素，再生成真正不可见的 residual holes；
 3. 把 STTN、FuseFormer、E²FGVI、ProPainter、diffusion 与 Video DiT 放进同一条机制谱系，而不是只背论文名；
-4. 写出 mask、flow、置信度、重建、时序和已知区保护的 tensor 合同；
+4. 写出 mask、flow、置信度、重建、时序和已知区保护的 张量规格；
 5. 设计包含 DAVIS / YouTube-VOS、受控 mask、长视频、scene cut、mask 外误差、人评和成本的公平协议；
 6. 识别“画面自然”“对象真的消失”“副作用被消除”“物理后果合理”四个逐级增强、但不能互相替代的证据命题。
 
-## 🧭 2. 先分清六个相邻任务
+## 1. 任务范围
 
 设视频
 
@@ -61,7 +67,7 @@ m_{\text{obj}}
 ![图 068：视频补全、对象移除、扩画幅、局部编辑与生成填充的任务边界](../../assets/imagegen-diagrams/068/diagram.png)
 **图的顺序化文字替代：** 先判断未知区是否在原画布外；若在外，是 outpainting。若在原画布内，再判断目标是否恢复缺失内容；是则属于 inpainting / completion。若不是，再判断是否删除对象及其副作用；是则属于 object removal。其余任务按已知区是否必须严格不变，分成区域内 generative fill 与更一般的 masked / global V2V editing。前三类和区域生成至少共同报告 mask 内质量、mask 外保护与时间一致；V2V 还要单独报告指令遵循和编辑范围。
 
-## 🖼️ 3. 一张图读懂现代证据管线
+## 2. 处理流程
 
 ![视频补全证据管线：输入视频和红色斜线缺失区先经过带置信度与遮挡判断的蓝色有效像素传播，只有紫色残余洞进入 Transformer 或 Video DiT；重叠窗口、记忆与 scene-cut 重置负责全局时间检查，最终用绿色锁保护已知像素，并分别评测 mask 内质量、mask 外误差、warp error、时间和内存。](../../assets/diagrams/video-inpainting-evidence-pipeline.png)
 
@@ -75,9 +81,13 @@ m_{\text{obj}}
 4. 重叠时间窗共享 memory 并做双向一致性检查；遇到 scene cut 时切断旧 flow 与 memory。
 5. 解码后硬合成已知区，分别测 mask 内质量、mask 外误差、warp error、耗时与内存，而不是只看整体画质。
 
-## 🧩 4. 四阶段 tensor 合同与误差传播
+<a id="4-tensor"></a>
 
-### 4.1 有效像素传播：先回答“别的帧是否真的看见了这里”
+## 3. 张量接口与误差传播
+
+<a id="41"></a>
+
+### 3.1 有效像素传播：先回答“别的帧是否真的看见了这里”
 
 设 $F_{s\rightarrow t}$ 把参考帧 $s$ warp 到目标帧 $t$，$W(\cdot,F)$ 是可微采样器。参考像素是否可用不能只由 mask 决定，还要乘上遮挡、越界、forward–backward consistency 和 flow confidence：
 
@@ -104,7 +114,9 @@ w=v.
 
 这里 $q$ 已包含在 $v$ 中，不再重复相乘；$b_t$ 是有证据的 propagated background，不是网络凭空生成的背景。Deep Flow-Guided Video Inpainting 先补全时空 flow 再传播像素 [[3]](#ref-3)；FGVC 先完成 motion edge，再构造保边的分段平滑 flow，并通过 non-local flow connection 越过局部运动边界 [[8]](#ref-8)。
 
-### 4.2 Missing-region synthesis：只生成传播够不到的残余洞
+<a id="42-missing-region-synthesis"></a>
+
+### 3.2 Missing-region synthesis：只生成传播够不到的残余洞
 
 传播可覆盖度可以写成 $a_t=\max_s v_{s\rightarrow t}$，剩余缺失区为
 
@@ -114,7 +126,9 @@ r_t=m_t\odot(1-a_t).
 
 若 $r_t\approx0$，复制/warp 比重新绘制更容易保持纹理与身份；若一个区域在所有帧都被遮挡，flow 没有信息可搬运，必须用 learned prior 生成。STTN 用全视频 joint spatial–temporal attention 同时补多帧 [[7]](#ref-7)；FuseFormer 用重叠的 Soft Split / Soft Composition 把 patch 边界以内的细粒度信息带进 Transformer 和 feed-forward block [[9]](#ref-9)。二者都扩大了搜索与合成能力，但 attention 找到“相似 token”不等于找到了几何上正确、可见且未被污染的来源。
 
-### 4.3 Global temporal consistency：局部帧对齐还不够
+<a id="43-global-temporal-consistency"></a>
+
+### 3.3 Global temporal consistency：局部帧对齐还不够
 
 时间一致至少包含三种尺度：
 
@@ -124,7 +138,9 @@ r_t=m_t\odot(1-a_t).
 
 ProPainter 把图像域传播、特征域传播和 mask-guided sparse Transformer 组合起来，让远端可见像素先被利用，再由 Transformer 处理剩余区域 [[12]](#ref-12)。Diffusion / DiT 则在更强生成先验中联合去噪整段 latent，但若窗口间没有共享锚点、重叠去噪或显式 memory，仍会在边界重新采样出不同背景。
 
-### 4.4 Outside-mask protection：模型输出后还要有系统级不变量
+<a id="44-outside-mask-protection"></a>
+
+### 3.4 Outside-mask protection：模型输出后还要有系统级不变量
 
 最强的像素级保护是解码后的硬合成：
 
@@ -150,7 +166,9 @@ m_z\odot z^{\text{gen}}_{k-1}
 
 但最终验收仍要回到 decoded RGB；“latent 被锁住”不等于用户看到的像素没有被 decoder 改动。
 
-### 4.5 训练损失不是一个总分
+<a id="45"></a>
+
+### 3.5 训练损失不是一个总分
 
 不同论文不会同时使用下列全部项，但可用这张账本检查监督落在哪里：
 
@@ -179,15 +197,21 @@ E²FGVI 把 flow completion、feature propagation 与 content hallucination 三�
 ![图 069：视频补全中的误差传播与四道证据闸门](../../assets/imagegen-diagrams/069/diagram.png)
 **图的顺序化文字替代：** 视频和 mask 先产生双向 flow；只有可见、未遮挡且未越界的对应才进入传播。传播结果还要通过 forward–backward 与边界检查，不可靠位置回到 residual hole。可靠锚点与残余洞共同进入 Transformer 或 diffusion；跨帧、跨窗口和身份检查失败时，应降低错误锚点权重、扩大上下文或重采样。通过后在 decoded RGB 上硬合成，并把洞内、洞外、时序和成本分开验收。
 
-## 🧬 5. 技术路线：不是“传统方法被 DiT 取代”
+<a id="5-dit"></a>
 
-### 5.1 Patch / exemplar：把视频当三维时空纹理
+## 4. 方法分类
+
+<a id="51-patch-exemplar"></a>
+
+### 4.1 Patch / exemplar：把视频当三维时空纹理
 
 Space-Time Video Completion 用可见时空块采样和全局一致优化填补大洞，奠定了“视频是 $x$-$y$-$t$ 体积”的问题形式 [[1]](#ref-1)。Newson 等人的全局 patch-based functional 改善复杂动态纹理、移动背景和高分辨率视频的自动补全效率 [[2]](#ref-2)。
 
 这类方法的优势是直接复用真实纹理，不需要大规模训练；当源视频里从未出现目标内容、patch 对应发生语义错配或洞很大时，它无法凭低层相似性创造正确结构。现代 attention 可以看作可学习的 non-local retrieval，但它仍继承“参考中是否有可用证据”的根本限制。
 
-### 5.2 Flow / alignment：沿真实运动搬运，而不是逐帧猜
+<a id="52-flow-alignment"></a>
+
+### 4.2 Flow / alignment：沿真实运动搬运，而不是逐帧猜
 
 2019–2020 年的关键问题是怎样把其他帧的真实内容对齐回来：
 
@@ -198,25 +222,33 @@ Space-Time Video Completion 用可见时空块采样和全局一致优化填补�
 
 它们对静态背景、相机运动后重新显露的区域和可追踪纹理很强；对无纹理、镜面、快速非刚体、运动边界、长时全遮挡和 scene cut 则容易失去可靠 correspondence。
 
-### 5.3 3D convolution 与 non-local attention：学习生成和全局搜索
+<a id="53-3d-convolution-non-local-attention"></a>
+
+### 4.3 3D convolution 与 non-local attention：学习生成和全局搜索
 
 Free-Form Video Inpainting 把 3D gated convolution、temporal PatchGAN 与自由形状动态 mask 放进统一训练设置 [[6]](#ref-6)。STTN 把多帧 patch 组成 joint spatial–temporal token，自注意力一次搜索整段参考 [[7]](#ref-7)。FuseFormer 用重叠 tokenization 减少 hard patch split 带来的模糊边缘 [[9]](#ref-9)。
 
 这一代将“哪里复制”和“怎样合成”交给网络共同学习，能处理 flow 不稳定的局部；代价是全局 attention 随 $T,H,W$ 增长，且被 mask 污染的 query 可能检索到错误参考。FGT++ 再把 flow discrepancy、flow-guided feature propagation 与时空解耦 attention 结合，表明 flow 和 Transformer 是互补关系 [[13]](#ref-13)。
 
-### 5.4 端到端 hybrid：传播负责证据，Transformer 负责缺口
+<a id="54-hybridtransformer"></a>
+
+### 4.4 端到端 hybrid：传播负责证据，Transformer 负责缺口
 
 E²FGVI 的三个可训练阶段是 flow completion、feature propagation、content hallucination [[10]](#ref-10)。ProPainter 进一步使用快速 recurrent flow completion、图像/特征 dual-domain propagation 和 mask-guided sparse video Transformer [[12]](#ref-12)。这条路线至今仍是重要强基线，因为它把真实像素保真、可解释 motion correspondence 和 learned hallucination 分工，而不是让大生成模型重画整帧。
 
-“模型参数更小/旧”不等于系统必然落后：若任务是固定机位、真实背景可在别帧观察、mask 外必须逐像素保持，传播型方法可能比开放式生成更符合合同。反过来，若大 mask 在所有帧都遮挡同一内容，传播无论多准都没有信息源。
+“模型参数更小/旧”不等于系统必然落后：若任务是固定机位、真实背景可在别帧观察、mask 外必须逐像素保持，传播型方法可能比开放式生成更符合规格。反过来，若大 mask 在所有帧都遮挡同一内容，传播无论多准都没有信息源。
 
-### 5.5 Diffusion：把不可见内容变成条件分布
+<a id="55-diffusion"></a>
+
+### 4.5 Diffusion：把不可见内容变成条件分布
 
 AVID 用 motion module、可调 structure guidance 和 Temporal MultiDiffusion 处理文字引导及任意时长窗口 [[14]](#ref-14)。FloED 以 flow branch 先恢复运动，再通过多尺度 adapter 引导 inpainting diffusion，并提出 latent interpolation 与 attention cache 降低作者设置内的成本 [[16]](#ref-16)。VipDiff 则用 flow 约束反向扩散中的噪声优化，在不微调预训练 diffusion 的情况下产生多种候选 [[18]](#ref-18)。
 
 DiffuEraser 将传统方法的先验结果作为初始化和弱条件，再扩大时间感受野，用生成先验修复大洞与结构 [[17]](#ref-17)。准确的结论不是“diffusion 不需要 flow”，而是：flow 可以继续提供可观测证据，diffusion 负责没有对应关系的分布式生成。
 
-### 5.6 Video DiT 与统一条件接口
+<a id="56-video-dit"></a>
+
+### 4.6 Video DiT 与统一条件接口
 
 VideoPainter 用只占 backbone 参数一小部分的 context encoder 处理 masked video，将背景上下文注入预训练 Video DiT，并用 target-region ID resampling 支持长视频身份保持；作者同时发布 VPData / VPBench（超过 390K clips） [[20]](#ref-20)。VACE 用 Video Condition Unit 与 Context Adapter 把 reference-to-video、V2V 与 masked V2V 放进统一 DiT 接口 [[21]](#ref-21)。
 
@@ -227,9 +259,9 @@ VideoPainter 用只占 backbone 参数一小部分的 context encoder 处理 mas
 
 VideoCanvas 将任意时刻、任意空间 patch 作为 in-context condition，统一 inpainting、outpainting、transition 和任意帧条件；它截至冻结日仍按 arXiv 预印本引用，不把“统一任务定义”写成所有子任务已被解决 [[24]](#ref-24)。
 
-## ⏳ 6. 长视频不是把短窗口循环调用
+## 5. 长视频处理
 
-设基础模型窗口长 $L$、步长 $`S\lt L`$。第 $k$ 个窗口覆盖 $[kS,kS+L)$。最简单的 output blending 是对已完成 RGB 做加权平均；更强的 co-denoising 是让重叠 latent 在每个 solver step 共享或协调噪声轨迹。两者都叫 overlap 时，实际含义完全不同，必须报告。
+设基础模型窗口长 $L$、步长 $S\lt L$。第 $k$ 个窗口覆盖 $[kS,kS+L)$。最简单的 output blending 是对已完成 RGB 做加权平均；更强的 co-denoising 是让重叠 latent 在每个 solver step 共享或协调噪声轨迹。两者都叫 overlap 时，实际含义完全不同，必须报告。
 
 | 风险 | 表面现象 | 最小处理 | 必须记录 |
 |---|---|---|---|
@@ -244,9 +276,13 @@ AVID 的 Temporal MultiDiffusion、VideoPainter 的 ID resampling 和 Unified Lo
 
 Outpainting 还多一个几何问题。Unboxed 用 3D Gaussian Splatting 支持静态区扩展，再处理动态对象与视频去噪 [[26]](#ref-26)；Seen-to-Scene 重新结合 flow completion 与生成模型，强调先传播已看见的内容、再生成未看见的区域 [[27]](#ref-27)。这些是 outpainting 的直接里程碑，不应倒写成狭义 hole restoration 的普适优胜。
 
-## 🎭 7. 2025–2026：对象之外的副作用与反事实后果
+<a id="7-20252026"></a>
 
-### 7.1 从对象轮廓扩展到影子、反射、光和透明效应
+## 6. 对象移除与关联效果
+
+<a id="71"></a>
+
+### 6.1 从对象轮廓扩展到影子、反射、光和透明效应
 
 ROSE 将对象副作用分成影子、反射、光、透明与镜面等类型，并用 3D 渲染产生配对监督和 effect mask [[28]](#ref-28)。Object-WIPER 是 training-free 路线：利用预训练视频 DiT 的 visual–text cross-attention 与 visual self-attention 定位效果 token，反演后重置前景 token，并在去噪时复制背景 token；其 CVPR 2026 论文还提出 WIPER-Bench 与 TokSim [[29]](#ref-29)。
 
@@ -254,19 +290,23 @@ SVOR 针对真实 mask 缺陷、突然运动和副作用，提出时间窗 mask 
 
 EffectLearner（2026-08 预印本）再让 VLM 先生成结构化 object–effect context，再指导 DiT eraser，并加入 motion-aware mask / consistency；其最新性和作者报告结果不能替代正式 venue 与独立复现 [[34]](#ref-34)。
 
-### 7.2 从视觉痕迹扩展到物理交互后果
+<a id="72"></a>
+
+### 6.2 从视觉痕迹扩展到物理交互后果
 
 若删除撞倒杯子的球，只擦掉球、影子和反射仍不够；杯子是否还应倒下是一个反事实动力学问题。VOID 用模拟器生成“有对象/无对象”的 counterfactual paired videos，由 VLM 找出受移除影响的区域，再指导视频 diffusion 生成物理上更合理的后果 [[32]](#ref-32)。
 
 这项工作推进了问题定义，但仍不能从视觉偏好直接证明模型学会普适因果：模拟器覆盖、VLM effect localization、真实视频域差和一对多反事实都要分别验证。对象删除若被用于安全决策，更需要受控干预或真实环境对照；创作视频“看起来合理”只支持生成质量命题。
 
-### 7.3 评测也从全局分数转向局部 removal coherence
+<a id="73-removal-coherence"></a>
+
+### 6.3 评测也从全局分数转向局部 removal coherence
 
 PROVE 指出，full-reference 指标可能奖励保留原对象或 copy-paste，no-reference 指标可能偏好模糊，而全局时间指标会被大量未修改背景稀释。其 RC-S 在局部滑窗特征上比较修复区与背景，RC-T 跟踪相邻帧共享修复区的分布，并提供 PROVE-M / PROVE-H 两层 benchmark [[33]](#ref-33)。这是 2026 年的重要评测节点，但 RC 指标也不是“真相函数”：必须与对象残留检测、mask 外保持、GT 指标和盲人评共同校准。
 
-## 🏁 8. 建议性的技术里程碑
+## 7. 代表工作
 
-下表把“改变任务定义、证据流或评测合同”的节点视为 milestone；单纯分辨率变高、demo 更漂亮或通用模型新增一个 UI 按钮不单列。
+下表把“改变任务定义、证据流或评测规格”的节点视为 milestone；单纯分辨率变高、demo 更漂亮或通用模型新增一个 UI 按钮不单列。
 
 | 时间 | 代表工作 | 真正改变 | 当时仍未解决 |
 |---|---|---|---|
@@ -286,9 +326,13 @@ PROVE 指出，full-reference 指标可能奖励保留原对象或 copy-paste，
 
 里程碑不是淘汰关系。Patch retrieval、flow、feature propagation、Transformer、diffusion、Video DiT、VLM reasoner 和 3D scene representation 可以出现在同一系统；关键是每个模块是否有明确输入、置信度、失败回退和独立消融。
 
-## 🧪 9. 数据、mask 与公平评测协议
+<a id="9-mask"></a>
 
-### 9.1 DAVIS 与 YouTube-VOS 不是为 inpainting 原生采集的 GT
+## 8. 数据、掩码与评测
+
+<a id="91-davis-youtube-vos-inpainting-gt"></a>
+
+### 8.1 DAVIS 与 YouTube-VOS 不是为 inpainting 原生采集的 GT
 
 DAVIS [[35]](#ref-35) 和 YouTube-VOS [[36]](#ref-36) 原本是视频对象分割数据。inpainting 工作通常把它们的干净 RGB 当 ground truth，再施加合成 stationary / curve / moving object masks。因此，同名“DAVIS 结果”仍可能因年份版本、训练/验证子集、分辨率、帧数、mask 文件和 crop 不同而不可比较。
 
@@ -300,7 +344,9 @@ DAVIS [[35]](#ref-35) 和 YouTube-VOS [[36]](#ref-36) 原本是视频对象分�
 - 是否以原对象 segmentation 当洞，以及 target object 是否仍出现在可见上下文；
 - 结果选择是单 seed、固定 $N$ 个样本、平均还是 best-of-$N$。
 
-### 9.2 Mask 必须覆盖不同信息条件
+<a id="92-mask"></a>
+
+### 8.2 Mask 必须覆盖不同信息条件
 
 | Mask slice | 测到什么 | 典型作弊或混淆 |
 |---|---|---|
@@ -315,7 +361,9 @@ DAVIS [[35]](#ref-35) 和 YouTube-VOS [[36]](#ref-36) 原本是视频对象分�
 
 DEVIL 专门把 camera motion、background motion、mask displacement、pose motion 和 size 分 slice 评测，并包含 1,250 个 45–90 帧 landscape clips [[11]](#ref-11)。它比随机平均更能定位 failure mode，但仍不覆盖人物身份、文字、反射和 2026 年对象效应任务。
 
-### 9.3 指标要按证据问题分栏
+<a id="93"></a>
+
+### 8.3 指标要按证据问题分栏
 
 | 问题 | 建议指标 | 必须说明的边界 |
 |---|---|---|
@@ -339,7 +387,9 @@ E_{\text{out}}
 
 并另取 mask 边缘内外各 $d$ 像素的 ring，检查边缘漏色。全帧 PSNR 会被大量不变背景主导；全局 temporal score 同样可能看不见只发生在洞内的一帧闪烁。
 
-### 9.4 最小可复核实验矩阵
+<a id="94"></a>
+
+### 8.4 最小可复核实验矩阵
 
 1. **三条基线**：copy/nearest warp、专用传播模型、生成式 diffusion / DiT；
 2. **两种信息条件**：洞在别帧可见 vs 全时不可见；
@@ -350,7 +400,7 @@ E_{\text{out}}
 7. **消融**：flow、confidence、propagation、global attention、overlap、memory、known-region anchor 分别关闭；
 8. **人评校准**：指标排序与盲人评不一致时，不以单一自动分数裁决。
 
-## ⚠️ 10. 典型失败模式及其根因
+## 9. 故障诊断
 
 | 失败 | 可能根因 | 定位实验 | 修复方向 |
 |---|---|---|---|
@@ -368,9 +418,11 @@ E_{\text{out}}
 | 文字变形 | perceptual loss 对精确 glyph 不敏感 | OCR 字符准确率 + track | copy-first、高分辨率局部重算、OCR constraint |
 | 物理交互错误 | 只删视觉对象，没有反事实状态 | collision/contact counterfactual set | 受影响区推理、配对模拟与世界状态建模 [[32]](#ref-32) |
 
-## 🛡️ 11. 从论文 demo 到可交付系统的验收
+<a id="11-demo"></a>
 
-### 输入合同
+## 10. 系统验收
+
+### 输入规格
 
 - mask 是 hole=1 还是 known=1；逐帧尺寸、alpha 与时间戳必须显式；
 - source video、mask、prompt、reference 的帧率和 crop 完全对齐；
@@ -392,7 +444,7 @@ E_{\text{out}}
 4. 窗口接缝、scene cut、遮挡结束和对象再出现位置逐帧审阅；
 5. 交付源视频、mask、raw output、hard-composite output、配置和失败案例，而不只交一个精选 MP4。
 
-## 🔬 12. 仍未解决的研究问题
+## 11. 开放问题
 
 1. **可见性与生成的软切换**：怎样让 flow confidence 真正校准，而不是错误复制与生成二选一？
 2. **大洞的一对多评测**：没有唯一 GT 时，怎样同时衡量合理性、覆盖度和 source compatibility？
@@ -404,7 +456,9 @@ E_{\text{out}}
 8. **评价与人类感知**：RC、TokSim、VFID/FVD、warp 和 VLM judge 在哪些 slice 会系统性失真？
 9. **权利与可追溯性**：被删除/补出的内容如何保留 provenance、版本、mask 与操作日志？
 
-## 📚 13. 建议阅读路径
+<a id="13"></a>
+
+## 12. 延伸阅读
 
 ### 建立机制直觉
 
@@ -431,7 +485,7 @@ Space-Time Completion / Newson
 
 <a id="ref-1"></a>[1] [Space-Time Video Completion](https://www.wisdom.weizmann.ac.il/~vision/VideoCompletion.html). Yonatan Wexler, Eli Shechtman, Michal Irani. CVPR. 2004；扩展版发表于 TPAMI 2007。
 
-<a id="ref-2"></a>[2] [Video Inpainting of Complex Scenes](https://arxiv.org/abs/1503.05528). Alasdair Newson, Andrés Almansa, Matthieu Fradet, Yann Gousseau, Patrick Pérez. SIAM Journal on Imaging Sciences. 2014.
+<a id="ref-2"></a>[2] [Video Inpainting of Complex Scenes](https://arxiv.org/abs/1503.05528). Alasdair Newson, Andrés Almansa, Matthieu Fradet, Yann Gousseau, Patrick Pérez. SIAM Journal on Imaging Sciences, 7(4):1993–2019, 2014; arXiv version first posted 2015. [DOI](https://doi.org/10.1137/140954933).
 
 <a id="ref-3"></a>[3] [Deep Flow-Guided Video Inpainting](https://openaccess.thecvf.com/content_CVPR_2019/html/Xu_Deep_Flow-Guided_Video_Inpainting_CVPR_2019_paper.html). Rui Xu, Xiaoxiao Li, Bolei Zhou, Chen Change Loy. CVPR. 2019.
 

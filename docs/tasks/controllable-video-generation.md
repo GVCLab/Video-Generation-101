@@ -1,22 +1,27 @@
-# 细粒度可控视频生成：从控制信号到可证伪的条件合同
+# 可控视频生成
 
-> 本章冻结于 **2026-08-30（Asia/Shanghai）**。“可控”不是一个形容词，而是一份可执行合同：用户给了什么信号，信号使用什么坐标和时间基准，从哪个位置进入生成器，与其他条件冲突时谁优先，以及如何证明输出真的遵循了它。
+介绍相机、轨迹、姿态、深度和几何条件的表达与注入方式。
+
+**前置知识：** 条件生成、基本几何。
+
+**使用步骤：** 固定控制坐标系和时间轴 → 选择控制信号与模型注入位置 → 同时评价控制误差、画质与运动。
+
 
 检索式、纳排标准、发表/代码/权重/产品状态核验、逐篇证据等级与图像审计见[配套研究记录](../../sources/research_20260830_controllable_video.md)。
 
-## 🎯 1. 学习目标
+## 学习目标
 
 读完本章，应能完成七件事：
 
 1. 用输入、输出和保真对象区分可控生成、I2V、V2V editing、story/multishot 与 action-conditioned world model；
-2. 为相机、点轨迹、框/掩码、骨架、深度/法线/边缘/光流和外观参考写出带形状、坐标、可见性和时钟的 tensor 合同；
+2. 为相机、点轨迹、框/掩码、骨架、深度/法线/边缘/光流和外观参考写出带形状、坐标、可见性和时钟的 张量规格；
 3. 判断条件经过 training-time adapter/ControlNet、attention/feature injection、latent/noise optimization，还是 inference-time guidance；
 4. 解释控制遵循、参考保真、运动自然性和条件多样性为何不能压成一个总分；
 5. 将轨迹串身、多对象冲突、身份漂移、遮挡失败和新视角坍塌定位到具体信号或注入路径；
 6. 对一篇新论文分别核验首发、正式发表、代码、权重、数据/评测集与产品可用性；
 7. 设计一个会在错误控制下失败、而不是只会奖励漂亮 demo 的复现协议。
 
-## 🧭 2. 任务边界：可控不等于任何带条件的视频
+## 1. 任务范围
 
 本章把**细粒度可控视频生成**定义为：给定文本、可选图像锚点与一个或多个显式时空控制信号 $C$，学习或采样
 
@@ -35,11 +40,11 @@ Y\sim p_\theta(Y\mid c_{\mathrm{text}},R,C),
 | [action-conditioned prediction](action-conditioned-prediction.md) | 历史观测 + 环境可执行 action | 状态转移、动作后果 | 动作可编码为视觉控制，但还需环境语义 | 拖动一个点不等于执行机器人 action |
 | [interactive world generation](interactive-world-generation.md) | 在线 action、观测、记忆循环 | 持久状态与反事实可达性 | 实时可控视频可作前端 | 作者报告 FPS 不证明闭环可玩性 |
 
-ReCapture 接收用户完整视频并在新相机轨迹下重生成，因而它是**相机可控的 V2V**，不是无源视频的 camera-conditioned generation [[18]](#ref-18)。2026 年的 3D point-track motion editing 同时给源视频和源/目标 3D tracks，也应在 V2V 守恒合同下验收 [[33]](#ref-33)。
+ReCapture 接收用户完整视频并在新相机轨迹下重生成，因而它是**相机可控的 V2V**，不是无源视频的 camera-conditioned generation [[18]](#ref-18)。2026 年的 3D point-track motion editing 同时给源视频和源/目标 3D tracks，也应在 V2V 保持约束下验收 [[33]](#ref-33)。
 
 EgoControl 虽以 3D 全身姿态控制第一人称未来视频，但输入仍是视觉姿态，而不是环境可执行 action；因此它是 egocentric pose-conditioned generation，不能仅凭“第一人称”和“未来预测”改写成闭环 world model [[32]](#ref-32)。
 
-## 📐 3. 先写控制合同，再谈模型
+## 2. 控制规格
 
 对第 $k$ 类条件，用一个八元组保存它的真实语义：
 
@@ -56,27 +61,31 @@ C_k=(s_k,\tau_k,\mathcal F_k,v_k,m_k,q_k,w_k,\pi_k).
 - $w_k$：条件强度与时间 schedule；
 - $\pi_k$：与其他条件冲突时的优先级和退让规则。
 
-两篇论文即使都写“trajectory control”，只要一篇的 $s_k$ 是无深度的 2D point track，另一篇是带 6DoF 姿态的 3D entity trajectory，它们就不是同一合同。3DTrajMaster 显式输入多对象 6DoF 序列，注入位置是 gated self-attention 的 3D-motion grounded object injector [[20]](#ref-20)；Motion Prompting 的表示则可稀疏、稠密、对象级或全局，但仍是时空轨迹提示 [[15]](#ref-15)。
+两篇论文即使都写“trajectory control”，只要一篇的 $s_k$ 是无深度的 2D point track，另一篇是带 6DoF 姿态的 3D entity trajectory，它们就不是同一规格。3DTrajMaster 显式输入多对象 6DoF 序列，注入位置是 gated self-attention 的 3D-motion grounded object injector [[20]](#ref-20)；Motion Prompting 的表示则可稀疏、稠密、对象级或全局，但仍是时空轨迹提示 [[15]](#ref-15)。
 
-### 3.1 一张图读懂“信号—合同—注入—验收”
+<a id="31"></a>
 
-![细粒度可控视频的五阶段合同：控制信号经坐标、时间、遮挡与冲突规则规范化后，通过 adapter、attention 或 guidance 进入生成器，最后分开评估控制、保真、运动和多样性。](../../assets/diagrams/controllable-video-contract.png)
+### 2.1 一张图读懂“信号—规格—注入—验收”
 
-![图 046：细粒度可控视频的五阶段合同](../../assets/imagegen-diagrams/046/diagram.png)
+![细粒度可控视频的五阶段规格：控制信号经坐标、时间、遮挡与冲突规则规范化后，通过 adapter、attention 或 guidance 进入生成器，最后分开评估控制、保真、运动和多样性。](../../assets/diagrams/controllable-video-contract.png)
+
+![图 046：细粒度可控视频的五阶段规格](../../assets/imagegen-diagrams/046/diagram.png)
 **图的顺序化文字替代：**
 
 1. 输入分成四类：相机内外参、对象轨迹/框/掩码、姿态/深度/法线/边缘/光流结构序列，以及身份/外观参考。
-2. 所有信号必须先进入合同层，统一坐标、时钟、有效掩码、可见性、置信度与冲突优先级。
+2. 所有信号必须先进入规格层，统一坐标、时钟、有效掩码、可见性、置信度与冲突优先级。
 3. 规范化后的条件经三类路径进入模型：adapter/ControlNet residual、attention/feature tokens，latent/noise 操作或推理 guidance。
 4. 生成器输出视频，但不使用一个总分验收。
 5. 控制遵循、参考保真、运动自然性和条件多样性分别过门。
-6. 任一门失败时，先回到合同层定位语义、时钟、冲突或注入问题；该反馈箭头不表示自动训练更新。
+6. 任一门失败时，先回到规格层定位语义、时钟、冲突或注入问题；该反馈箭头不表示自动训练更新。
 
-## 🎥 4. 控制信号的五条技术路线
+## 3. 控制信号
 
-### 4.1 Camera：extrinsics 和 intrinsics 必须分开
+<a id="41-cameraextrinsics-intrinsics"></a>
 
-一条最小相机合同包含
+### 3.1 Camera：extrinsics 和 intrinsics 必须分开
+
+一条最小相机规格包含
 
 ```math
 K_t=\begin{bmatrix}f_x&0&c_x\\0&f_y&c_y\\0&0&1\end{bmatrix},
@@ -91,7 +100,9 @@ CameraCtrl 将相机轨迹参数化并通过 plug-and-play pose module 注入冻
 
 这一步开始越过普通 camera control 的边界：一条相机路径只覆盖“每个时间选择一个视角”，而多视角视频要求同一时间的多个视图彼此一致，可渲染 4D 状态还要支持重复的任意 $(v,t)$ 查询。相机 × 世界时间坐标图、动态表示和几何证据详见[多视角与 4D 专章](multiview-4d-generation.md)。
 
-### 4.2 Object trajectory / drag / box / mask / keypoint
+<a id="42-object-trajectory-drag-box-mask-keypoint"></a>
+
+### 3.2 Object trajectory / drag / box / mask / keypoint
 
 用户画的一条线至少需要展开为
 
@@ -115,7 +126,9 @@ MagicMotion 用 `mask → dense boxes → sparse boxes` 的渐进训练来降低
 
 Image Conductor 将点拖动、框与相机运动组织为交互式精确控制 [[14]](#ref-14)；IM-Zero 则在零样本设置下处理实例级运动 [[19]](#ref-19)。它们补足了“交互信号如何进入既有生成先验”这条路线，但都不能绕过对象绑定、遮挡和冲突条件的独立验收。
 
-### 4.3 Pose / depth / normal / edge / flow：结构序列不是同义词
+<a id="43-pose-depth-normal-edge-flow"></a>
+
+### 3.3 Pose / depth / normal / edge / flow：结构序列不是同义词
 
 | 结构信号 | 它强约束什么 | 它丢掉什么 | 正确的负例 |
 |---|---|---|---|
@@ -125,11 +138,13 @@ Image Conductor 将点拖动、框与相机运动组织为交互式精确控制 
 | edge/sketch | 边界、线稿和轮廓 | 区域归属、深度与运动 | 纹理边缘、断线、新显露区 |
 | optical flow | 两帧间的投影位移 | 3D 运动分解、遮挡后真实路径 | 出画再入画、旋转、运动边界 |
 
-VideoComposer 将文本、sketch/depth、reference video/image 与压缩视频 motion vector 通过 STC encoder 统一组合，是“多结构条件”的早期系统转折 [[3]](#ref-3)。Control-A-Video 训练 Video-ControlNet 处理 edge/depth 序列 [[4]](#ref-4)；ControlVideo 则在不训练新视频模型的设置下复用图像 ControlNet，加入 fully cross-frame interaction、latent 插帧平滑与 hierarchical sampler [[5]](#ref-5)。两者名字相似，但“训一个视频控制分支”与“推理时复用已训图像 ControlNet”是不同证据合同。
+VideoComposer 将文本、sketch/depth、reference video/image 与压缩视频 motion vector 通过 STC encoder 统一组合，是“多结构条件”的早期系统转折 [[3]](#ref-3)。Control-A-Video 训练 Video-ControlNet 处理 edge/depth 序列 [[4]](#ref-4)；ControlVideo 则在不训练新视频模型的设置下复用图像 ControlNet，加入 fully cross-frame interaction、latent 插帧平滑与 hierarchical sampler [[5]](#ref-5)。两者名字相似，但“训一个视频控制分支”与“推理时复用已训图像 ControlNet”是不同验证要求。
 
 MOFA-Video 先把人工轨迹、人脸 landmark 或 driving video 转成生成式 motion field，再通过 domain-aware adapters 驱动冻结 I2V prior；不同 adapter 还可零样本组合 [[10]](#ref-10)。这种统一中间表示减少了模型分叉，但也会把 landmark/trajectory 误差变成稠密 field 误差，不能只验收最终帧。
 
-### 4.4 Reference identity / appearance：守住“谁”不等于复制“哪个姿势”
+<a id="44-reference-identity-appearance"></a>
+
+### 3.4 Reference identity / appearance：守住“谁”不等于复制“哪个姿势”
 
 参考集应写成
 
@@ -141,9 +156,11 @@ R=\{(I_j,a_j,r_j)\}_{j=1}^{J},
 
 参考条件过强会把源姿势、光照甚至背景一起复制；过弱则在大姿态、遮挡和转身时丢失身份。因此身份评测必须按姿态幅度、可见面、遮挡和时间分层；“全帧 CLIP 相似度高”无法排除静帧复制。FaceCam 进一步说明人像相机控制有特殊尺度歧义；其 scale-aware camera representation 专门处理单目人像的几何变形和身份/运动保留 [[31]](#ref-31)。
 
-本节只拥有 identity signal 的坐标、时钟、注入和与其他控制信号的冲突合同；逐主体适配、开放集拆分、多主体绑定与参考泄漏由[开放集视频个性化](personalized-video-generation.md)验收。
+本节只拥有 identity signal 的坐标、时钟、注入和与其他控制信号的冲突规格；逐主体适配、开放集拆分、多主体绑定与参考泄漏由[开放集视频个性化](personalized-video-generation.md)验收。
 
-### 4.5 Multi-control composition：同时接收不等于同时遵循
+<a id="45-multi-control-composition"></a>
+
+### 3.5 Multi-control composition：同时接收不等于同时遵循
 
 对多条件模型，最小消融不是 `all controls on/off`，而是
 
@@ -155,21 +172,29 @@ R=\{(I_j,a_j,r_j)\}_{j=1}^{J},
 
 VideoComposer 的 STC interface [[3]](#ref-3)、MOFA-Video 的 adapter composition [[10]](#ref-10)和 VACE 的 Video Condition Unit + Context Adapter [[22]](#ref-22)分别代表“统一编码”、“专家组合”和“任务形式化”三条路线。LAMP 在更上层用 motion DSL 把自然语言编译成对象和相机的显式 3D 程序 [[26]](#ref-26)。但 DSL 解决的是“用户意图如何变成轨迹”，不自动解决生成器对冲突轨迹的可实现性。
 
-## 🧩 5. 条件从哪里进入生成器
+## 4. 条件注入
 
-### 5.1 Training-time adapter / ControlNet residual
+<a id="51-training-time-adapter-controlnet-residual"></a>
+
+### 4.1 Training-time adapter / ControlNet residual
 
 ControlNet 的经典做法是冻结预训主干，用可训分支编码结构条件，再经 zero-initialized layers 将 residual 加回多层主干 [[1]](#ref-1)。视频扩展的优点是保留原生成 prior，且可用少量参数换控制精度；代价是 adapter 与 backbone、采样步数、latent 尺度和训练信号分布绑定。MagicMotion 中的 Trajectory ControlNet 复制 DiT blocks，将编码后的轨迹 latent 经 zero convolution 加到对应主干块 [[21]](#ref-21)；FlashMotion 说明换成少步 backbone 后还需重新对齐 adapter [[25]](#ref-25)。
 
-### 5.2 Attention / feature injection
+<a id="52-attention-feature-injection"></a>
+
+### 4.2 Attention / feature injection
 
 条件可以变成 tokens，作为 cross-attention 的 key/value，也可在 self-attention 中与 video tokens 共同建模。这类路线容易表达“哪个对象带哪条轨迹”，但若没有局部 mask/对象 ID，attention 可把一个对象的运动泄漏到全局。Tora 先将轨迹压缩为分层 spacetime motion patches，再经 Motion-guidance Fuser 与 DiT 特征交互 [[13]](#ref-13)；3DTrajMaster 则通过 gated self-attention 融合对象外观与 3D 轨迹 [[20]](#ref-20)。
 
-### 5.3 Latent / noise optimization
+<a id="53-latent-noise-optimization"></a>
+
+### 4.3 Latent / noise optimization
 
 不更新模型参数时，可直接改变初始噪声、中间 latent 或每步 denoising state。Text2Video-Zero 对初始 latent 添加运动动力学，并将帧内 self-attention 改为跨帧与首帧交互，不需额外视频训练 [[2]](#ref-2)。FreeTraj 在初始噪声构造和 attention 两处施加轨迹 guidance，属于 tuning-free 推理操作 [[23]](#ref-23)。这类方法迁移快，但控制与生成 prior 冲突时，容易以贴图、拉伸或静态化来降低 guidance loss。
 
-### 5.4 Inference guidance
+<a id="54-inference-guidance"></a>
+
+### 4.4 Inference guidance
 
 Inference guidance 通常为每个扩散步定义条件误差 $L_C(z_t)$，用 $\nabla_{z_t}L_C$ 或条件/无条件分支差值改变更新方向。Peekaboo 在 masked attention 中施加时空区域控制，无需额外训练且不增加作者设置下的推理延迟 [[8]](#ref-8)。PoseAnything 的 Subject and Camera Motion Decoupled CFG 则把主体与相机信息放入不同 CFG anchors，避免 pose 跟着镜头一起漂 [[30]](#ref-30)。
 
@@ -180,9 +205,11 @@ Inference guidance 通常为每个扩散步定义条件误差 $L_C(z_t)$，用 $
 | latent / noise | 否或只优化个例 | 可迅速迁移 backbone | 以降画质/多样性换 adherence | 固定 seed 比较原噪声/导引噪声 |
 | inference guidance / CFG | 否 | 可调强度、便于冲突试验 | 过强后锐化、粘连、模态坍塌 | 完整 scale–quality–diversity 曲线 |
 
-## 🔬 6. 八篇代表工作的深读
+## 5. 代表方法
 
-### 6.1 VideoComposer：统一的是条件接口，不是评测语义
+<a id="61-videocomposer"></a>
+
+### 5.1 VideoComposer：统一的是条件接口，不是评测语义
 
 **核心问题。** 文本只能粗略描述运动；不同空间/时间信号若各自建模，组合成本很高。
 
@@ -192,7 +219,9 @@ Inference guidance 通常为每个扩散步定义条件误差 $L_C(z_t)$，用 $
 
 **限制与反证。** 同一 encoder 接收多信号不代表它们在冲突时可校准；应构造 depth 与 sketch 不兼容、motion vector 与物体掩码不一致的成对反例，分别报告每个条件的遵循率。
 
-### 6.2 MotionCtrl：首次系统拆开 camera motion 与 object motion
+<a id="62-motionctrl-camera-motion-object-motion"></a>
+
+### 5.2 MotionCtrl：首次系统拆开 camera motion 与 object motion
 
 **方法。** 相机用 pose 序列，物体用轨迹，两个 controller 可独立或联合加到 VideoCrafter/AnimateDiff/SVD 系列主干 [[6]](#ref-6)。
 
@@ -200,7 +229,9 @@ Inference guidance 通常为每个扩散步定义条件误差 $L_C(z_t)$，用 $
 
 **限制与反证。** 2D object track 不包含遮挡后深度；应用“对象围绕另一对象 + 相机反向 orbit”检查是否只学了画面平移。官方仓库已提供多主干推理/训练实现与模型，但复现时仍必须锁定具体 backbone 和权重版本 [[39]](#ref-39)。
 
-### 6.3 Boximator：用 hard/soft box 把交互约束显式化
+<a id="63-boximator-hardsoft-box"></a>
+
+### 5.3 Boximator：用 hard/soft box 把交互约束显式化
 
 **方法。** Hard box 绑定条件帧中的对象，soft/hard future boxes 给出未来位置、大小或路径；原始主干冻结，只训 control module，self-tracking 用来学 box–object 对应 [[7]](#ref-7)。
 
@@ -208,7 +239,9 @@ Inference guidance 通常为每个扩散步定义条件误差 $L_C(z_t)$，用 $
 
 **限制与反证。** 高 box IoU 可由“框内重新生成一个相似物体”实现，不保证同一实例连续；应同时检查 instance feature、轮廓、遮挡重现与框外守恒。
 
-### 6.4 Motion Prompting：轨迹从结果标注变成运动语言
+<a id="64-motion-prompting"></a>
+
+### 5.4 Motion Prompting：轨迹从结果标注变成运动语言
 
 **方法。** 方法训练视频生成器接收任意数量、时间稀疏/稠密、对象级/全局的 motion trajectories，并将高层用户请求扩展为更详细的 semi-dense motion prompts [[15]](#ref-15)。
 
@@ -216,7 +249,9 @@ Inference guidance 通常为每个扩散步定义条件误差 $L_C(z_t)$，用 $
 
 **证据边界。** 论文展示的仿佛物理现象是作者实验观察，不是对封闭物理规则或反事实动力学的证明。
 
-### 6.5 3DTrajMaster：从 2D 投影路径到多对象 6DoF
+<a id="65-3dtrajmaster-2d-6dof"></a>
+
+### 5.5 3DTrajMaster：从 2D 投影路径到多对象 6DoF
 
 **方法。** 对每个对象输入 3D 位置和旋转序列，用 gated self-attention injector 融合对象与轨迹；domain adaptor 与 annealed sampling 用来降低合成 360° 运动数据与真实视频之间的域差 [[20]](#ref-20)。
 
@@ -224,7 +259,9 @@ Inference guidance 通常为每个扩散步定义条件误差 $L_C(z_t)$，用 $
 
 **限制与反证。** 该路线依赖 3D assets/轨迹监督；应在非刚体、接触、自遮挡和不完整参考外观上单独报告 sim-to-real 失败。
 
-### 6.6 GEN3C：把几何记忆放在生成器外部
+<a id="66-gen3c"></a>
+
+### 5.6 GEN3C：把几何记忆放在生成器外部
 
 **方法。** 从种子图像/已生成帧估深度，反投影为 3D cache，沿目标相机渲染条件帧，视频模型主要负责修复投影伪影、补全 disocclusion 与推进动态 [[17]](#ref-17)。
 
@@ -232,19 +269,25 @@ Inference guidance 通常为每个扩散步定义条件误差 $L_C(z_t)$，用 $
 
 **限制与反证。** 深度错误会直接变成错几何；应用镜面、纹理弱、薄结构、动态前景和前进—后退闭环测试，并把 pose error 与外观补全错误分开。
 
-### 6.7 MagicMotion 与 FlashMotion：可控性也有训练课程和采样状态
+<a id="67-magicmotion-flashmotion"></a>
+
+### 5.7 MagicMotion 与 FlashMotion：可控性也有训练课程和采样状态
 
 MagicMotion 的核心不只是“支持三种信号”，而是用 mask→box→sparse box 的 curriculum 先学对象边界，再减少监督密度 [[21]](#ref-21)。FlashMotion 则将问题延伸到少步：先训 slow adapter，再蒸馏 generator，最后用 diffusion + adversarial objectives 对齐 fast adapter [[25]](#ref-25)。
 
 两者共同提醒：条件表示、主干采样轨迹和 adapter 训练状态是一个整体。只把轨迹编码器移植到更新的 backbone，即使代码能跑，也不等于精度保持。
 
-### 6.8 BulletTime 与 WorldStereo：时间解耦与空间记忆是两条不同前沿
+<a id="68-bullettime-worldstereo"></a>
+
+### 5.8 BulletTime 与 WorldStereo：时间解耦与空间记忆是两条不同前沿
 
 BulletTime 回答“场景内时间如何与相机时间分开”，以便做冻结、慢放、反向或非均匀时间曲线 [[27]](#ref-27)。WorldStereo 回答“相机离开后再回来，如何仍看见同一空间”，用全局 point-cloud memory 和 3D correspondence-constrained attention 支持多视角一致 [[29]](#ref-29)。
 
 两者不能用同一个 camera error 相互替代：前者必须测试同一 camera path 下不同 world-time curve，后者必须测试 loop closure、novel-view geometry 和重建。
 
-## 🗓️ 7. 里程碑：能力转折、发表层和 release surface 分开
+<a id="7-release-surface"></a>
+
+## 6. 技术发展
 
 | 首次公开 | 正式发表 | 工作 | 实际能力转折 | 2026-08-30 公开面/边界 |
 |---:|---:|---|---|---|
@@ -254,7 +297,7 @@ BulletTime 回答“场景内时间如何与相机时间分开”，以便做冻
 | 2023 | SIGGRAPH 2024 | MotionCtrl [[6]](#ref-6) | 相机与物体运动独立/联合控制 | 正式论文 + 训练/推理代码 + 多主干权重 [[39]](#ref-39) |
 | 2024 | ICML 2024 | Boximator [[7]](#ref-7) | hard/soft box 插件 | 正式论文；评测仍要排除实例替换 |
 | 2024 | CVPR 2024 | Peekaboo [[8]](#ref-8) | 无训练 masked attention 时空布局 | 正式论文 + 代码/基准 |
-| 2024 | ECCV 2024 | DragAnything / MOFA-Video [[9]](#ref-9), [[10]](#ref-10) | entity trajectory 与可组合 motion-field adapters | 正式论文；合同分别是拖动与 I2V animation |
+| 2024 | ECCV 2024 | DragAnything / MOFA-Video [[9]](#ref-9), [[10]](#ref-10) | entity trajectory 与可组合 motion-field adapters | 正式论文；规格分别是拖动与 I2V animation |
 | 2024 | ICLR 2025 | CameraCtrl / 3DTrajMaster [[12]](#ref-12), [[20]](#ref-20) | camera pose adapter 与多对象 6DoF 轨迹 | 正式论文；代码/数据覆盖面不同 |
 | 2024 | CVPR 2025 | Tora / Motion Prompting [[13]](#ref-13), [[15]](#ref-15) | DiT 轨迹 patches 与通用 motion prompt | 正式论文；Tora 有官方代码/权重 [[40]](#ref-40) |
 | 2025 | CVPR/ICCV 2025 | GEN3C / MagicMotion / VACE [[17]](#ref-17), [[21]](#ref-21), [[22]](#ref-22) | 3D cache、dense-to-sparse curriculum、生成编辑统一接口 | 均已正式发表；不同子任务不做单排行 |
@@ -263,29 +306,41 @@ BulletTime 回答“场景内时间如何与相机时间分开”，以便做冻
 | 2026 | CVPR 2026 | UCPE / WorldStereo [[28]](#ref-28), [[29]](#ref-29) | 统一相机编码；几何记忆+空间对应 | 正式论文；WorldStereo 2.0 代码/权重已公开，数据预处理仍有 TODO [[44]](#ref-44) |
 | 2026-08 | 仅 arXiv v1 | 4DStreamCtrl [[35]](#ref-35) | 相机+对象+深度统一 3D point tracks，因果少步流式 | 作者项目页在冻结日仍标记 paper/code coming soon [[45]](#ref-45) |
 
-## 🔭 8. 2025–2026 frontier：前沿不再只是“更准的 2D 拖动”
+<a id="8-20252026-frontier-2d"></a>
 
-### 8.1 2D 轨迹→3D 对象/相机共同坐标
+## 7. 近期方法
+
+<a id="81-2d-3d"></a>
+
+### 7.1 2D 轨迹→3D 对象/相机共同坐标
 
 3DTrajMaster 使用 entity 6DoF，LAMP 用 DSL 编译对象和相机 3D 路径，GEN3C/WorldStereo 用外部几何 cache 保持空间 [[20]](#ref-20), [[26]](#ref-26), [[17]](#ref-17), [[29]](#ref-29)。这些路线共同将控制从 image-plane correspondence 推向 world-coordinate intent，但它们的 3D 来源分别是合成资产、程序轨迹、单目深度和增量重建，不能把误差源混为“几何失败”。
 
 WorldForge 从另一个方向在不重训视频主干的前提下，用零样本相机控制把视频模型用于 3D/4D 生成 [[34]](#ref-34)。这可作为 inference-time camera manipulation 的正式发表证据，却不等于模型具有可持续的在线状态或 action-conditioned dynamics。
 
-### 8.2 相机→相机 + 世界时间 + 内参
+<a id="82"></a>
+
+### 7.2 相机→相机 + 世界时间 + 内参
 
 BulletTime 明确分开 world time 和 camera pose [[27]](#ref-27)；UCPE 将相对位移/旋转、初始方位和镜头内参的编码问题系统化 [[28]](#ref-28)；FaceCam 显示人像领域中尺度歧义会放大头脸几何失真 [[31]](#ref-31)。所以今后“camera control”的最小复现字段必须加上 intrinsics、world-time 和 scale convention。
 
-### 8.3 多步→少步，但不牺牲控制
+<a id="83"></a>
+
+### 7.3 多步→少步，但不牺牲控制
 
 FlashMotion 的正式 CVPR 2026 证据支持“few-step trajectory control 需要专门对齐 adapter 与 fast generator”，但其速度、显存和质量数字仍必须与作者硬件、分辨率、帧数和 denoising-only 计时绑定 [[25]](#ref-25), [[43]](#ref-43)。不能把 NFE 降低直接改写成端到端实时。
 
-### 8.4 Offline fixed clip→online 4D stream：仍是待独立复现的预印本前沿
+<a id="84-offline-fixed-cliponline-4d-stream"></a>
+
+### 7.4 Offline fixed clip→online 4D stream：仍是待独立复现的预印本前沿
 
 4DStreamCtrl 将 camera motion、object trajectories 和 depth 统一成 3D point-track representation，用可时间分离的 Geometric Motion Head 接入预训 VDM，并蒸馏为四步因果流式 student [[35]](#ref-35)。作者报告 480p、20 FPS、单高端 GPU 和数百帧一致；这些数字属于**预印本作者协议下的自报结果**，冻结日项目页仍未公开论文与代码下载，因而不能当作已独立复现的实时世界模型 [[45]](#ref-45)。
 
-这里的“4D”既涉及在线 3D 控制，也涉及跨视角/时间一致性；后者必须额外测试 freeze-time 多视角、重投影、遮挡与 loop closure，不能由轨迹误差或 FPS 代替。对应的 `GridFork-1` 协议见[多视角与 4D 专章](multiview-4d-generation.md)。
+这里的“4D”既涉及在线 3D 控制，也涉及跨视角/时间一致性；后者必须额外测试 freeze-time 多视角、重投影、遮挡与 loop closure，不能由轨迹误差或 FPS 代替。对应的 视角与时间网格实验 协议见[多视角与 4D 专章](multiview-4d-generation.md)。
 
-## ⚖️ 9. 四方权衡：control–fidelity–motion–diversity
+<a id="9-controlfidelitymotiondiversity"></a>
+
+## 8. 控制与质量的权衡
 
 对固定输入 $x$ 与条件 $C$，不应最大化一个神秘总分，而应保存向量
 
@@ -300,7 +355,7 @@ S(x,C)=\big(A_C,F_R,N_M,D_{Y\mid x,C}\big),
 - 更大光流幅度不等于 $N_M$ 更高；相机抖动和背景漂移也会增加 dynamic degree。
 - 多样性必须在轨迹/相机/姿态误差过门后计算；偏离条件的样本不是有益多样性。
 
-## 🧯 10. 失败模式：从症状回到控制路径
+## 9. 故障诊断
 
 | 症状 | 优先怀疑 | 最小定位实验 | 不充分的“修复” |
 |---|---|---|---|
@@ -314,9 +369,11 @@ S(x,C)=\big(A_C,F_R,N_M,D_{Y\mid x,C}\big),
 | 冲突条件时任选一个 | 没有优先级 $\pi_k$ 或训练未见冲突 | 构造成对冲突，交换优先级 | 报告非冲突平均分 |
 | 少步后轨迹失真 | slow adapter / fast generator 状态不匹配 | 固定 generator，比 slow/realigned fast adapter | 只增加 CFG |
 
-## 📏 11. 评测：先测条件，再测画面
+## 10. 评测方法
 
-### 11.1 六类控制各用自己的度量
+<a id="111"></a>
+
+### 10.1 六类控制各用自己的度量
 
 | 控制 | 主指标 | 必须同时报告 | 不能单独作证据的分数 |
 |---|---|---|---|
@@ -327,19 +384,25 @@ S(x,C)=\big(A_C,F_R,N_M,D_{Y\mid x,C}\big),
 | depth/normal/edge/flow | scale-aligned depth、angular error、edge F-score、EPE/warp | 估计器、尺度对齐、运动边界/遮挡子集 | 平滑区占多数的全图平均 |
 | identity/appearance | face/instance/DINO similarity、local patch/material score | 姿态幅度、新可见面、时间漂移曲线 | 首帧或全帧 CLIP-I |
 
-### 11.2 三个不能省的高难子集
+### 10.2 三个不能省的高难子集
 
 1. **Occlusion / re-entry**：对象完全遮挡后重现，与另一对象交叉，出画后再入画。只在 visible frames 计位置误差，另报身份恢复与遮挡判断。
 2. **Novel view**：超出初始帧可见范围，大 orbit、前进/后退、回到旧视点。报 pose error、geometry consistency、loop closure 与 disocclusion 质量，不只报视频美学。
 3. **Conflict**：相机与对象轨迹相抵、两个对象争夺同一空间、pose 与 mask 不匹配、外观参考相互矛盾。验证模型是遵循 $\pi_k$、拒绝，还是静默丢弃条件。
 
-### 11.3 多样性必须是 conditional diversity
+<a id="113-conditional-diversity"></a>
+
+### 10.3 多样性必须是 conditional diversity
 
 每个输入至少生成 $K\ge8$ 个预先公布的 seeds，先以控制阈值筛出有效样本，再在有效集中计算 pairwise video-feature distance、运动路径的允许自由度和人类偏好。若 8 个样本只有 1 个过轨迹门，不能用另外 7 个的差异宣称“多样”。
 
-## 🧪 12. 一套可复现、可归因的实验
+## 11. 实验设计示例
 
-### 12.1 ControlContract-120
+本节是可按任务调整的实验设计示例，尚未在本仓库运行；参数与阈值是示例设置，不是已发布基准或实测结果。
+
+<a id="121-controlcontract-120"></a>
+
+### 11.1 ControlContract-120
 
 建立 120 个固定 case，六类信号各 20 个：
 
@@ -350,7 +413,9 @@ S(x,C)=\big(A_C,F_R,N_M,D_{Y\mid x,C}\big),
 - identity/appearance：单参考、多视图、冲突参考、大姿态；
 - multi-control：相容和冲突条件各半。
 
-### 12.2 固定并公布的运行账本
+<a id="122"></a>
+
+### 11.2 固定并公布的运行账本
 
 1. 模型、权重 commit/hash、VAE、text/reference encoder、control adapter 版本。
 2. $F,H,W,fps$、时间压缩、crop/resize、相机坐标系、轨迹插值和 visibility convention。
@@ -358,7 +423,9 @@ S(x,C)=\big(A_C,F_R,N_M,D_{Y\mid x,C}\big),
 4. GPU、精度、显存、warm-up、是否包含 encoder/VAE/I/O、批大小。
 5. 条件来自人工、估计器还是 ground truth；估计器版本和置信度。
 
-### 12.3 五个必做对照
+<a id="123"></a>
+
+### 11.3 五个必做对照
 
 1. Base generator：无显式控制。
 2. Prompt-only：把轨迹/相机改写成文本。
@@ -368,15 +435,17 @@ S(x,C)=\big(A_C,F_R,N_M,D_{Y\mid x,C}\big),
 
 每个对照在同一 seeds 上运行，同时扫条件强度；画出 control–fidelity–motion–diversity Pareto 面。停止规则是：若控制改变与输出误差没有单调或局部可解释关系，先停止宣称 controllability，定位信号绑定与评估器。
 
-## 📦 13. 论文、代码、权重与产品不是一个发布面
+## 12. 公开实现与产品接口
 
-截至冻结日，公开产品已经暴露了与论文不完全相同的控制接口：Adobe Firefly 官方文档允许上传 5–10 秒参考视频提取 pan/zoom/tilt/path 等相机运动 [[36]](#ref-36)；Kling VIDEO 3.0 Motion Control 官方指南的合同是“角色图像 + 驱动视频/动作库”，主要复制角色动作和表情，不是通用 3D object trajectory [[37]](#ref-37)；Runway Gen-4 官方指南主要通过文本描述主体、场景与相机运动 [[38]](#ref-38)。
+截至冻结日，公开产品已经暴露了与论文不完全相同的控制接口：Adobe Firefly 官方文档允许上传 5–10 秒参考视频提取 pan/zoom/tilt/path 等相机运动 [[36]](#ref-36)；Kling VIDEO 3.0 Motion Control 官方指南的规格是“角色图像 + 驱动视频/动作库”，主要复制角色动作和表情，不是通用 3D object trajectory [[37]](#ref-37)；Runway Gen-4 官方指南主要通过文本描述主体、场景与相机运动 [[38]](#ref-38)。
 
 这些产品页可证明**当日 UI/API 中存在某个入口**，不能证明底层使用了某篇论文的 adapter/attention/3D cache，也不能与开放权重方法做可复现性等价。产品能力会更新或下线，因而必须带日期回读，不把宣传视频当 benchmark。
 
-## 🚀 14. 结论与开放问题
+<a id="14"></a>
 
-本领域的主线已从“给每帧一张 edge/depth map”，经历“用点、框、掩码控对象”、“相机/对象运动解耦”和“2D 轨迹升级为 3D 几何”，走向“相机、对象、深度、世界时间与流式采样的共同合同”。但仍有六个未解的核心问题：
+## 13. 使用建议
+
+本领域的主线已从“给每帧一张 edge/depth map”，经历“用点、框、掩码控对象”、“相机/对象运动解耦”和“2D 轨迹升级为 3D 几何”，走向“相机、对象、深度、世界时间与流式采样的共同规格”。但仍有六个未解的核心问题：
 
 1. 如何让点/框在遮挡、分裂、合并与出画后仍绑定同一实例？
 2. 如何用可编辑的 4D 表示同时处理 camera、geometry、non-rigid object motion 与 disocclusion？
@@ -386,6 +455,11 @@ S(x,C)=\big(A_C,F_R,N_M,D_{Y\mid x,C}\big),
 6. 是否能建立包含可见性、冲突、失败尾部和条件多样性的公共 benchmark，而不是每篇论文一套不可横比协议？
 
 最终判断可以浓缩为一句话：**可控性不是“结果看起来像命令”，而是改变条件时，输出按声明的坐标、时钟、优先级和不变量发生可预测、可测量、可反证的变化。**
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 

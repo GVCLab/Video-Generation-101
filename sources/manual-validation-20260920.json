@@ -1,0 +1,24 @@
+{
+  "date": "2026-09-20",
+  "citation_check": {
+    "mode": "online",
+    "scope": "published",
+    "files": 53,
+    "links": 2307,
+    "arxiv_requested": 421,
+    "arxiv_queried": 421,
+    "arxiv_returned": 421,
+    "arxiv_unverified": 0,
+    "online_complete": true,
+    "errors": 0,
+    "warnings": 0
+  },
+  "strict_build": "passed",
+  "manual_check": "59 source files; 61 rendered pages; 14246 local links; 0 issue(s)",
+  "regression_tests": 6,
+  "runtime_models_reproduced": false,
+  "browser_checks": [
+    "datasets chapter: removed section absent, 28 rendered math elements, 0 math error elements",
+    "video prediction: flow diagram visually rendered, 0 math error elements"
+  ]
+}

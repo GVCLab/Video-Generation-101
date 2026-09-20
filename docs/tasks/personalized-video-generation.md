@@ -1,20 +1,27 @@
-# 开放集视频个性化：主体槽、绑定证据与身份—运动 Pareto
+<a id="pareto"></a>
 
-> 本章冻结于 **2026-08-30（Asia/Shanghai）**。它讨论的不是“把一张图当首帧”，而是让一个或多个参考主体进入**新的场景、动作、构图和时间结构**，同时保持可辨认身份、正确角色和自然运动。检索、纳排、代码状态、逐篇反证与主图验收见[研究日志](../../sources/research_20260830_personalized_video_generation.md)。
+# 个性化视频生成
+
+介绍主体参考、身份绑定、模型适配及多主体生成。
+
+**前置知识：** 条件视频生成、特征表示。
+
+**使用步骤：** 指定参考主体及保持范围 → 选择微调、适配器或上下文条件方案 → 评价身份、动作、绑定和参考泄漏。
+
 
 ## 学习目标
 
 读完本章，应当能够：
 
 1. 用“参考是否占输出时间轴”和“是否存在待编辑源视频”区分个性化、I2V、V2V、角色动画与跨镜头一致性；
-2. 写出多参考、多主体、可选动作/相机/时间窗和适配预算都不含糊的 tensor 合同；
+2. 写出多参考、多主体、可选动作/相机/时间窗和适配预算都不含糊的 张量规格；
 3. 解释每主体微调、共享 subject encoder、冻结 reference token、身份—运动模块组合、reward/post-training 和多镜头记忆六类路线；
 4. 判断 `open-set`、`tuning-free`、`zero-shot`、`open weights` 为什么不是同义词；
 5. 用交换参考、空槽、遮挡后重现、背景/姿态扰动和多主体相似矩阵证伪“身份保持”；
 6. 把身份、动作、文本、运动、绑定、泄漏、底座能力和系统成本画成 Pareto，而不是只报一个 CLIP/DINO/FaceSim；
 7. 按“首次公开 / 正式发表 / 工件状态”阅读 2022–2026 的里程碑，并识别作者结论与表格不一致之处。
 
-## 1. 先明确任务边界：参考主体不等于首帧
+## 1. 任务定义
 
 给定 $N$ 个主体，每个主体有至多 $K$ 张参考图：
 
@@ -24,7 +31,7 @@ R\in[0,1]^{B\times N\times K\times3\times H_r\times W_r},
 M_R\in\{0,1\}^{B\times N\times K},
 ```
 
-对应实体描述 $`E=\lbrace e_n\rbrace_{n=1}^{N}`$、文本 prompt $y$，以及可选的动作、相机、关系或时间窗条件 $c$，目标是生成：
+对应实体描述 $E=\lbrace e_n\rbrace_{n=1}^{N}$、文本 prompt $y$，以及可选的动作、相机、关系或时间窗条件 $c$，目标是生成：
 
 ```math
 X\in[0,1]^{B\times F\times3\times H\times W},
@@ -64,7 +71,7 @@ $a$ 是**适配预算**。若方法需要每个主体微调，它至少包含：
 
 对互联网预训练模型，严格证明某位公众人物从未出现通常不可行。可靠写法是 **identity-disjoint benchmark generalization**，并公开无法审计的底座污染边界。
 
-## 2. 主体槽不是一个向量
+## 2. 主体表示与绑定
 
 一个可执行的主体状态至少包括：
 
@@ -91,7 +98,7 @@ q_n
 
 把所有参考图压成一个全局向量，容易保类别而丢实例；保留大量局部 token，又容易复制参考的背景、姿态、裁切和光照。真正的难点不是“是否用了图像 encoder”，而是**什么应当不变、什么必须允许变化、每个 token 属于谁、在何时生效**。
 
-### 2.1 最小 tensor 与绑定合同
+### 2.1 最小 tensor 与绑定规格
 
 | 字段 | 示例形状 | 必须冻结的语义 |
 |---|---|---|
@@ -104,17 +111,17 @@ q_n
 | Output video latent | $Z:B\times f\times C\times h\times w$ | VAE 时间压缩率、reference token 与 video token 的位置约定 |
 | Adaptation state | $\phi:B\times N\times P$ 或模块文件 | token/LoRA/adapter/全模型；版本、大小、可删除性 |
 
-若交换 $R_1,R_2$ 与它们的 entity binding，输出中两位主体也应随之交换，而背景、相机和动作语义不应无关改变。这个**置换等变性**比“看起来都有两个人”更接近真正的多主体合同。
+若交换 $R_1,R_2$ 与它们的 entity binding，输出中两位主体也应随之交换，而背景、相机和动作语义不应无关改变。这个**置换等变性**比“看起来都有两个人”更接近真正的多主体规格。
 
-## 3. 一张图读懂成功与失败
+## 3. 生成流程
 
-![开放集视频个性化合同图。左侧三组人物、狗和玩具参考图分别进入三个主体槽；中间四条并列路线为逐主体调优、共享适配器、上下文参考 token 和显式绑定；右侧生成的新场景视频依次通过身份、运动、文本、绑定和无泄漏五道门。下方四个反例分别展示身份融合、主体丢失、参考复制和静态冻结。](../../assets/diagrams/personalized-video-binding-contract.png)
+![开放集视频个性化规格图。左侧三组人物、狗和玩具参考图分别进入三个主体槽；中间四条并列路线为逐主体调优、共享适配器、上下文参考 token 和显式绑定；右侧生成的新场景视频依次通过身份、运动、文本、绑定和无泄漏五道门。下方四个反例分别展示身份融合、主体丢失、参考复制和静态冻结。](../../assets/diagrams/personalized-video-binding-contract.png)
 
 **图 1：成功不是“参考图像素更像”。** 参考集位于输出时间轴之外；`TUNE / ADAPTER / IN-CONTEXT / BIND` 是可组合或替代的路线。成功视频必须同时保留人物、狗和玩具，又产生新姿态、新动作和新背景。下方四个红框是必须主动构造的反例：`BLEND` 把多个身份融合，`DROP` 丢掉一个槽，`COPY` 复刻参考姿态/背景，`FREEZE` 用几乎静止的视频换取高相似度。生成提示、两轮定向修正、尺寸、SHA-256 与灰度验收见[研究日志](../../sources/research_20260830_personalized_video_generation.md#9-teaching-visual-record)。
 
 **顺序化文字替代：** 三组参考先分别形成主体槽；模型从逐主体调优、共享适配器、上下文参考 token 或显式绑定路线生成新视频；输出必须分别通过身份、运动、prompt、主体—角色绑定和参考泄漏检查；任何身份融合、主体缺失、参考复制或静态冻结都判为失败，不能用其他平均分抵消。
 
-## 4. 为什么个性化天然形成多目标冲突
+## 4. 目标之间的权衡
 
 ### 4.1 同片段重建会教会错误捷径
 
@@ -152,7 +159,7 @@ q_n
 
 因此横轴不能只有 reference count。至少要联合报告 $K$、视角覆盖、服饰变化、裁切方式、同类主体数量、总 reference token 数和 text/image guidance。
 
-## 5. 六条技术路线
+## 5. 方法分类
 
 ### 5.1 路线 A：每主体 token、LoRA、adapter 或全量微调
 
@@ -227,9 +234,9 @@ Gloria 用紧凑 content anchors 维护长视频角色，从训练内外片段�
 
 长视频的身份状态由本章提供；镜头计划、事实更新、道具状态、冲突和回滚仍由[故事与多镜头](story-multishot.md)拥有。
 
-## 6. 里程碑：按合同变化而不是演示画质收录
+## 6. 代表工作
 
-| 首次公开 / 正式版本 | 工作 | 合同变化 | 仍未解决 |
+| 首次公开 / 正式版本 | 工作 | 规格变化 | 仍未解决 |
 |---|---|---|---|
 | 2022 / 预印本 | Textual Inversion [[1]](#ref-1) | 一个 token 表示新图像概念 | 视频运动、时序与角色绑定 |
 | 2022 / CVPR 2023 | DreamBooth [[2]](#ref-2) | 少样本主体微调 + prior preservation | 每主体成本、参考过拟合 |
@@ -258,7 +265,7 @@ Gloria 用紧凑 content anchors 维护长视频角色，从训练内外片段�
 
 “首次公开”记录思想进入公共领域的时间，“正式版本”记录可核验 proceedings；二者不应互相覆盖。产品演示、作者自称 accepted 和项目页占位不计作正式里程碑。
 
-## 7. 重点论文精读：机制、证据与不能外推的结论
+## 7. 方法比较
 
 ### 7.1 Video Alchemist：内建 open-set binding，但主定量仍是单主体
 
@@ -328,7 +335,9 @@ Gloria 把角色外观压成 content anchors，以 superset anchoring 防复制�
 
 Vera 构建 1,001,891 个跨片段 identity-aligned human image–video pairs，用 Identity-Focal Masked Supervision 聚焦人类身份区域，以 Reference-Aware Layer-wise Attention 稳定 identity readout [[33]](#ref-33)。它报告单/多人身份与自然动作改善，但截至冻结日仍是预印本，且是 human-specific；不能外推到开放域通用主体。
 
-## 8. 多主体 binding：从看图升级为相似矩阵与交换实验
+<a id="8-binding"></a>
+
+## 8. 多主体绑定
 
 令生成视频在时间 $t$ 检测出 $M_t$ 个主体 crop，reference 槽为 $N$。使用未参与训练 reward 的 evaluator 得到：
 
@@ -355,12 +364,12 @@ S_{n,\pi_t(n),t}
 \right].
 ```
 
-$`\Delta_{\mathrm{bind}}\gt0`$ 仍不够：还要验证 $\pi_t$ 随时间稳定、主体出画重现后回到同一槽，并且正确主体执行正确动作。
+$\Delta_{\mathrm{bind}}\gt0$ 仍不够：还要验证 $\pi_t$ 随时间稳定、主体出画重现后回到同一槽，并且正确主体执行正确动作。
 
 ![图 060：多主体身份绑定的反证实验](../../assets/imagegen-diagrams/060/diagram.png)
 **顺序化文字替代：** 冻结人物、狗、玩具三个 reference slots、prompt、相机和 seed；分别运行原始 binding、交换两组参考、空置/加入无关槽、去背景/改变裁切姿态、遮挡后重现五个条件；对每帧检测、分割和跟踪，构造完整 reference-to-generated-subject 相似矩阵并做一一匹配；最后分别判定身份融合、主体丢失、身份/属性/动作交换、参考泄漏和遮挡后漂移。
 
-## 9. 评测：十个账本不能压成一个平均分
+## 9. 评测方法
 
 | 账本 | 推荐单位 | 最少报告 | 不能替代 |
 |---|---|---|---|
@@ -384,7 +393,7 @@ $`\Delta_{\mathrm{bind}}\gt0`$ 仍不够：还要验证 $\pi_t$ 随时间稳定�
 - FVD/FID 对实现、样本量和 reference distribution 敏感，不能跨论文表格直接排行；
 - t-IoU/t-L2 测实体何时出现，不测同类身份是否交换。
 
-VGBE 2026 Challenge 从单张参考图和文本生成视频，联合考察身份、几何一致性与视觉质量，并对进入决赛的 7 支队伍做源码核验；它评测的是单图条件 I2V，而不是本章定义的 reference-outside-timeline S2V，结果不能直接跨合同外推 [[32]](#ref-32)。
+VGBE 2026 Challenge 从单张参考图和文本生成视频，联合考察身份、几何一致性与视觉质量，并对进入决赛的 7 支队伍做源码核验；它评测的是单图条件 I2V，而不是本章定义的 reference-outside-timeline S2V，结果不能直接跨规格外推 [[32]](#ref-32)。
 
 ### 9.2 必须发布 Pareto，而不是调权重后的单分数
 
@@ -419,7 +428,9 @@ VGBE 2026 Challenge 从单张参考图和文本生成视频，联合考察身份
 
 同一 subject 的不同 reference/prompt 不是独立身份样本。bootstrap 应以 subject set 为 cluster；多方法比较使用相同 prompt/seed 并报告 paired interval。split 至少按 identity、原视频、捕获源和 near-duplicate group 隔离。若底座预训练不可审计，明确写“无法排除 foundation-model memorization”。
 
-## 10. PersonaBind-1：一套可执行的最小反证实验
+<a id="10-personabind-1"></a>
+
+## 10. 实验设计示例
 
 > **状态：本章提出，尚未运行。** 下列数值是预注册门槛草案，不是论文或本仓库实测结果；正式使用前应以真实视频与人评校准。
 
@@ -454,7 +465,7 @@ VGBE 2026 Challenge 从单张参考图和文本生成视频，联合考察身份
 
 阈值不能靠测试集调到恰好过线。若 evaluator 与人评的 Spearman/paired agreement 未达到预注册校准标准，自动门降级为诊断，不作为最终裁决。
 
-### 10.4 必须交付
+### 10.4 实验输出
 
 - 原始 references、masks、许可和 split manifest；
 - 原 prompt、改写 prompt、slot mapping、seed 和全部失败视频；
@@ -463,11 +474,11 @@ VGBE 2026 Challenge 从单张参考图和文本生成视频，联合考察身份
 - adaptation state、参数量、训练/推理 time、峰值 VRAM、磁盘和删除日志；
 - evaluator 版本、训练重叠风险、人评问卷与匿名原始投票。
 
-## 11. 数据、工件与可复现状态
+## 11. 数据与公开实现
 
 截至冻结日：Magic-Me 有官方训练/推理代码但无训练数据；Video Alchemist 公开 MSRVTT-Personalization 评测工件而未公开模型代码/权重；PersonalVideo、AlcheMinT 和 PoCo 的作者仓库仍是不同程度的占位；Movie Weaver 未链接官方代码/权重/数据；MAGREF 公开部分推理代码与 checkpoint，但高分辨率/14B/训练代码仍在计划中；OpenS2V-Nexus 公开评测代码、结果视频和数据子集 [[9]](#ref-9), [[14]](#ref-14), [[17]](#ref-17), [[15]](#ref-15), [[24]](#ref-24), [[25]](#ref-25), [[23]](#ref-23), [[35]](#ref-35)。
 
-复现实验必须把 release surface 分开：
+复现实验必须把 发布内容 分开：
 
 - paper/project page；
 - inference code；
@@ -479,7 +490,7 @@ VGBE 2026 Challenge 从单张参考图和文本生成视频，联合考察身份
 
 “有 GitHub”不能缩写成“已开源”，“能跑 demo”不能缩写成“可训练复现”。
 
-## 12. 权利、隐私与撤回也是任务要求的一部分
+## 12. 授权与隐私
 
 人脸和声音可能是生物识别信息；宠物、产品、艺术角色和服饰也可能涉及所有权、商标、著作权或商业秘密。最小治理字段包括：
 
@@ -494,7 +505,7 @@ VGBE 2026 Challenge 从单张参考图和文本生成视频，联合考察身份
 
 不能把“生成质量高”当作授权。数字人特有的音频、口型、声音克隆和人类授权细则见[数字人章节](digital-human.md)；本章负责通用 subject state 与适配工件的 provenance/revocation。
 
-## 13. 常见误区与快速纠正
+## 13. 故障诊断
 
 1. **把参考图当首帧。** 问它是否必须出现在 $X_0$；是则进入 I2V。
 2. **把 `open-set` 写成“底座从未见过”。** 只声明相对于可审计 split 的 identity-disjoint generalization。
@@ -502,14 +513,14 @@ VGBE 2026 Challenge 从单张参考图和文本生成视频，联合考察身份
 4. **用 Temporal Consistency 证明运动。** 静止视频也可能高分；另报 motion magnitude、diversity 和 action success。
 5. **用多张同一人的 reference 证明多主体。** 多视图 identity 与多个 distinct subjects 是不同协议。
 6. **把两个人都出现当正确 binding。** 交换 references，检查谁执行谁的动作、属性是否串槽。
-7. **把 tuning-free 当低成本/开源。** 报共享训练成本、模型大小、预处理依赖和 release surface。
+7. **把 tuning-free 当低成本/开源。** 报共享训练成本、模型大小、预处理依赖和 发布内容。
 8. **把强增强当泄漏已消失。** 做背景、姿态、裁切 counterfactual，并测 copy score。
 9. **把 face metric 当通用主体。** 人、动物、物体、产品和虚构角色分别校准 evaluator。
 10. **照抄论文公式。** 若 prose、表格、损失方向或 RoPE 代数冲突，标注歧义并查代码。
 11. **跨论文直接比较点数。** 数据、reference 数、crop、分辨率、帧数和 evaluator 不同；只在 matched protocol 下比较。
 12. **把项目页当代码。** 分开核验代码、权重、数据、评测和 commit。
 
-## 14. 仍值得研究的问题
+## 14. 开放问题
 
 1. 能否学到“身份不变量”和“可编辑属性”的校准分布，而不是把服饰/年龄/光照永久绑定？
 2. 如何在同类多主体、交互、遮挡和出画重现中维持 slot identity，同时允许角色关系变化？
@@ -522,7 +533,7 @@ VGBE 2026 Challenge 从单张参考图和文本生成视频，联合考察身份
 9. 如何为动物、产品、艺术角色和非刚性主体建立与人脸同等可靠的 identity metric？
 10. 如何把 subject personalization 与原生音视频中的声音身份联合建模，同时避免跨模态身份串绑？
 
-## 15. 最小阅读顺序
+## 15. 延伸阅读
 
 1. **图像祖先与模块化运动**：Textual Inversion → DreamBooth → AnimateDiff。
 2. **早期视频定制**：VideoBooth → DreamVideo → CustomVideo → DisenStudio / Magic-Me。
@@ -532,6 +543,11 @@ VGBE 2026 Challenge 从单张参考图和文本生成视频，联合考察身份
 6. **2026 前沿**：ID-Crafter → AlcheMinT → Gloria / PoCo → Vera。
 
 每读一篇只回答八个问题：reference 是否占时间轴、是否每主体优化、主体 token 怎样形成、文本如何绑定 reference、训练对是否泄漏、动作由谁控制、多主体如何证伪、工件实际开放到哪一层。
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 

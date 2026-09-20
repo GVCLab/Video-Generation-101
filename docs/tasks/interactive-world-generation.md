@@ -1,22 +1,30 @@
-# 交互式世界生成：从动作条件视频到可验证的持久世界
+# 交互式世界生成
+
+介绍由在线动作驱动的持续观测生成、状态维护与环境接口。
+
+**前置知识：** 动作条件预测、流式生成。
+
+**使用步骤：** 定义动作到观测的接口及时间要求 → 实现状态更新与输出提交 → 测试响应、回访一致性和闭环任务表现。
 
 > 本章资料与开放状态冻结于 **2026-08-30（Asia/Shanghai）**。Interactive World Generation（IWG）不是“把视频生成器接上键盘”这么简单：它要求系统在 rollout 中持续接收新动作、按因果顺序更新输出，并使动作后果、空间布局与对象状态可被反事实和回访实验检验。
 
 检索式、结果数、纳入/排除、证据等级、代码/权重开放面和 AI 图 provenance 见[配套研究记录](../../sources/research_20260830_interactive_world_generation.md)。
 
-## 🎯 1. 学习目标
+## 学习目标
 
 读完本章，应能：
 
 1. 区分交互式世界生成、动作条件预测、learned game engine、一般 world model、4D/scene simulation 与 World Action Model（WAM）；
-2. 写出 observation–action–state–memory 的闭环合同，并分别报告 FPS、accepted-action Hz、动作 hold 规则、p95 input-to-first-affected-frame latency 与 rollout horizon；
+2. 写出 observation–action–state–memory 的闭环规格，并分别报告 FPS、accepted-action Hz、动作 hold 规则、p95 input-to-first-affected-frame latency 与 rollout horizon；
 3. 把 Genie、UniSim、GameNGen、DIAMOND、Oasis、Genie 2/3 和 2026 年系统放进 latent action、diffusion game engine、memory/compression、joint video–action、persistent world 五条机制路线；
 4. 设计 action validity、counterfactual intervention、revisitation、uncertainty、model exploitation 与 decision utility 的分层实验；
 5. 看到 demo、paper、checkpoint、product/platform 时，知道它们分别能证明什么、不能证明什么。
 
-## 🧭 2. 操作定义与边界
+## 1. 定义与范围
 
-### 2.1 最小操作定义
+<a id="21"></a>
+
+### 1.1 最小操作定义
 
 令 $o_t$ 是当前观测，$A_t=(a_t,\ldots,a_{t+K-1})$ 是与未来 $K$ 个 observation steps 对齐的动作 schedule，$g_t$ 是可选目标或世界事件，$m_t$ 是跨窗口记忆。原始动作事件先在独立的动作时钟上被系统**接受**，再按明示规则对齐到 schedule；因此相邻 $a$ 可以是同一 accepted action 的 hold，而不是 $K$ 次独立输入。交互式世界生成器至少实现
 
@@ -27,7 +35,7 @@
 p_\theta(\cdot\mid h_t,A_t,g_t,m_t),
 ```
 
-其中 $h_t=(o_0,a_0,\ldots,o_t)$，$\hat s$、$\hat r$、$\hat d$ 可以缺省，但若系统声称可作为环境训练或评估策略，就应说明状态、奖励、终止与约束来自哪里；$u_t$ 表示不确定性或拒绝信号。若接口每个 model chunk 只接收一次动作，必须显式声明 hold semantics，例如 $`a_{t+j}=a_t,\ 0\le j\lt K`$，并给出 hold 时长；不能用单个 $a_t$ 默认代表一段未定义的未来。
+其中 $h_t=(o_0,a_0,\ldots,o_t)$，$\hat s$、$\hat r$、$\hat d$ 可以缺省，但若系统声称可作为环境训练或评估策略，就应说明状态、奖励、终止与约束来自哪里；$u_t$ 表示不确定性或拒绝信号。若接口每个 model chunk 只接收一次动作，必须显式声明 hold semantics，例如 $a_{t+j}=a_t,\ 0\le j\lt K$，并给出 hold 时长；不能用单个 $a_t$ 默认代表一段未定义的未来。
 
 预测分支与真实分支的记忆权限也必须拆开：
 
@@ -49,9 +57,11 @@ $m^{\mathrm{pred}}$ 只是可回滚、带 provenance 的 speculative memory，$q
 - **状态连续性**：离屏对象、已发生事件、空间拓扑和资源状态不能只靠“看起来相似”维持。
 - **时钟可解释**：视频帧时钟与动作接受时钟是两个时钟；动作提交/接受、hold 区间、模型 chunk、真实执行和评测采样必须有明确时间戳。
 
-只给定完整动作序列、离线一次性预测整段视频的模型是 **action-conditioned prediction**；只有当动作能在 rollout 中途进入并影响后续帧，才满足本章的交互合同。
+只给定完整动作序列、离线一次性预测整段视频的模型是 **action-conditioned prediction**；只有当动作能在 rollout 中途进入并影响后续帧，才满足本章的交互规格。
 
-### 2.2 六个相邻概念不能混写
+<a id="22"></a>
+
+### 1.2 六个相邻概念不能混写
 
 | 概念 | 典型输入 → 输出 | 必须具备 | 不自动具备 |
 |---|---|---|---|
@@ -62,9 +72,11 @@ $m^{\mathrm{pred}}$ 只是可回滚、带 provenance 的 speculative memory，$q
 | **[4D / scene simulation](multiview-4d-generation.md)** | 已捕获/生成场景 + 视角/时间 → novel view 或动态状态 | 时空几何或可渲染表示 | 未见动作的因果后果、对象状态干预 |
 | **WAM / policy** | 观测/目标 → 动作，可能联合未来视频 | 提议或输出可执行动作 | 充当环境；动作正确也不证明预测世界正确 |
 
-World Models 与 Dreamer 代表“学动力学供想象和控制”的主线 [[1]](#ref-1), [[2]](#ref-2)；它们不需要生成开放域高清视频。Sora 类视频生成器具有很强视觉先验，但官方“world simulator”表述本身不构成在线动作闭环证据 [[5]](#ref-5)。反过来，learned game engine 即便画面较窄，只要能按动作持续更新，也比离线高保真视频更接近交互合同。
+World Models 与 Dreamer 代表“学动力学供想象和控制”的主线 [[1]](#ref-1), [[2]](#ref-2)；它们不需要生成开放域高清视频。Sora 类视频生成器具有很强视觉先验，但官方“world simulator”表述本身不构成在线动作闭环证据 [[5]](#ref-5)。反过来，learned game engine 即便画面较窄，只要能按动作持续更新，也比离线高保真视频更接近交互规格。
 
-### 2.3 Demo、paper、checkpoint、product/platform 是五层证据
+<a id="23-demopapercheckpointproductplatform"></a>
+
+### 1.3 Demo、paper、checkpoint、product/platform 是五层证据
 
 | 层 | 能支持什么 | 不能直接推出什么 |
 |---|---|---|
@@ -76,9 +88,9 @@ World Models 与 Dreamer 代表“学动力学供想象和控制”的主线 [[1
 
 Oasis 正是典型分层案例：项目页同时展示更大在线 demo，并开放一个 500M 下缩模型的代码与权重；两者不能合并为“开源了 demo 同款模型” [[8]](#ref-8), [[9]](#ref-9), [[10]](#ref-10)。Genie 3 **模型**面没有等价公开 paper/checkpoint/API，20–24 FPS、720p 与持续数分钟是 Google DeepMind 官方模型页主张 [[12]](#ref-12)；**Project Genie 产品面**则是由 Genie 3 驱动的实验性 web 原型：2026-01-29 首发给美国 Google AI Ultra 成年订阅者，2026-05-19 开始向全球符合条件的 Ultra 成年订阅者逐步扩展，并加入美国地点先行的 Street View grounding [[35]](#ref-35), [[36]](#ref-36)。帮助页与官方发布仍把它定位为原型，单次生成限制 60 秒，且不包含模型展示过的全部能力 [[35]](#ref-35), [[37]](#ref-37)。
 
-## 🔁 3. 闭环合同：预测分支与真实执行分支必须分开
+## 2. 环境交互接口
 
-![图 054：交互式世界生成的最小闭环合同](../../assets/imagegen-diagrams/054/diagram.png)
+![图 054：交互式世界生成的最小闭环规格](../../assets/imagegen-diagrams/054/diagram.png)
 **图的顺序化文字替代：**
 
 1. 人或策略在带时间戳的接口上提出动作；系统记录实际接受的序列 $A_t$ 及 hold 区间。
@@ -87,7 +99,7 @@ Oasis 正是典型分层案例：项目页同时展示更大在线 demo，并开
 4. 预测与实际结果进入动作有效性、状态一致性和不确定性事后审计；通过的结果仅用于**后续**展示、训练或决策，不能倒回去为已执行动作提供安全互锁。
 5. 生成候选只能写可回滚的 $m^{\mathrm{pred}}$；真实观测或权威状态才能写 $m^{\mathrm{auth}}$ 并回写权威历史。
 
-这张合同故意不把模型画成 policy。交互式 world generator 可以供 policy 做 imagined rollout，也可以直接给人提供可玩画面；**选择动作**和**预测动作后果**是两个不同责任。
+这张规格故意不把模型画成 policy。交互式 world generator 可以供 policy 做 imagined rollout，也可以直接给人提供可玩画面；**选择动作**和**预测动作后果**是两个不同责任。
 
 ![交互式世界生成闭环栈：Human / Policy 向输入栈提出动作，并把选中动作送入外部执行前互锁；互锁只在 ALLOW 时通往 Real Environment，另一支进入 REJECT / FALLBACK。输入经动作编码、自回归或扩散动力学和状态预测产生候选输出；短期上下文、实体事件和空间地标记忆以虚线读写。候选未来、预测输出与实际观测以点线进入 EVIDENCE & POST-HOC AUDIT；实际观测再回流输入。图中特别标出 FPS、Action Hz 与 Latency 不相等。](../../assets/diagrams/interactive-world-closed-loop-stack.png)
 
@@ -103,9 +115,11 @@ Oasis 正是典型分层案例：项目页同时展示更大在线 demo，并开
 6. Candidate Future A/B、Predicted Outputs 与 Actual Observation 都以点线进入 `EVIDENCE & POST-HOC AUDIT`，依次检查 Action Validity、Counterfactual、Uncertainty 与 `POST-HOC SAFETY AUDIT`；这条带只审计已产生的候选/轨迹，不冒充执行前互锁。
 7. 系统最后分别记录 FPS、accepted-action Hz 与 input-to-first-affected-frame Latency；图上的通用 `Action Hz` 必须按这里的 accepted-action 口径实现，三者不能互相代替。
 
-## 🧬 4. 五条机制路线
+## 3. 建模方法
 
-### 4.1 可控自回归与 latent action：先解决“动作从哪里来”
+<a id="41-latent-action"></a>
+
+### 3.1 可控自回归与 latent action：先解决“动作从哪里来”
 
 Genie 用未标动作的互联网视频训练 spatiotemporal tokenizer、自回归 dynamics model 和 latent action model；11B 模型能按 learned latent action 逐帧控制 [[4]](#ref-4)。它解决了缺少动作标签时如何发现可控变化，但 latent action 的编号没有天然物理单位：不同场景里的同一 latent code 不一定对应相同位移，也不等于机器人控制量。
 
@@ -113,7 +127,9 @@ UniSim 选择另一条数据路线：把图像、导航与机器人数据的互�
 
 Astra 把这一路扩展到异构动作：temporal causal attention 支持 streaming，noise-augmented history 平衡响应与连续性，action-aware adapter 直接注入控制，mixture of action experts 在相机、驾驶和机器人动作之间路由；它已有 ICLR 2026 正式论文 [[15]](#ref-15)。官方仓库已提供 checkpoint 与部分推理/训练路径，但仍列出更多场景完整 pipeline、统一评测和长期记忆为待办 [[16]](#ref-16)。
 
-### 4.2 Diffusion game engine：把下一帧生成器放进 deadline
+<a id="42-diffusion-game-engine-deadline"></a>
+
+### 3.2 Diffusion game engine：把下一帧生成器放进 deadline
 
 GameNGen 先用 RL agent 收集 DOOM 轨迹，再训练 diffusion model 根据过去帧和动作预测下一帧；ICLR 2025 正式论文报告单 TPU 20 FPS、多分钟生成和 29.4 next-frame PSNR [[6]](#ref-6)。训练时对条件历史加噪，目的是让模型见过推理时会遇到的轻微错误；这属于 exposure-bias 缓解，不是规则正确性的保证。
 
@@ -125,7 +141,9 @@ Matrix-Game 2.0 以约 1200 小时 Unreal/GTA5 数据、frame-level 鼠标键盘
 
 Vid2World 给出一条更可迁移的 ICLR 2026 路线：它对预训练视频扩散模型同时做 architecture/training-objective causalization，再加 causal action guidance，使同一改造原则能覆盖机器人操作、3D 游戏和开放世界导航 [[32]](#ref-32)。它推进的是“如何把 pretrained video diffusion 变成 causal/actionable model”，不自动证明长时权威状态或任意动作安全。
 
-### 4.3 Memory 与 compression：长视频不是持久世界
+<a id="43-memory-compression"></a>
+
+### 3.3 Memory 与 compression：长视频不是持久世界
 
 固定窗口生成器一旦丢弃旧帧，就可能把离开视野的房间、门的开关状态或对象身份重新采样。2025–2026 的工作形成四种互补记忆：
 
@@ -146,7 +164,9 @@ WorldPlay 以 Dual Action Representation、Reconstituted Context Memory、tempor
 
 ReWorld 把多数 attention heads 限在短窗口、少数 heads 访问全历史，并用 random routing 与 chunk dropping 训练稀疏历史；推理时固定 KV cache 后接 pose-indexed landmark bank，作者报告在 64 秒/384 latent 回访中仍恢复起始视图 [[22]](#ref-22)。截至冻结日，repo 已有 inference code，但 ReWorld generator 与 4-step LoRA 权重均标为 “Coming soon”，不能称端到端可复现 [[23]](#ref-23)。
 
-### 4.4 Joint video–action：环境模型与 policy 在同一 backbone 中相邻，但不相同
+<a id="44-joint-videoaction-policy-backbone"></a>
+
+### 3.4 Joint video–action：环境模型与 policy 在同一 backbone 中相邻，但不相同
 
 DreamZero 以 14B autoregressive video diffusion 同时建模未来视频与机器人动作，作者报告真机 7 Hz 闭环与跨 embodiment 迁移 [[26]](#ref-26)。它更接近 WAM/policy：输出动作是核心产品；本章的 interactive generator 则以“给定动作，环境怎样响应”为核心。联合模型可以共享视觉动力学，但评测必须拆成两栏：
 
@@ -155,7 +175,9 @@ DreamZero 以 14B autoregressive video diffusion 同时建模未来视频与机�
 
 WAM 教程可用于术语与系统位置的比较，但它是 tutorial，不是性能 benchmark [[29]](#ref-29)。WorldGym 则是 ICLR 2026 的 policy-evaluation environment：它从真实机器人首帧做 action-conditioned autoregressive rollout，用 VLM 给 reward，并检验模型内成功率与真实成功率、policy 排序的相关性 [[33]](#ref-33)。World-In-World 则提供统一在线 planning 和 action API、四个闭环环境，用 task success 检验不同 world model 的决策效用；其正式 ICLR 2026 结果表明视觉质量本身不足以保证任务成功，动作可控性、action–observation post-training 和 inference-time compute 都必须单独验收 [[34]](#ref-34)。任何联合模型都不能用“视频看起来合理”替代 action error，也不能用任务成功率反推所有预测状态都准确。
 
-### 4.5 Persistent、multi-agent 与 robotics world：从相机移动到对象事件
+<a id="45-persistentmulti-agent-robotics-world"></a>
+
+### 3.5 Persistent、multi-agent 与 robotics world：从相机移动到对象事件
 
 ActWorld 指出许多系统只支持 walk/turn/look，却不能在 rollout 中途可靠地开门、拿盘子或改变对象状态；它用 100K interaction video、hierarchical action-aware memory 与 persistent event/object tokens 缓解 action forgetting [[20]](#ref-20)。这比单纯“镜头回到原处”更接近 persistent world：回访时不仅几何要相似，门还应保持已打开、物体还应在被移动后的位置。
 
@@ -163,7 +185,7 @@ MultiWorld 为多 agent、多 view 增加 Multi-Agent Condition Module 与 Globa
 
 Sekai2 本身是 2026 数据集报告，不是完成的 interactive model；其价值在于 2,826 小时 real-world exploration、相机轨迹和 982 条带 loop/revisit 的全景序列，为 persistent memory 提供过去稀缺的监督 [[28]](#ref-28)。数据规模不等于闭环能力，必须等模型在冻结协议上验收。
 
-## 🕰️ 5. 里程碑、开放面与证据边界
+## 4. 代表工作
 
 | 时间 | 工作 | 真正推进 | 冻结日证据面 | 仍未证明 |
 |---|---|---|---|---|
@@ -179,7 +201,9 @@ Sekai2 本身是 2026 数据集报告，不是完成的 interactive model；其�
 | 2026 | ActWorld、MultiWorld、GeniWorld | 对象交互、多主体/多视角、机器人动作 | fresh arXiv/project | 高风险真实部署与安全保证 |
 | 2026 | iWorld-Bench、WorldRoamBench、WorldGym、World-In-World | action、physics、memory、policy ranking 与闭环 task success | iWorld-Bench ICML 2026；WorldGym/World-In-World ICLR 2026；WorldRoamBench arXiv | 单一总分覆盖所有闭环用途 |
 
-### 5.1 厂商/作者规格不能去掉主语
+<a id="51"></a>
+
+### 4.1 厂商/作者规格不能去掉主语
 
 | 系统 | 作者或官方所报 | 必须同时写出的边界 |
 |---|---|---|
@@ -195,7 +219,7 @@ Sekai2 本身是 2026 数据集报告，不是完成的 interactive model；其�
 | ReWorld | 704×1280 streaming；64 秒回访评测 | fresh author report；未给统一可比 FPS；核心权重未发布 [[22]](#ref-22), [[23]](#ref-23) |
 | DreamZero | 14B、7 Hz 真机闭环 | 这是 policy action rate，不是视频 render FPS [[26]](#ref-26) |
 
-## 🧠 6. 长程记忆与回访：把“像”升级为“还是同一个世界”
+## 5. 长期记忆
 
 ![图 055：持久世界的写入、离开、干预与回访协议](../../assets/imagegen-diagrams/055/diagram.png)
 **图的顺序化文字替代：**
@@ -217,21 +241,29 @@ Sekai2 本身是 2026 数据集报告，不是完成的 interactive model；其�
 - **write policy**：按时间、位姿、novelty、事件重要度还是置信度写入；
 - **state authority**：明确区分可回滚的 $m^{\mathrm{pred}}$ 与只由事实确认的 $m^{\mathrm{auth}}$；并说明记忆只是生成条件/可查询状态，还是决定奖励与终止的权威数据库。
 
-## ⚠️ 7. 典型失败：画面连贯不等于环境可信
+## 6. 故障诊断
 
-### 7.1 Action aliasing、忽略与延迟
+<a id="71-action-aliasing"></a>
+
+### 6.1 Action aliasing、忽略与延迟
 
 Latent action 可能把“向左走”“镜头左转”和“背景向右移动”聚成同一视觉变化；连续控制又可能被离散键位粗化。最低压力测试包括 `no-op`、互为相反的动作、短脉冲、长按、快速切换和同时按键。Genie 2 官方 outtake 中甚至展示 no-op 时幽灵出现，说明“画面有趣”与“动作是唯一因果来源”不同 [[11]](#ref-11)。
 
-### 7.2 Exposure bias 与自我条件污染
+<a id="72-exposure-bias"></a>
+
+### 6.2 Exposure bias 与自我条件污染
 
 训练看到 clean history，部署看到自己生成的 history；小错误被下一个窗口当作事实。条件加噪、error buffer、self-generated rollout 与 distillation 可缓解，但可能牺牲高频细节或引入训练未覆盖的稳态。必须画出 drift–time 曲线，而不是只报第 1 秒和最后 1 帧。
 
-### 7.3 Stochasticity 被错误当作 physics
+<a id="73-stochasticity-physics"></a>
+
+### 6.3 Stochasticity 被错误当作 physics
 
 同一历史和动作可以有多种真实未来，但动作直接控制的状态不应任意漂移。评测要把**受控变量**与**未控随机量**分开：角色位移、门状态、库存变化应高度 action-faithful；云、粒子或 NPC 微动作可以分布式变化。增加 diffusion steps 可改善 mode selection，却不能补齐没学到的规则。
 
-### 7.4 Model exploitation
+<a id="74-model-exploitation"></a>
+
+### 6.4 Model exploitation
 
 Policy 会寻找模型误差而非任务解。DIAMOND 的连续跳跃是直观案例 [[30]](#ref-30)。更一般的防线包括：
 
@@ -241,30 +273,38 @@ Policy 会寻找模型误差而非任务解。DIAMOND 的连续跳跃是直观�
 4. 用 ensemble/disagreement 或 action verifier 拒绝可疑分支；
 5. 采用 receding horizon，频繁回写真实观测，避免长期开环相信模型。
 
-### 7.5 Persistent hallucination
+<a id="75-persistent-hallucination"></a>
+
+### 6.5 Persistent hallucination
 
 持久记忆也会把错误永久化：对象被错误识别一次，之后所有回访都忠实重现错误。因而“记住”不是单向加分；写入必须保留来源、时间、置信度与可撤销性，真实观测与权威 state 应优先覆盖纯生成记忆。
 
-### 7.6 Safety 与访问边界
+<a id="76-safety"></a>
+
+### 6.6 Safety 与访问边界
 
 开放世界生成可能复现受版权保护的游戏视觉、生成误导性实景、构造不安全机器人情境或让 policy 在未经校准的模拟器中过拟合。安全 gate 应位于模型外部，能阻断真实执行；生成器的自我评价不是安全证书。上面的闭环栈图是让真实环境提供 ground truth 的受控审计路径，不是高风险部署图；部署时必须把外部 gate 放到动作执行之前。Genie 3 模型未开放与 Project Genie 的 Ultra 原型访问/官方 limitations 说明，模型能力和产品开放状态本身都是系统证据的一部分 [[12]](#ref-12), [[35]](#ref-35), [[36]](#ref-36)。
 
-## 📏 8. 分层评测协议：从 artifact 到真实决策
+<a id="8-artifact"></a>
 
-iWorld-Bench 的 ICML 2026 正式论文用 330K clips、2.1K 高质量样本和六类任务测视觉、轨迹与 memory，并评估 14 个模型 [[24]](#ref-24)。WorldRoamBench 再把 action、vision drift、controllability-gated physics 与 action-decoupled memory 分开，在 10–60 秒连续交互中暴露单一轨迹分数看不到的失败 [[25]](#ref-25)。它们提供重要组件，但项目仍应使用下面的 L0–L7 合同，不把任何 leaderboard 总分当作最终结论。
+## 7. 评测方法
+
+iWorld-Bench 的 ICML 2026 正式论文用 330K clips、2.1K 高质量样本和六类任务测视觉、轨迹与 memory，并评估 14 个模型 [[24]](#ref-24)。WorldRoamBench 再把 action、vision drift、controllability-gated physics 与 action-decoupled memory 分开，在 10–60 秒连续交互中暴露单一轨迹分数看不到的失败 [[25]](#ref-25)。它们提供重要组件，但项目仍应使用下面的 IW0–IW7 检查项目（本章局部编号，与评测章节的 L0–L7 能力报告约定分开），不把任何 leaderboard 总分当作最终结论。
 
 | 层级 | 要回答的问题 | 最低报告 |
 |---|---|---|
-| **L0 Artifact / release** | 到底开放了什么？ | demo、paper、code、checkpoint、license、product access 分栏；版本与日期 |
-| **L1 Runtime / clock** | 能否按目标 deadline 接受动作并出结果？ | 分辨率、clip/chunk、NFE、硬件、precision、batch、TTFF、p50/p95/p99 latency、p95 input-to-first-affected-frame、jitter、deadline miss、FPS、accepted-action Hz、hold/drop/coalescing 规则、显存 |
-| **L2 Open-loop perceptual** | 给真实历史和动作时，画面是否合理？ | PSNR/SSIM/LPIPS、FVD 或视频特征距离、VLM/人评；短/长 horizon 曲线 |
-| **L3 State & action fidelity** | 模型是否执行了正确动作并更新正确状态？ | per-frame action confusion、轨迹/位姿误差、对象状态 F1、reward/done error、no-op false change |
-| **L4 Counterfactual validity** | 改动作是否产生正确差分？ | 同历史同 seed 的 paired branch、干预方向/幅度、因果可分性、非法动作处理 |
-| **L5 Memory & revisitation** | 离开、干预、返回后还是同一世界吗？ | loop-closure pose/geometry、entity ID、event state、相似地点误检、memory bytes/step、retrieval latency |
-| **L6 Uncertainty & safety** | 错时是否知道自己错，并阻止高风险执行？ | calibration、coverage–risk、OOD detection、abstention、unsafe-action block、failure severity |
-| **L7 Decision utility & transfer** | 世界模型是否真的改善决策？ | policy ranking、regret、planning success、held-out engine replay、real-world transfer 与置信区间 |
+| **IW0 Artifact / release** | 到底开放了什么？ | demo、paper、code、checkpoint、license、product access 分栏；版本与日期 |
+| **IW1 Runtime / clock** | 能否按目标 deadline 接受动作并出结果？ | 分辨率、clip/chunk、NFE、硬件、precision、batch、TTFF、p50/p95/p99 latency、p95 input-to-first-affected-frame、jitter、deadline miss、FPS、accepted-action Hz、hold/drop/coalescing 规则、显存 |
+| **IW2 Open-loop perceptual** | 给真实历史和动作时，画面是否合理？ | PSNR/SSIM/LPIPS、FVD 或视频特征距离、VLM/人评；短/长 horizon 曲线 |
+| **IW3 State & action fidelity** | 模型是否执行了正确动作并更新正确状态？ | per-frame action confusion、轨迹/位姿误差、对象状态 F1、reward/done error、no-op false change |
+| **IW4 Counterfactual validity** | 改动作是否产生正确差分？ | 同历史同 seed 的 paired branch、干预方向/幅度、因果可分性、非法动作处理 |
+| **IW5 Memory & revisitation** | 离开、干预、返回后还是同一世界吗？ | loop-closure pose/geometry、entity ID、event state、相似地点误检、memory bytes/step、retrieval latency |
+| **IW6 Uncertainty & safety** | 错时是否知道自己错，并阻止高风险执行？ | calibration、coverage–risk、OOD detection、abstention、unsafe-action block、failure severity |
+| **IW7 Decision utility & transfer** | 世界模型是否真的改善决策？ | policy ranking、regret、planning success、held-out engine replay、real-world transfer 与置信区间 |
 
-### 8.1 FPS、accepted-action Hz 与 latency 三个时钟
+<a id="81-fpsaccepted-action-hz-latency"></a>
+
+### 7.1 FPS、accepted-action Hz 与 latency 三个时钟
 
 若每次模型生成 $K$ 个显示帧耗时 $\Delta t$，平均 render throughput 可写成 $K/\Delta t$ FPS；但用户可能只能在整个 chunk 结束后提交一次新动作，此时 action rate 至多约为 $1/\Delta t$。端到端 latency 还包括输入采集、编码、排队、采样、解码、网络与显示：
 
@@ -276,7 +316,9 @@ L_{\mathrm{e2e}}
 
 因此 24 FPS 不代表 24 Hz 动作响应，更不代表 p95 latency 小于 42 ms。**Accepted-action Hz** 只统计经过排队/限流后真正进入模型或环境的动作，不用 UI 点击率充当；**p95 input-to-first-affected-frame latency** 从动作被接受计时，到首个可归因于该动作的显示帧。公平报告还必须给出动作何时可插入、chunk 内是长按、逐帧采样还是最新值覆盖，过载时是丢弃还是合并、动作影响从哪一帧开始、是否 speculative/丢帧，以及长 rollout 中显存是否增长。
 
-### 8.2 Action validity 与 counterfactual intervention
+<a id="82-action-validity-counterfactual-intervention"></a>
+
+### 7.2 Action validity 与 counterfactual intervention
 
 推荐用成对分支冻结其他变量：
 
@@ -288,7 +330,9 @@ L_{\mathrm{e2e}}
 
 Action verifier 可以检查 state plausibility、action reachability 或 candidate consistency，但它只是额外证据层；若 verifier 与 generator 共享偏差，两者可能一起通过错误分支。Inverse Dynamics Model（IDM）在不同系统中可用于从视频恢复伪动作、对齐动作标签，或对候选 rollout 做动作可达性评估；它不是唯一 planner，也不能单独证明环境 transition 正确。
 
-### 8.3 Open-loop 与 closed-loop 必须成对
+<a id="83-open-loop-closed-loop"></a>
+
+### 7.3 Open-loop 与 closed-loop 必须成对
 
 Open-loop teacher forcing 测的是 $p_\theta(o_{t+1}\mid o_{\le t}^{\text{real}},a_{\le t})$；closed-loop rollout 测的是模型在自己生成历史上的稳定性。两者应画在同一 horizon 轴上：
 
@@ -297,11 +341,15 @@ Open-loop teacher forcing 测的是 $p_\theta(o_{t+1}\mid o_{\le t}^{\text{real}
 - perceptual 好、state 差：模型会“画合理画面”，不会执行正确规则；
 - state 好、perceptual 差：可能仍适合 latent planning，但不适合面向人的生成环境。
 
-### 8.4 Uncertainty、coverage–risk 与拒绝
+<a id="84-uncertaintycoveragerisk"></a>
+
+### 7.4 Uncertainty、coverage–risk 与拒绝
 
 对同一历史/动作多次采样，可把不可约随机性与受控状态分开；跨 checkpoint、ensemble 或 dropout disagreement 更接近 epistemic signal。校准不能只对像素 NLL，而应对下游事件：碰撞、对象状态、回访成功、reward error 和 policy failure。报告随着 abstention threshold 变化的 coverage–risk 曲线；若系统从不拒绝，它就没有被实验证明的安全置信机制。
 
-### 8.5 Decision utility：漂亮 rollout 的最终压力测试
+<a id="85-decision-utility-rollout"></a>
+
+### 7.5 Decision utility：漂亮 rollout 的最终压力测试
 
 至少三种实验逐级增强：
 
@@ -311,7 +359,9 @@ Open-loop teacher forcing 测的是 $p_\theta(o_{t+1}\mid o_{\le t}^{\text{real}
 
 UniSim、DIAMOND、DreamZero、GeniWorld、WorldGym 与 World-In-World 分别从 simulator-trained policy、world-model RL、joint WAM 真机控制、robot policy evaluation、policy ranking 和标准化闭环 task success 提供局部证据 [[3]](#ref-3), [[7]](#ref-7), [[26]](#ref-26), [[27]](#ref-27), [[33]](#ref-33), [[34]](#ref-34)。它们任务和 action space 不同，不能被压成一个“world model usefulness”总分。
 
-## 🧪 9. 一份可执行的最小实验矩阵
+## 8. 实验设计示例
+
+本节是可按任务调整的实验设计示例，尚未在本仓库运行；参数与阈值是示例设置，不是已发布基准或实测结果。
 
 | 轴 | 最小切片 | 为什么需要 |
 |---|---|---|
@@ -326,7 +376,9 @@ UniSim、DIAMOND、DreamZero、GeniWorld、WorldGym 与 World-In-World 分别从
 
 每个结果都应保存 model/version、checkpoint SHA、代码 commit、数据切片、随机种子、硬件、precision、动作时间戳、原始 rollout、state trace 和失败样例。只有视频 montage、没有 action log 与 state trace 的实验，最多支持 demo 级结论。
 
-## 🔭 10. 结论与开放问题
+<a id="10"></a>
+
+## 9. 适用限制
 
 交互式世界生成的真正进展不是单一画质或 FPS 纪录，而是把五个对象同时做实：**因果动作接口、可持续生成、持久状态、可校准不确定性、真实决策效用**。到冻结日，研究已经从 Genie 的 latent action、GameNGen/DIAMOND/Oasis 的 neural game engine，推进到 Vid2World 的 video-diffusion causalization、WorldPack/Infinite/WorldPlay/Matrix 3/3.5/ReWorld 的长期记忆，以及 WorldGym/World-In-World 与 ActWorld/MultiWorld/GeniWorld/DreamZero 的闭环评价、对象、多主体和机器人路线；但证据面仍碎片化。
 
@@ -337,7 +389,7 @@ UniSim、DIAMOND、DreamZero、GeniWorld、WorldGym 与 World-In-World 分别从
 3. 怎样让 uncertainty 针对 planning failure 校准，而不只针对像素似然？
 4. 怎样防止 policy exploit learned dynamics，并以真实环境回放形成 receding-horizon 纠错？
 5. 怎样在多 agent、多 view、对象交互和开放内容下定义可执行的安全边界？
-6. 怎样让开放 checkpoint、demo 与产品使用同一套可复核性能合同？
+6. 怎样让开放 checkpoint、demo 与产品使用同一套可复核性能规格？
 
 在这些问题解决前，最稳妥的表述是：现代系统已经能生成越来越逼真、可控制、可回访的**候选世界体验**；它们距离传统引擎的权威状态、长时规则可靠性和高风险决策保证仍有明确差距。
 
@@ -417,6 +469,6 @@ UniSim、DIAMOND、DreamZero、GeniWorld、WorldGym 与 World-In-World 分别从
 
 <a id="ref-37"></a>[37] [Get started with Project Genie](https://support.google.com/labs/answer/16875695). Google Labs Help. Current official access and policy page.
 
-<a id="ref-38"></a>[38] Matrix-Game 3.0 code and checkpoints [![GitHub: SkyworkAI/Matrix-Game](https://img.shields.io/github/stars/SkyworkAI/Matrix-Game?style=social)](https://github.com/SkyworkAI/Matrix-Game/tree/main/Matrix-Game-3). Skywork AI. Official repository and release surface. 2026.
+<a id="ref-38"></a>[38] Matrix-Game 3.0 code and checkpoints [![GitHub: SkyworkAI/Matrix-Game](https://img.shields.io/github/stars/SkyworkAI/Matrix-Game?style=social)](https://github.com/SkyworkAI/Matrix-Game/tree/main/Matrix-Game-3). Skywork AI. Official repository and 发布内容. 2026.
 
 <a id="ref-39"></a>[39] Matrix-Game 3.5: Enhancing Real-Time Streaming Interactive World Models with Patch Memory [![GitHub: Riemann-Dynamics/Matrix-Game-3.5](https://img.shields.io/github/stars/Riemann-Dynamics/Matrix-Game-3.5?style=social)](https://github.com/Riemann-Dynamics/Matrix-Game-3.5). Riemann Dynamics. Official code, checkpoints and project/technical-report repository. 2026.

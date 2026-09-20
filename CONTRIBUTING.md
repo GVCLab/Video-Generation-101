@@ -43,6 +43,27 @@
 - 对 closed model 的内部 benchmark 保持明确归因。
 - 日期统一使用 `YYYY-MM` 或 `YYYY-MM-DD`。
 
+## 技术手册写作要求
+
+- 方法章节先定义范围、前置知识和输入输出，再说明机制、操作步骤、配置、结果解释和故障处理。
+- 标题使用术语或操作名称；修订过程、检索流水和编辑争论写入 `sources/`。
+- 数据集、模型、标准与基准名称必须有一手来源；自拟方案使用“实验设计示例”，注明尚未运行。
+- 引用保留官方标题，分别记录预印本初次公开和正式发表年份。数值注明统计单位和实验条件。
+- 图示说明适用范围。概念图不能当作模型输出或实验结果；正文与图内术语应一致。
+- 通用约定与配置记录模板见[手册使用说明](docs/manual-guide.md)。
+
+## 提交前检查
+
+```sh
+python3 -m pip install -r requirements-docs.txt
+python3 scripts/verify_citations.py --offline
+python3 scripts/build_site.py --strict
+python3 scripts/check_manual.py --site _site
+python3 -m unittest discover -s scripts/tests -p 'test_manual*.py'
+```
+
+涉及引用变更时，运行 `python3 scripts/verify_citations.py --json citation-findings.json --coverage citation-coverage.json`。在线检查应报告实际查询覆盖率；网络失败不代表文献不存在，也不能记为核验通过。检查只覆盖脚本列明的元数据与结构规则，不替代对论文机制和结果的阅读。
+
 ## Commit 建议
 
 ```text

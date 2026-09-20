@@ -1,21 +1,26 @@
-# 图像到视频：条件合同、运动先验与可验证控制
+# 图像到视频生成
 
-> 本章冻结于 **2026-08-30（Asia/Shanghai）**。Image-to-Video（I2V）不是“把任意图片放进视频模型”：在严格定义下，输入图像是输出视频的**时间锚点**，通常对应首帧；模型既要保留可观察内容，又要生成图外、遮挡后和未来才出现的内容。
+介绍以图像为时间锚点的运动生成、条件保持及长时扩展。
+
+**前置知识：** 条件生成、视频表示。
+
+**使用步骤：** 区分首帧与身份参考 → 配置图像条件和运动信号 → 联合评估外观保持、运动幅度和生成质量。
+
 
 检索式、结果数、纳排标准、首发/正式年份裁决、逐篇证据等级和图片审计见[配套研究记录](../../sources/research_20260830_image_to_video.md)。
 
-## 🎯 学习目标
+## 学习目标
 
 读完本章，应能完成六件事：
 
 1. 用“输入图是否占据输出时间轴”区分 I2V、reference-to-video、角色动画、图像条件编辑与 camera-conditioned generation；
-2. 写出可复现的 RGB、latent、文本、运动、相机和音频 tensor 合同；
+2. 写出可复现的 RGB、latent、文本、运动、相机和音频 张量规格；
 3. 判断一篇工作采用帧替换、通道拼接、cross-attention、control residual、噪声初始化，还是显式 flow/warp；
 4. 解释“保持参考图”与“产生足够运动”为何构成结构性冲突；
 5. 把身份漂移、静态偏置、相机/物体运动纠缠、长时漂移定位到具体条件路径；
 6. 设计不依赖跨论文排行榜的 I2V 评测与消融协议。
 
-## 📐 1. 先明确任务边界：图像是不是时间锚点
+## 1. 任务范围
 
 给定参考图像
 
@@ -30,7 +35,7 @@ p_\theta(X_{0:F-1}\mid I_{\mathrm{ref}},c_{\mathrm{text}},
 c_{\mathrm{motion}},c_{\mathrm{cam}},c_{\mathrm{audio}}),
 ```
 
-其中 $X\in[0,1]^{B\times F\times3\times H\times W}$，并且合同声明 $I_{\mathrm{ref}}$ 对应某个已知时间索引，最常见是 $X_0$。若输入图只提供人物外观、画风或产品身份，却不要求成为视频中的实际帧，则更准确的名字是 **reference-to-video**，而不是严格首帧 I2V；当参考用于定义测试时未见主体、输出使用新场景与新时间轴时，进入[开放集视频个性化](personalized-video-generation.md)的身份—运动合同。
+其中 $X\in[0,1]^{B\times F\times3\times H\times W}$，并且规格声明 $I_{\mathrm{ref}}$ 对应某个已知时间索引，最常见是 $X_0$。若输入图只提供人物外观、画风或产品身份，却不要求成为视频中的实际帧，则更准确的名字是 **reference-to-video**，而不是严格首帧 I2V；当参考用于定义测试时未见主体、输出使用新场景与新时间轴时，进入[开放集视频个性化](personalized-video-generation.md)的身份—运动规格。
 
 ### 1.1 三种“锚定”强度不能混写
 
@@ -65,7 +70,7 @@ Animate Anyone 用参考人物图和姿态序列驱动角色，属于 reference-
 5. 输入图不占时间轴但另有 pose、audio 或 driving video 时，属于角色/肖像动画。
 6. 输入图只给身份或风格时属于 reference-to-video。
 
-## 🧩 2. 一条可检查形状的训练—推理合同
+## 2. 训练与推理接口
 
 ### 2.1 RGB 到视频 latent
 
@@ -92,23 +97,23 @@ Z_t=\alpha_tZ_0+\sigma_t\epsilon,
 \qquad \epsilon\sim\mathcal N(0,I),
 ```
 
-并预测噪声、速度或 flow-matching velocity。核心不是损失名字，而是**哪个条件在什么噪声状态进入网络**。Step-Video-TI2V 把单帧条件编码成 $Z_c\in\mathbb R^{1\times C\times h\times w}$，在时间维补零后与视频 latent 通道拼接，得到送入 DiT 的 $f\times2C\times h\times w$ 条件输入；这是可复核的 tensor 合同，不等于所有 I2V 都必须如此 [[20]](#ref-20)。
+并预测噪声、速度或 flow-matching velocity。核心不是损失名字，而是**哪个条件在什么噪声状态进入网络**。Step-Video-TI2V 把单帧条件编码成 $Z_c\in\mathbb R^{1\times C\times h\times w}$，在时间维补零后与视频 latent 通道拼接，得到送入 DiT 的 $f\times2C\times h\times w$ 条件输入；这是可复核的 张量规格，不等于所有 I2V 都必须如此 [[20]](#ref-20)。
 
 ### 2.2 条件张量、坐标和时间轴
 
-只写 `camera control` 或 `trajectory condition` 不能复现。下面是一份最小条件合同；具体模型可以只实现其中一部分，但必须为每个启用条件保存 presence mask，并声明训练 dropout 与推理缺省值。
+只写 `camera control` 或 `trajectory condition` 不能复现。下面是一份最小条件规格；具体模型可以只实现其中一部分，但必须为每个启用条件保存 presence mask，并声明训练 dropout 与推理缺省值。
 
 | 条件 | 一个可执行的形状示例 | 必须冻结的语义 |
 |---|---|---|
-| 已知图像/关键帧 | $I\in[0,1]^{B\times K\times3\times H\times W}$，索引 $`\tau\in\lbrace0,\ldots,F-1\rbrace^{B\times K}`$，有效位 $`M_I\in\lbrace0,1\rbrace^{B\times K}`$ | $\tau$ 对应 RGB 还是 latent 时间；像素/latent/软锚定；多个锚点冲突规则 |
-| 文本 | $C_T\in\mathbb R^{B\times L\times D}$，token mask $`M_T\in\lbrace0,1\rbrace^{B\times L}`$ | encoder/tokenizer 版本、原 prompt 与改写 prompt、negative prompt |
-| 点轨迹 | $P\in\mathbb R^{B\times F\times N\times d}$，$d=2$ 或 $3$；可见位 $`V\in\lbrace0,1\rbrace^{B\times F\times N}`$ | pixel/归一化/相机/世界坐标；遮挡含义；插值与 FPS |
+| 已知图像/关键帧 | $I\in[0,1]^{B\times K\times3\times H\times W}$，索引 $\tau\in\lbrace0,\ldots,F-1\rbrace^{B\times K}$，有效位 $M_I\in\lbrace0,1\rbrace^{B\times K}$ | $\tau$ 对应 RGB 还是 latent 时间；像素/latent/软锚定；多个锚点冲突规则 |
+| 文本 | $C_T\in\mathbb R^{B\times L\times D}$，token mask $M_T\in\lbrace0,1\rbrace^{B\times L}$ | encoder/tokenizer 版本、原 prompt 与改写 prompt、negative prompt |
+| 点轨迹 | $P\in\mathbb R^{B\times F\times N\times d}$，$d=2$ 或 $3$；可见位 $V\in\lbrace0,1\rbrace^{B\times F\times N}$ | pixel/归一化/相机/世界坐标；遮挡含义；插值与 FPS |
 | 稠密 flow | $U\in\mathbb R^{B\times(F-1)\times2\times H\times W}$，遮挡 $O$ | $x_t\rightarrow x_{t+1}$ 还是反向；resize 后向量缩放；未知区域 |
 | 姿态/骨架 | $J\in\mathbb R^{B\times F\times N_J\times d}$，置信度 $Q_J$ | joint 定义、root/相机坐标、缺失点、驱动频率 |
 | 相机 | 外参 $T_{wc}\in SE(3)^{B\times F}$、内参 $K_c\in\mathbb R^{B\times F\times3\times3}$，或 Plücker rays $R\in\mathbb R^{B\times F\times6\times h\times w}$ | world-to-camera/camera-to-world、左右手系、长度单位、参考 pose、畸变 |
 | 已知音频输入 | waveform $A_{\mathrm{in}}\in\mathbb R^{B\times C_a\times S}$，或 feature $E_a\in\mathbb R^{B\times L_a\times D_a}$ | sample rate、声道、起点、$t/f_{\mathrm{video}}\leftrightarrow s/f_{\mathrm{audio}}$ 映射、静音 mask |
 
-Audio-driven I2V 的合同是 $p(X\mid I,A_{\mathrm{in}},\ldots)$：音频已知，只驱动画面。原生联合音视频则生成新的 $A_{\mathrm{out}}$：
+Audio-driven I2V 的规格是 $p(X\mid I,A_{\mathrm{in}},\ldots)$：音频已知，只驱动画面。原生联合音视频则生成新的 $A_{\mathrm{out}}$：
 
 ```math
 p_\theta(X,A_{\mathrm{out}}\mid I,c_{\mathrm{text}},c_{\mathrm{motion}},c_{\mathrm{cam}}),
@@ -147,27 +152,27 @@ A_{\mathrm{out}}\in\mathbb R^{B\times C_a\times S}.
 
 这里三次预测的条件状态必须和训练 dropout 一致。把图像也从“无文本分支”中移除，会同时改变身份和文本 guidance 的语义；不同论文的 $s_I,s_T$ 不能只看数值横比。
 
-## 🖼️ 3. 条件合同示意图：四道门同时通过
+## 3. 条件处理流程
 
-![I2V 条件合同图。左侧为必须的参考帧和可选的文本、运动、相机、音频；中间为锚定、运动先验与视频去噪器；右侧为首帧加锁的五帧纸鸟序列；底部依次检查保持、运动、遵循和长时展开。该图是概念合同，不代表某一具体模型的唯一接线。](../../assets/diagrams/image-to-video-conditioning-contract.png)
+![I2V 条件规格图。左侧为必须的参考帧和可选的文本、运动、相机、音频；中间为锚定、运动先验与视频去噪器；右侧为首帧加锁的五帧纸鸟序列；底部依次检查保持、运动、遵循和长时展开。该图是概念规格，不代表某一具体模型的唯一接线。](../../assets/diagrams/image-to-video-conditioning-contract.png)
 
-**图注：** `ANCHOR + CONTROL` 表示参考帧与可选文本/运动/相机在合同层汇合，不代表所有模型共享同一个融合模块；`PRESERVE` 与 `MOVE` 是一对需要联合优化的目标，而不是先后独立完成的功能；`OBEY` 检查文本、轨迹、相机或音频条件是否真的改变了视频；`ROLL OUT` 检查误差是否随时间累积。图中的虚线表示可选条件，已知音频在此作为视频条件；原生联合音视频的输出合同需另行声明。首帧锁图标只表示“已知锚点”，像素硬锁、latent 锚定还是软条件必须由具体实现说明。
+**图注：** `ANCHOR + CONTROL` 表示参考帧与可选文本/运动/相机在规格层汇合，不代表所有模型共享同一个融合模块；`PRESERVE` 与 `MOVE` 是一对需要联合优化的目标，而不是先后独立完成的功能；`OBEY` 检查文本、轨迹、相机或音频条件是否真的改变了视频；`ROLL OUT` 检查误差是否随时间累积。图中的虚线表示可选条件，已知音频在此作为视频条件；原生联合音视频的输出规格需另行声明。首帧锁图标只表示“已知锚点”，像素硬锁、latent 锚定还是软条件必须由具体实现说明。
 
 **图的顺序化文字替代：**
 
 1. 参考帧是必需输入；文本、运动、相机与音频是可选输入。
-2. 参考帧与可选文本、运动和相机控制在合同层汇合，运动先验决定可行变化；已知音频可直接条件化 denoiser。
+2. 参考帧与可选文本、运动和相机控制在规格层汇合，运动先验决定可行变化；已知音频可直接条件化 denoiser。
 3. Video denoiser 从锚点和条件展开后续帧，并为新显露区域生成内容。
 4. 首帧是否被硬锁定必须由具体实现声明。
 5. 输出依次通过参考保持、有效运动、条件遵循与长时稳定四道验证门。
 
-## 🧭 4. 技术路线一：从隐式视频先验到显式运动
+## 4. 视频先验与运动
 
 ### 4.1 真正的 I2V 起点与通用祖先
 
 Vondrick 等人在 NeurIPS 2016 从一张静态图预测最长约一秒的未来视频，是静态图未来合成的早期原型；论文目标是学习 scene dynamics，不应被改写成现代开放域 TI2V 系统 [[1]](#ref-1)。Zhao 等人在 ECCV 2018 明确定义 image-to-video translation，用 structure generation 预测序列结构，再以 residual refinement 细化外观，是更合适的“命名任务”里程碑 [[2]](#ref-2)。
 
-MoCoGAN、SVG 等通用视频生成/预测祖先虽然建立了内容—运动分解和随机未来建模思想，但它们的标准合同没有外部静态参考图，因此本章不把它们计作 I2V 里程碑。**思想祖先**与**任务里程碑**必须分开。
+MoCoGAN、SVG 等通用视频生成/预测祖先虽然建立了内容—运动分解和随机未来建模思想，但它们的标准规格没有外部静态参考图，因此本章不把它们计作 I2V 里程碑。**思想祖先**与**任务里程碑**必须分开。
 
 ### 4.2 随机未来与窄域动画
 
@@ -177,7 +182,9 @@ cINN 方法以可逆条件网络从单图采样多种可能未来，强调同一
 
 Make It Move 将图像用于外观、文本用于动作，并用 motion anchor 连接二者，正式提出可控 text-image-to-video；其 MNIST/CATER 证据适合证明任务可行性，不能直接外推到开放域照片 [[6]](#ref-6)。I2VGen-XL 后来用低分辨率基础模型和高分辨率细化级联，把全局语义、局部细节和文本共同注入；它是 2023 技术报告，而非已核验的正式会议论文 [[10]](#ref-10)。
 
-## 🌊 5. 技术路线二：motion prior 怎样表示
+<a id="5-motion-prior"></a>
+
+## 5. 运动表示
 
 ### 5.1 直接在视频 latent 中生成
 
@@ -195,7 +202,9 @@ Motion-I2V 更明确地分成两阶段：第一阶段预测从参考帧到未来
 
 I2V-Adapter 把已有 T2I/T2V diffusion 通过轻量适配器扩展为图像条件视频，说明“完整重训一个 I2V 基座”不是唯一道路 [[33]](#ref-33)。Unified Text-Image-to-Video 也研究在不训练新模块时，把多张视觉条件放到不同时间位置；这类方法扩展的是**条件接口**，不自动提供新的动力学知识 [[32]](#ref-32)。AnyI2V 更进一步，在已有视频 diffusion 上做 inversion、特征注入、跨帧 query 对齐和语义 mask 优化，使 edge、depth、skeleton、mesh 等条件图也能成为首帧空间控制，并叠加用户轨迹 [[19]](#ref-19)。它的 `any` 指条件图模态灵活，不等于任何真实场景动力学都已解决。
 
-## 🎥 6. 技术路线三：相机、3D 与物体运动解耦
+<a id="6-3d"></a>
+
+## 6. 相机与主体运动
 
 相机运动会让全画面产生一致 flow，物体运动则只作用于局部；仅用文本 “camera pans left” 很容易把两者纠缠。
 
@@ -205,7 +214,7 @@ I2V-Adapter 把已有 T2I/T2V diffusion 通过轻量适配器扩展为图像条�
 
 这些工作仍不等于显式 4D 重建：单目深度可能有尺度和遮挡错误，动态物体也不服从静态场景相机模型。正确评测应分别报告 camera pose adherence、背景几何一致性和独立物体 motion，而不是用一个视觉质量分数替代。若主张扩展到同刻多视角或任意 $(v,t)$ 查询，还需进入[多视角与 4D 生成](multiview-4d-generation.md)的重投影、遮挡、loop-closure 与状态导出协议。
 
-## 🪞 7. 技术路线四：身份保持、关键帧与长视频
+## 7. 身份、关键帧与长视频
 
 ### 7.1 身份保持不是只比首帧相似度
 
@@ -227,7 +236,7 @@ FramePack 以几何衰减的重要性打包历史帧，使 Transformer 上下文
 
 长视频应画出随时间的曲线：身份相似度、几何/物体数量、motion amplitude、prompt event completion 和 chunk seam error。只展示几十秒精选样例没有失败尾部。
 
-## 🔊 8. 原生音视频与移动端：两个相邻前沿
+## 8. 音视频与端侧实现
 
 ### 8.1 音频是输入条件，还是共同生成变量
 
@@ -239,7 +248,7 @@ OSV 先做 latent GAN 预训练，再做 adversarial consistency latent distilla
 
 MobileI2V 则组合高压缩 VAE、线性/softmax 混合 attention 和 1–2 步蒸馏，并给出 Core ML/iPhone 16 Pro 的作者设备数据 [[22]](#ref-22)。这些时延不能与数据中心 GPU 或不同分辨率横排；最低系统账本必须包含设备、精度、分辨率、帧数、VAE 是否计时、warm-up、峰值内存和能耗。
 
-## 🗓️ 9. 里程碑：首发年与正式发表年分列
+## 9. 代表工作
 
 | 首次公开 | 正式发表 | 工作 | 对 I2V 的实际贡献 | 边界 |
 |---:|---:|---|---|---|
@@ -261,7 +270,7 @@ MobileI2V 则组合高压缩 VAE、线性/softmax 混合 attention 和 1–2 步
 
 表中没有把通用 T2V、MoCoGAN、SVG 或纯 video editing 当作 I2V 里程碑；它们可以提供 backbone 或思想，但任务定义不同。
 
-## 🔬 10. 代表论文的深读对照
+## 10. 方法比较
 
 | 工作 | 图像条件怎么进 | motion 从哪里来 | 训练/推理关键点 | 最值得做的反证 |
 |---|---|---|---|---|
@@ -276,18 +285,20 @@ MobileI2V 则组合高压缩 VAE、线性/softmax 混合 attention 和 1–2 步
 | ReasonDiff [[23]](#ref-23) | 图像不一定是首帧 | MLLM narrative + temporal anchor | AlignFormer 对齐帧级 latent | 锚点推断错时是否仍保持图像语义 |
 | HPSD [[27]](#ref-27) | teacher 有 clean fixed first frame | 从 TI2V teacher 蒸馏到 T2V student | re-noise anchor、student subtrajectory、重置 clean frame | 条件状态切换是否产生边界偏差 |
 
-ReasonDiff 处理的是**非配对测试时图文**：图像可能对应中间时刻，甚至与文本描述的事件没有训练配对；VisionNarrator 先推断逐帧叙事和锚点位置，再由 AlignFormer 做时间对齐 [[23]](#ref-23)。它扩展了 I2V 的锚点合同，不能拿其结果与“图像必为首帧”的表直接横排。
+ReasonDiff 处理的是**非配对测试时图文**：图像可能对应中间时刻，甚至与文本描述的事件没有训练配对；VisionNarrator 先推断逐帧叙事和锚点位置，再由 AlignFormer 做时间对齐 [[23]](#ref-23)。它扩展了 I2V 的锚点规格，不能拿其结果与“图像必为首帧”的表直接横排。
 
 HPSD 则不是新的输出任务，而是 2026 的训练策略：teacher 在 TI2V 轨迹中看到干净首帧，student 的 T2V 状态不兼容；方法在 teacher/student 子轨迹之间重加噪并重新施加 clean first frame，专门处理 condition-state mismatch [[27]](#ref-27)。这说明蒸馏不仅要对齐输出，还要对齐采样状态。
 
-## 📊 11. 评测协议：把“像”和“动”画成 Pareto 前沿
+<a id="11-pareto"></a>
+
+## 11. 评测方法
 
 ### 11.1 先冻结测试卡
 
 每组结果至少附以下字段：
 
 - **任务模式**：paired first-frame、unpaired/OOD image-text、first–last、reference-only 或 camera-controlled；
-- **输出合同**：$F,H,W,fps$、时长、锚点索引、像素/latent/软锚定；
+- **输出规格**：$F,H,W,fps$、时长、锚点索引、像素/latent/软锚定；
 - **条件**：prompt、negative prompt、motion bucket、trajectory/camera/audio 的坐标与时间基准；
 - **采样**：sampler、steps、guidance、seed 数、每输入样本数，是否 cherry-pick；
 - **系统**：模型/权重版本、VAE、设备、精度、峰值内存、是否含编解码与 I/O；
@@ -314,7 +325,7 @@ HPSD 则不是新的输出任务，而是 2026 的训练策略：teacher 在 TI2
 5. 对长视频按 1/4、1/2、3/4、末尾切片，报告身份与 motion 曲线。
 6. 至少公开随机样例网格、失败尾部和所有 seeds；精选视频只作说明。
 
-## 🧯 12. 从症状反推条件路径
+## 12. 故障诊断
 
 | 症状 | 优先怀疑 | 定位实验 | 不充分的“修复” |
 |---|---|---|---|
@@ -328,7 +339,9 @@ HPSD 则不是新的输出任务，而是 2026 的训练策略：teacher 在 TI2
 | chunk 边界闪烁 | 历史打包、VAE context 或 seed 重启 | seam 前后 latent/decoder 单独对照 | 后处理插帧掩盖 |
 | 音画事件错位 | 先视频后配音、时间 token/采样率未对齐 | 正负事件、无声、离屏声源测试 | 只测口型样例 |
 
-## 🚀 13. 2026 前沿与仍未解决的问题
+<a id="13-2026"></a>
+
+## 13. 适用限制与开放问题
 
 截至冻结日，可把前沿分成五条，而不是笼统称“更大模型”：
 
@@ -348,6 +361,11 @@ HPSD 则不是新的输出任务，而是 2026 的训练策略：teacher 在 TI2
 - 怎样建立公开、去训练集近重复、包含失败尾部的 I2V benchmark？
 
 最终判断标准很简单：一段 I2V 结果必须同时回答**保留了什么、改变了什么、为什么这样动、控制是否真的生效、误差怎样随时间增长**。回答不了这五个问题，漂亮 demo 仍不是可复核证据。
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 

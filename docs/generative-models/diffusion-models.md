@@ -1,10 +1,20 @@
-# 扩散模型：从 DDPM、Score-SDE 到视频生成系统
+<a id="ddpmscore-sde"></a>
+
+# 视频扩散模型
+
+介绍前向扰动、去噪目标、Score-SDE、采样器及视频条件建模。
+
+**前置知识：** 概率分布、梯度与微分方程基础。
+
+**使用步骤：** 固定噪声时间和视频时间的符号 → 从训练参数化推导采样更新 → 检查条件遵循、采样误差和计算成本。
 
 扩散模型不是“把噪声逐帧变成视频”的单一算法，而是一套可以拆开的设计：用什么前向扰动定义训练分布，网络预测什么量，怎样把预测换算成 score 或去噪方向，推理时采用随机链还是确定性常微分方程，以及模型究竟在像素还是压缩表示中工作。DDPM 给出了现代离散去噪框架，Score-SDE 把它推广到连续随机过程并导出 probability-flow ODE（PF-ODE），DDIM、DPM-Solver 等则主要改变采样过程而非训练目标 [[1]](#ref-1) [[2]](#ref-2) [[3]](#ref-3) [[6]](#ref-6)。
 
 对视频而言，还必须再加一条独立的轴：画面中的物理时间。一次视频生成既可能沿视频帧推进，也会在每一帧或整段视频上沿噪声等级反复去噪。若把这两个“时间”都写成 $t$，就容易把视频自回归误认为反向扩散，或把少步去噪误认为流式输出。本章因此固定用 $k$ 表示视频时间，用 $\tau$ 表示噪声时间，并在这一符号约定下讨论训练、架构与部署。
 
-## 1. 两条时间轴：视频时间 $k$ 与噪声时间 $\tau$
+<a id="1-kk-tautau"></a>
+
+## 1. 视频时间与噪声时间
 
 设一段含 $K$ 帧的干净视频为
 
@@ -12,14 +22,16 @@
 X_0=\left(x_0^{(1)},x_0^{(2)},\ldots,x_0^{(K)}\right).
 ```
 
-上标 $`k\in\lbrace1,\ldots,K\rbrace`$ 表示第几帧，即现实画面怎样随时间演化；下标 $\tau\in[0,T]$ 表示这整段视频处在多强的噪声下。于是 $x_\tau^{(k)}$ 是“第 $k$ 帧在噪声等级 $\tau$ 的状态”，$X_0$ 是整段干净视频而不是第一帧，$X_T$ 则接近先验噪声。条件 $c$ 可以是文本、首帧、参考视频、深度、姿态、相机轨迹或动作。
+上标 $k\in\lbrace1,\ldots,K\rbrace$ 表示第几帧，即现实画面怎样随时间演化；下标 $\tau\in[0,T]$ 表示这整段视频处在多强的噪声下。于是 $x_\tau^{(k)}$ 是“第 $k$ 帧在噪声等级 $\tau$ 的状态”，$X_0$ 是整段干净视频而不是第一帧，$X_T$ 则接近先验噪声。条件 $c$ 可以是文本、首帧、参考视频、深度、姿态、相机轨迹或动作。
 
 ![图 018：视频与噪声双时间轴](../../assets/imagegen-diagrams/018/diagram.png)
 顺序化文字替代：第一，固定一个噪声等级 $\tau$，按 $k=1,\ldots,K$ 排列视频帧；第二，固定整段视频的帧索引结构，增加 $\tau$，把 $X_0$ 逐渐扰动为 $X_T$；第三，从 $X_T$ 出发降低 $\tau$；第四，可沿带随机项的 reverse SDE 或不带随机项的 PF-ODE 生成 $\hat X_0$；第五，在精确 score 与精确积分的理想条件下，两条反向过程共享各噪声时刻的边缘分布，但不共享逐样本轨迹。
 
 这一区分也澄清了三个常见说法。其一，“一次生成 16 帧”描述的是 $K$；“采样 20 步”描述的是噪声轴离散点数。其二，frame-wise causal attention 限制的是 $k$ 方向的信息访问，并不规定 $\tau$ 方向采用 DDPM、ODE 还是少步蒸馏。其三，网络调用次数（number of function evaluations，NFE）减少，只说明噪声轴计算可能变少，不自动说明系统能在视频结束前持续发帧。
 
-## 2. 从离散 DDPM 到 Score-SDE 与 PF-ODE
+<a id="2-ddpm-score-sde-pf-ode"></a>
+
+## 2. DDPM、Score-SDE 与概率流 ODE
 
 ### 2.1 DDPM：前向链易采样，反向链需要学习
 
@@ -107,7 +119,9 @@ s_\theta(X,\tau,c)\right]\mathrm d\tau,
 
 PF-ODE 没有 Wiener 随机项，因此给定初始噪声和确定性求解器后，轨迹是确定的。在 score 精确、初始分布正确且连续方程被精确求解的理想条件下，reverse SDE 与 PF-ODE 在每个 $\tau$ 上具有相同边缘分布；这不表示它们对同一个初始噪声产生相同样本，也不表示粗离散、近似 score 下仍完全等价 [[2]](#ref-2)。由此可见，“diffusion 等于随机链、flow 等于确定 ODE”不是可靠分界：score-based diffusion 自身就同时拥有随机 SDE 和确定 ODE。
 
-## 3. $\epsilon$、$X_0$、$v$、score 与训练权重
+<a id="3-epsilonepsilonx_0x_0vvscore"></a>
+
+## 3. 预测参数化与训练权重
 
 ### 3.1 四种常见预测量怎样换算
 
@@ -152,7 +166,9 @@ y_\theta(X_\tau,\tau,c)\right\|_2^2\right],
 
 所以“不加权的 $\epsilon$ MSE”在 $X_0$ 误差坐标中已经隐含 SNR 权重。EDM 将噪声尺度、网络预条件、训练权重、采样 schedule 与数值求解器拆成模块，说明高质量系统不能只报告“用了哪一种预测头” [[5]](#ref-5)。实践复现至少要记录 $\alpha/\sigma$ 定义、$\tau$ 的采样分布、loss weight、数据归一化和推理噪声网格。
 
-## 4. 训练目标与 sampler 必须分开
+<a id="4-sampler"></a>
+
+## 4. 训练目标与采样器
 
 ### 4.1 相同网络可以接不同 sampler
 
@@ -174,7 +190,9 @@ DPM-Solver 在不重新训练 score/denoiser 的前提下求解 diffusion ODE，
 
 训练 noise schedule 决定模型见过的扰动族；推理 schedule 则选择从 $T$ 到 $0$ 的离散节点。只要 sampler 与模型参数化兼容，可以在不重训的情况下改变节点数量和位置，但少步时数值误差、score 误差与 guidance 误差会共同放大。反过来，蒸馏后的少步 student 往往已经改变训练目标和参数，不能再称为“只是换了一个 solver”。
 
-## 5. Pixel、latent 与 tokenizer 的真实上限
+<a id="5-pixellatent-tokenizer"></a>
+
+## 5. 像素空间与潜空间
 
 ### 5.1 Pixel diffusion
 
@@ -198,7 +216,7 @@ Z_0=E(X_0),\qquad X_{\mathrm{rec}}=D(Z_0),
 
 本章只负责这些表示如何接入 diffusion。连续/离散/结构化类型、量化、预算口径、真实 codec 与 tokenizer 替换实验统一见[视频 Tokenizer 与生成式压缩](video-tokenizers.md)。Stable Video Diffusion 是连续 latent video diffusion 的公开技术报告实例 [[14]](#ref-14)；Sora 的机构技术报告则明确披露了视频压缩、spacetime patch 与 Transformer diffusion 的组合，但没有公开足以复现训练数据、完整注意力结构、参数量、sampler 和成本的细节 [[16]](#ref-16)。
 
-## 6. 视频时空架构与条件控制
+## 6. 时空架构与条件控制
 
 本节只说明 diffusion denoiser 的接口与历史代表；Video DiT 的 token 公式、full/factorized/window/sparse/linear/hybrid topology、position/fusion、MoE、并行和 cache 统一由[骨干扩展专章](video-dit-backbones.md)维护。
 
@@ -231,9 +249,9 @@ Classifier-free guidance（CFG）在训练时随机丢弃条件，使一个网�
 \right].
 ```
 
-这里 $s=1$ 恢复 conditional 预测，$`s\gt1`$ 是向条件方向外推。另一种常见写法 $(1+w)\epsilon_c-w\epsilon_u$ 与本式对应 $s=1+w$；比较配置时不能混用两个 scale。CFG 提供质量/条件强度与覆盖度之间的可调折中，不会免费提升所有维度。对视频还要检查条件是否贯穿整个 $k=1\ldots K$，而不是只在首帧或少量关键帧上成立。
+这里 $s=1$ 恢复 conditional 预测，$s\gt1$ 是向条件方向外推。另一种常见写法 $(1+w)\epsilon_c-w\epsilon_u$ 与本式对应 $s=1+w$；比较配置时不能混用两个 scale。CFG 提供质量/条件强度与覆盖度之间的可调折中，不会免费提升所有维度。对视频还要检查条件是否贯穿整个 $k=1\ldots K$，而不是只在首帧或少量关键帧上成立。
 
-## 7. 训练难点与三类加速路线
+## 7. 训练与推理成本
 
 ### 7.1 视频训练不只是把图像 batch 增加一维
 
@@ -271,7 +289,9 @@ Distribution Matching Distillation（DMD）不要求 student 沿 teacher 的同�
 
 CausVid 把 DMD 扩展到视频，用双向 diffusion teacher 监督 4-step causal student，并通过 KV cache 流式生成 [[20]](#ref-20)。Self Forcing 则让 causal video diffusion 在训练时条件于自身已经生成的历史，以处理 teacher-forcing 与 rollout 之间的 exposure gap [[21]](#ref-21)。这两项工作同时改变了噪声轴上的步数和视频轴上的 factorization；不能把其 streaming 能力全部归因于 DMD，也不能把 causal mask 当作新的 diffusion objective。完整部署问题见[因果、流式与实时视频生成](causal-streaming-generation.md)；如需比较少步 student 与结构压缩、低 bit 和服务系统的交互，请继续阅读[蒸馏综述](inference-acceleration/distillation.md)与[推理加速综述导航](inference-acceleration.md)。
 
-## 8. 2022–2026：视频扩散的可证据化里程碑
+<a id="8-20222026"></a>
+
+## 8. 代表工作
 
 下表选择改变表示、架构、训练或部署问题定义的节点，而不是做模型排行榜。A 表示正式同行评审 proceedings，B 表示作者论文或机构技术报告。不同工作使用的数据、提示词、分辨率、时长、采样预算和硬件不同，表中的任何数字都不能直接横向排名。
 
@@ -293,7 +313,7 @@ CausVid 把 DMD 扩展到视频，用双向 diffusion teacher 监督 4-step caus
 
 这条历史不是“U-Net 被 DiT 淘汰、diffusion 被少步模型淘汰”的直线。更准确的理解是：2022–2023 年解决视频化、压缩与时空骨干；2024 年扩大 joint spatiotemporal 建模规模；2025 年把高质量双向 teacher 转成因果少步 student；2026 年进一步分离时间推理与去噪计算，并把算法速度升级为带 TTFF、deadline 和 jitter 的服务目标。
 
-## 9. 如何读结果：质量、速度与能力声明
+## 9. 结果报告
 
 扩散视频的实验至少应同时报告以下信息：
 

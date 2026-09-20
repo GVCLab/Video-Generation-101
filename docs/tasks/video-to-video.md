@@ -1,14 +1,19 @@
-# 视频到视频编辑：把“改变”与“守恒”写进同一份合同
+# 视频编辑与变换
 
-> **冻结日期：2026-08-30。** 本页把 video-to-video（V2V）限定为：源视频定义待修改的既有时间轴，系统按指令、掩码、参考或控制信号产生反事实视频，并能说明哪些内容应改变、哪些内容必须保留。若源视频只是驱动信号、历史前缀或可被丢弃的提示，就不能仅因输出也是视频而称为 V2V 编辑。
+介绍在已有视频上改变指定属性，同时保持其余内容的表示和生成方法。
+
+**前置知识：** 条件生成、视频时序。
+
+**使用步骤：** 定义编辑目标、区域和保持项 → 选择传播、反演、条件注入或原生编辑 → 评价编辑成功、非目标变化和时间一致性。
+
 
 从 Video Rewrite 的局部口型替换 [[1]](#ref-1)、时空补全 [[2]](#ref-2) 和 vid2vid 的条件域翻译 [[3]](#ref-3)，到扩散模型的测试时特征注入、原生视频编辑 DiT / flow、三维运动控制与流式编辑，能力主线并不是“画面越来越漂亮”，而是**可编辑自由度扩大时，源视频中的身份、几何、运动和因果关系还能否守恒**。
 
-检索式、纳排规则、正式 venue、2025–2026 release surface、负面核验、图片记录与验证命令见[配套研究记录](../../sources/research_20260830_video_to_video.md)。
+检索式、纳排规则、正式 venue、2025–2026 发布内容、负面核验、图片记录与验证命令见[配套研究记录](../../sources/research_20260830_video_to_video.md)。
 
-## 1. 先明确编辑目标，再选择模型
+## 1. 任务定义
 
-### 1.1 严格输入、输出与区域合同
+### 1.1 严格输入、输出与区域规格
 
 一次可审计的 V2V 请求写成
 
@@ -18,13 +23,13 @@ T_{\mathrm{V2V}}=(X,U,M,R,C,H)\rightarrow(Y,\Delta,D),
 
 其中：
 
-- $`X=\lbrace x_t\rbrace_{t=1}^{T}`$ 是完整源视频，决定输出的时间轴；
+- $X=\lbrace x_t\rbrace_{t=1}^{T}$ 是完整源视频，决定输出的时间轴；
 - $U$ 是自然语言编辑指令，可为空；
-- $`M=\lbrace m_t\rbrace`$ 是可选时空掩码，需声明是**硬边界**还是**软提示**；
+- $M=\lbrace m_t\rbrace$ 是可选时空掩码，需声明是**硬边界**还是**软提示**；
 - $R$ 是外观、身份、材质或风格参考，可为多图、多视频或前一轮结果；
 - $C$ 是轨迹、点、框、姿态、深度、法线、相机、音频等显式控制；
 - $H$ 是多轮历史或流式状态，必须区分“已接受状态”和临时预览；
-- $`Y=\lbrace y_t\rbrace_{t=1}^{T'}`$ 是编辑视频；$\Delta$ 是机器可读的改动范围；$D$ 是种子、模型、条件、轮次和撤销信息。
+- $Y=\lbrace y_t\rbrace_{t=1}^{T'}$ 是编辑视频；$\Delta$ 是机器可读的改动范围；$D$ 是种子、模型、条件、轮次和撤销信息。
 
 对时间重映射、插帧或变速，$T'$ 可以不同于 $T$，但必须给出源—目标时间映射。否则默认 $T'=T$ 且逐帧对齐。令 $E_t$ 为允许编辑区，$P_t=\Omega\setminus E_t$ 为保留区：
 
@@ -34,14 +39,14 @@ T_{\mathrm{V2V}}=(X,U,M,R,C,H)\rightarrow(Y,\Delta,D),
 +\lambda_t\mathcal L_{\mathrm{temporal}}(Y,X).
 ```
 
-硬掩码表示 $`y_t(p)=x_t(p),\ p\in P_t`$，应在解码后再做一次已知像素合成；软掩码只表示“主要改这里”，允许影子、反射、遮挡和接触区域随对象一起变化。只给对象轮廓而不说明环境效应，无法判断 mask 外变化是错误还是必要编辑。
+硬掩码表示 $y_t(p)=x_t(p),\ p\in P_t$，应在解码后再做一次已知像素合成；软掩码只表示“主要改这里”，允许影子、反射、遮挡和接触区域随对象一起变化。只给对象轮廓而不说明环境效应，无法判断 mask 外变化是错误还是必要编辑。
 
 ### 1.2 四个正交轴，不把任务名混成方法名
 
-| 轴 | 选项 | 必须固定的合同 |
+| 轴 | 选项 | 必须固定的规格 |
 |---|---|---|
 | 编辑范围 | local / masked；global | 局部任务报告 mask 外泄漏；全局任务列出仍需保留的身份、布局、运动或镜头 |
-| 编辑内容 | appearance；object；motion；camera / geometry | “换材质”和“改轨迹”不能共用一个模糊的文本相似度验收；restoration 是邻接合同而非编辑内容标签 |
+| 编辑内容 | appearance；object；motion；camera / geometry | “换材质”和“改轨迹”不能共用一个模糊的文本相似度验收；restoration 是邻接规格而非编辑内容标签 |
 | 条件接口 | instruction；mask / box；reference；track / pose / depth / camera；组合条件 | 说明哪个条件具有冲突时优先级，以及条件是否逐帧对齐 |
 | 会话形态 | one-shot；multi-turn；streaming | 多轮需保存状态与撤销点；流式需声明可见未来、缓冲区和端到端延迟 |
 
@@ -57,7 +62,7 @@ T_{\mathrm{V2V}}=(X,U,M,R,C,H)\rightarrow(Y,\Delta,D),
 | 超分、去模糊、去噪、去压缩或复合低质恢复 | 邻接任务 | 全帧通常仍有退化观测；详见[视频退化修复](video-restoration.md) |
 | 缺失像素补全、对象移除后背景生成、outpainting | 邻接任务 | 未知支持由 mask 指定或估计；详见[视频补全](video-inpainting.md) |
 | 单图 / 首帧 + 文本 → 视频 | 否 | 图像是时间锚点而非待编辑视频；详见[图像到视频](image-to-video.md) |
-| 语义图 / pose / depth 视频 → RGB 视频 | 视合同而定 | 若源 RGB 不参与或可丢弃，是 conditional synthesis / translation；vid2vid 属于历史上的 video translation [[3]](#ref-3) |
+| 语义图 / pose / depth 视频 → RGB 视频 | 视规格而定 | 若源 RGB 不参与或可丢弃，是 conditional synthesis / translation；vid2vid 属于历史上的 video translation [[3]](#ref-3) |
 | 相机轨迹 + 文本 → 新场景 | 否 | 是 camera-conditioned generation |
 | 源视频 + 新相机轨迹 → 同一动态场景的新视图 | 是，属于 camera / geometry edit | 必须保持同一对象状态并检验显露区和三维几何；ReCamMaster 是这一交叉点 [[26]](#ref-26) |
 | 视频前缀 → 未知未来 | 否 | 是 prediction / continuation，源帧是历史而非被修改对象 |
@@ -67,11 +72,11 @@ T_{\mathrm{V2V}}=(X,U,M,R,C,H)\rightarrow(Y,\Delta,D),
 ![图 074：严格视频到视频编辑的边界判定](../../assets/imagegen-diagrams/074/diagram.png)
 **顺序化文字替代：** 先确认存在完整源视频；再确认输出修改的是这条既有时间轴，而非把它当驱动或历史。若目标只是恢复原内容，再判断是全帧退化观测的 restoration，还是由 mask 指定缺失支持的 inpainting。其余按局部、全局、运动或相机 / 视角编辑分流，每一支都同时写出编辑目标和守恒目标。
 
-## 2. 方法选择器：控制越强，证据合同越具体
+## 2. 方法选择
 
 ![视频到视频编辑任务选择器：从同一源视频与可选 instruction、mask、domain、reference、audio 或 pose 条件出发，先把图中的广义 restoration 或 completion 入口继续拆成全帧退化修复与缺失支持补全，再与外观翻译、语义编辑和重定时分流，并分别检查编辑成功、源保真、局部性、时间一致和身份或运动守恒。](../../assets/diagrams/video-to-video-method-selector.png)
 
-**图注：** 四条路线先写“允许改变什么”和“必须保留什么”，再交付输出视频与 edit ledger。A 路是邻接任务入口，图中的 `restoration / completion` 必须继续拆成[全帧退化逆问题](video-restoration.md)与[mask 缺失支持补全](video-inpainting.md)，不能共用一份验收；B–D 分别扩大到外观、语义与时间/运动结构。右侧五个验收轴彼此独立，不能用 edit success 掩盖整帧重绘。未来预测与首帧动画不修改完整源时间轴，属于不同合同。
+**图注：** 四条路线先写“允许改变什么”和“必须保留什么”，再交付输出视频与 edit ledger。A 路是邻接任务入口，图中的 `restoration / completion` 必须继续拆成[全帧退化逆问题](video-restoration.md)与[mask 缺失支持补全](video-inpainting.md)，不能共用一份验收；B–D 分别扩大到外观、语义与时间/运动结构。右侧五个验收轴彼此独立，不能用 edit success 掩盖整帧重绘。未来预测与首帧动画不修改完整源时间轴，属于不同规格。
 
 **图的顺序化文字替代：**
 
@@ -83,19 +88,19 @@ T_{\mathrm{V2V}}=(X,U,M,R,C,H)\rightarrow(Y,\Delta,D),
 6. 所有路线都输出 edit ledger，并分别验收 edit success、source fidelity、locality、temporal consistency 和 identity/motion preservation。
 
 ![图 075：视频编辑方法主线选择器](../../assets/imagegen-diagrams/075/diagram.png)
-**顺序化文字替代：** 先由 mask 外是否需要像素级锁定决定是否使用 mask-aware 路线。没有专用训练数据时优先考虑 inversion 与测试时注入；大幅语义变化优先原生编辑模型；首帧或关键帧驱动的小改动可走对应传播。运动、相机和材质分解需要更具体的 2D / 3D / RGBX 控制。最后按离线、多轮长视频或因果流式选择状态管理。上方 PNG 用于快速识别输出关系；本 Mermaid 保留“编辑目标 → 控制自由度 → 时序形态”的可编辑精确分支。
+**顺序化文字替代：** 先由 mask 外是否需要像素级锁定决定是否使用 mask-aware 路线。没有专用训练数据时优先考虑 inversion 与测试时注入；大幅语义变化优先原生编辑模型；首帧或关键帧驱动的小改动可走对应传播。运动、相机和材质分解需要更具体的 2D / 3D / RGBX 控制。最后按离线、多轮长视频或因果流式选择状态管理。上方 PNG 用于快速识别输出关系；本 流程图及文字说明 保留“编辑目标 → 控制自由度 → 时序形态”的分支关系。
 
-## 3. 八条机制路线及各自的守恒假设
+## 3. 建模方法
 
 ### 3.1 传播与 warp：把少量可靠编辑扩散到时间轴
 
 这一路线先编辑首帧、关键帧或稀疏锚点，再用光流、对应特征或 I2V 模型传播。优点是接口直观、可复用成熟图像编辑器；弱点是遮挡、显露区、快速非刚性运动和长程漂移。AnyV2V 把图像编辑与视频传播解耦 [[10]](#ref-10)，FlowV2V 将一致编辑重写为 flow-driven I2V [[12]](#ref-12)，FFP-300K 则把首帧传播扩展为大规模配对训练问题 [[13]](#ref-13)。
 
-**隐藏假设：** 第一帧包含未来所需身份和材质，且对应关系可跨遮挡恢复。若编辑目标只在后半段出现，首帧传播合同本身就不充分。
+**隐藏假设：** 第一帧包含未来所需身份和材质，且对应关系可跨遮挡恢复。若编辑目标只在后半段出现，首帧传播规格本身就不充分。
 
 ### 3.2 GAN 与 paired translation：从逐帧映射走向时间判别
 
-vid2vid 把语义图、姿态等输入序列翻译为 RGB 视频，并用时序判别、前帧与光流约束增强连续性 [[3]](#ref-3)。它建立了“结构条件 + 时间一致”的工程范式，却依赖配对域、固定任务和训练分布；对任意自然语言反事实编辑并不天然适用。把 vid2vid 当作现代 instruction-based V2V 的同义词，会掩盖“源 RGB 是否必须保留”的合同差异。
+vid2vid 把语义图、姿态等输入序列翻译为 RGB 视频，并用时序判别、前帧与光流约束增强连续性 [[3]](#ref-3)。它建立了“结构条件 + 时间一致”的工程范式，却依赖配对域、固定任务和训练分布；对任意自然语言反事实编辑并不天然适用。把 vid2vid 当作现代 instruction-based V2V 的同义词，会掩盖“源 RGB 是否必须保留”的规格差异。
 
 ### 3.3 分层、atlas 与显式合成：先把可编辑对象从视频中拆出来
 
@@ -119,23 +124,23 @@ Dreamix 的逐视频反演/微调仍围绕已有源时间轴验收；若优化�
 
 Movie Gen 把视频生成与精确编辑纳入同一媒体基础模型族 [[14]](#ref-14)。VACE 用统一条件接口覆盖生成、参考和视频编辑，并在 ICCV 2025 正式发表 [[15]](#ref-15)。2026 年，EditVerse 把异构编辑样本统一为 token 序列 [[16]](#ref-16)，UNIC 把源视频、带噪目标和多模态条件共同建模 [[17]](#ref-17)，Ditto 用大规模合成数据训练原生指令编辑器 [[19]](#ref-19)，EasyV2V 用序列拼接、LoRA 与时空 mask 兼容局部 / 全局及可选参考 [[18]](#ref-18)。
 
-原生模型能执行更大语义变化，却不能因为“端到端”就省略编辑区域合同。VIVA 用 VLM instructor 与强化学习提升指令对齐 [[20]](#ref-20)，CoT-Edit 把指令规划为框、mask 和编辑步骤 [[21]](#ref-21)，EditCtrl 只更新 mask token 并用低分辨率全局上下文控制计算量 [[45]](#ref-45)：三者分别把语义规划、空间定位和计算边界显式化。
+原生模型能执行更大语义变化，却不能因为“端到端”就省略编辑区域规格。VIVA 用 VLM instructor 与强化学习提升指令对齐 [[20]](#ref-20)，CoT-Edit 把指令规划为框、mask 和编辑步骤 [[21]](#ref-21)，EditCtrl 只更新 mask token 并用低分辨率全局上下文控制计算量 [[45]](#ref-45)：三者分别把语义规划、空间定位和计算边界显式化。
 
 ### 3.7 多参考、3D / 4D 与内禀分解：从像素相关走向可控制世界状态
 
-MotionFollower 用 pose / appearance controllers 和 score guidance 改变主体运动并保留外观与背景 [[22]](#ref-22)；MotionV2V 构造 motion counterfactual，以稀疏轨迹改变对象运动同时保留外观 [[23]](#ref-23)；3D Point Tracks 方法进一步把深度、遮挡与源 / 目标三维点轨迹写入运动合同 [[24]](#ref-24)。TrajectoryCrafter [[25]](#ref-25) 与 ReCamMaster [[26]](#ref-26) 面向新轨迹 / 新相机视角，只有当它们保持同一动态场景状态时才属于 V2V 的 novel-view edit。
+MotionFollower 用 pose / appearance controllers 和 score guidance 改变主体运动并保留外观与背景 [[22]](#ref-22)；MotionV2V 构造 motion counterfactual，以稀疏轨迹改变对象运动同时保留外观 [[23]](#ref-23)；3D Point Tracks 方法进一步把深度、遮挡与源 / 目标三维点轨迹写入运动规格 [[24]](#ref-24)。TrajectoryCrafter [[25]](#ref-25) 与 ReCamMaster [[26]](#ref-26) 面向新轨迹 / 新相机视角，只有当它们保持同一动态场景状态时才属于 V2V 的 novel-view edit。
 
 V-RGBX 先把视频分解为反照率、法线、材质和照明，再做 intrinsic-aware 编辑 [[27]](#ref-27)；V2Edit 同时面向视频和三维场景 [[28]](#ref-28)。这一路线更适合检验遮挡、光照和几何，却要求可靠深度、相机或内禀估计。所谓“4D-aware”若没有跨视角 / 时间的几何证据，仍可能只是更强的视频先验。
 
-编辑主张一旦扩展到“所有视角、所有时刻保持同一变化”，就要从像素保持合同升级为 camera-time grid、重投影、遮挡、loop closure 与可渲染状态合同；完整测试见[多视角与 4D 生成](multiview-4d-generation.md)。
+编辑主张一旦扩展到“所有视角、所有时刻保持同一变化”，就要从像素保持规格升级为 camera-time grid、重投影、遮挡、loop closure 与可渲染状态约束；完整测试见[多视角与 4D 生成](multiview-4d-generation.md)。
 
-### 3.8 记忆、多轮与流式：状态管理成为模型合同的一部分
+### 3.8 记忆、多轮与流式：状态管理成为模型规格的一部分
 
 Memory-V2V 用外部记忆、检索、动态 token 化和压缩支持长视频多轮一致性 [[29]](#ref-29)。EgoEdit 面向第一视角数据、流式模型与评测 [[30]](#ref-30)。LiveEdit 以双向到因果蒸馏和自回归 mask cache 逼近实时流式编辑 [[31]](#ref-31)，JoyAI 使用自回归扩散、因果 VAE 和有界 KV cache [[32]](#ref-32)，EditStream 则统一交互式视频生成与编辑 [[33]](#ref-33)。
 
 “实时”必须拆成捕获到显示的端到端延迟、稳态 FPS、首帧时间、分辨率、窗口长度、峰值显存和硬件；论文中的作者报告速度不能替代本地复测。离线模型一次处理完整 clip 的 FPS 也不能证明在线因果性。
 
-## 4. 能力转折点：每次扩大自由度，都留下新的守恒债务
+## 4. 技术发展
 
 | 时间 | 能力转折 | 代表证据 | 当时没有解决、今天仍需验收的项 |
 |---|---|---|---|
@@ -150,7 +155,9 @@ Memory-V2V 用外部记忆、检索、动态 token 化和压缩支持长视频�
 
 这条时间线不是 SOTA 排名。早期显式分层方法在可解释 delta 和撤销上可能优于大模型；新模型扩大了指令覆盖，并未自动偿还 preservation、geometry 或 provenance 的债务。
 
-## 5. 2025–2026 冻结快照：正式发表、预印本与 release surface 分开写
+<a id="5-20252026-release-surface"></a>
+
+## 5. 代表方法
 
 | 工作 | 截至冻结日的证据状态 | 核心贡献 | 可公开复现边界 |
 |---|---|---|---|
@@ -158,7 +165,7 @@ Memory-V2V 用外部记忆、检索、动态 token 化和压缩支持长视频�
 | MotionFollower / TrajectoryCrafter / ReCamMaster | ICCV 2025 正式论文 [[22]](#ref-22) [[25]](#ref-25) [[26]](#ref-26) | 运动轨迹、通用轨迹和相机重定位 | 需逐项目核对数据、相机 / 深度前处理和权重，不把项目 demo 当复现 |
 | VE-Bench / FiVE-Bench | AAAI 2025 / ICCV 2025 正式论文 [[34]](#ref-34) [[35]](#ref-35) | 主观对齐质量与细粒度编辑评测 | 是评测协议，不是编辑模型 |
 | V2Edit / FlowV2V | 2025 arXiv 预印本 [[28]](#ref-28) [[12]](#ref-12) | 视频—3D 联合编辑；flow-driven I2V | 不因年份相同写成正式 proceedings |
-| EditVerse / UNIC / IVEBench | ICLR 2026 正式论文 [[16]](#ref-16) [[17]](#ref-17) [[36]](#ref-36) | 统一数据 / 条件建模；现代 instruction benchmark | 数据、权重与训练 recipe 仍需按各官方发布面核验 |
+| EditVerse / UNIC / IVEBench | ICLR 2026 正式论文 [[16]](#ref-16) [[17]](#ref-17) [[36]](#ref-36) | 统一数据 / 条件建模；现代 instruction benchmark | 数据、权重与训练 recipe 仍需按各官方发布内容核验 |
 | EasyV2V / Ditto / MotionV2V / 3D Point Tracks / EditCtrl / VIVA / CoT-Edit / V-RGBX / EgoEdit / FFP-300K | CVPR 2026 正式论文 [[18]](#ref-18) [[19]](#ref-19) [[23]](#ref-23) [[24]](#ref-24) [[45]](#ref-45) [[20]](#ref-20) [[21]](#ref-21) [[27]](#ref-27) [[30]](#ref-30) [[13]](#ref-13) | 原生编辑、数据扩展、运动 / 3D、mask 计算、规划、内禀属性、流式第一视角、首帧传播 | “有 proceedings”不等于“有完全一致的训练代码与 checkpoint” |
 | Memory-V2V | arXiv v3；Adobe Research 页面标注 ECCV 2026，但页面公开日期晚于冻结日 [[29]](#ref-29) | 外部记忆与多轮一致 | 冻结日官方仓库仍写 Code coming soon [[41]](#ref-41) |
 | LiveEdit | arXiv v2；官方仓库标注 accepted to ECCV 2026 [[31]](#ref-31) [[46]](#ref-46) | 双向到因果蒸馏、流式 cache | 仓库公开推理 / 训练 / checkpoint；作者速度需本地复测 |
@@ -168,12 +175,12 @@ Memory-V2V 用外部记忆、检索、动态 token 化和压缩支持长视频�
 ### 5.1 这些论文真正改变了什么
 
 - **数据成为能力瓶颈。** Ditto-1M 与 EditVerse 不再把编辑当成生成模型的附带推理技巧，而是训练原生 source→target 关系 [[16]](#ref-16) [[19]](#ref-19)。收益是大幅编辑和组合条件；代价是合成配对偏差、数据许可和巨大训练成本。Ditto 论文报告超过 12,000 GPU-days，这是作者报告，不是本页复测值。
-- **mask 从输入提示变成算力边界。** EasyV2V 的时空 mask 统一 local / global 编辑 [[18]](#ref-18)，EditCtrl 只在 masked token 上执行主要计算，并保留低分辨率全局上下文 [[45]](#ref-45)。但 mask 外 token 不更新仍不保证解码后像素完全不变，硬合同需要输出合成和误差审计。
+- **mask 从输入提示变成算力边界。** EasyV2V 的时空 mask 统一 local / global 编辑 [[18]](#ref-18)，EditCtrl 只在 masked token 上执行主要计算，并保留低分辨率全局上下文 [[45]](#ref-45)。但 mask 外 token 不更新仍不保证解码后像素完全不变，硬规格需要输出合成和误差审计。
 - **运动编辑从文本形容词走向反事实轨迹。** MotionV2V 的问题是“同一对象如果沿另一条轨迹运动会怎样” [[23]](#ref-23)；3D Point Tracks 显式处理深度与遮挡 [[24]](#ref-24)。这比用 CLIP 判断“moves left”更可检验，但仍未自动解决接触、碰撞与拓扑变化。
 - **规划与执行被拆开。** CoT-Edit 先生成计划、框和 mask，再调用编辑器 [[21]](#ref-21)；VIVA 用视觉语言反馈训练编辑器 [[20]](#ref-20)。需要分别测 planner 的定位错误和 renderer 的生成错误，不能只报最终偏好分。
 - **在线编辑把未来信息变成公平性问题。** EgoEdit、LiveEdit、JoyAI 与 EditStream 的可见未来和缓存不同 [[30]](#ref-30) [[31]](#ref-31) [[32]](#ref-32) [[33]](#ref-33)。离线基线若看到完整视频，不能与严格因果模型只按 FPS 横比。
 
-## 6. 评价：至少八个维度，不能压成一个“总体质量”
+## 6. 评测方法
 
 VE-Bench 收集 8 个模型、24 位标注者和 28,080 个主观分数，用于研究自动指标与人类判断的对齐 [[34]](#ref-34)。FiVE-Bench 由 74 个真实源视频和 26 个生成源视频构成，覆盖 6 类编辑与 420 组 prompt / mask [[35]](#ref-35)。IVEBench 包含 600 个源视频、32–1024 帧、8 个主类和 35 个子类，强调现代指令编辑的时长与任务覆盖 [[36]](#ref-36)。这些规模来自论文，不应外推为“已覆盖所有真实编辑”。
 
@@ -216,11 +223,13 @@ S_{\mathrm{edit}}=s(Y\odot M,U,R,C),
 
 统一输入帧率和分辨率，分别设置 look-ahead $L=0$、有限 $L$ 和 full-context；报告 capture→encode→edit→decode→display 的分段与总延迟。发生 scene cut、指令切换或 mask 突变时，检查 cache 是否重置。对作者报告的 LiveEdit、JoyAI 或 EditStream 速度，只能写“在其硬件和设置下报告”，本地未复测前不能写成通用实时结论。
 
-## 7. 一套可复现、可归因的实验矩阵
+## 7. 实验设计示例
+
+本节是可按任务调整的实验设计示例，尚未在本仓库运行；参数与阈值是示例设置，不是已发布基准或实测结果。
 
 ### 7.1 固定样本，而不是为每个方法挑最擅长的 demo
 
-建立带版本号的 source suite，至少分层覆盖：静态 / 运动相机、刚体 / 非刚体、单 / 多对象、短 / 长遮挡、室内 / 户外、真实 / 生成视频、人物 / 动物 / 通用对象、低 / 高纹理。每个源视频配同一组合同：
+建立带版本号的 source suite，至少分层覆盖：静态 / 运动相机、刚体 / 非刚体、单 / 多对象、短 / 长遮挡、室内 / 户外、真实 / 生成视频、人物 / 动物 / 通用对象、低 / 高纹理。每个源视频配同一组规格：
 
 1. **零编辑：** 空指令或 identity instruction，测纯重建与方法固有漂移；
 2. **局部外观：** 小 mask 换色 / 材质，测 mask 外守恒和边界；
@@ -231,7 +240,7 @@ S_{\mathrm{edit}}=s(Y\odot M,U,R,C),
 7. **多轮：** 三个互不相交编辑、一个重叠编辑、一次撤销；
 8. **流式：** 指令切换、scene cut、长期运行和突发遮挡。
 
-只比较共同支持的条件。一个仅文本全局编辑器不能因不接受 mask 而在 mask 精确度上被判为实现错误，但应明确标成“不支持该合同”，不能把缺失接口记成零分后再算综合排名。
+只比较共同支持的条件。一个仅文本全局编辑器不能因不接受 mask 而在 mask 精确度上被判为实现错误，但应明确标成“不支持该规格”，不能把缺失接口记成零分后再算综合排名。
 
 ### 7.2 每条路线的最低对照
 
@@ -254,9 +263,11 @@ S_{\mathrm{edit}}=s(Y\odot M,U,R,C),
 - **R1 推理复现：** 用官方 checkpoint 完成固定样本和哈希记录；
 - **R2 训练 / 微调复现：** 数据版本、训练代码、预算与指标可重跑。
 
-本页的 release surface 审计属于 R0；没有下载全部权重、执行 GPU 推理或复跑作者速度。
+本页的 发布内容 审计属于 R0；没有下载全部权重、执行 GPU 推理或复跑作者速度。
 
-## 8. Release surface：有论文不等于可完整复现
+<a id="8-release-surface"></a>
+
+## 8. 公开实现
 
 以下状态按 2026-08-30 的官方页面与默认分支快照记录；“未见”只表示在核验位置没有发现，不能证明私有资产不存在。
 
@@ -274,7 +285,7 @@ S_{\mathrm{edit}}=s(Y\odot M,U,R,C),
 | LiveEdit | 官方仓库与 checkpoint [[46]](#ref-46) | 推理、训练与模型资源 | 需按其硬件重测端到端延迟；接受状态不等于冻结日已有正式 proceedings 页面 |
 | EditStream | 官方项目页 [[47]](#ref-47) | 论文、视频与说明 | 页面写 Code soon、Data & Model soon，冻结日不可做 R1 |
 
-## 9. 失败诊断：先判断破坏了哪条合同
+## 9. 故障诊断
 
 | 现象 | 优先检查 | 可能机制原因 | 针对性对照 |
 |---|---|---|---|
@@ -287,7 +298,7 @@ S_{\mathrm{edit}}=s(Y\odot M,U,R,C),
 | 流式遇 scene cut 污染 | cache 生命周期 | 旧 KV / mask cache 未重置 | 人工 cut；强制 reset 对照 |
 | 指令分数高但整帧重绘 | preservation 指标 | 目标函数只奖励语义匹配 | 配对人审；mask 外特征和轨迹 |
 
-## 10. 尚未解决的研究问题
+## 10. 开放问题
 
 1. **可证明的编辑局部性。** 如何让 hard mask 成为架构或采样不变量，而不只是训练提示？
 2. **组合因果编辑。** 改变对象运动后，影子、接触、碰撞和相机遮挡应如何联动，又如何避免无关背景重生成？
@@ -297,7 +308,7 @@ S_{\mathrm{edit}}=s(Y\odot M,U,R,C),
 6. **流式公平性。** 如何统一 look-ahead、缓存、VAE、传输和显示延迟，使不同论文的 FPS 可比？
 7. **评价可解释性。** 如何把 VLM 偏好与像素、身份、几何、物理和人类工作流中的可撤销性结合，而不制造新的单一总分？
 
-## 11. 建议阅读路径
+## 11. 延伸阅读
 
 - **理解任务边界：** 先读本页第 1 节，再读[图像到视频](image-to-video.md)、[开放集视频个性化](personalized-video-generation.md)、[视频退化修复](video-restoration.md)、[视频补全](video-inpainting.md)和[任务分类](../taxonomy.md)。
 - **理解测试时编辑：** Dreamix → FateZero → Pix2Video → TokenFlow → AnyV2V。
@@ -305,6 +316,11 @@ S_{\mathrm{edit}}=s(Y\odot M,U,R,C),
 - **理解运动与几何：** MotionFollower → MotionV2V → 3D Point Tracks → ReCamMaster → V-RGBX。
 - **理解工作流状态：** Layered Neural Atlases / Text2LIVE → Memory-V2V → EgoEdit / LiveEdit / JoyAI / EditStream。
 - **做实验前：** 先读 VE-Bench、FiVE-Bench 与 IVEBench，再按第 7 节冻结样本和版本。
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 

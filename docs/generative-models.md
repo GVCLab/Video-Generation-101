@@ -1,4 +1,10 @@
-# 视频生成系统：表示 × 分解 × 目标 × 骨干 × 部署
+# 视频生成模型分类与基础
+
+从表示、概率分解、训练目标、骨干网络和部署方式五个维度组织视频生成方法。
+
+**前置知识：** 概率分布、神经网络基础。
+
+**使用步骤：** 确定视频表示及预测变量 → 识别概率分解和训练目标 → 结合骨干与部署约束选择对应专题。
 
 > 一手来源审计截至 **2026-08-30**。本章把 representation、factorization、objective、backbone 和 deployment 分成五个交叉分类轴；2026 年尚未正式发表的系统只按作者技术报告解释，不把演示或作者自报速度当作独立复现。
 
@@ -20,16 +26,16 @@
 
 本章建立全局地图。连续/离散表示、压缩指标、因果 codec 与实际 bitstream 的边界见[视频 Tokenizer 与生成式压缩专章](generative-models/video-tokenizers.md)，ELBO、learned prior 与随机未来见[变分生成专章](generative-models/variational-generation.md)；DDPM、score、SDE/PF-ODE 的完整推导见[扩散模型专章](generative-models/diffusion-models.md)；FM、RF、Consistency、Shortcut 与 DMD 的差异见[Flow 与 Consistency 专章](generative-models/flow-consistency-models.md)；latent patch、full/factorized/window/sparse/linear attention、条件融合、3D 位置、noise-time MoE、并行与 cache 的分项分析见[Video DiT 与骨干扩展专章](generative-models/video-dit-backbones.md)；跨环节成本分析与六类加速方法见[压缩与推理加速综述导航](generative-models/inference-acceleration.md)，并可分别进入[蒸馏](generative-models/inference-acceleration/distillation.md)、[量化](generative-models/inference-acceleration/quantization.md)、[模型剪枝](generative-models/inference-acceleration/pruning.md)、[Token/注意力稀疏](generative-models/inference-acceleration/sparsity.md)、[缓存与复用](generative-models/inference-acceleration/caching.md)及[底层算子、并行与在线服务](generative-models/inference-acceleration/systems.md)综述；如何用多候选、验证器、轨迹搜索与临时适配把额外推理预算换成质量，见[Test-Time Scaling 专章](generative-models/test-time-scaling.md)；fixed-long、length extrapolation、open-horizon、长期记忆与随时间退化的证据见[长视频生成专章](generative-models/long-video-generation.md)；SFT、reward model、DPO/RWR、policy-gradient RL、推理期 guidance 与蒸馏的边界见[视频后训练与对齐专章](generative-models/video-post-training-alignment.md)；在线生成的暴露偏移、缓存、commit 和 SLO 见[因果、流式与实时专章](generative-models/causal-streaming-generation.md)。
 
-## 1. 一张图看懂五个交叉分类轴
+## 1. 方法分类总览
 
 ![视频生成五轴结构图：Representation、Factorization、Objective、Backbone 和 Deployment 五个交叉分类维度汇入 Configured Video Generator，再由系统的具体能力主张决定应报告画质、NFE、首帧延迟、deadline、漂移或控制证据；下方以 NOVA、Pyramidal Flow、CausVid 和 StreamDiffusionV2 说明受兼容约束的多轴组合。](../assets/diagrams/video-generation-five-axis-map.png)
 
-**图 1：系统不是单标签，claim 也不能脱离证据。** 图中示例只说明组合关系，不代表性能排序。生成图中的虚线用于提示代表系统；下面的 Mermaid 给出确定性连接和可搜索文字。
+**图 1：系统不是单标签，claim 也不能脱离证据。** 图中示例只说明组合关系，不代表性能排序。生成图中的虚线用于提示代表系统；下面的 流程图及文字说明 给出确定性连接和可搜索文字。
 
 ![图 008：视频生成系统的五个交叉分类轴](../assets/imagegen-diagrams/008/diagram.png)
 顺序化文字替代：先确定生成变量是像素、连续 latent 还是离散 token；再确定联合分布按全片、逐帧、逐 token、mask 块、尺度或因果 chunk 怎样分解；再选择 ELBO、adversarial、denoising/score、flow、consistency/DMD 或偏好目标；由 U-Net、DiT、decoder-only Transformer 或 recurrent/SSM 实现；最后才讨论离线、少步、流式或交互部署。系统声称什么，就必须提供对应的质量、NFE、TTFF、deadline、长期漂移或闭环控制证据。
 
-## 2. 五个分类轴的定义与组合
+## 2. 五个分类维度
 
 理解一个视频生成系统时，可以先分别回答下面五个问题，再把答案组合成完整配置。下表给出每个轴的定义、典型取值，以及它与其他轴的关系；后文将逐轴展开。
 
@@ -39,7 +45,7 @@
 | **分解（Factorization）** | 数据联合分布按什么条件顺序产生或补全？ | full-sequence joint、stepwise state、strict AR、masked/block、hierarchical、causal chunk | 描述数据依赖；每个条件分布可以采用不同训练目标 |
 | **目标（Objective）** | 参数通过什么统计信号学习？ | MLE/ELBO、adversarial、denoising/score、FM/RF、consistency/shortcut、DMD、preference/RL | 描述学习信号；网络实现和数据生成顺序由其他轴说明 |
 | **骨干（Backbone）** | 用什么网络实现条件映射、score 或速度场？ | 2D/3D U-Net、DiT、decoder Transformer、RNN/recurrent-state/SSM、dense/sparse/linear mixer、FFN/MoE | 负责具体计算，可承载多种表示、分解方式和训练目标 |
-| **部署（Deployment）** | 输出何时可见，系统受什么运行约束？ | offline multistep、few-step、preview、streaming、interactive、quantized/cached/pipelined | 描述运行合同，需要结合因果范围、采样步数和系统实测理解 |
+| **部署（Deployment）** | 输出何时可见，系统受什么运行约束？ | offline multistep、few-step、preview、streaming、interactive、quantized/cached/pipelined | 描述运行规格，需要结合因果范围、采样步数和系统实测理解 |
 
 VAE 在这套框架中常承担两种不同角色：一是用 ELBO 学习整个生成分布的潜变量模型；二是在现代视频系统中作为负责紧凑编码与解码的 tokenizer。后一种系统的上层 generator 可以使用 diffusion、flow、AR 或 DMD。若没有量化、概率模型、熵编码器与 bitstream，仅凭 latent shape 只能说明表示预算，不能说明实际码率压缩。因此，“使用 VAE”通常描述表示轴的一部分；完整系统还需要结合其余四轴理解 [[1]](#ref-1)。两种角色分别见[变分生成](generative-models/variational-generation.md)与[视频 Tokenizer](generative-models/video-tokenizers.md)。
 
@@ -51,7 +57,9 @@ VAE 在这套框架中常承担两种不同角色：一是用 ELBO 学习整个�
 
 顺序化文字替代：连续路线是 `pixel → causal 3D VAE → continuous latent → joint 或 frame/chunk factorization → diffusion/flow head → decode`；离散自回归路线是 `pixel → VQ/LFQ/BSQ → token IDs → strict 或 grouped AR → categorical CE → decode`；masked 路线从部分 mask 开始，经双向预测、置信度选择和提交，再把不确定位置 remask，循环到完整。这三种配置用于展示五个轴怎样组合；具体系统仍需分别说明表示、分解、训练 head 与部署证据。
 
-## 3. 第一轴：Representation——模型到底生成什么
+<a id="3-representation"></a>
+
+## 3. 视频表示
 
 ### 3.1 Pixel space
 
@@ -96,9 +104,11 @@ VQ 类 tokenizer 将 encoder 输出映射到有限 codebook，生成器可使用
 
 Sora 报告在压缩 latent 上切 spacetime patches，再由 Transformer diffusion 建模 [[18]](#ref-18)。Patchification 是把连续张量组织成 Transformer 输入单元；除非前置 tokenizer 真的量化到有限 codebook，否则不能写成“离散视觉 token”。
 
-同理，**causal VAE**只表示 tokenizer 在时间上不偷看未来，便于在线编码或解码；它不证明上层生成器 causal，更不证明端到端 streaming。首帧、padding、chunk 与 cache 的详细合同见[视频 Tokenizer 专章](generative-models/video-tokenizers.md)。
+同理，**causal VAE**只表示 tokenizer 在时间上不偷看未来，便于在线编码或解码；它不证明上层生成器 causal，更不证明端到端 streaming。首帧、padding、chunk 与 cache 的详细规格见[视频 Tokenizer 专章](generative-models/video-tokenizers.md)。
 
-## 4. 第二轴：Factorization——联合分布怎样被拆开
+<a id="4-factorization"></a>
+
+## 4. 联合分布分解
 
 为避免符号冲突，本章用 $k$ 表示**视频数据时间**，用 $\tau$ 表示**噪声或运输时间**。
 
@@ -146,9 +156,11 @@ p(X_j\mid X_{<j},c),
 
 CausVid、Self Forcing 与 Separable Causal Diffusion 分别从蒸馏、自生成历史和“时间推理与迭代去噪解耦”推进这一分支 [[23]](#ref-23) [[24]](#ref-24) [[26]](#ref-26)。这些论文中的 causal 首先表示不访问未来帧，不能自动升级为干预正确或物理因果理解。
 
-实现时还要把四层合同拆开：causal codec → causal generator → streaming commit → real-time SLO；任一层成立都不自动推出下一层。首帧与 chunk codec 细节见[视频 Tokenizer](generative-models/video-tokenizers.md)，commit、backpressure、open-horizon 与反证实验见[因果流式专章](generative-models/causal-streaming-generation.md)。
+实现时还要把四层规格拆开：causal codec → causal generator → streaming commit → real-time SLO；任一层成立都不自动推出下一层。首帧与 chunk codec 细节见[视频 Tokenizer](generative-models/video-tokenizers.md)，commit、backpressure、open-horizon 与反证实验见[因果流式专章](generative-models/causal-streaming-generation.md)。
 
-## 5. 第三轴：Objective——模型用什么统计信号学习
+<a id="5-objective"></a>
+
+## 5. 训练目标
 
 ### 5.1 Likelihood、ELBO 与 stochastic latent
 
@@ -164,9 +176,9 @@ D_{\mathrm{KL}}
 \left(q_\phi(z\mid x)\Vert p(z)\right).
 ```
 
-用于未知未来时，信息合同变成 $q_\phi(z\mid h,y,c)$ 在训练可见真实未来 $y$，而部署 $p_\psi(z\mid h,c)$ 只能见历史与合法条件；固定 prior 是后者的特例。若测试仍使用 posterior，结果只能算 oracle，不能代表部署生成。
+用于未知未来时，信息规格变成 $q_\phi(z\mid h,y,c)$ 在训练可见真实未来 $y$，而部署 $p_\psi(z\mid h,c)$ 只能见历史与合法条件；固定 prior 是后者的特例。若测试仍使用 posterior，结果只能算 oracle，不能代表部署生成。
 
-它显式平衡重建与 latent prior，但会面对 posterior collapse、近似/摊销误差、prior–posterior gap 和时间 latent 未被利用。SVG-LP 用 history-conditioned learned prior 建模多模态未来，是 stochastic video prediction 的重要里程碑 [[1]](#ref-1) [[4]](#ref-4)。之后的路线分别增加 deep/clockwork hierarchy、fully latent residual dynamics、object/module structure 与 categorical RSSM；到 2026 又出现对象粒子 + latent action 的显式变分 world-model 接口。完整的 2015–2026 谱系、best-of-K 反例与 `LatentFork-1` 见[变分生成专章](generative-models/variational-generation.md)。
+它显式平衡重建与 latent prior，但会面对 posterior collapse、近似/摊销误差、prior–posterior gap 和时间 latent 未被利用。SVG-LP 用 history-conditioned learned prior 建模多模态未来，是 stochastic video prediction 的重要里程碑 [[1]](#ref-1) [[4]](#ref-4)。之后的路线分别增加 deep/clockwork hierarchy、fully latent residual dynamics、object/module structure 与 categorical RSSM；到 2026 又出现对象粒子 + latent action 的显式变分 world-model 接口。完整的 2015–2026 谱系、best-of-K 反例与 潜变量对照实验 见[变分生成专章](generative-models/variational-generation.md)。
 
 ### 5.2 Adversarial objective
 
@@ -208,9 +220,11 @@ DMD 的核心是 distribution matching：用 target score 与 fake/student score
 
 偏好优化可以作用于已有 diffusion/flow generator，用人评、VLM、程序约束或 task reward 改变输出分布。它属于后训练 objective；不能从“用了 RL/DPO”推出 foundation objective 已改变，也不能用训练 reward 直接兼任最终裁判。
 
-这一行标签仍不够描述完整系统：SFT 改变条件遵循的初始化，reward model 把人评或程序信号压缩为训练信号，DPO/RWR 使用离线或在线偏好，policy-gradient 方法还要处理采样轨迹和信用分配，推理期 reward guidance 则不更新基础模型。Consistency/DMD 主要改变采样映射或学生分布，也不能因为和 reward 同训就自动归为“对齐”。完整的目标、数据、反馈时点、reference policy、训练成本、reward hacking 与独立验收合同见[视频后训练与对齐专章](generative-models/video-post-training-alignment.md)。
+这一行标签仍不够描述完整系统：SFT 改变条件遵循的初始化，reward model 把人评或程序信号压缩为训练信号，DPO/RWR 使用离线或在线偏好，policy-gradient 方法还要处理采样轨迹和信用分配，推理期 reward guidance 则不更新基础模型。Consistency/DMD 主要改变采样映射或学生分布，也不能因为和 reward 同训就自动归为“对齐”。完整的目标、数据、反馈时点、reference policy、训练成本、reward hacking 与独立验收规格见[视频后训练与对齐专章](generative-models/video-post-training-alignment.md)。
 
-## 6. 第四轴：Backbone——谁来实现条件映射
+<a id="6-backbone"></a>
+
+## 6. 骨干网络
 
 | Backbone | 典型用法 | 优点 | 主要边界 |
 |---|---|---|---|
@@ -221,9 +235,11 @@ DMD 的核心是 distribution matching：用 target score 与 fake/student score
 | Recurrent / SSM | causal chunk、压缩状态 | 内存可控、适合持续输出 | 状态遗忘、暴露偏移、难以回改过去 |
 | FFN/MoE 与 hybrid mixer | 模态、噪声阶段或 token 的容量分工 | total/active parameters 可分；选择性保留昂贵交互 | 路由轴必须写清；不是所有“expert”都有稀疏路由 |
 
-“DiT 模型”“Transformer diffusion”“flow Transformer”不是同一层标签。DiT 只说明 backbone；它可以承载 denoising、score、FM、RF、consistency 或其他目标。更重要的是，Video DiT 也不是单一实现：full、factorized、window、sparse、linear、recurrent 与 hybrid mixer 的连边、复杂度和证据合同不同；完整 token 账、融合、位置、MoE、并行、缓存及 `BackboneFork-1`/`ServeFork-1` 见[专章](generative-models/video-dit-backbones.md)。
+“DiT 模型”“Transformer diffusion”“flow Transformer”不是同一层标签。DiT 只说明 backbone；它可以承载 denoising、score、FM、RF、consistency 或其他目标。更重要的是，Video DiT 也不是单一实现：full、factorized、window、sparse、linear、recurrent 与 hybrid mixer 的连边、复杂度和验证要求不同；完整 token 账、融合、位置、MoE、并行、缓存及 骨干结构对照实验/固定检查点执行对照实验 见[专章](generative-models/video-dit-backbones.md)。
 
-## 7. 第五轴：Deployment——离线、少步、流式和实时不是同义词
+<a id="7-deployment"></a>
+
+## 7. 部署方式
 
 | 声明 | 最低操作定义 | 必须报告 | 不能偷换成 |
 |---|---|---|---|
@@ -235,16 +251,18 @@ DMD 的核心是 distribution matching：用 target score 与 fake/student score
 
 StreamDiffusionV2 把 TTFF、逐帧 deadline、jitter、SLO-aware batching 和多 GPU pipeline 纳入正式系统评测；论文在 4×H100 的特定设置中报告首帧不超过约 0.5 秒等结果，这些数字不能脱离硬件、模型、分辨率、NFE 和精度外推 [[27]](#ref-27)。
 
-开放时长也必须拆成固定长片、测试长度外推、启动时未知终点和恒定资源架构四层。程序能继续调用 sampler，只证明没有主动停止；只有 quality–time/survival curve、resident/外存斜率、EOS/reset 语义和失败样本，才能判断内容与系统是否真的支持 open horizon。完整方法谱系、五道证据门与 `LongHorizon-1` 建议实验见[长视频生成专章](generative-models/long-video-generation.md)。
+开放时长也必须拆成固定长片、测试长度外推、启动时未知终点和恒定资源架构四层。程序能继续调用 sampler，只证明没有主动停止；只有 quality–time/survival curve、resident/外存斜率、EOS/reset 语义和失败样本，才能判断内容与系统是否真的支持 open horizon。完整方法谱系、五道证据门与 长时域稳定性实验 建议实验见[长视频生成专章](generative-models/long-video-generation.md)。
 
-## 8. 两个时间轴不能混用
+## 8. 视频时间与生成迭代
 
 最常见的概念错误，是把视频帧时间 $k$ 与去噪/运输时间 $\tau$ 混成一个 $t$。下图右侧的 $\tau$ 链只适用于采用 diffusion、flow 或 consistency 条件头的分支；纯分类式 CE 或其他条件头不会进入这条噪声时间链。
 
 ![图 009：视频时间与噪声时间的双时钟](../assets/imagegen-diagrams/009/diagram.png)
 顺序化文字替代：factorization 先决定当前要生成第 $k$ 帧、一个 token、一个 chunk 或一个 mask 块；若条件分布采用 diffusion/flow，内部再沿 $\tau$ 从 base noise 走到样本；样本被 commit 后才进入下一个数据时间。因而“autoregressive diffusion”通常是 data-time AR 与 noise-time denoising 的组合，不是一个神秘的第三时钟。
 
-## 9. 2023–2026 的关键里程碑应该怎样读
+<a id="9-20232026"></a>
+
+## 9. 代表方法
 
 | 时间 / 工作 | 五轴配置摘要 | 真正推进 | 证据边界 |
 |---|---|---|---|
@@ -268,7 +286,7 @@ StreamDiffusionV2 把 TTFF、逐帧 deadline、jitter、SLO-aware batching 和�
 2. **2025：objective 与数据时间交叉。** Flow 可配时间金字塔，diffusion loss 可作为 AR 条件头，DMD 可蒸馏 causal student。
 3. **2026：few-step 与部署证据分开。** 目标函数继续稳定化，系统论文开始报告 TTFF、deadline、jitter 和多 GPU pipeline。
 
-## 10. 如何判定一个新模型应该放在哪里
+## 10. 模型分类示例
 
 按以下顺序读论文，不要从标题猜家族：
 
@@ -322,7 +340,7 @@ evidence:
   known_limitations:
 ~~~
 
-## 11. 常见误区
+## 11. 常见问题
 
 - **“AR 就是离散 VQ + 交叉熵。”** AR 是条件分解；变量和条件分布都可以连续。
 - **“Masked 与 AR 永远互斥。”** 窄义 strict token AR 不同于 masked iterative；广义 next-set 文献会把后者称为 masked AR，必须声明定义。
@@ -337,7 +355,7 @@ evidence:
 - **“VAE 分数高，最终视频就不会坏。”** codec 只给上限；generator、sampler、conditioning 和后处理仍会失败。
 - **“最新论文的作者速度就是平台能力。”** 速度必须绑定硬件、模型大小、精度、分辨率、时长、NFE、并发和统计口径。
 
-## 12. 页面分工与阅读顺序
+## 12. 专题索引
 
 | 页面 | 负责回答 | 不应承担 |
 |---|---|---|
@@ -354,7 +372,7 @@ evidence:
 | [压缩与推理加速综述导航](generative-models/inference-acceleration.md) | 从 NFE、单次前向、bit/访存、复用、kernel 和并行分析端到端成本，并链接至六篇独立综述 | 把 FLOPs、kernel、DiT-only、E2E 或多卡倍数混报；相乘不同论文倍数 |
 | [Test-Time Scaling](generative-models/test-time-scaling.md) | 多候选、轨迹搜索、验证器、临时适配、自适应预算与质量—成本曲线 | 把精选最好样例、oracle、更多 NFE 或同 reward 自证写成基础模型能力提升 |
 | [长视频生成](generative-models/long-video-generation.md) | fixed-long、length extrapolation、open-horizon、整段/分层/滑窗/滚动路线、长期状态与资源曲线 | 把可继续采样、精选最长演示、流式或多镜头自动写成长期稳定 |
-| [因果、流式与实时](generative-models/causal-streaming-generation.md) | codec→generator→commit→SLO 合同、自生成历史、KV/cache、lookahead、backpressure 与恢复 | 把低 NFE、因果 mask 或长 demo 自动写成实时；重复长视频方法总览 |
+| [因果、流式与实时](generative-models/causal-streaming-generation.md) | codec→generator→commit→SLO 规格、自生成历史、KV/cache、lookahead、backpressure 与恢复 | 把低 NFE、因果 mask 或长 demo 自动写成实时；重复长视频方法总览 |
 
 推荐先读本章，再按 representation 进入[视频 Tokenizer](generative-models/video-tokenizers.md)，按 objective 进入变分、Diffusion 或 Flow/Consistency，按 backbone 进入[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)；分析实际部署问题时，先进入[压缩与推理加速综述导航](generative-models/inference-acceleration.md)，再按瓶颈选择蒸馏、量化、剪枝、稀疏、缓存或系统专题；随后根据 factorization 去读 AR、masked 或 causal streaming。最后回到[大模型系统路线](foundation-models.md)、[评测指南](evaluation.md)和[World Models](world-models.md)，检查能力 claim 是否真的由对应证据支持。
 

@@ -1,14 +1,19 @@
-# 视频基础模型：从数据引擎到可审计生成系统
+# 视频基础模型系统
 
-> **资料冻结：2026-08-30。** 本章把论文机制、单个 checkpoint、模型家族、产品系统和托管 API 分开陈述。动态开放状态均以该日期的官方仓库、模型卡、许可证或产品页为准；作者 benchmark 和产品能力不是独立复现结论。
+介绍数据处理、视频表示、生成器、后训练和服务部署的组成及接口。
+
+**前置知识：** 生成模型分类、视频表示。
+
+**使用步骤：** 明确模型与系统边界 → 逐项检查数据、权重和推理配置 → 在固定输出规格下验证质量、显存和时延。
+
 
 视频基础模型不是“一个更大的 T2V 网络”，而是一条可复用、可后训练、可部署且可审计的链：数据治理产生训练语料，captioner 把视觉事实和创作语言对齐，tokenizer 决定学习空间，generator 学习条件分布，后训练与蒸馏改变行为和成本，超分、插帧、音频、安全及 API 再把 checkpoint 变成服务。Foundation model 的判据是广泛预训练后可跨任务适配，而非固定参数门槛 [[1]](#ref-1)。若问题是“模型会什么”，先读[基础模型能力地图](foundation-model-capabilities.md)：物理一致性属于能力，后训练属于能力获得方式，可适配性才是相应的元能力。
 
-本章回答“一个视频基础模型系统怎样成立、证据应归因给哪一层”。表示、factorization、objective、backbone 与 deployment 的正交机制见[生成模型路线](generative-models.md)，其中连续 latent、离散 token、量化与生成式压缩的表示合同见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)，Video DiT 的 token 预算、attention topology、条件融合、3D 位置、noise-time MoE、并行与 cache 见[骨干扩展专章](generative-models/video-dit-backbones.md)，fixed-long、length extrapolation、open-horizon 与长期退化见[长视频生成](generative-models/long-video-generation.md)，causal codec→generator→commit→SLO 的部署合同见[因果、流式与实时](generative-models/causal-streaming-generation.md)；SFT/reward/DPO/RL 的细分见[视频后训练与对齐](generative-models/video-post-training-alignment.md)，相机/轨迹/姿态/几何条件见[细粒度可控生成](tasks/controllable-video-generation.md)，相机 × 世界时间、多视角网格与可渲染动态状态见[多视角与 4D](tasks/multiview-4d-generation.md)，联合声画合同见[原生音视频生成](tasks/native-audio-video-generation.md)，逐年节点见[技术时间线](timeline.md)，动作条件、状态与规划证据见[World Model 专章](world-models.md)。
+本章回答“一个视频基础模型系统怎样成立、证据应归因给哪一层”，不再兼任能力 taxonomy。表示、factorization、objective、backbone 与 deployment 的正交机制见[生成模型路线](generative-models.md)，其中连续 latent、离散 token、量化与生成式压缩的表示规格见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)，Video DiT 的 token 预算、attention topology、条件融合、3D 位置、noise-time MoE、并行与 cache 见[骨干扩展专章](generative-models/video-dit-backbones.md)，fixed-long、length extrapolation、open-horizon 与长期退化见[长视频生成](generative-models/long-video-generation.md)，causal codec→generator→commit→SLO 的部署规格见[因果、流式与实时](generative-models/causal-streaming-generation.md)；SFT/reward/DPO/RL 的细分见[视频后训练与对齐](generative-models/video-post-training-alignment.md)，相机/轨迹/姿态/几何条件见[细粒度可控生成](tasks/controllable-video-generation.md)，相机 × 世界时间、多视角网格与可渲染动态状态见[多视角与 4D](tasks/multiview-4d-generation.md)，联合声画规格见[原生音视频生成](tasks/native-audio-video-generation.md)，逐年节点见[技术时间线](timeline.md)，动作条件、状态与规划证据见[World Model 专章](world-models.md)。
 
 智能体如何在生成工具之上组织规划、检查和返工，见 [Agentic Video Generation](agentic-video-generation.md)；该章区分制作系统收益与基础模型能力。
 
-## 1. 先固定研究对象与证据单位
+## 1. 模型与系统边界
 
 同一产品名常同时指模型、模型家族和服务。比较之前必须先固定实体，否则“支持 2K”“原生音频”或“已开源”都可能错误落到一个 checkpoint 上。
 
@@ -28,10 +33,12 @@
 因此，本章使用“Paper / Artifact / Service”三条证据线：
 
 1. **Paper**：正式会议论文优先，其次为预印本或技术报告；只支持其中明确实验过的机制与结果。
-2. **Artifact**：官方仓库、模型卡、权重清单、变更日志与许可证；决定实际 release surface。
+2. **Artifact**：官方仓库、模型卡、权重清单、变更日志与许可证；决定实际 发布内容。
 3. **Service**：官方产品页、API 文档和系统卡；决定托管能力，但不反推单个开放权重。
 
-## 2. 端到端闭环：checkpoint 只是中间件
+<a id="2-checkpoint"></a>
+
+## 2. 系统组成与数据流
 
 ![图 006：视频基础模型从数据治理到服务审计的端到端闭环](../assets/imagegen-diagrams/006/diagram.png)
 图的顺序文字替代：
@@ -54,11 +61,11 @@
 4. 对 generator 做后训练与加速；只有所选蒸馏方法需要时才使用训练期判别器反馈。
 5. 解码并按需做超分、插帧或音频同步；decoder 的 adversarial loss 是重建目标，不是 rollout 机制。
 6. 在安全与 provenance 控制后部署，同时报告质量和系统证据。
-7. 归因产品能力前，逐项审计 release surface 与 checkpoint 边界。
+7. 归因产品能力前，逐项审计 发布内容 与 checkpoint 边界。
 
 SkyReels-V2 披露了较完整的实例：切镜与多级过滤、去重、专家 caption 蒸馏、渐进预训练、概念均衡 SFT、运动偏好优化、Diffusion Forcing 和高质量 SFT [[2]](#ref-2)。Open-Sora 2.0 报告了数据金字塔、多过滤器、多源 caption、Video DC-AE、flow matching 与蒸馏初始化 [[3]](#ref-3)。Cosmos 则把数据 curator、tokenizer、生成模型、后训练与 guardrail 放进 Physical AI 平台 [[4]](#ref-4)。这些是一手系统报告，不意味着三者公开了相同的数据、权利清单或可复训程度。
 
-## 3. 数据引擎：质量、覆盖与可追责同时优化
+## 3. 训练数据处理
 
 原始视频越多不等于训练集越好。视频数据引擎至少同时优化四个目标：法律与伦理可用性、视觉/运动质量、条件可学习性、分布覆盖。只公开过滤阈值而不公开数据版本、去重范围和切分策略，仍无法复核污染或复现训练。
 
@@ -76,7 +83,9 @@ captioner 不是中性标注工具，而是第二个学习系统。SkyReels-V2 �
 
 数据集与现成 benchmark 入口见[数据集索引](../resources/datasets.md)。产品验收还需增加权利删除回放：删除一个来源后，应能定位受影响 shard、训练 run、adapter 和已发布版本，而不只是从搜索页面移除链接。
 
-## 4. Tokenizer 与 generator：表示瓶颈决定上限
+<a id="4-tokenizer-generator"></a>
+
+## 4. 视频表示与生成器
 
 视频系统通常不在像素域直接生成，而先编码为离散或连续时空 latent。VQ-VAE 建立了离散视觉 code 的基础 [[5]](#ref-5)；MAGVIT 将 masked video token 建模扩展为多任务生成 [[6]](#ref-6)，VideoPoet 又把文本、图像、视频与音频 token 放入自回归多模态序列 [[7]](#ref-7)。另一条主流路线使用连续 VAE latent、DiT 与 diffusion/flow；CogVideoX 是公开研究中的代表 [[8]](#ref-8)。
 
@@ -92,7 +101,9 @@ tokenizer 的验收必须同时覆盖：静态纹理、快速运动、镜头切�
 
 架构命名也不能替代机制分解。例如 Wan2.2-A14B 的 MoE 专家按去噪时间 $\tau$ 阶段路由，而 TI2V-5B 使用更紧凑的 VAE 表示；两者属于同一产品家族，但不是同一 checkpoint 的两个开关 [[11]](#ref-11)。Expert AdaLN、MMDiT/dual→single stream 和 noise-time MoE 也分别属于模态归一化、条件融合与专家路由，不能因都出现“expert/stream”就合并。详细五轴分类与公式见[生成模型路线](generative-models.md)，表示层的量化与 codec 边界见[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)，骨干内部与执行层分账见[Video DiT 专章](generative-models/video-dit-backbones.md)。
 
-## 5. 从基础 checkpoint 到模型家族：行为、成本与输出形态来自不同层
+<a id="5-checkpoint"></a>
+
+## 5. 后训练与模型配置
 
 ### 5.1 后训练与偏好优化
 
@@ -129,9 +140,11 @@ tokenizer 的验收必须同时覆盖：静态纹理、快速运动、镜头切�
 
 “接受音频参考”“输出有声音”和“原生联合生成”是三个不同声明。评测应同时做语义对应、毫秒级事件同步、说话人/场景身份、长时连续、音频伪影以及仅改变一模态条件的干预测试。
 
-这三类 factorization、跨模态信息交换位置、音视频 codec/噪声时钟、streaming memory、产品发布面与可证伪干预见[原生音视频生成专章](tasks/native-audio-video-generation.md)。
+这三类 factorization、跨模态信息交换位置、音视频 codec/噪声时钟、streaming memory、产品发布内容与可证伪干预见[原生音视频生成专章](tasks/native-audio-video-generation.md)。
 
-## 6. 从 checkpoint 到 API：能力归因与治理
+<a id="6-checkpoint-api"></a>
+
+## 6. 服务接口与部署
 
 ![图 007：产品能力到可下载权重的归因边界](../assets/imagegen-diagrams/007/diagram.png)
 图的顺序文字替代：
@@ -145,11 +158,13 @@ API 验收还应冻结 endpoint、模型版本、seed 语义、上传/保留政�
 
 安全不是末端单一过滤器。最低链路包括数据权利与人物同意、输入政策、训练去记忆/去污染、输出分类与身份风险、红队、申诉/撤回、可追踪版本和事故响应。C2PA 2.4 可签名记录内容来源和编辑链，但它证明的是声明与资产的加密绑定，不证明画面中的事件为真；缺少 Content Credentials 也不等于内容为假 [[23]](#ref-23)。
 
-## 7. 代表系统的机制与 release surface
+<a id="7-release-surface"></a>
+
+## 7. 代表系统
 
 下表是截至 2026-08-30 的逐实体快照。“开放权重”不等于完整预训练可复现；仓库许可证、模型权重许可证与托管服务条款也可能不同。
 
-| 实体（单位） | 机制或系统增量 | 2026-08-30 官方发布面 | 不能归因或仍缺失 |
+| 实体（单位） | 机制或系统增量 | 2026-08-30 官方发布内容 | 不能归因或仍缺失 |
 |---|---|---|---|
 | LTX-Video（家族） [[24]](#ref-24) [[40]](#ref-40) | 高压缩时空 VAE、DiT、蒸馏与 IC-LoRA；主开发已迁往 LTX-2 | Apache-2.0 仓库；2B/13B 变体、推理、训练/LoRA 与 upscaler 资产按版本列出 | 旧仓库状态不能代表 LTX-2.5 |
 | LTX-2 / 2.5（家族+管线） [[19]](#ref-19) [[25]](#ref-25) | 22B 联合音视频主干；Gemma 4 投影、视频/音频 VAE、upscaler、DFR、关键帧和训练包由编排组合 | 代码、若干权重、LoRA/全参训练工作流、本地 pipeline 与官方 API；v1.3.0 为 2026-08-25 | 2.5 采用自定义社区许可证；年收入不低于 1000 万美元的 Commercial Entity 进行商业使用时须另购许可，纯非商业用途仍可依协议第 2.2 节使用。4K 是 DFR 系统能力 [[26]](#ref-26) |
@@ -170,7 +185,9 @@ API 验收还应冻结 endpoint、模型版本、seed 语义、上传/保留政�
 
 这张表故意不比较官方分数：不同数据、提示集、样本数、NFE、分辨率和人工评测协议下的“领先”不可直接排序。需要横向结论时，应在同一 harness 重跑，并报告置信区间、失败样本和系统成本。
 
-## 8. 2026 前沿：正在改变哪一层
+<a id="8-2026"></a>
+
+## 8. 近期方法
 
 | 方向 | 2026 信号 | 需要的确认 |
 |---|---|---|
@@ -182,7 +199,7 @@ API 验收还应冻结 endpoint、模型版本、seed 语义、上传/保留政�
 
 这些方向多数仍以预印本、技术报告或官方 release 为主。2026 的“前沿”表示证据新、系统影响大，不表示已经通过多年同行检验。
 
-## 9. 系统成熟度与发布面：进入下一阶段的判据与未解决项
+## 9. 发布与部署条件
 
 | 里程碑 | 通过判据 | 仍未解决 |
 |---|---|---|
@@ -198,7 +215,7 @@ API 验收还应冻结 endpoint、模型版本、seed 语义、上传/保留政�
 
 M0–M7 不是按年份自动升级：一个闭源产品可能先达到系统部署而缺少开放复现，一个开放 checkpoint 可能达到 M2/M3 却没有产品安全与 SLO。
 
-## 10. 详细验收矩阵
+## 10. 系统检查表
 
 | 层 | 必须冻结 | 核心测试 | 拒绝该声明的条件 |
 |---|---|---|---|
@@ -222,7 +239,7 @@ M0–M7 不是按年份自动升级：一个闭源产品可能先达到系统部
 
 完整生成预算、人工评测、统计单位与置信区间见[评测指南](evaluation.md)。任何比较报告都应同时交付输入 manifest、实际输出、失败样本、环境锁定文件和 release-surface 快照。
 
-## 11. 最小阅读路径
+## 11. 延伸阅读
 
 1. 先读第 1、2 节，建立“checkpoint ≠ family ≠ product ≠ API”的证据单位。
 2. 再读第 3–6 节，沿数据→caption→tokenizer→generator→post-train→部署→治理追踪因果链。
@@ -230,6 +247,11 @@ M0–M7 不是按年份自动升级：一个闭源产品可能先达到系统部
 4. 用第 9、10 节设计验收；表示与 codec 转到[视频 Tokenizer 与生成式压缩](generative-models/video-tokenizers.md)，生成机制总图转到[生成模型路线](generative-models.md)，block/attention/MoE/并行与 cache 转到[Video DiT 与骨干扩展](generative-models/video-dit-backbones.md)，长度外推/长期状态/资源曲线转到[长视频生成](generative-models/long-video-generation.md)，commit/backpressure/SLO 转到[因果、流式与实时](generative-models/causal-streaming-generation.md)，行为优化转到[视频后训练与对齐](generative-models/video-post-training-alignment.md)，创作控制转到[细粒度可控生成](tasks/controllable-video-generation.md)，相机—时间网格与可渲染状态转到[多视角与 4D](tasks/multiview-4d-generation.md)，动作与规划声明转到[World Model 专章](world-models.md)。
 
 本章的检索、筛选、证据分级和 release-surface 逐项记录见[研究日志](../sources/research_20260830_video_foundation_models.md)。
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 

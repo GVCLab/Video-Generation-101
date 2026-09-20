@@ -1,10 +1,16 @@
-# 数字人视频生成：任务边界、条件契约与可审计评测
+# 数字人与说话人物生成
+
+介绍音频驱动、动作驱动和联合音视频人物生成的表示、训练与评价。
+
+**前置知识：** 条件视频生成、音频基础。
+
+**使用步骤：** 明确驱动信号和人物输出范围 → 配置身份、动作和声音条件 → 评价同步、身份、自然度及长时稳定性。
 
 “数字人”不是一个单一任务。只改嘴形、从单张照片生成说话头像、用姿态驱动全身、让模型同时生成声音和画面，以及跨镜头保持同一角色，所需输入、可辨识信息和验收标准都不同。把它们混成一个排行榜，会把“声音驱动”“运动复制”“身份保持”和“视频叙事”四种能力错误地归给同一模型。
 
-本文冻结于 **2026-08-30**。时间、venue 和 release surface 以论文初版、正式 proceedings、官方项目页与官方仓库交叉核验；未公开代码或权重不等于不可研究，但不应写成“开源”。检索式、证据分级和逐项审计见[研究日志](../../sources/research_20260830_digital_human.md)。
+本章冻结于 **2026-08-30**。时间、venue 和 发布内容 以论文初版、正式 proceedings、官方项目页与官方仓库交叉核验；未公开代码或权重不等于不可研究，但不应写成“开源”。检索式、证据分级和逐项审计见[研究日志](../../sources/research_20260830_digital_human.md)。
 
-## 1. 先判断到底是哪一个任务
+## 1. 任务分类
 
 ### 1.1 七类任务不能互换
 
@@ -27,11 +33,11 @@
 
 TalkCuts 收集剪切后的说话人物片段，并提供文字、2D 关键点和 3D SMPL-X 等标注；正式记录是 NeurIPS 2025 Datasets & Benchmarks [[26]](#ref-26)。官方仓库称数据规模约 164,000 个片段、500 小时和 10,000 余身份，但访问需申请，数据许可限定研究/非商业用途并禁止再分发 [[27]](#ref-27)。因此它可以支持单镜头、镜头切换与人体动作研究，却不能仅凭数据集名称证明某方法会规划多镜头。
 
-## 2. 一个可复现的生成合同
+## 2. 输入输出规格
 
 ![身份参考、驱动音频、姿态表情和场景镜头必须先经过授权与用途检查，再依次做时间轴对齐、条件融合、音视频生成与分轴验收；授权失败时停止处理。](../../assets/diagrams/digital-human-condition-sync-contract.png)
 
-**图 1：条件与同步合同的最短主链。** 授权门不能被模型调用绕过；通过后，输入才进入统一时间轴。最终验收必须拆成口型同步、身份保持、动作节奏和音画完整，而不是用一个“数字人质量分”掩盖不同失败。
+**图 1：条件与同步规格的最短主链。** 授权门不能被模型调用绕过；通过后，输入才进入统一时间轴。最终验收必须拆成口型同步、身份保持、动作节奏和音画完整，而不是用一个“数字人质量分”掩盖不同失败。
 
 ### 2.1 条件、时间轴与输出
 
@@ -65,16 +71,16 @@ L_{\mathrm{total}}=L_{\mathrm{lookahead}}+L_{\mathrm{compute}}+L_{\mathrm{buffer
 
 ### 2.2 同步、身份与授权不是一句“保持一致”
 
-完整合同至少声明：
+完整规格至少声明：
 
-1. **同步合同**：音频重采样、静音处理、声画起点、允许的全局偏移 $\delta$、是否校准显示/编码延迟、是否允许未来帧。
-2. **身份合同**：参考图数量、视角覆盖、是否允许美化/年龄变化、脸外的发型、服装和身体比例是否属于身份约束。
-3. **运动合同**：动作来自音频、文本、随机采样还是外部 pose；若混合，报告各条件的优先级与冲突处理。
-4. **镜头合同**：单镜头还是多镜头；切镜时身份、服装、道具、空间方向和音频连续性分别如何继承。
+1. **同步规格**：音频重采样、静音处理、声画起点、允许的全局偏移 $\delta$、是否校准显示/编码延迟、是否允许未来帧。
+2. **身份规格**：参考图数量、视角覆盖、是否允许美化/年龄变化、脸外的发型、服装和身体比例是否属于身份约束。
+3. **运动规格**：动作来自音频、文本、随机采样还是外部 pose；若混合，报告各条件的优先级与冲突处理。
+4. **镜头规格**：单镜头还是多镜头；切镜时身份、服装、道具、空间方向和音频连续性分别如何继承。
 5. **授权合同**：谁授权了身份与声音、允许的用途与期限、如何撤回、生成物如何标识和追踪。
 
-![图 048：从授权输入到可审计数字人输出的合同链](../../assets/imagegen-diagrams/048/diagram.png)
-## 3. 音频到底能告诉模型什么
+![图 048：从授权输入到可审计数字人输出的规格链](../../assets/imagegen-diagrams/048/diagram.png)
+## 3. 音频条件
 
 语音不是动作的完整剧本。给定同一句音频，可以点头、摇头、静止或做许多同样合理的手势；因此除嘴形外，许多视觉变量是**一对多**的。单个参考视频只展示一种选择，不等于唯一真值。
 
@@ -92,7 +98,7 @@ L_{\mathrm{total}}=L_{\mathrm{lookahead}}+L_{\mathrm{compute}}+L_{\mathrm{buffer
 - **手势不能只对单一真值算逐帧距离**。还需测多样性、语义适切度、节奏一致性和人体可行性。
 - **情绪不能从声学标签直接推定**。MEAD 等受控情绪数据可用于比较，但演员表演、标签和真实情绪不是同一个变量 [[41]](#ref-41)。
 
-## 4. 技术路线：表示决定了模型容易守住什么
+## 4. 表示与生成方法
 
 | 路线 | 核心表示与控制 | 擅长 | 固有限制 |
 |---|---|---|---|
@@ -107,7 +113,7 @@ L_{\mathrm{total}}=L_{\mathrm{lookahead}}+L_{\mathrm{compute}}+L_{\mathrm{buffer
 
 这些路线不是互斥标签。系统常以 3DMM 提供可控运动，以 diffusion/DiT 合成细节，再用 2D warp 或 neural renderer 保留纹理；应报告真正参与训练和推理的组件，而不是只按 backbone 命名。
 
-## 5. 从“会动”到长时、全身和交互的时间线
+## 5. 代表工作
 
 早期 Video Rewrite 将新的音频与口型单元组合到已有视频 [[1]](#ref-1)；Synthesizing Obama 与 Deep Video Portraits 分别推动了高质量语音重定向和可控全头重演 [[2]](#ref-2), [[3]](#ref-3)。随后关键点/warp、3D 参数、NeRF、GAN 和 diffusion 逐渐把输入从已有视频放宽到单图，把输出从嘴部扩展到头肩和全身。
 
@@ -120,20 +126,20 @@ L_{\mathrm{total}}=L_{\mathrm{lookahead}}+L_{\mathrm{compute}}+L_{\mathrm{buffer
 | 2025 | Hallo2，ICLR 2025 [[18]](#ref-18)；Hallo3，CVPR 2025 [[19]](#ref-19) | 长时/分层音频肖像；文本与音频控制肖像 | 两者是后续独立工作，不能倒填为 Hallo v1 的 venue |
 | 2025-02-03 | OmniHuman-1，ICCV 2025 [[22]](#ref-22) | 单图 + 音频/姿态等条件的人体动画 | 官方项目页提供论文与演示，未链接研究代码或权重 [[23]](#ref-23) |
 | 2025-06-23 | OmniAvatar，arXiv 预印本；冻结日未核到正式 venue [[24]](#ref-24) | 音频驱动、可流式的肖像/半身视频 | 官方仓库提供代码及 Wan2.1 14B/1.3B LoRA/音频权重，Apache-2.0 [[25]](#ref-25) |
-| 2025-08-26 | OmniHuman-1.5，后发表于 ICLR 2026 Oral [[28]](#ref-28) | 强调语义与环境交互的音频驱动人体 | 正式论文与项目演示；与 OmniHuman-1 的 release surface 分开记录 |
+| 2025-08-26 | OmniHuman-1.5，后发表于 ICLR 2026 Oral [[28]](#ref-28) | 强调语义与环境交互的音频驱动人体 | 正式论文与项目演示；与 OmniHuman-1 的 发布内容 分开记录 |
 | 2025-10-08 | TalkCuts，NeurIPS 2025 Datasets & Benchmarks [[26]](#ref-26) | 数据集：说话人物剪切、姿态与 SMPL-X | 2025-12-14 宣布数据/代码；数据需申请且受非商业研究许可约束 [[27]](#ref-27) |
 | 2026 | StreamAvatar、InfinityHuman、AudioAvatar，CVPR 2026 [[29]](#ref-29), [[30]](#ref-30), [[31]](#ref-31) | 分别面向流式交互、长时音频全身、个性化全身 | 正式 CVF 论文；开源状态必须逐项目核验 |
 | 2026 | SpeakerVid-5M，ICLR 2026 [[32]](#ref-32) | 数据/benchmark：独白、倾听、双人和多轮对话 | 正式论文；报告约 5.2M clips、8,743+ 小时及 VidChatBench |
 
 ### 5.1 2026 年候选必须分开写“论文存在”和“资产可用”
 
-- **Hallo-Live**：arXiv 初版 2026-04-26；官方仓库提供推理、训练、合成 prompts 和阶段检查点，并标注 ACM Multimedia 2026 接收。冻结日尚未用正式 proceedings 独立核实该 venue，故正文仍以预印本 + 作者仓库记录 [[33]](#ref-33), [[34]](#ref-34)。
+- **Hallo-Live**：文本驱动的流式联合音视频人物生成，采用异步双流扩散和偏好引导蒸馏；不是仅以外部音频驱动肖像的模型。arXiv 初版 2026-04-26；官方仓库提供推理、训练、合成 prompts 和阶段检查点，并标注 ACM Multimedia 2026 接收。冻结日尚未用正式 proceedings 独立核实该 venue，故正文仍以预印本 + 作者仓库记录 [[33]](#ref-33), [[34]](#ref-34)。
 - **AptAvatar**：arXiv 初版 2026-07-27。仓库 checklist 与正文对权重状态表述不一致，示例命令仍有占位符；保守记录为“推理代码可见、完整权重不可确认” [[35]](#ref-35), [[36]](#ref-36)。
 - **Omni-LiveAvatar**：arXiv 初版 2026-08-07；论文摘要写 code available，但官方仓库的 code/checkpoint 仍为 TODO。冻结日按“论文/项目页，无可复现代码权重”处理 [[37]](#ref-37), [[38]](#ref-38)。
-- **LongCat-Video-Avatar 1.5**：预印本与官方仓库可见，仓库提供代码、权重与少步推理配置；这比只有演示页的 release surface 更强 [[39]](#ref-39), [[40]](#ref-40)。
+- **LongCat-Video-Avatar 1.5**：音频驱动的人物视频生成系统，使用 Whisper Large 音频编码、偏好优化与步数蒸馏 [[39]](#ref-39)。推理代码在 LongCat-Video 主仓库中发布，模型权重由该仓库链接的模型卡提供；部署时记录具体 Avatar 版本 [[40]](#ref-40)。
 - **EfficientSync、DynaForcing、OmniMate** 等临近冻结日的新预印本只作为前沿信号，不把尚未经过正式 proceedings 或充分复现的结论写入主线 [[50]](#ref-50), [[51]](#ref-51), [[52]](#ref-52)。
 
-## 6. 训练目标为什么会互相打架
+## 6. 训练目标
 
 常见目标可写成
 
@@ -161,7 +167,7 @@ L_{\mathrm{total}}=L_{\mathrm{lookahead}}+L_{\mathrm{compute}}+L_{\mathrm{buffer
 
 建议同时报告各 loss 梯度余弦或消融，不只报告最终加权和；如果权重在训练中动态变化，还要公布调度规则。
 
-## 7. 数据泄漏与公平协议
+## 7. 数据与划分
 
 ### 7.1 最低限度的拆分
 
@@ -185,7 +191,7 @@ LRS3、VoxCeleb 与 HDTF 分别代表大规模视听语音、说话人身份和�
 
 再对年龄表现、肤色、口音、发型遮挡、侧脸、眼镜、胡须、低照度和音频噪声分层。跨身份结果若仍用训练人物的背景、声音或服装，不算干净的身份外推。
 
-## 8. 指标的最小充分集合
+## 8. 评测指标
 
 不存在一个“数字人总分”。最低报告集应覆盖彼此独立的失败轴，并给出 bootstrap 置信区间、样本数、裁切/重采样实现与失败样本比例。
 
@@ -203,7 +209,7 @@ LRS3、VoxCeleb 与 HDTF 分别代表大规模视听语音、说话人身份和�
 
 不要把这些轴未经校准地加成一个分数。一个模型可能同步更好、身份更差、动作更多样；加权平均会隐藏真实取舍。
 
-## 9. 必做的反事实与外推实验
+## 9. 诊断实验
 
 ### 9.1 音频因果性
 
@@ -211,7 +217,7 @@ LRS3、VoxCeleb 与 HDTF 分别代表大规模视听语音、说话人身份和�
 - **韵律交换**：保持文本，改变语速、重音、$F_0$ 或停顿；动作节奏可变，但不能虚构场景事件。
 - **静音/倒放/时间移位**：测模型是否只靠数据先验生成“看似自然”的嘴形；画出输入 offset 与输出最佳 offset 的响应曲线。
 - **说话人交换**：同一句话换声音；若任务不要求 speaker style，身份不应随声音漂移。
-- **冲突条件**：音频、文本、pose 给出不一致指令，事先声明谁优先，检查模型是否稳定遵循合同。
+- **冲突条件**：音频、文本、pose 给出不一致指令，事先声明谁优先，检查模型是否稳定遵循规格。
 
 ### 9.2 长时、跨语言与跨身份
 
@@ -223,7 +229,7 @@ LRS3、VoxCeleb 与 HDTF 分别代表大规模视听语音、说话人身份和�
 
 每个反事实至少多 seed，并公开未经人工挑选的样本索引。若论文只展示项目页 cherry-picked demo，应明确证据等级而不是据此宣称稳健。
 
-## 10. 安全、授权与溯源
+## 10. 授权与来源管理
 
 数字人系统最容易把“技术上能复现一个人”误写成“有权代表这个人”。上线前最低要求是：
 
@@ -250,7 +256,7 @@ LRS3、VoxCeleb 与 HDTF 分别代表大规模视听语音、说话人身份和�
 
 <a id="ref-8"></a>[8] Guo et al. [AD-NeRF: Audio Driven Neural Radiance Fields for Talking Head Synthesis](https://openaccess.thecvf.com/content/ICCV2021/html/Guo_AD-NeRF_Audio_Driven_Neural_Radiance_Fields_for_Talking_Head_Synthesis_ICCV_2021_paper.html). ICCV, 2021.
 
-<a id="ref-10"></a>[10] Zhang et al. [SadTalker: Learning Realistic 3D Motion Coefficients for Stylized Audio-Driven Single Image Talking Face Animation](https://openaccess.thecvf.com/content/CVPR2023/html/Zhang_SadTalker_Learning_Realistic_3D_Motion_Coefficients_for_Stylized_Audio-Driven_Single_Image_CVPR_2023_paper.html). CVPR, 2023; first arXiv version 2022-11-22.
+<a id="ref-10"></a>[10] Zhang et al. [SadTalker: Learning Realistic 3D Motion Coefficients for Stylized Audio-Driven Single Image Talking Face Animation](https://openaccess.thecvf.com/content/CVPR2023/html/Zhang_SadTalker_Learning_Realistic_3D_Motion_Coefficients_for_Stylized_Audio-Driven_Single_CVPR_2023_paper.html). CVPR, 2023; first arXiv version 2022-11-22.
 
 <a id="ref-11"></a>[11] OpenTalker. SadTalker official repository [![GitHub: OpenTalker/SadTalker](https://img.shields.io/github/stars/OpenTalker/SadTalker?style=social)](https://github.com/OpenTalker/SadTalker).
 
@@ -270,7 +276,7 @@ LRS3、VoxCeleb 与 HDTF 分别代表大规模视听语音、说话人身份和�
 
 <a id="ref-23"></a>[23] ByteDance. [OmniHuman-1 official project page](https://omnihuman-lab.github.io/).
 
-<a id="ref-24"></a>[24] Chen et al. [OmniAvatar: Efficient Audio-Driven Avatar Video Generation with Adaptive Body Animation](https://arxiv.org/abs/2506.18866). arXiv:2506.18866, first submitted 2025-06-23.
+<a id="ref-24"></a>[24] Qijun Gan et al. [OmniAvatar: Efficient Audio-Driven Avatar Video Generation with Adaptive Body Animation](https://arxiv.org/abs/2506.18866). arXiv:2506.18866, first submitted 2025-06-23.
 
 <a id="ref-25"></a>[25] Omni-Avatar. OmniAvatar official repository [![GitHub: Omni-Avatar/OmniAvatar](https://img.shields.io/github/stars/Omni-Avatar/OmniAvatar?style=social)](https://github.com/Omni-Avatar/OmniAvatar).
 
@@ -288,7 +294,7 @@ LRS3、VoxCeleb 与 HDTF 分别代表大规模视听语音、说话人身份和�
 
 <a id="ref-32"></a>[32] SpeakerVid authors. [SpeakerVid-5M: A Large-Scale High-Quality Dataset for Audio-Visual Dyadic Interactive Human Generation](https://proceedings.iclr.cc/paper_files/paper/2026/hash/bf7dbac50ed7f6e12ad529c5b9396bc4-Abstract-Conference.html). ICLR, 2026.
 
-<a id="ref-33"></a>[33] Cui et al. [Hallo-Live: Real-Time and High-Fidelity Audio-Driven Portrait Image Animation](https://arxiv.org/abs/2604.23632). arXiv:2604.23632, first submitted 2026-04-26.
+<a id="ref-33"></a>[33] Chunyu Li et al. [Hallo-Live: Real-Time Streaming Joint Audio-Video Avatar Generation with Asynchronous Dual-Stream and Human-Centric Preference Distillation](https://arxiv.org/abs/2604.23632). arXiv:2604.23632, first submitted 2026-04-26.
 
 <a id="ref-34"></a>[34] Fudan Generative Vision. Hallo-Live official repository [![GitHub: fudan-generative-vision/hallo-live](https://img.shields.io/github/stars/fudan-generative-vision/hallo-live?style=social)](https://github.com/fudan-generative-vision/hallo-live).
 
@@ -302,7 +308,7 @@ LRS3、VoxCeleb 与 HDTF 分别代表大规模视听语音、说话人身份和�
 
 <a id="ref-39"></a>[39] LongCat team. [LongCat-Video-Avatar 1.5](https://arxiv.org/abs/2605.26486). arXiv:2605.26486, 2026.
 
-<a id="ref-40"></a>[40] Meituan. LongCat-Video-Avatar official repository [![GitHub: meituan-longcat/LongCat-Video-Avatar](https://img.shields.io/github/stars/meituan-longcat/LongCat-Video-Avatar?style=social)](https://github.com/meituan-longcat/LongCat-Video-Avatar).
+<a id="ref-40"></a>[40] Meituan. LongCat-Video official repository (includes Avatar) [![GitHub: meituan-longcat/LongCat-Video](https://img.shields.io/github/stars/meituan-longcat/LongCat-Video?style=social)](https://github.com/meituan-longcat/LongCat-Video).
 
 <a id="ref-41"></a>[41] Wang et al. [MEAD: A Large-Scale Audio-Visual Dataset for Emotional Talking-Face Generation](https://wywu.github.io/projects/MEAD/MEAD.html). ECCV, 2020.
 
@@ -312,7 +318,7 @@ LRS3、VoxCeleb 与 HDTF 分别代表大规模视听语音、说话人身份和�
 
 <a id="ref-44"></a>[44] Zhang et al. [Flow-Guided One-Shot Talking Face Generation with a High-Resolution Audio-Visual Dataset](https://openaccess.thecvf.com/content/CVPR2021/html/Zhang_Flow-Guided_One-Shot_Talking_Face_Generation_With_a_High-Resolution_Audio-Visual_Dataset_CVPR_2021_paper.html). CVPR, 2021 (HDTF).
 
-<a id="ref-45"></a>[45] Chung and Zisserman. [Out of Time: Automated Lip Sync in the Wild](https://arxiv.org/abs/1603.04433). ACCV Workshops, 2016.
+<a id="ref-45"></a>[45] Chung and Zisserman. [Out of time: automated lip sync in the wild](https://www.robots.ox.ac.uk/~vgg/publications/2016/Chung16a/). ACCV Workshops, 2016.
 
 <a id="ref-46"></a>[46] Deng et al. [ArcFace: Additive Angular Margin Loss for Deep Face Recognition](https://openaccess.thecvf.com/content_CVPR_2019/html/Deng_ArcFace_Additive_Angular_Margin_Loss_for_Deep_Face_Recognition_CVPR_2019_paper.html). CVPR, 2019.
 

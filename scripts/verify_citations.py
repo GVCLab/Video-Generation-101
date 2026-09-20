@@ -20,6 +20,8 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import html
+from html.parser import HTMLParser
 import difflib
 import json
 import re
@@ -32,7 +34,7 @@ from dataclasses import dataclass, field, asdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SCAN_DIRS = ["docs", "resources", "sources"]
+SCAN_DIRS = ["docs", "resources"]
 SCAN_FILES = ["README.md"]
 
 ARXIV_API = "https://export.arxiv.org/api/query"
@@ -109,12 +111,12 @@ def title_score(claimed: str, actual: str) -> float:
     return max(difflib.SequenceMatcher(None, a, b).ratio(), jacc)
 
 
-def iter_markdown() -> list[Path]:
+def iter_markdown(include_sources: bool = False) -> list[Path]:
     out: list[Path] = []
-    for d in SCAN_DIRS:
+    for d in SCAN_DIRS + (["sources"] if include_sources else []):
         p = ROOT / d
         if p.is_dir():
-            out += sorted(p.rglob("*.md"))
+            out += sorted(f for f in p.rglob("*.md") if "plans" not in f.parts)
     for f in SCAN_FILES:
         p = ROOT / f
         if p.is_file():
@@ -122,18 +124,67 @@ def iter_markdown() -> list[Path]:
     return out
 
 
-def collect_refs() -> list[Ref]:
+class LinkParser(HTMLParser):
+    """Collect HTML links too (timeline cards use HTML, not Markdown)."""
+    def __init__(self):
+        super().__init__()
+        self.links = []
+        self.active = None
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "a":
+            url = dict(attrs).get("href", "")
+            self.active = [self.getpos()[0], url, []]
+
+    def handle_data(self, data):
+        if self.active is not None:
+            self.active[2].append(data)
+
+    def handle_endtag(self, tag):
+        if tag == "a" and self.active is not None:
+            line, url, text = self.active
+            self.links.append((line, "".join(text).strip(), url))
+            self.active = None
+
+
+def collect_refs(include_sources: bool = False) -> list[Ref]:
     refs: list[Ref] = []
-    for path in iter_markdown():
+    for path in iter_markdown(include_sources):
         rel = str(path.relative_to(ROOT))
-        for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            for text, url in MD_LINK.findall(line):
-                if text.startswith("!") or "img.shields.io" in url:
-                    continue
-                m = ARXIV_ABS.search(url)
-                refs.append(Ref(rel, lineno, text.strip(), url,
-                                line.strip(), m.group(1) if m else None))
+        content = path.read_text(encoding="utf-8")
+        lines = content.splitlines()
+        entries = [(n, text, url) for n, line in enumerate(lines, 1)
+                   for text, url in MD_LINK.findall(line)]
+        parser = LinkParser()
+        parser.feed(content)
+        entries.extend(parser.links)
+        for lineno, text, url in entries:
+            if not url.startswith(("https://", "http://")) or text.startswith("!") or "img.shields.io" in url:
+                continue
+            m = ARXIV_ABS.search(url)
+            refs.append(Ref(rel, lineno, html.unescape(text.strip()), url,
+                            lines[lineno - 1].strip(), m.group(1) if m else None))
     return refs
+
+
+# Common method aliases used in timeline cards, tied to a verified paper identity.
+TITLE_ALIASES = {
+    "2506.09985": {"v jepa 2 v jepa 2 ac"},
+    "2602.15031": {"editctrl paper"},
+    "1605.07157": {"dna cdna stp"},
+    "2212.09748": {"diffusion transformer"},
+    "2304.08818": {"latent video diffusion"},
+    "2501.03575": {"nvidia cosmos"},
+}
+
+def looks_like_title(text: str) -> bool:
+    label = text.strip().lower()
+    if len(label) <= 12 or label.startswith(("http", "github", "官方", "见", "arxiv", "paper", "abstract", "project", "论文", "预印本", "preprint", "first public preprint", "probing preprint", "workshop paper", "model card")):
+        return False
+    # Non-title navigation labels should not trigger metadata mismatch errors.
+    if label in {"technical report", "official repository", "technical paper"}:
+        return False
+    return True
 
 
 class ArxivUnavailable(RuntimeError):
@@ -211,7 +262,7 @@ def check_arxiv(refs: list[Ref], meta: dict[str, dict],
                 "id may be wrong, withdrawn, or not yet announced"))
             continue
         # title check -- only when the anchor text looks like a title
-        if len(r.text) > 12 and not r.text.lower().startswith(("http", "github", "官方", "见")):
+        if looks_like_title(r.text) and norm_title(r.text) not in TITLE_ALIASES.get(r.arxiv_id, set()):
             score = title_score(r.text, info["title"])
             if score < TITLE_FLAG:
                 findings.append(Finding(
@@ -277,24 +328,28 @@ def main() -> int:
     ap.add_argument("--offline", action="store_true",
                     help="skip arXiv API, run URL-path checks only")
     ap.add_argument("--json", type=Path, help="write findings as JSON")
+    ap.add_argument("--coverage", type=Path, help="write query coverage as JSON")
+    ap.add_argument("--metadata", type=Path, help="save retrieved arXiv metadata")
+    ap.add_argument("--include-sources", action="store_true", help="also inspect historical source notes")
     ap.add_argument("--fail-on", default="ERROR", choices=["ERROR", "WARN", "NONE"])
     args = ap.parse_args()
 
-    refs = collect_refs()
+    refs = collect_refs(args.include_sources)
     arxiv_ids = sorted({r.arxiv_id for r in refs if r.arxiv_id})
     print(f"scanned {len(set(r.file for r in refs))} files, "
           f"{len(refs)} links, {len(arxiv_ids)} unique arXiv ids",
           file=sys.stderr)
 
     findings = check_url_venue(refs)
-    unverified = 0
+    unverified = len(arxiv_ids)
+    meta, queried = {}, set()
     if not args.offline:
         try:
             meta, queried = arxiv_lookup(arxiv_ids)
         except ArxivUnavailable as exc:
             print(f"\nFATAL: {exc}", file=sys.stderr)
             print("Re-run with --offline for URL-path checks only.", file=sys.stderr)
-            return 2
+            # Continue to write findings and an explicit incomplete coverage record.
         findings += check_arxiv(refs, meta, queried)
         unverified = len(arxiv_ids) - len(queried)
 
@@ -320,6 +375,21 @@ def main() -> int:
                                         ensure_ascii=False, indent=2),
                              encoding="utf-8")
 
+    coverage = {
+        "mode": "offline" if args.offline else "online",
+        "scope": "published-and-sources" if args.include_sources else "published",
+        "files": len({r.file for r in refs}), "links": len(refs),
+        "arxiv_requested": len(arxiv_ids), "arxiv_queried": len(queried),
+        "arxiv_returned": len(meta), "arxiv_unverified": unverified,
+        "online_complete": not args.offline and unverified == 0,
+        "errors": errs, "warnings": warns,
+    }
+    if args.coverage:
+        args.coverage.write_text(json.dumps(coverage, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if args.metadata:
+        args.metadata.write_text(json.dumps(meta, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if not args.offline and unverified:
+        return 2
     if args.fail_on == "ERROR":
         return 1 if errs else 0
     if args.fail_on == "WARN":

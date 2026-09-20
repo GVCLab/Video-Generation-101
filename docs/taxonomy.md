@@ -1,6 +1,11 @@
-# 视频生成任务地图：如何定义和区分不同任务
+# 视频生成任务分类
 
-> 一手来源复核截至 **2026-08-30**；任务地图结构于 **2026-08-31** 复核，表述于 **2026-09-03** 更新。本页是任务定义与验收入口，不是模型排行榜。检索式、纳排标准和历史图像记录见[研究日志](../sources/research_20260830_task_application_taxonomy.md)。
+按输入条件、输出关系、运行方式和评价目标定义视频生成任务。
+
+**前置知识：** 视频生成入门。
+
+**使用步骤：** 列出输入和输出 → 确定保持项、变化项及时间范围 → 选择任务专题并建立评价协议。
+
 
 视频任务不应被排成“无条件 → 文生视频 → 图生视频 → 编辑 → 世界模型”的单线升级链。也不能把反馈方式、是否流式、持续时长和记忆能力压成一条“交互时域”轴。更实用的做法是先回答三个问题：
 
@@ -67,7 +72,7 @@ flowchart TB
 | 参考条件 | 身份图、服装图、音色、风格、场景参考 | 参考是否占输出时间轴、授权和绑定关系 | 模型确实使用参考；需反事实消融 |
 | 控制条件 | mask、相机、轨迹、姿态、深度、状态、动作 | 单位、坐标系、频率、延迟和对齐 | 控制误差小、无串扰或闭环可用 |
 
-### 2.2 与已有素材的关系：输出必须保留什么
+### 2.2 内容保持约束
 
 为了统一表述，本页使用“创作、参考、锚定、变换、恢复、补全、外推、重建”八种常见关系；一个任务可以对应多种关系。
 
@@ -257,7 +262,7 @@ flowchart TB
 
 **图 2：平均分不能掩盖关键失败。** 顺序为：定义输入输出；划分保持项和变化项；说明运行与评测设置；预先确定测试组合和验收阈值；执行多 seed 单变量测试；所有关键要求满足后才判定通过，否则记录失败、修订并重测。
 
-### 5.1 分项报告，关键要求必须全部满足
+### 5.1 分项报告与必要条件
 
 要求变化是否实现、应保留内容的误差、时间误差、安全性和系统性能应分开报告，不要压成一个加权总分。验收前需按任务、数据切片和使用风险预先确定阈值；任一关键项不达标，整体就不应判定为通过。画质或变化成功率上升，不能抵消身份泄漏、mask 外变化、服装标识篡改、动作无效、deadline miss 等关键失败。
 
@@ -344,6 +349,11 @@ DreamGen 的价值不在“生成机器人视频”本身，而在把生成、�
 4. 一个系统支持多个任务时，应分别验收每项任务，不共享一个总分。
 5. 若涉及现实动作或决策，继续阅读 [World Model](world-models.md)、[物理一致性](physical-consistency.md)和[相关应用](applications.md)。
 
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
+
 ## 参考文献
 
 <a id="ref-1"></a>[1] [Video Diffusion Models](https://proceedings.neurips.cc/paper_files/paper/2022/hash/39235c56aef13fb05a6adc95eb9d8d66-Abstract-Conference.html). Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, David J. Fleet. NeurIPS. 2022.
@@ -366,7 +376,7 @@ DreamGen 的价值不在“生成机器人视频”本身，而在把生成、�
 
 <a id="ref-10"></a>[10] [VideoComposer: Compositional Video Synthesis with Motion Controllability](https://proceedings.neurips.cc/paper_files/paper/2023/hash/180f6184a3458fa19c28c5483bc61877-Abstract-Conference.html). Xiang Wang, Hangjie Yuan, Shiwei Zhang, Dayou Chen, Jiuniu Wang, Yingya Zhang, et al. NeurIPS. 2023.
 
-<a id="ref-11"></a>[11] [MotionCtrl: A Unified and Flexible Motion Controller for Video Generation](https://arxiv.org/abs/2312.03641). Zhouxia Wang, Ziyang Yuan, Xintao Wang, Yaowei Li, Tianshui Chen, Menghan Xia, et al. First preprint 2023; SIGGRAPH Conference Papers. 2024. [Official project and release surface](https://wzhouxiff.github.io/projects/MotionCtrl/).
+<a id="ref-11"></a>[11] [MotionCtrl: A Unified and Flexible Motion Controller for Video Generation](https://arxiv.org/abs/2312.03641). Zhouxia Wang, Ziyang Yuan, Xintao Wang, Yaowei Li, Tianshui Chen, Menghan Xia, et al. First preprint 2023; SIGGRAPH Conference Papers. 2024. [Official project and 发布内容](https://wzhouxiff.github.io/projects/MotionCtrl/).
 
 <a id="ref-12"></a>[12] [Ovi: Twin Backbone Cross-Modal Fusion for Audio-Video Generation](https://arxiv.org/abs/2510.01284). Chetwin Low, Weimin Wang, Calder Katyal. arXiv preprint. 2025. Official code and weights: [character-ai/Ovi](https://github.com/character-ai/Ovi).
 

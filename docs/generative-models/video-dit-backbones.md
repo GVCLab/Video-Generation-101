@@ -1,4 +1,12 @@
-# Video DiT 与骨干扩展：Token、注意力、融合、MoE、并行与缓存
+<a id="video-dit-tokenmoe"></a>
+
+# Video DiT 骨干网络
+
+介绍视频 token、时空注意力、位置编码、条件融合和网络扩展。
+
+**前置知识：** Transformer、视频表示。
+
+**使用步骤：** 计算 token 数和注意力成本 → 选择时空交互结构与条件接口 → 分析质量、内存和并行效率。
 
 > **证据快照：2026-08-30。** 本章只采用正式 proceedings、作者论文/技术报告和官方代码或模型页。论文里的速度、显存与质量数字均保留作者协议限定；产品名、演示样例和 README 宣传不能反推出未公开的骨干细节。2026 年预印本、尚未正式发表的系统和只在官方仓库出现的实现会明确标注。
 
@@ -13,7 +21,7 @@
 5. depth/width、noise-time MoE、并行、量化、缓存和减少采样步数分别改变哪一笔成本？
 6. 怎样做公平且可证伪的 backbone 比较，而不是把 tokenizer、数据、objective 或硬件收益错记到架构头上？
 
-## 1. 先冻结章节边界
+## 1. 范围与术语
 
 令视频 tokenizer 输出连续 latent：
 
@@ -39,9 +47,9 @@ f_\theta(z_\tau,\tau,c;m)
 | 本章：Backbone | patch、位置、mixer、条件融合、FFN/MoE、路由与执行图 | 给定输入和目标后的网络实现 | 参数更多、attention FLOPs 更少或 GPU 更多都不自动等于更好/更快 |
 | [因果、流式与实时](causal-streaming-generation.md) | history exposure、lookahead、revision、commit、backpressure 与 SLO | 骨干的实际 mask、cache 和状态更新规则 | causal mask 不自动推出 TTFF、p99、jitter 或 deadline 达标 |
 
-## 2. 一张图看懂计算去了哪里
+## 2. 计算组成
 
-![Video DiT 计算合同：先由时空 latent 网格和 patch 大小决定 token 数，再选择 full、factorized、window/sparse、linear 或 hybrid attention；token reduction、attention design、noise-time experts、parallelism 与 cache 是不同扩展杠杆；最终必须在同一输出合同下同时报告 FLOPs、延迟、峰值显存、通信、质量与覆盖。](../../assets/diagrams/video-dit-compute-contract.png)
+![Video DiT 计算规格：先由时空 latent 网格和 patch 大小决定 token 数，再选择 full、factorized、window/sparse、linear 或 hybrid attention；token reduction、attention design、noise-time experts、parallelism 与 cache 是不同扩展杠杆；最终必须在同一输出规格下同时报告 FLOPs、延迟、峰值显存、通信、质量与覆盖。](../../assets/diagrams/video-dit-compute-contract.png)
 
 **图 1：先记 token 账，再讨论“高效”。** 原始教学图，不复刻任何论文结构图。Attention topology 决定 token 之间怎样通信；token reduction、noise-time experts、distributed parallelism、denoising-step reduction 和 caching 不能互换。底部警告是本章最重要的工程边界：attention FLOPs 下降，不保证端到端视频生成更快。生成提示词、SHA-256、来源边界和视觉验收见[研究记录](../../sources/research_20260830_video_dit_backbones.md)。
 
@@ -83,7 +91,9 @@ N=
 \text{peak VRAM},\ \text{latency},\ \text{throughput},\ \text{communication}).
 ```
 
-## 3. Video DiT block 到底做什么
+<a id="3-video-dit-block"></a>
+
+## 3. Video DiT 模块
 
 ![图 031：Video DiT 的接口、位置与条件融合](../../assets/imagegen-diagrams/031/diagram.png)
 **图 2：同一个 block 可以承载不同 objective。** 顺序化文字替代：pixel video 先由 codec 变成 latent grid；patch embedding 加入时空、FPS 和 modality 位置后成为 $N$ 个视频 token。噪声时间可以经 AdaLN/FiLM 调制 block，文本、图像、音频或控制可经 cross-attention 或 joint/dual stream 融合。时空 mixer 与 FFN/experts 重复 $L$ 层，输出再 unpatchify；最终预测 $\epsilon$、$x_0$、score、$v$ 还是 flow velocity 由 objective 决定，solver/NFE 属于采样层。
@@ -109,7 +119,9 @@ x_{\ell+1}=u_{\ell}+F_\ell(\mathrm{Norm}(u_{\ell});c,\tau),
 
 Wan2.2 的高噪声/低噪声 expert 是沿 $\tau$ 路由，不是把视频前半段交给一个 expert、后半段交给另一个。相反，causal temporal attention 限制的是 $k$ 上能否读取未来帧。把两者都叫“temporal routing”会产生根本性误读。
 
-## 4. 时空 attention 拓扑：少连边不等于少能力，也不等于无损
+<a id="4-attention"></a>
+
+## 4. 时空注意力结构
 
 设每个时间位置有 $S=H_pW_p$ 个空间 token，总长度 $N=T_pS$。
 
@@ -187,11 +199,13 @@ m_{ij}=
 \end{cases}
 ```
 
-其中 $\ell=0$ 是严格 causal，$`\ell\gt0`$ 是有限 lookahead。这个 mask 只定义信息可见性；要声称 streaming，还必须给出 chunk 输入、state/cache 更新、revision window、commit frontier、backpressure 和真实 SLO。
+其中 $\ell=0$ 是严格 causal，$\ell\gt0$ 是有限 lookahead。这个 mask 只定义信息可见性；要声称 streaming，还必须给出 chunk 输入、state/cache 更新、revision window、commit frontier、backpressure 和真实 SLO。
 
-## 5. 位置、packing 与条件融合
+<a id="5-packing"></a>
 
-### 5.1 位置不是“加一个编号”
+## 5. 位置编码与条件融合
+
+### 5.1 时空位置编码
 
 视频 token 至少有 $(k,h,w)$ 三个几何坐标，还可能需要：
 
@@ -212,7 +226,9 @@ m_{ij}=
 
 图像 Stable Diffusion 3 的 MMDiT 使用文本与图像各自权重并允许双向信息流，是后来多模态双流/合流设计的重要架构祖先；它本身不是视频时序证据 [[4]](#ref-4)。CogVideoX 的 expert transformer 为文本与视频使用 expert adaptive LayerNorm；HunyuanVideo 则采用双流后接单流的结构 [[7]](#ref-7) [[8]](#ref-8)。比较融合方式时，应做**条件交换、条件删除、局部控制和非目标泄漏**测试，而不是只看平均 prompt score。
 
-## 6. 六种 scaling 杠杆必须分账
+<a id="6-scaling"></a>
+
+## 6. 模型扩展
 
 ### 6.1 减少 token：改变 $N$
 
@@ -244,7 +260,9 @@ P_{total}\ne P_{active/step},
 
 ScaleFusion 针对视频 DiT 的时空 attention 做分布式切分与通信重叠；xDiT 组合 sequence parallel、PipeFusion 与 CFG parallel [[29]](#ref-29) [[31]](#ref-31)。论文中的强扩展数字只能在给定模型、GPU 数、互连、序列、batch 和精度下成立。应同时报告单卡不可运行时的 **scale-up capacity** 与固定问题规模下的 **strong scaling efficiency**。
 
-### 6.5 Inter-step cache：利用 $\tau$ 相邻，不是视频 KV cache 的同义词
+<a id="65-inter-step-cache-tautau-kv-cache"></a>
+
+### 6.5 生成迭代缓存与视频 KV 缓存
 
 同一采样轨迹中，相邻 denoising step 的 activation/attention 常相似，因而可复用：
 
@@ -271,7 +289,9 @@ C_{backbone}(N_i,d,L,\rho_i,q_i,\text{hardware})
 
 以上仅分析 backbone 内部的执行成本。若需继续比较少步蒸馏、参数/结构剪枝、token pruning、低比特量化、跨步 cache、底层算子、显存调度和多卡在线服务的端到端组合，见[推理加速综述导航](inference-acceleration.md)；按瓶颈可直接进入[蒸馏](inference-acceleration/distillation.md)、[量化](inference-acceleration/quantization.md)、[模型剪枝](inference-acceleration/pruning.md)、[Token/注意力稀疏](inference-acceleration/sparsity.md)、[缓存与复用](inference-acceleration/caching.md)或[底层算子、并行与在线服务](inference-acceleration/systems.md)综述。
 
-## 7. 2022–2026 机制里程碑：首次公开与正式发表分开
+<a id="7-20222026"></a>
+
+## 7. 代表工作
 
 | 首次公开 → 正式状态 | 机制节点 | 它真正推进了什么 | 证据边界 |
 |---|---|---|---|
@@ -297,9 +317,13 @@ C_{backbone}(N_i,d,L,\rho_i,q_i,\text{hardware})
 
 这里的时间按“首次可核验公开材料 → 正式 venue”写，不用正式发表年份倒置技术先后。预印本或官方仓库节点不被冒充为同行评审结论。
 
-## 8. 论文精读：按机制问题组织，而不是列模型 Logo
+<a id="8-logo"></a>
 
-### 8.1 Full、factorized、window：谁负责全局通信？
+## 8. 方法比较
+
+<a id="81-fullfactorizedwindow"></a>
+
+### 8.1 全局、分解与窗口注意力的通信范围
 
 **问题。** 视频既需要邻近运动连续，也需要远距离身份与场景状态。全局连边昂贵，局部连边又可能让信息传播路径过长。
 
@@ -309,7 +333,9 @@ C_{backbone}(N_i,d,L,\rho_i,q_i,\text{hardware})
 
 **应做的反证。** 构造“物体离开画面后再次出现”“远距属性复现”“两事件顺序交换”“主体跨窗口快速移动”四类 probe；同时匹配参数和训练 FLOPs。若 full attention 没有预注册的远距增益，就不能声称全局连边带来可测长程优势。
 
-### 8.2 Linear/hybrid：渐近复杂度怎样变成实际收益？
+<a id="82-linearhybrid"></a>
+
+### 8.2 线性与混合结构的实际计算成本
 
 **问题。** 当 $N$ 足够大，dense attention score matrix 成为显存与通信瓶颈；但纯线性状态可能丢失选择性回忆。
 
@@ -319,7 +345,9 @@ C_{backbone}(N_i,d,L,\rho_i,q_i,\text{hardware})
 
 **应做的反证。** 在 $T,H,W$ 多个网格上拟合 peak memory 与 latency 对 $N$ 的斜率；同时设置等参数、等 FLOPs和固定 checkpoint 三种比较。若理论线性方法在实际范围没有改善斜率，或长距/小物体质量超过预设非劣界，则“无损扩展”声明失败。
 
-### 8.3 Sparse/reuse：稀疏模式是每步重算，还是可复用？
+<a id="83-sparsereuse"></a>
+
+### 8.3 稀疏模式的计算与复用
 
 **问题。** 视频 token 关系和相邻 $\tau$ activation 都有冗余，但冗余不必在高噪声、低噪声、快速运动和 scene cut 上相同。
 
@@ -329,7 +357,9 @@ C_{backbone}(N_i,d,L,\rho_i,q_i,\text{hardware})
 
 **应做的反证。** 报告每层/每步 density、selector time、attention kernel time、通信、总 denoiser time；按噪声区间、运动、镜头切换与条件改变分桶。若 sparsity 只在静态或低运动 prompt 上成立，不能写成通用视频冗余。
 
-### 8.4 Noise-time experts：容量扩展还是计算缩减？
+<a id="84-noise-time-experts"></a>
+
+### 8.4 噪声时间专家的容量与计算量
 
 **问题。** 高噪声阶段更依赖全局布局，低噪声阶段更依赖细节；单一参数集合是否必须同时优化两类行为？
 
@@ -347,7 +377,9 @@ C_{backbone}(N_i,d,L,\rho_i,q_i,\text{hardware})
 
 **应做的反证。** 并行系统报告 1/2/4/8/... GPU 的 latency、throughput、峰值显存、通信和扩展效率；cache 系统与 full recompute 用相同 checkpoint、prompt、seed、sampler/NFE、输出 shape 比较，并给出逐 prompt 差异而非只报平均分。
 
-## 9. Backbone 评测合同
+<a id="9-backbone"></a>
+
+## 9. 性能测试
 
 ### 9.1 最小模型卡
 
@@ -384,7 +416,7 @@ cost:
   communication_bytes_or_time: ...
 ~~~
 
-### 9.2 四组必须同时有的测试
+### 9.2 质量与性能测试配置
 
 | 测试组 | 最低内容 | 主要反证对象 |
 |---|---|---|
@@ -397,9 +429,11 @@ cost:
 
 本章保留若干数字只为展示“结论必须带 protocol”：例如 LinVideo 在单 H100、batch 1、50-step 作者设置中报告 1.43–1.71×，结合 4-step variant 报告 15.9–20.9×；RAPID 在单 A100 的作者设置下，Turbo 版本报告对 Wan2.1-14B 1.79×、对 HunyuanVideo 2.01×；DSA 在 8 GPU 作者设置下报告相对既有 distributed 方法 1.43×、相对 single GPU 10.79× [[20]](#ref-20)–[[22]](#ref-22)。这些数字**不能横向排序或相乘**，因为模型、NFE、输出、硬件、baseline、精度和质量容差都不同。
 
-## 10. 两个可证伪协议
+## 10. 实验设计示例
 
-### 10.1 `BackboneFork-1`：从头训练的结构比较（尚未运行）
+<a id="101-backbonefork-1"></a>
+
+### 10.1 骨干结构对照实验：从头训练的结构比较（尚未运行）
 
 **目的：** 判断 mixer、position 或 condition fusion 本身是否带来预注册收益。
 
@@ -407,7 +441,17 @@ cost:
 |---|---|---|---|
 | codec/latent、patch、数据及顺序、文本 encoder、条件 dropout、objective/loss weighting、sampler/NFE/CFG、输出、训练 tokens、精度与硬件 | U-Net、full、factorized、window/sparse、linear/recurrent；position 和 fusion 另做单变量 fork | parameter-matched；training-FLOP-matched | 按 $\tau$ 分桶 target error；质量/覆盖；长程/绑定/网格 probe；forward FLOPs、VRAM、tokens/s、端到端成本 |
 
-![图 032：BackboneFork-1 的冻结、分叉与反证路径](../../assets/imagegen-diagrams/032/diagram.png)
+```mermaid
+flowchart LR
+    B[固定数据、训练预算与评测配置] --> A[基准骨干]
+    B --> C[仅改变待测结构]
+    A --> E[等预算训练与多种子评测]
+    C --> E
+    E --> Q[比较质量、成本和失败类型]
+    Q --> R[记录成立条件与限制]
+```
+
+图示为建议实验流程，尚未运行。训练后的结构比较与固定检查点的执行优化应分别报告。
 顺序化文字替代：先冻结 codec、数据、objective、sampler 和输出；再分叉 full、factorized、window/sparse 与 linear/recurrent 骨干；每个分叉都做等参数和等训练 FLOPs 两套比较；随后同时运行质量/覆盖、长程/绑定、网格外推和资源斜率探针。只有达到预注册质量非劣界并出现所声称收益时保留有限结论，否则驳回或收窄。
 
 预注册反证：
@@ -418,7 +462,9 @@ cost:
 - 若交换/删除条件不能产生局部定向响应，或引起严重非目标泄漏，则“融合改善绑定”不成立。
 - 若 MoE 专家互换或单专家覆盖全 $\tau$ 仍无损，则“noise specialization”证据不足。
 
-### 10.2 `ServeFork-1`：固定 checkpoint 的执行比较（尚未运行）
+<a id="102-servefork-1-checkpoint"></a>
+
+### 10.2 固定检查点执行对照实验：固定 checkpoint 的执行比较（尚未运行）
 
 **目的：** 判断 sparse/cache/quantization/parallelism 的实际部署收益，不把再训练收益混进来。
 
@@ -432,9 +478,9 @@ cost:
 
 每项报告 compile/warm-up 与 steady-state，batch 1 latency 与吞吐，host/device transfer，peak allocated/reserved VRAM，通信时间，逐 prompt 质量差异和失败桶。若相同 seed 的“exact cache”超过数值容差，则应改标 approximate；若 wall time 没改善，即使理论 FLOPs 下降，也不能保留“更快”主张。
 
-若 linearized attention、learned sparse router 或其他方法需要校准、蒸馏或后训练优化，则进入独立的 `ServeFork-1b`：允许生成 converted checkpoint，但必须另报校准数据、更新步数、训练 FLOPs、参数变化和转换时间，并同时对照原 checkpoint 的 dense serving。它证明的是“后训练转换后的系统收益”，不能记作固定 checkpoint 的纯 kernel 加速。
+若 linearized attention、learned sparse router 或其他方法需要校准、蒸馏或后训练优化，则进入独立的 后训练转换对照实验：允许生成 converted checkpoint，但必须另报校准数据、更新步数、训练 FLOPs、参数变化和转换时间，并同时对照原 checkpoint 的 dense serving。它证明的是“后训练转换后的系统收益”，不能记作固定 checkpoint 的纯 kernel 加速。
 
-## 11. 常见误读与快速诊断
+## 11. 故障诊断
 
 | 误读 | 为什么错 | 快速追问 |
 |---|---|---|
@@ -447,14 +493,14 @@ cost:
 | “causal attention 就是 streaming” | mask 不定义 commit、revision 和 SLO | lookahead、state、commit frontier、TTFF/p99 呢？ |
 | “Sora 用 spacetime patch，因此是离散 token AR” | patch 可以来自连续 latent，且报告称 diffusion Transformer | 是否存在有限 codebook 与 categorical AR likelihood？ |
 
-## 12. 建议阅读顺序
+## 12. 延伸阅读
 
 1. 先读 DiT，理解 latent patch Transformer 与 objective 的接口 [[1]](#ref-1)。
 2. 对照 W.A.L.T.、Latte、CogVideoX、HunyuanVideo 和 Step-Video-T2V，比较 window、factorized、expert normalization、dual→single 与 full attention [[3]](#ref-3) [[5]](#ref-5) [[7]](#ref-7)–[[9]](#ref-9)。
 3. 再读 LinGen、SANA-Video、SANA-Video 2.0 与 LinVideo，区分 from-scratch linear、hybrid anchor 和 post-training conversion [[12]](#ref-12) [[15]](#ref-15)–[[17]](#ref-17) [[21]](#ref-21)。
 4. 读 RAPID、DSA、BLADE、AdaCluster/VMoBA/VecAttention，逐项追问 sparsity selector、kernel、通信与质量容差 [[20]](#ref-20) [[22]](#ref-22)–[[25]](#ref-25)。
 5. 最后读 PAB、AdaCache、ScaleFusion 与 xDiT，分清 inter-step reuse、sequence/context parallel、pipeline 与 CFG parallel [[13]](#ref-13) [[14]](#ref-14) [[29]](#ref-29) [[31]](#ref-31)。
-6. 用 `BackboneFork-1` 或 `ServeFork-1` 复核一条有限主张；不要以“跑出了视频”代替反证。
+6. 用 骨干结构对照实验 或 固定检查点执行对照实验 复核一条有限主张；不要以“跑出了视频”代替反证。
 
 ## 参考文献
 
@@ -490,7 +536,7 @@ cost:
 
 <a id="ref-16"></a>[16] [SANA-Video 2.0: Hybrid Linear Attention with Attention Residuals for Efficient Video Generation](https://arxiv.org/abs/2607.21553). Junsong Chen et al. Preprint. 2026.
 
-<a id="ref-17"></a>[17] [SANA-Video 2.0 Official Documentation](https://nvlabs.github.io/Sana/docs/sana_video2/). NVIDIA Research. Official documentation and release surface. 2026.
+<a id="ref-17"></a>[17] [SANA-Video 2.0 Official Documentation](https://nvlabs.github.io/Sana/docs/sana_video2/). NVIDIA Research. Official documentation and 发布内容. 2026.
 
 <a id="ref-18"></a>[18] Wan2.2 Official Repository [![GitHub: Wan-Video/Wan2.2](https://img.shields.io/github/stars/Wan-Video/Wan2.2?style=social)](https://github.com/Wan-Video/Wan2.2). Wan Team. Official code, model cards and weights. 2025.
 

@@ -1,25 +1,30 @@
-# 原生音视频联合生成：从“有声视频”到同轨迹协同去噪
+# 联合音视频生成
 
-> 本章冻结于 **2026-08-30（Asia/Shanghai）**。这里把“原生联合”限定为：音频与视频都是待生成变量，并在同一生成轨迹中通过已学习的共享表示或双向信息交换共同演化。产品能输出声音、训练时用了多模态数据、共用一套 token，均不能单独证明这一点。
+介绍声音与画面的联合分布、双流模型、时间对齐及同步评价。
 
-检索式、纳排规则、逐项证据等级、发布面核验与图片审计见[配套研究记录](../../sources/research_20260830_native_audio_video.md)。
+**前置知识：** 视频生成、音频采样。
+
+**使用步骤：** 明确联合生成或条件生成的分解 → 统一视频帧率、音频采样率和分块 → 分别评价模态质量与跨模态同步。
+
+
+检索式、纳排规则、逐项证据等级、发布内容核验与图片审计见[配套研究记录](../../sources/research_20260830_native_audio_video.md)。
 
 ## 学习目标
 
 读完本章，应能完成六件事：
 
 1. 严格区分 V2A、A2V、共同条件双支路、级联产品工作流、推理期耦合与原生联合模型；
-2. 写出视频、波形、codec latent、真实时间坐标和 mux 的完整输入输出合同；
+2. 写出视频、波形、codec latent、真实时间坐标和 mux 的完整输入输出规格；
 3. 比较双塔交互、joint DiT/MMDiT、单流 packed tokens、对齐 latent、流式记忆与推理时搜索；
 4. 解释训练目标、同步机制、数据标注和 codec 瓶颈如何共同决定成败；
 5. 用互不抵消的评测门检查画面、声音、语义、事件时序、声源绑定与系统延迟；
 6. 按冻结版本复现开放模型，并用跨模态干预证伪“原生联合”主张。
 
-## 1. 先判因子化：有声音不等于联合生成
+## 1. 联合分布与条件分解
 
-设文本、首帧、参考音色等外部条件统称为 $C$，视频为 $V$，音频为 $A$。同一个 MP4 可以来自完全不同的生成合同。
+设文本、首帧、参考音色等外部条件统称为 $C$，视频为 $V$，音频为 $A$。同一个 MP4 可以来自完全不同的生成规格。
 
-| 类别 | 概率/执行合同 | 哪个变量在生成 | 典型证据 | 不能声称什么 |
+| 类别 | 概率/执行规格 | 哪个变量在生成 | 典型证据 | 不能声称什么 |
 |---|---|---|---|---|
 | Video-to-Audio（V2A） | $p_\theta(A\mid V,C)$ | 只生成音频；视频已知且固定 | MMAudio、Movie Gen Audio | 视频会响应新生成的声音 |
 | Audio-to-Video（A2V） | $p_\theta(V\mid A,C)$ | 只生成视频；音频已知且固定 | TPoS | 同时生成音频与视频 |
@@ -44,7 +49,9 @@ Movie Gen 更说明产品族与单模型不能混写：技术报告披露独立�
 
 该判据不要求音频与视频共用一个 VAE。Ovi 和 LTX-2 都使用模态专用 codec/分支，却在每个生成 block 中双向交换；MiniMax H3 的官方模型卡则披露单流 H3-Omni-Transformer 联合预测音视频 latent，但仍使用独立 VisualVAE 与 AudioVAE [[11]](#ref-11) [[13]](#ref-13) [[26]](#ref-26)。因此“单流”不是联合生成的必要条件，“一个模型文件”也不是充分条件。
 
-## 2. 输入、输出、latent 与真实时间合同
+<a id="2-latent"></a>
+
+## 2. 表示与时间规格
 
 批大小为 $B$，视频帧数为 $F$、帧率为 $f_v$，音频声道数为 $C_a$、采样点数为 $S$、采样率为 $f_a$：
 
@@ -80,7 +87,7 @@ z_a=E_a(A)\in\mathbb R^{B\times T_a\times D_a}.
 \tau_a(j)=\delta_a+\frac{j\,h_a}{f_a}.
 ```
 
-实现还需声明首帧的非均匀覆盖、center/causal window、padding、裁切、重采样、声道布局，以及封装时的 mux 偏移 $\delta_{mux}$。LTX-2 的论文例子使用约 25 Hz、128 维音频 latent，并由 16 kHz stereo mel 表示经 vocoder 输出 24 kHz stereo；NAVA 则复用 LTX-2.3 音频 VAE 与 Wan2.2 视频 VAE；MiniMax H3 官方模型卡披露 32 kHz stereo、每声道 40 Hz 音频 latent 和 $4\times16\times16$ 视觉压缩 [[13]](#ref-13) [[16]](#ref-16) [[26]](#ref-26)。跨论文分数若忽略这些 codec 与采样合同，不能直接解释为 backbone 优劣。
+实现还需声明首帧的非均匀覆盖、center/causal window、padding、裁切、重采样、声道布局，以及封装时的 mux 偏移 $\delta_{mux}$。LTX-2 的论文例子使用约 25 Hz、128 维音频 latent，并由 16 kHz stereo mel 表示经 vocoder 输出 24 kHz stereo；NAVA 则复用 LTX-2.3 音频 VAE 与 Wan2.2 视频 VAE；MiniMax H3 官方模型卡披露 32 kHz stereo、每声道 40 Hz 音频 latent 和 $4\times16\times16$ 视觉压缩 [[13]](#ref-13) [[16]](#ref-16) [[26]](#ref-26)。跨论文分数若忽略这些 codec 与采样规格，不能直接解释为 backbone 优劣。
 
 ### 2.1 联合流匹配的最小形式
 
@@ -106,16 +113,16 @@ z_a(t)=(1-t)\epsilon_a+t z_a.
 
 Ovi 的作者稿即以共享 $t$、独立噪声和加权 AV flow-matching loss 训练双塔；Harmony 则把 clean-audio→video 与 clean-video→audio 两个辅助任务加入联合损失，试图缓解两个高噪 latent 同时学习对应关系时的 correspondence drift [[11]](#ref-11) [[15]](#ref-15)。这些是作者提出并在其协议中验证的机制，不是跨模型已独立确认的普遍定律。
 
-## 3. 一张图判清生成合同
+## 3. 生成流程
 
-![五种音视频生成合同：V2A 与 A2V 是单向条件，共同条件是无桥双支路，级联是先视频后音频；只有音频和视频 latent 在同一时间轴逐步双向交换的 JOINT 行被高亮。右侧四道门表示语义、事件时序、声源绑定和单模态质量均需验证。](../../assets/diagrams/native-audio-video-generation-contract.png)
+![五种音视频生成规格：V2A 与 A2V 是单向条件，共同条件是无桥双支路，级联是先视频后音频；只有音频和视频 latent 在同一时间轴逐步双向交换的 JOINT 行被高亮。右侧四道门表示语义、事件时序、声源绑定和单模态质量均需验证。](../../assets/diagrams/native-audio-video-generation-contract.png)
 
 **图 1：输出带声音，不足以证明原生联合。** 黑色单向箭头表示条件方向；`SHARED C` 的两支没有交互；`STAGED` 明确先后顺序；只有 `JOINT` 在多个去噪阶段出现双向交换。右侧图标依次代表语义一致、事件时序、声源绑定和单模态质量，任何一项失败都不能被平均分掩盖。
 
-![图 058：音视频生成合同判别树](../../assets/imagegen-diagrams/058/diagram.png)
+![图 058：音视频生成规格判别树](../../assets/imagegen-diagrams/058/diagram.png)
 **顺序化文字替代：** 先看音频与视频是否都要生成；若只有一侧未知，就是 V2A 或 A2V。若两侧都未知，再看是否同一轨迹：不在同一轨迹时，无先后依赖是共同条件双支路，有先后依赖是级联。若同轨迹但只靠外部评分器拉近，是推理期耦合；若服务不披露实现，只能记产品能力。只有能定位已学习的双向交换或共享生成层，才进入原生联合；随后再区分双支路和共享/packed 表示，并通过五类验证门。
 
-## 4. 技术路线与里程碑
+## 4. 代表方法
 
 ### 4.1 2023：低分辨率联合扩散建立问题
 
@@ -170,7 +177,7 @@ Inference-Time Scaling for Joint Audio-Video Generation 已发表于 TMLR 2026�
 | 2026 | Harmony / NAVA / OmniVAE / H3 | 跨任务监督、align-then-fuse、对齐 codec、单流 packed | NAVA/OmniVAE 为预印本；H3 为官方发布 |
 | 2026 | ITS / Ripple / VABench | 搜索扩展、流式记忆、系统化评测 | ITS 为正式 TMLR；Ripple 为未开放预印本 |
 
-## 5. 同步不是一个模块：六类机制
+## 5. 同步机制
 
 ### 5.1 共享物理时间坐标
 
@@ -188,7 +195,7 @@ h_v^{l+1}=F_v^l(h_v^l,\mathrm{Attn}(h_v^l,h_a^l),C,t),
 h_a^{l+1}=F_a^l(h_a^l,\mathrm{Attn}(h_a^l,h_v^l),C,t).
 ```
 
-Ovi 的对称 twin fusion 与 LTX-2 的非对称双流都满足这类合同 [[11]](#ref-11) [[13]](#ref-13)。判据是交换发生在生成轨迹内部并影响两侧更新，不是“模型图里画了两条线”。
+Ovi 的对称 twin fusion 与 LTX-2 的非对称双流都满足这类规格 [[11]](#ref-11) [[13]](#ref-13)。判据是交换发生在生成轨迹内部并影响两侧更新，不是“模型图里画了两条线”。
 
 ### 5.3 先对齐、后共享
 
@@ -206,7 +213,9 @@ Harmony 用 joint+A2V+V2A 训练，NAVA 混合 audio-only、video-only 与 AV �
 
 Ripple 把滑窗之外的历史压缩进 AV recurrent memory；ITS 则不保存长期内容状态，而在候选空间里用多 verifier 选择 [[23]](#ref-23) [[21]](#ref-21)。前者解决 streaming context，后者解决随机采样质量；二者不能互相替代，也都需要审计奖励/记忆是否累积偏差。
 
-## 6. 数据与 codec：同步上限先由输入决定
+<a id="6-codec"></a>
+
+## 6. 数据与编解码
 
 ### 6.1 数据账本
 
@@ -233,13 +242,13 @@ NAVA 的作者附录披露 OCR/字幕过滤、视觉与音频分标签、AV 对�
 
 视频侧检查 PSNR/LPIPS/rFVD、运动模糊、文字和首帧覆盖；音频侧检查频响、瞬态、语音可懂度、音乐谐波、stereo 相位与声像。若 codec 已抹掉 20 ms 撞击瞬态、立体声相位或口型细节，backbone 不可能恢复可靠同步。OmniVAE 的消融也显示加入 AV 对比对齐会轻微改变音频重建质量，说明“更易联合建模”和“逐模态重建无损”需要同时报告 [[19]](#ref-19)。
 
-## 7. 推理与产品工作流
+## 7. 推理流程
 
 ### 7.1 离线联合采样
 
 最小日志应保存：模型/commit/checkpoint、codec 版本、prompt 原文、参考素材 hash、seed、solver、步数、$t$ schedule、各模态 CFG、分辨率、帧率、时长、精度、设备、峰值显存、纯 denoising 时间、decode/vocoder/mux 时间。LTX-2 的论文还使用低分辨率 base、latent upscale 与时空 tile refinement；若只计 backbone 单步时间，会漏掉完整成片成本 [[13]](#ref-13)。
 
-### 7.2 流式合同
+### 7.2 流式规格
 
 “28 FPS”不是完整实时证明。流式系统至少报告：
 
@@ -256,7 +265,7 @@ Ripple 使用固定 sliding window、首块 sink、recurrent memory 和 rolling 
 
 MiniMax H3 官方模型卡把完整服务拆成 hosted H3-Context-IR、可本地部署的 768p H3-Base、以及 hosted H3-Regenerate-2K；开放 checkpoint 不能单独复现官方 2K 产品结果 [[26]](#ref-26)。Veo 官方页声明可生成同步音效、环境声与对白，但没有公开足以判断其内部因子化的训练/架构细节 [[27]](#ref-27)。Sora 2 与 Seedance 2.0 的官方发布同样可支持“产品输出带同步音频”的事实，却不能替代 joint backbone 证据 [[28]](#ref-28) [[29]](#ref-29)。
 
-## 8. 评测：五道门不能平均掉
+## 8. 评测方法
 
 VABench 在 CVPR 2026 覆盖 T2AV、I2AV 与 stereo，含 15 个维度和动物、人声、音乐、环境、同步物理声、复杂场景、虚拟世界七类内容 [[24]](#ref-24)。它比单一总分完整，但自动 evaluator、API 版本和小规模用户研究仍有自己的域与统计限制；本章把它当正式评测框架，不把其一次排行榜当永久模型结论。
 
@@ -276,7 +285,7 @@ VABench 在 CVPR 2026 覆盖 T2AV、I2AV 与 stereo，含 15 个维度和动物�
 1. 把“敲一次”改成“敲三次”，检查画面次数与声音 onset 是否一起改变；
 2. 交换两名说话者的台词/参考音色，检查口型、turn-taking 和声源归属；
 3. 将音频描述改为静音或不可见画外声，检查视频是否不应被无关同步器强迫运动；
-4. 人工将输出音轨平移 $`\lbrace-1,-0.5,0.5,1\rbrace`$ 秒，验证同步指标在正确偏移处有唯一最优。
+4. 人工将输出音轨平移 $\lbrace-1,-0.5,0.5,1\rbrace$ 秒，验证同步指标在正确偏移处有唯一最优。
 
 若修改音频条件只改变最终音轨、视频在所有 seed 下不变，系统可能是 staged V2A；若两侧都变，却只因 prompt 同时改写，则还不能证明 AV 内部双向交换。应进一步对 cross-modal block 做 mask/ablation，并记录两侧变化。
 
@@ -284,7 +293,9 @@ VABench 在 CVPR 2026 覆盖 T2AV、I2AV 与 stereo，含 15 个维度和动物�
 
 ITS 论文在其协议中发现：只用文本—视频 verifier 会提高文本画面对齐却几乎不改善 AV，同步 verifier 单独使用又偏向 AV 分数；多 verifier 与 ARW 更平衡，但搜索开销显著增加 [[21]](#ref-21)。因此训练 reward、搜索 verifier 和最终验收器至少应有一套独立来源，并用盲评、held-out 事件和时间平移负对照检查。
 
-## 9. Failure modes：按因果位置定位
+<a id="9-failure-modes"></a>
+
+## 9. 故障诊断
 
 | 现象 | 优先怀疑 | 最小诊断 | 可能修复 |
 |---|---|---|---|
@@ -297,9 +308,11 @@ ITS 论文在其协议中发现：只用文本—视频 verifier 会提高文本
 | 错误地“逢动必响” | 正配对捷径 | 静默动作与画外声负例 | diegetic 标签、silence/off-screen 数据 |
 | 长时身份/音色漂移 | 有限窗口与 memory 污染 | 30/60 秒、插入无关片段 | 可失效 memory、reset 与 long-horizon 训练 |
 | 总分高但样片怪异 | verifier hacking | 独立盲评与未优化指标 | 多 verifier、held-out evaluator、预算上限 |
-| 产品与本地复现差距大 | hosted preprocessing/upscale | 分别调用/跳过每个服务模块 | 报告 release surface，不混写版本 |
+| 产品与本地复现差距大 | hosted preprocessing/upscale | 分别调用/跳过每个服务模块 | 报告 发布内容，不混写版本 |
 
-## 10. 2025–2026 frontier 与发布面
+<a id="10-20252026-frontier"></a>
+
+## 10. 近期方法与发布内容
 
 ### 10.1 研究前沿的五个方向
 
@@ -309,7 +322,7 @@ ITS 论文在其协议中发现：只用文本—视频 verifier 会提高文本
 4. **从离线短片到有界流式 memory：** Ripple 用固定窗口与 cross-modal recurrent memory 换取长程和稳定吞吐 [[23]](#ref-23)。
 5. **从一次采样到多目标 test-time search：** ITS 用多 verifier 与 ARW 扩展推理预算，同时暴露 verifier hacking 与成本上限 [[21]](#ref-21)。
 
-### 10.2 冻结日发布面
+### 10.2 冻结日发布内容
 
 | 系统 | 证据 | 代码/权重 | 可复现到哪一层 | 关键缺口 |
 |---|---|---|---|---|
@@ -326,9 +339,9 @@ ITS 论文在其协议中发现：只用文本—视频 verifier 会提高文本
 | Ripple | 预印本 | 未核验官方工件 | 只能审读作者协议 | 实时/长时尚不能独立复现 |
 | MiniMax H3 | 官方发布/模型卡 | 两个 H3-Base checkpoint 与代码 | 本地 768p Base | Context-IR、2K regenerate、稀疏 attention 未开 |
 
-证据等级解释：正式发表说明入口经同行评议，不保证结论已独立复现；预印本结果写“作者报告”；官方发布只支持提供方披露。release surface 每次升级都应按 checkpoint、commit 与日期重新冻结。
+证据等级解释：正式发表说明入口经同行评议，不保证结论已独立复现；预印本结果写“作者报告”；官方发布只支持提供方披露。发布内容 每次升级都应按 checkpoint、commit 与日期重新冻结。
 
-## 11. 最小复现协议
+## 11. 复现配置
 
 ### 11.1 Phase A：任务与版本预注册
 
@@ -383,11 +396,16 @@ ITS 论文在其协议中发现：只用文本—视频 verifier 会提高文本
 - 作者报告结果与本地复现结果分栏；
 - 可复现层级：paper-only、inference、fine-tune、full-train、full-product。
 
-## 12. 结论
+## 12. 使用建议
 
 原生音视频生成的核心不是“声音更像”，而是两种时间信号能否在可审计的同一生成过程中共同决定彼此。判断顺序应固定为：**先看因子化，再看轨迹内交互，再看表示和真实时间轴，最后用不可互相抵消的评测门与干预实验验收。**
 
-截至 2026-08-30，领域已从 MM-Diffusion 的早期耦合 U-Net，发展到 Ovi/LTX-2/JavisDiT 的双支路交互、NAVA 的 align-then-fuse、H3 的单流 packed sequence、OmniVAE 的 codec 对齐，以及 Ripple/ITS 的系统与推理扩展；但预印本、官方发布、开放 checkpoint 和完整产品链仍是四种不同证据。真正可靠的 frontier 结论，必须同时写清任务定义、版本、release surface、计算预算与失败样例。
+截至 2026-08-30，领域已从 MM-Diffusion 的早期耦合 U-Net，发展到 Ovi/LTX-2/JavisDiT 的双支路交互、NAVA 的 align-then-fuse、H3 的单流 packed sequence、OmniVAE 的 codec 对齐，以及 Ripple/ITS 的系统与推理扩展；但预印本、官方发布、开放 checkpoint 和完整产品链仍是四种不同证据。真正可靠的 frontier 结论，必须同时写清任务定义、版本、发布内容、计算预算与失败样例。
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 
@@ -441,7 +459,7 @@ ITS 论文在其协议中发现：只用文本—视频 verifier 会提高文本
 
 <a id="ref-25"></a>[25] MiniMax. [MiniMax H3: An Open Model Breaking the Boundaries Between Tasks and Modalities](https://www.minimax.io/blog/minimax-h3). Official release, 2026.
 
-<a id="ref-26"></a>[26] MiniMaxAI. [MiniMax H3 model card and release surface](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/README.md). Accessed 2026-08-30.
+<a id="ref-26"></a>[26] MiniMaxAI. [MiniMax H3 model card and 发布内容](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/README.md). Accessed 2026-08-30.
 
 <a id="ref-27"></a>[27] Google DeepMind. [Veo](https://deepmind.google/models/veo/). Official model page, accessed 2026-08-30.
 

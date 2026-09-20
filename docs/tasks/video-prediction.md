@@ -1,10 +1,15 @@
-# 视频预测：从过去可见帧到可检验的未来分布
+# 视频预测
 
-> 本章冻结于 **2026-08-30（Asia/Shanghai）**。这里的 video prediction 特指：部署时只看见观测前缀，预测其后的未来观测或与未来观测对应的状态。画面“像视频”只是最低门槛；若要声称模型学会长期动力学、物理或规划，还必须逐级补上分布、干预和闭环证据。
+介绍根据历史观测建模未来视频的确定性、随机性与滚动预测方法。
+
+**前置知识：** 条件概率、时序模型。
+
+**使用步骤：** 划分可见历史与预测区间 → 区分训练目标和推理输入 → 评估多步误差、未来覆盖及校准。
+
 
 检索式、结果数、纳排规则、逐篇标题/ID/venue 核验、FramePack 版本史、图片生成记录和验收命令见[配套研究记录](../../sources/research_20260830_video_prediction.md)。
 
-## 🎯 学习目标
+## 学习目标
 
 读完本章，应能完成六件事：
 
@@ -15,7 +20,7 @@
 5. 按单步保真、多步开环、分布校准、OOD/干预、闭环效用五级组织证据；
 6. 对任何“长视频世界模型”主张提出可复现的里程碑验收，而不是接受精选样例。
 
-## 📐 1. 精确定义：过去是唯一的推理输入
+## 1. 任务定义
 
 设 RGB 观测前缀和未来目标分别为
 
@@ -32,7 +37,7 @@ Y=x_{T_c+1:T_c+T_h}.
 
 随机预测器则学习条件分布 $p_\theta(Y\mid X)$，测试时应报告
 $K$ 个独立或有设计的样本
-$`\lbrace\hat Y^{(k)}\rbrace_{k=1}^{K}`$。严格限制针对的是**部署推理**：真实未来 $Y$
+$\lbrace\hat Y^{(k)}\rbrace_{k=1}^{K}$。严格限制针对的是**部署推理**：真实未来 $Y$
 或其编码不得作为部署路径的模型输入。训练期可以把 $Y$ 用于损失目标、扩散加噪/腐蚀输入、变分 posterior、teacher forcing，或构造 stop-gradient foresight teacher/target，但这些都必须标为 **train-only** 并在部署时移除。离线评价可以用 $Y$ 比较预测，也不得回流到当次推理。
 
 “预测一帧”和“预测一块”还需显式写出块长 $b$：
@@ -52,14 +57,14 @@ $U$ 可以把生成帧追加到滑动窗口、更新递归状态，或把历史�
 | **Video prediction** | 仅过去观测；可另有已声明外生变量 | 未来像素或对应未来状态 | 目标时间严格晚于最后一帧条件 | 把测试未来帧的 feature 当成“辅助条件” |
 | **Video frame interpolation（VFI）** | 查询时刻两侧都有真实端点 | 端点之间的帧 | 不属于；它是双侧条件重建 | 用插值结果证明外推能力 |
 | **Future frame synthesis** | 术语本身不限定条件 | 一个或多个“未来”画面 | 只有 past-only 时才与 prediction 同义 | 文本、终点图、pose 或完整轨迹也输入，却仍叫无条件预测 |
-| **Action-conditioned prediction** | 过去观测加未来动作 $a_{T_c:T_c+T_h-1}$ | 动作条件下的未来 | 是预测的条件化子类，合同为 $p(Y\mid X,A)$ | 与被动 $p(Y\mid X)$ 混算；把相关性当干预效应 |
+| **Action-conditioned prediction** | 过去观测加未来动作 $a_{T_c:T_c+T_h-1}$ | 动作条件下的未来 | 是预测的条件化子类，规格为 $p(Y\mid X,A)$ | 与被动 $p(Y\mid X)$ 混算；把相关性当干预效应 |
 | **World model** | 状态/观测、动作，常含 reward/termination | 可用于决策的状态转移或观测 | 只有预测进入 planning/control 并验证 utility 时 | 一段逼真视频直接升级成“可规划世界模型” |
 | **Latent state prediction** | 过去像素或 latent | 未来 $z$、token、trajectory | $z_t$ 与未来观测/任务目标有明确定义 | 没有 decoder 或 probe 仍声称像素正确 |
-| **Generative continuation** | 图像/视频前缀，可叠加文本等 | 视觉上合理的后续 | 只在条件合同与真实未来分布匹配时 | 把 prompt adherence、审美或任意续写当预测准确性 |
+| **Generative continuation** | 图像/视频前缀，可叠加文本等 | 视觉上合理的后续 | 只在条件规格与真实未来分布匹配时 | 把 prompt adherence、审美或任意续写当预测准确性 |
 
 一个随机预测器当然会“生成续写”，但生成续写并不自动是预测证据。前者可追求条件下的可看性；后者必须说明数据生成过程、时间因果方向，以及采样分布是否覆盖真实可能未来。
 
-若提供未来动作，合同变为
+若提供未来动作，规格变为
 
 ```math
 p_\theta(Y\mid X,A),\qquad
@@ -68,9 +73,21 @@ A=a_{T_c:T_c+T_h-1}\in\mathbb R^{B\times T_h\times d_a}.
 
 这允许比较不同动作的反事实后果，但仍不保证因果可识别：行为策略覆盖不足、动作与隐藏状态混杂、观测缺失，都可能让模型只记住数据相关性。PlaNet 把 stochastic/deterministic latent dynamics 接到 online planning，是“预测如何成为决策模型”的早期正式范例；它不是被动视频预测 benchmark 的同义词 [[9]](#ref-9)。
 
-![视频预测的部署推理合同与证据阶梯：过去帧进入模型，生成帧按自条件方式回灌并分支为多个可能未来；真实未来在图中只用于离线比较，不回流到部署推理。右侧证据从单步保真、多步开环、分布与校准、OOD 与干预，逐级上升到闭环效用。](../../assets/diagrams/video-prediction-evidence-ladder.png)
+```mermaid
+flowchart LR
+    H[历史帧与条件] --> P[未来预测器]
+    P --> S[多个候选未来]
+    S --> R[使用预测结果继续滚动]
+    R --> P
+    S --> E[离线评测]
+    T[真实未来：仅供离线评测] --> E
+    E --> V[VP0 短期保真 / VP1 多步稳定]
+    E --> D[VP2 分布与校准 / VP3 干预与泛化]
+    E --> C[VP4 独立闭环效用]
+```
 
-**图注：** 该 PNG 只画**部署推理主路径 + 离线评价**，因此左侧先检查“未来真值不进入部署推理”，再检查模型是否以自己的输出继续 rollout，并为多峰未来保留多个样本。图中没有展开训练期的 corruption/posterior/teacher/target 分支；完整训练合同见下方 Mermaid。右侧是主张强度而非单一排行榜：L0 好看不能推出 L4 可用于决策；每上升一级都要增加新的实验，而不是替换一项指标。
+**图注：** 图示为部署预测与离线评测流程。VP0–VP4 是本章的测试项目编号，与全手册 L0–L7 报告约定分开。真实未来不能作为部署输入；训练期允许使用的后验、教师和目标分支在后文另行说明。
+
 
 **图的顺序化文字替代：**
 
@@ -78,11 +95,26 @@ A=a_{T_c:T_c+T_h-1}\in\mathbb R^{B\times T_h\times d_a}.
 2. 模型预测下一帧或下一块，并把自己的生成结果用于下一次预测。
 3. 随机模型从同一前缀产生 $K$ 个可能未来，再交给评估器。
 4. 真实未来在这张“部署推理 + 离线评价”图中只进入 loss/metric，不能回到当次部署推理；训练期可有另外的 train-only 未来监督路径。
-5. 证据依次从 L0 单步保真、L1 多步开环、L2 分布与校准、L3 OOD 与干预，上升到 L4 闭环效用。
+5. 证据依次从 VP0 单步保真、VP1 多步开环、VP2 分布与校准、VP3 OOD 与干预，上升到 VP4 闭环效用。
 
-## 🧩 2. Tensor、训练与 rollout 合同
+<a id="2-tensor-rollout"></a>
 
-![图 070：视频预测的训练与推理张量合同](../../assets/imagegen-diagrams/070/diagram.png)
+## 2. 训练与滚动预测接口
+
+```mermaid
+flowchart TB
+    X[历史帧 X] --> Train[训练期预测]
+    Y[真实未来 Y] --> Aux[后验、加噪或监督目标]
+    Aux --> Train
+    Train --> Loss[训练损失与参数更新]
+    X --> Infer[部署期预测器]
+    Seed[随机种子与已知条件] --> Infer
+    Infer --> Future[预测未来]
+    Future --> History[更新生成历史]
+    History --> Infer
+```
+
+训练图概括允许的未来监督路径，具体分支取决于模型。部署路径只读取历史、合法条件与随机变量。
 **顺序化文字替代：**
 
 1. 把完整训练片段沿时间切成 $X$ 与 $Y$，并保留原始时间戳/FPS。
@@ -91,16 +123,16 @@ A=a_{T_c:T_c+T_h-1}\in\mathbb R^{B\times T_h\times d_a}.
 4. 把预测块追加、递归更新或压缩进上下文，再预测下一块。
 5. 重复到 $T_h$，得到形状为 $K\times B\times T_h\times3\times H\times W$ 的样本集；离线评价再与 $Y$ 比较，不回流到该次 rollout。
 
-### 2.1 四种实现合同
+### 2.1 四种实现规格
 
-| 合同 | 训练输出 | 推理状态 | 关键复现字段 | 典型风险 |
+| 规格 | 训练输出 | 推理状态 | 关键复现字段 | 典型风险 |
 |---|---|---|---|---|
 | **Direct / one-shot** | 一次输出全部 $T_h$ 帧 | 无自回灌 | $T_h$ 是否固定、时间位置编码 | 训练视野之外无法自然延长 |
 | **Frame autoregression** | 下一帧 $b=1$ | 生成帧或 recurrent state | warm-up、窗口、状态 reset、sampling | 误差逐帧复合，吞吐低 |
-| **Block autoregression** | 下一块 $`b\gt1`$ | 生成块与压缩历史 | 块重叠、边界融合、block FPS | 块内一致但块间跳变 |
+| **Block autoregression** | 下一块 $b\gt1$ | 生成块与压缩历史 | 块重叠、边界融合、block FPS | 块内一致但块间跳变 |
 | **Latent/token rollout** | $z$ 或离散/连续 token | latent KV cache 或 state | encoder 是否冻结、decoder、token 顺序 | latent 好但像素/物理不可读 |
 
-Latent 合同至少应写成
+Latent 规格至少应写成
 
 ```math
 z_t=E(x_t),\quad
@@ -122,7 +154,9 @@ z_t=E(x_t),\quad
 
 Self Forcing 用自回归 rollout、KV cache、少步 diffusion 和 stochastic gradient truncation 训练 video-level objective，正式发表于 NeurIPS 2025 [[19]](#ref-19)。Diffusion Forcing 则给序列中每个 token 独立噪声等级，使过去不必全部加噪、未来可以逐个或分块生成；它优化的是扩散式序列目标，不能只因为名字相似就写成“scheduled sampling 的扩散版” [[15]](#ref-15)。
 
-## 🧭 3. 技术路线：表示、随机性与 rollout 是三条正交轴
+<a id="3-rollout"></a>
+
+## 3. 建模方法
 
 ![图 071：视频预测的五条技术路线及其证据出口](../../assets/imagegen-diagrams/071/diagram.png)
 **顺序化文字替代：**
@@ -153,7 +187,7 @@ p_\theta(z_t\mid X,\hat Y_{<t})\right).
 
 训练 posterior 看见真实未来，部署 prior 看不见；二者错配、posterior collapse 与 best-of-$K$ 挑样都会让“多样”看起来比实际分布校准更好。至少同时报告 sample-average、best-of-$K$、$K$ 值、样本内/样本间多样性，以及覆盖与准确的权衡。
 
-这条 direct stochastic-future 路线在 2019–2026 又分成 deep hierarchy、fully latent residual dynamics、clockwork/event temporal abstraction 与 object/module latent。categorical RSSM 是共享变分 state-space 数学、但以 action/reward/return 验收的相邻控制支线；LPWM 的 object-particle + latent-action ELBO 是二者的桥接点。严格纳入门、论文协议和 `Forking-Squares-v1` 反证实验见[变分随机视频生成](../generative-models/variational-generation.md)。名字里只有 VAE/latent、但没有 future-aware posterior + 不看未来的 deployment prior + KL/ELBO 的系统，不应并入 direct 主线。
+这条 direct stochastic-future 路线在 2019–2026 又分成 deep hierarchy、fully latent residual dynamics、clockwork/event temporal abstraction 与 object/module latent。categorical RSSM 是共享变分 state-space 数学、但以 action/reward/return 验收的相邻控制支线；LPWM 的 object-particle + latent-action ELBO 是二者的桥接点。严格纳入门、论文协议和 合成分叉方块数据示例 反证实验见[变分随机视频生成](../generative-models/variational-generation.md)。名字里只有 VAE/latent、但没有 future-aware posterior + 不看未来的 deployment prior + KL/ELBO 的系统，不应并入 direct 主线。
 
 ### 3.3 Diffusion / score：高保真条件分布与高昂 rollout
 
@@ -170,7 +204,7 @@ y^{(\tau)}=\alpha_\tau y+\sigma_\tau\epsilon,\qquad
 
 CausVid 从慢的双向 diffusion teacher 蒸馏 few-step causal student，配合 distribution matching 与 ODE initialization，正式发表于 CVPR 2025 [[17]](#ref-17)。它证明高质量生成 backbone 可以被改造成更流式的自回归模型；但其速度和画质数字是特定硬件、分辨率、步数与数据协议的系统结果，不是任意预测任务的常数。
 
-### 3.4 Latent、token 与 foundation continuation：压缩了输出，不免除合同
+### 3.4 Latent、token 与 foundation continuation：压缩了输出，不免除规格
 
 VideoGPT 将视频 VQ-VAE token 交给自回归 Transformer [[10]](#ref-10)；NOVA 则不依赖量化码本，在时间上逐帧自回归、帧内按 set 双向建模，正式发表于 ICLR 2025 [[16]](#ref-16)。这类模型把高维像素分解为可扩展 token 顺序，但 token likelihood、prompt adherence 和主观画质都不能单独证明对一个真实未来分布的校准。
 
@@ -187,7 +221,7 @@ FramePack 更具体地处理固定 context budget。它按帧重要性压缩输�
 
 只预测对决策足够的状态可以避开不可控纹理。V-JEPA 2 先在大规模 action-free 视频上训练 joint-embedding predictor，再用小规模机器人轨迹后训练 V-JEPA 2-AC 并进行 planning [[20]](#ref-20)。因此“action-free V-JEPA 2 能理解视频”和“V-JEPA 2-AC 能按动作规划”是两层证据，不能合成一句“被动视频直接学会控制”。
 
-决策合同至少包含
+决策规格至少包含
 
 ```math
 z_{t+1}\sim p_\theta(z_{t+1}\mid z_t,a_t),\qquad
@@ -197,7 +231,7 @@ a_{t:t+H-1}^*=\arg\max_A\mathbb E\sum_h\gamma^h\hat r_{t+h}.
 
 只有当 action intervention 会在 latent rollout 中产生正确、可区分的后果，并在真实环境提升 success/return 或降低 planning regret，才到达“world model utility”。
 
-## 📚 4. 代表工作精读矩阵
+## 4. 代表方法
 
 | 工作 | 输入 → 输出 | 训练与 forcing | Rollout | 它真正建立的证据 | 主要限制 |
 |---|---|---|---|---|---|
@@ -206,7 +240,7 @@ a_{t:t+H-1}^*=\arg\max_A\mathbb E\sum_h\gamma^h\hat r_{t+h}.
 | DNA/CDNA/STP, 2016 [[3]](#ref-3) | 视频 + 动作 → 像素运动 | 真实机器人交互监督 | action-conditioned AR | 复制/warp 先验有利于物体运动 | 新显露内容和长程漂移 |
 | SV2P, 2018 [[5]](#ref-5) | 历史，可选动作 → 随机未来 | latent-variable variational training | 多帧 recurrent | 真实视频多未来需要随机变量 | posterior/prior mismatch；评测依赖 $K$ |
 | SVG-LP, 2018 [[6]](#ref-6) | 历史 → per-step latent + future | learned prior 与 posterior | stochastic recurrent | history-dependent prior 分离确定/随机因素 | 长 rollout 仍积累状态误差 |
-| PlaNet, 2019 [[9]](#ref-9) | 图像 + 动作 → latent/reward | latent dynamics learning | imagined planning | prediction 可按 task utility 验证 | 属于控制合同，不是纯视频画质榜 |
+| PlaNet, 2019 [[9]](#ref-9) | 图像 + 动作 → latent/reward | latent dynamics learning | imagined planning | prediction 可按 task utility 验证 | 属于控制规格，不是纯视频画质榜 |
 | VideoGPT, 2021 [[10]](#ref-10) | VQ video token → token | next-token likelihood | token AR | 离散 latent 支持生成与预测 | 量化损失、长 token 序列；仅 arXiv 来源 |
 | FitVid, 2021 [[11]](#ref-11) | 历史，可选动作 → future | deterministic/stochastic ablation | recurrent | 简化架构仍可成强基线 | CoRR/arXiv；不应误写成正式 ICLR 接收 |
 | SimVP, 2022 [[12]](#ref-12) | past tensor → future tensor | end-to-end MSE | one-shot | 纯 CNN 在固定协议下很强 | 单未来与短 horizon 不能覆盖不确定性 |
@@ -220,13 +254,19 @@ a_{t:t+H-1}^*=\arg\max_A\mathbb E\sum_h\gamma^h\hat r_{t+h}.
 
 矩阵中的“2025”同时包含首发年和正式发表年一致的工作；若二者不一致，应像 FramePack 一样分开记录。论文名旁的年份不是“技术被发明的唯一时刻”，而是本章可核验的版本节点。
 
-## 📏 5. 评价：五级 evidence ladder
+<a id="5-evidence-ladder"></a>
 
-### L0：单步/短期视觉保真
+## 5. 评测项目
+
+<a id="l0"></a>
+
+### VP0：单步/短期视觉保真
 
 固定相同 resolution、FPS、color range、crop 和 horizon，报告 PSNR/SSIM（失真）、LPIPS（感知），必要时补 motion/flow consistency。它们回答“与这一条 GT 多像”，不回答“是否覆盖其他可能未来”。PSNR 更高而图像更糊并不矛盾。
 
-### L1：多步 open-loop 稳定性
+<a id="l1-open-loop"></a>
+
+### VP1：多步 open-loop 稳定性
 
 让模型在第一个预测之后只吃自己的输出，按 horizon 曲线报告而非一个平均数：
 
@@ -237,7 +277,9 @@ a_{t:t+H-1}^*=\arg\max_A\mathbb E\sum_h\gamma^h\hat r_{t+h}.
 
 必须同时给 teacher-forced one-step 与 self-conditioned rollout；否则无法判断改进来自模型本身，还是测试时持续喂 GT。
 
-### L2：条件分布、覆盖与校准
+<a id="l2"></a>
+
+### VP2：条件分布、覆盖与校准
 
 对每个前缀采样 $K$ 次，报告 $K$、seed 和 sampling temperature。可组合：
 
@@ -249,15 +291,19 @@ a_{t:t+H-1}^*=\arg\max_A\mathbb E\sum_h\gamma^h\hat r_{t+h}.
 
 FVD 只有在 feature extractor、clip length、FPS、resolution、preprocessing 与样本数完全一致时才可横向比较。单条真实未来不可能独自证明多峰分布是否正确。
 
-### L3：OOD、反事实与干预
+<a id="l3ood"></a>
+
+### VP3：OOD、反事实与干预
 
 把外观 shift 与 dynamics shift 分开：新纹理/背景、未见速度/碰撞参数、长尾事件、动作序列、相机扰动。对 action-conditioned 模型执行 matched-state action swap，检查预测差异是否与真实干预后果一致。只在自然视频上“看起来物理”仍属于观察性证据。
 
-### L4：闭环 utility
+<a id="l4-utility"></a>
+
+### VP4：闭环 utility
 
 把预测接入同一 planner/policy，在真实或可信 simulator 中比较 success、return、planning regret、collision/constraint violation、latency 与 compute。控制变量至少包括 encoder、planner 搜索预算、action horizon 和真实观测重规划频率。只有这一层能直接支持“对决策有用”。
 
-## 🧪 6. 数据与协议陷阱
+## 6. 数据与划分
 
 1. **相邻片段泄漏**：同一原视频切出的相邻 clip 分散在 train/test，背景和演员几乎重复；应按 source video、scene 或 episode 分组切分。
 2. **FPS 偷换**：同样预测 16 帧，在 4 FPS 与 25 FPS 上代表完全不同时间跨度；必须同时报告帧数和秒数。
@@ -269,7 +315,7 @@ FVD 只有在 feature extractor、clip length、FPS、resolution、preprocessing
 8. **模型选择泄漏**：在 test FVD 上挑 checkpoint、guidance、temperature 或 best seed 等同调参；应有 validation split。
 9. **不等价算力**：diffusion step、sample 数 $K$、context length、cache、分辨率与硬件都影响质量和速度；同时报告端到端延迟、吞吐和峰值显存。
 
-## 🔬 7. 失败模式：从画面症状定位合同错误
+## 7. 故障诊断
 
 | 失败模式 | 可观察症状 | 优先诊断 | 反证实验 |
 |---|---|---|---|
@@ -284,7 +330,7 @@ FVD 只有在 feature extractor、clip length、FPS、resolution、preprocessing
 | 不确定性失真 | 样本多样但事件频率错误 | temperature、posterior/prior gap | reliability diagram 与 held-out event frequency |
 | metric hacking | best-of-$K$ 很好，平均样本很差 | oracle selection | 固定 $K$，同时报告 average、best 与 compute |
 
-## 🗺️ 8. 可复核的里程碑，不是线性“代际替代”
+## 8. 技术发展
 
 一个工作只有满足下列判据才进入主里程碑：它改变了任务定义、表示/概率建模、rollout/forcing 或证据层级之一；有可定位的一手版本；后续工作仍可明确继承或反驳该变化。单纯更大模型、精选 demo 或不可比的单项 SOTA 不构成里程碑。
 
@@ -300,7 +346,9 @@ FVD 只有在 feature extractor、clip length、FPS、resolution、preprocessing
 | 2025 | NOVA、CausVid、FramePack、Self Forcing [[16]](#ref-16)-[[19]](#ref-19) | 连续 token AR、因果蒸馏、固定预算历史、rollout-aligned training |
 | 2026 | PHANTOM、trajectory prediction、Causal Forcing 与新预印本前沿 [[21]](#ref-21), [[22]](#ref-22), [[25]](#ref-25) | 联合物理状态、先预测动力学轨迹、正式因果扩散训练；长期记忆/4D reward 仍在快速验证 |
 
-## 🔭 9. 2026 frontier：哪些已经正式，哪些仍只是强假说
+<a id="9-2026-frontier"></a>
+
+## 9. 近期方法
 
 ### 9.1 已有正式 proceedings 的方向
 
@@ -319,9 +367,11 @@ Causal Forcing 也已有 ICML 2026 正式接收页；它强调 causal teacher/OD
 
 这组工作共同把前沿从“下一帧更清楚”推向四个可检验问题：远距状态是否可检索、运动是否被静态画质奖励压死、预测 representation 是否能被稳定渲染、训练期 foresight 是否真正不泄漏到部署。它们不是同一排行榜，也不应把 arXiv 日期写成正式发表 venue。
 
-## ✅ 10. 最小可复现实验与验收门
+## 10. 实验设计示例
 
-### 10.1 实验合同
+本节是可按任务调整的实验设计示例，尚未在本仓库运行；参数与阈值是示例设置，不是已发布基准或实测结果。
+
+### 10.1 实验规格
 
 ```text
 input:  B x Tc x 3 x H x W, RGB, [0,1], fps=..., seconds=Tc/fps
@@ -338,14 +388,19 @@ split:  source-video/scene/episode grouped; duplicates audited
 
 | 想写的结论 | 最低验收门 |
 |---|---|
-| “短期预测更准” | 同协议 L0 指标、置信区间、copy-last/SimVP 类强基线 |
-| “长 rollout 更稳” | L1 self-conditioned horizon curve、time-to-failure、所有样本 |
-| “能表达多未来” | 固定 $K$ 的 L2 coverage/calibration，加 average 与 best-of-$K$ |
+| “短期预测更准” | 同协议 VP0 指标、置信区间、copy-last/SimVP 类强基线 |
+| “长 rollout 更稳” | VP1 self-conditioned horizon curve、time-to-failure、所有样本 |
+| “能表达多未来” | 固定 $K$ 的 VP2 coverage/calibration，加 average 与 best-of-$K$ |
 | “理解物理” | state/trajectory probe，加 dynamics OOD 与受控 intervention |
-| “是 world model” | 明确 action/reward/state 合同，加 L4 closed-loop utility |
+| “是 world model” | 明确 action/reward/state 规格，加 VP4 closed-loop utility |
 | “实时/流式” | 因果输出顺序、端到端首帧/稳态延迟、硬件、步数、峰值显存 |
 
 最后的审稿问题只有一句：**如果把所有未来真值、精选 seed 和视觉修辞拿走，模型还能在自己的状态分布上保持正确，并为可重复的预测或决策带来收益吗？**
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 

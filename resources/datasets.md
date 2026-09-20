@@ -1,25 +1,19 @@
-# 视频生成与 World Model 数据：从数据集清单到可审计 Data Engine
+# 视频数据集与数据处理
 
-> **综述日期：2026-08-29。** 本页是一篇面向视频生成、视频世界模型和具身学习的聚焦型 scoping review。规模、可下载性和许可均是日期相关快照；用于训练前必须重新核对官方数据卡与上游条款。完整检索与纠错记录见[研究审计](../sources/research_20260829_video_data.md)。
+介绍视频数据的统计口径、数据集类型、描述标注、去重、划分与版本管理。
 
-## 先记住四句话
+**前置知识：** 视频生成任务、数据预处理。
 
-1. **先看统计单位，再看数字。** `10M` 可能是源视频、切出的 clips、caption rows、URL 或帧，彼此不能直接比较。
-2. **“开放”不是一个布尔值。** 论文、代码、URL 索引、metadata、视频媒体和训练声明是六种不同产物。
-3. **数据卡的 wrapper license 不能授予它并不拥有的上游视频版权。** “公开可访问”也不等于“可训练、可再分发或可商用”。
-4. **现代视频模型的关键资产不是一张 CSV，而是可回放、可删除、可去污染的版本化 Data Engine。**
+**使用步骤：** 按任务选择数据及标注类型 → 抽样检查媒体、描述、重复与划分 → 保存处理配置、来源和版本后开展训练。
 
-本页回答五个问题：
 
-- 数据规模到底应该怎样读？
-- 2019–2026 的数据技术路线发生了什么变化？
-- 哪些产物现在真的能拿到，哪些只是论文中的训练披露？
-- 视频、动作、物理和多传感器数据应该怎样统一治理？
-- 怎样证明“这个数据更好”，而不是只证明“这个数据更大”？
+## 数据使用概述
 
----
+数据选择取决于任务所需的条件信号、内容分布、质量和可用权限。登记数据时，分别记录源视频数、片段数、总时长、标注类型与实际发布文件；不同统计单位不能直接相加或排名。
 
-## 1. 什么才算“数据集已发布”
+本章先说明统计单位与处理流程，再按视频文本、动作条件、物理和多传感器数据分类。末尾给出清单格式、划分方法和数据质量检查步骤。表中的规模和发布状态属于注明日期的资料记录，使用前应通过条目的官方入口确认版本。
+
+## 1. 发布内容与统计单位
 
 ### 1.1 六个发布层级
 
@@ -55,17 +49,16 @@ N_{\mathrm{eff,source}}
 ```
 
 这只是来源集中度诊断，不是对“独立训练样本数”的估计。报告它时还应同时给出唯一来源数、重复簇数，以及每个来源或簇贡献 clips 的分位数；否则 70M rows 仍可能主要来自少量长视频的重复切分。
-本页公式统一采用 [GitHub 支持的 dollar-delimited math syntax](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/writing-mathematical-expressions)。
 
 ---
 
-## 2. 一张图看懂现代 Video Data Engine
+## 2. 数据处理流程
 
 ![Video Data Engine 主流程：来源与权利门、不可变摄取、镜头或段落切分、质量与运动筛选、跨源去重与 benchmark 去污染、分层描述与核验、分组混合、训练评测防火墙、版本化划分、训练审计；下方另列更正、tombstone 与派生数据或 checkpoint 台账。](../assets/diagrams/video-data-engine-v2.png)
 
-**图 1：概念总览。** 上方 PNG 的 1–10 号框就是本章采用的主路径；紫色链给出 `Removal / Correction → Tombstone + New Manifest → Derived Data / Checkpoint Ledger`。为避免静态图中的长反馈线遮挡主流程，tombstone 回写 manifest、台账传播到训练审计、撤回或重授权反馈到权利门的精确连接放在下方 Mermaid。两者都不代表某个机构的内部实现。Rights + Safety 不是末端过滤器，而是贯穿来源登记到版本发布的控制面。
+**图 1：概念总览。** 上方 PNG 的 1–10 号框就是本章采用的主路径；紫色链给出 `Removal / Correction → Tombstone + New Manifest → Derived Data / Checkpoint Ledger`。为避免静态图中的长反馈线遮挡主流程，tombstone 回写 manifest、台账传播到训练审计、撤回或重授权反馈到权利门的精确连接放在下方 流程图及文字说明。两者都不代表某个机构的内部实现。Rights + Safety 不是末端过滤器，而是贯穿来源登记到版本发布的控制面。
 
-下面给出可编辑、可搜索、对读屏器更友好的确定性版本：
+下面给出补充图示和顺序化文字说明：
 
 ![图 085：可审计的现代 Video Data Engine](../assets/imagegen-diagrams/085/diagram.png)
 顺序化文字替代：
@@ -83,7 +76,7 @@ N_{\mathrm{eff,source}}
 
 ---
 
-## 3. 数据技术路线与里程碑：2019–2026
+## 3. 代表数据集的发展
 
 这里把“里程碑”限定为至少改变一项：**主导数据单位、annotation 表达、过滤/去重技术、公开访问面或治理机制**。单纯把数字再做大，不自动成为里程碑。
 
@@ -96,8 +89,8 @@ N_{\mathrm{eff,source}}
 | 2023 预印本 | Stable Video Diffusion data engine [[5]](#ref-5) | 系统披露切镜、OCR、光流、审美、caption 与人偏好阈值消融 | 约 580M annotated clips（表中 577M）与 152M LVD-F training examples 是私有池，不是公开数据集 |
 | 2024 | Panda-70M [[6]](#ref-6) | 多个跨模态教师提出 caption，再用小型人工集训练选择器；增加 desirability 与 shot 标注 | 70M clips 只来自约 3.8M 源视频；媒体依赖上游 |
 | 2024 | Vript / MiraData / LVD-2M [[7]](#ref-7) [[8]](#ref-8) [[9]](#ref-9) | 从短标签转向脚本式 dense caption、结构字段与长镜头 | dense 不等于正确；许可、下载面和版本高度不一致 |
-| 2024 / ICLR 2025 | OpenVid-1M [[10]](#ref-10) | 高审美、高技术质量、相邻帧一致与 1080p 子集 | 包装许可与上游许可冲突，不能直接推导商用权 |
-| 2024 | FineVideo [[11]](#ref-11) | 实际媒体、逐项 provenance、CC attribution、opt-out 与版本更新被放到同一发布面 | 43,751 源视频远小于 Web-scale 训练池；仍需分布审计 |
+| 2024 / ICLR 2025 | OpenVid-1M [[10]](#ref-10) | 高审美、高技术质量、相邻帧一致与 1080p 子集 | 发布条款与上游许可需分别核对 |
+| 2024 | FineVideo [[11]](#ref-11) | 实际媒体、逐项 provenance、CC attribution、opt-out 与版本更新被放到同一发布内容 | 43,751 源视频远小于 Web-scale 训练池；仍需分布审计 |
 | 2025 / CVPR 2025、NeurIPS 2025 | Koala-36M / VideoUFO [[12]](#ref-12) [[13]](#ref-13) | 更强结构 caption；从真实用户 prompt 聚类反推主题覆盖 | ID overlap 不是感知去重；仍受来源与非商业条款约束 |
 | 2025 / NeurIPS 2025、CVPR 2026、预印本 | UltraVideo / SpatialVID / ViMix [[14]](#ref-14) [[15]](#ref-15) [[16]](#ref-16) | UHD 长描述、相机 pose/depth/dynamic mask、跨源去重与 crawl-free access | 大存储、合成标注误差、wrapper 与 upstream rights |
 | 2026 / CVPR 2026 | SceneScribe-1M [[38]](#ref-38) | 在公开视频上加入 dense depth、3D point tracks、motion masks、camera parameters 与细粒度 caption | 论文规模不等于发布规模；当前官方卡没有可用数据文件 |
@@ -117,7 +110,7 @@ N_{\mathrm{eff,source}}
 
 ---
 
-## 4. 开放域视频—文本数据：规模、实际可得物与边界
+## 4. 开放域视频文本数据
 
 ### 4.1 2019–2024 的主干数据
 
@@ -136,25 +129,18 @@ N_{\mathrm{eff,source}}
 
 | 数据 | 论文 / 当前发布口径 | 新 supervision | 实际可得物 | 许可与关键限制 |
 |---|---|---|---|---|
-| OpenVid-1M [[10]](#ref-10) | 论文 >1M；当前卡片 1,453,466 rows / 12.4TB；OpenVidHD 433K 1080p | aesthetic、DOVER、temporal consistency、motion、camera motion、long caption | 托管媒体、CSV、HD 子集（约 4.5TB） | 卡片同时写 CC-BY-4.0、research/non-commercial 和多个上游条款；不可推导 blanket commercial permission |
+| OpenVid-1M [[10]](#ref-10) | 论文约 1M 视频片段；OpenVidHD-0.4M 为约 0.4M 的 1080p 子集 | 质量、时序一致性与运动筛选；长文本描述 | 官方仓库提供下载说明、视频分片和描述文件入口 | 使用时同时核对发布条款与上游来源许可；代码许可不代表媒体许可 |
 | FineVideo [[11]](#ref-11) | 43,751 videos；3,425 h；平均 4.7min；约 600GB | time-coded ASR、scene/character/story/audio annotations、逐项 provenance | gated 但托管实际媒体；版本与 removal 线程 | 原视频 CC-BY、需要 attribution；用户需跟随 latest usable version |
 | Koala-36M [[12]](#ref-12) | 论文 36M clips / 约 172K h；当前 v1 viewer 显示 3,766,054 rows，分片合计估算 35,961,606 rows / 48.9GB metadata | transition detector、结构 caption、VTSS、clarity/aesthetic/motion | 托管 metadata；视频媒体需回到上游来源获取 | 自定义非商业研究许可；viewer 行数、全分片估算与论文规模不可混写 |
 | VideoUFO [[13]](#ref-13) | 1,091,712 clips；1,291 user-focused topics；论文 / 卡片称压缩媒体约 800GB，当前 HF storage 快照为 911GB | 从 VidProM 用户 prompt 聚类主题；brief+detailed captions；六类 VBench scores | metadata 与压缩媒体可下载 | 官方称 CC-BY-4.0；0.29% 仅为 YouTube ID 重合，不排除重上传 / 裁剪 |
 | UltraVideo [[14]](#ref-14) | 58,781 clips；约 1.78TB；UHD，22.4% 为 8K | 九类 structured captions + summary，平均约 824 words | HF 媒体与 annotations | “CC-BY with additional restrictions”实为自定义非商业约束；需读完整条款 |
 | SpatialVID [[15]](#ref-15) | 21K raw h → 2.7M clips / 7,089 h；7.67TB | camera intrinsics/poses、depth、dynamic masks、motion instructions、structured caption | gated 完整媒体和 annotations，545 groups | CC-BY-NC-SA-4.0；pose/depth 是估计标注，不是测量真值 |
 | ViMix-14M [[16]](#ref-16) | 论文约 13.7M pairs / 22.8K h；当前托管 23.1GB `ViMix-14M.json` 与 100-row 示例 | 多源统一去重、质量过滤、多粒度 recaption | 完整 metadata manifest、示例和七个上游来源各自的下载命令；**没有同库托管整合媒体** | 卡片 wrapper 为 CC-BY-NC-SA；下载与使用仍需逐源履行上游义务 |
-| SceneScribe-1M [[38]](#ref-38) | 论文 1M in-the-wild videos / 4,191 h | 细粒度 caption、camera parameters、dense depth、3D point tracks、motion masks / probability | 当前作者 HF 仓库只有 2.54KB README，没有 metadata 或媒体文件 | README 的 Apache badge 不能证明语料许可；应写“论文已发表、发布面为空”，不能写“1M 已开放” |
+| SceneScribe-1M [[38]](#ref-38) | 论文 1M in-the-wild videos / 4,191 h | 细粒度 caption、camera parameters、dense depth、3D point tracks、motion masks / probability | 当前作者 HF 仓库只有 2.54KB README，没有 metadata 或媒体文件 | README 的 Apache badge 不能证明语料许可；应写“论文已发表、发布内容为空”，不能写“1M 已开放” |
 | LAION-BVD [[17]](#ref-17) | 1.3B URLs；80M downloaded raw videos / 10M h；BVD-V 从 2.4M sources 切 55M clips | video/audio captions；audio clips；300M scene-change frames | 公开 URL-only 变体；当前 BVD-V gated card 为 55M clips / 41.1TB，RAW 需研究协作或门控 | [BVD Terms of Use](https://github.com/LAION-AI/BVD/blob/main/assets/bvd_terms_of_use.pdf)限定研究、非商业用途；**URL index ≠ media availability ≠ media rights** |
 
-### 4.3 不要虚构 “OpenVid-2M”
 
-截至本页核查日，没有在 OpenVid 作者项目、官方 Hugging Face 或 arXiv 找到一手 “OpenVid-2M” 记录。它可能与 WebVid-2M、LVD-2M 或当前 OpenVid 卡片的 1.45M rows 混淆。数字增长不能由我们替作者改名。
-
-同样，[VideoGen-of-Thought](https://arxiv.org/abs/2412.02259) 是 training-free 多镜头生成框架，不是数据集；另一个 arXiv 条目 2503.15138 已撤回。
-
----
-
-## 5. 私有训练语料与公开数据集必须分表
+## 5. 私有训练数据披露
 
 | 系统 | 作者公开的数据引擎信息 | 可以得出的结论 | 不能得出的结论 |
 |---|---|---|---|
@@ -166,7 +152,7 @@ N_{\mathrm{eff,source}}
 
 ---
 
-## 6. Caption 不再是一句话：五层表述与核验
+## 6. 视频描述标注
 
 ### 6.1 建议同时保存的五层文本
 
@@ -208,7 +194,7 @@ VidCapBench [[19]](#ref-19) 与 VCapsBench [[20]](#ref-20) 表明，caption 评�
 
 ---
 
-## 7. 从预训练数据到偏好、奖励与安全数据
+## 7. 偏好与奖励数据
 
 生成模型的数据生命周期至少有四层：
 
@@ -223,19 +209,19 @@ VideoDPO [[21]](#ref-21)、VideoAlign [[22]](#ref-22) 与 MJ-VIDEO [[23]](#ref-2
 
 ---
 
-## 8. 动作条件与 World Model 数据：视频不是 action
+## 8. 动作条件数据
 
 开放域视频可以提供“发生了什么”，但闭环 world model 还要知道“哪个动作、以什么坐标和延迟、在什么 embodiment 上导致了什么状态”。
 
 ### 8.1 机器人 / Action 数据主干
 
-| 数据 | 论文 / 项目规模 | 2026-08-29 实际发布面 | 关键模态 | 权利 / 版本边界 | 对 world model 的价值 |
+| 数据 | 论文 / 项目规模 | 2026-08-29 实际发布内容 | 关键模态 | 权利 / 版本边界 | 对 world model 的价值 |
 |---|---|---|---|---|---|
 | Open X-Embodiment [[24]](#ref-24) | >1M trajectories；22 embodiments | 官方仓库、TFDS builders、GCS buckets 与统一 RLDS schema | RGB、proprioception、language、robot actions | 仓库说明代码 Apache-2.0、其他材料 CC-BY-4.0；各贡献数据的原始条款仍须逐项核验 | 跨机构、跨 embodiment 预训练 |
-| DROID [[25]](#ref-25) | 76K trajectories；350 h；564 scenes；当前项目 86 tasks | full RLDS 约 1.7TB、raw 约 8.7TB GCS，以及 100-episode / 2GB sample | 多视角 RGB、末端 / 关节 action、语言 | 代码仓库 MIT 不能自动视为数据许可；使用前需从项目发布面另行确认数据条款 | 大范围真实场景与统一采集硬件 |
+| DROID [[25]](#ref-25) | 76K trajectories；350 h；564 scenes；当前项目 86 tasks | full RLDS 约 1.7TB、raw 约 8.7TB GCS，以及 100-episode / 2GB sample | 多视角 RGB、末端 / 关节 action、语言 | 代码仓库 MIT 不能自动视为数据许可；使用前需从项目发布内容另行确认数据条款 | 大范围真实场景与统一采集硬件 |
 | RH20T [[26]](#ref-26) | 110K contact-rich sequences | 官方数据页 / 下载面与 API 仓库 | vision、force、audio、action | API 代码为 MIT；数据媒体的授权需独立核验，不能由代码许可推导 | 接触、声音与力提供视频中不可观测的物理信号 |
 | RoboMIND [[27]](#ref-27) | 107K trajectories；479 tasks；4 embodiments；含失败 | gated HF v1.2，约 12.3TB | RGB、action、task、success / failure | 数据卡标 Apache-2.0，但仍受访问 gate 与组件权利约束；数字必须带版本 | 失败轨迹支持 recovery 与不确定性研究 |
-| RoboMIND 2.0 [[28]](#ref-28) | 310K dual-arm；6 embodiments；739 tasks；>1,000 h；另含 12K tactile、20K mobile、20K sim | 项目页指向 ModelScope 公开发布面 | bimanual、tactile、mobile、sim | 须核验 ModelScope 当前条款；不能继承 RoboMIND v1 的 HF badge | 扩展到双臂、触觉、移动操作与 digital twin |
+| RoboMIND 2.0 [[28]](#ref-28) | 310K dual-arm；6 embodiments；739 tasks；>1,000 h；另含 12K tactile、20K mobile、20K sim | 项目页指向 ModelScope 公开发布内容 | bimanual、tactile、mobile、sim | 须核验 ModelScope 当前条款；不能继承 RoboMIND v1 的 HF badge | 扩展到双臂、触觉、移动操作与 digital twin |
 | AgiBot World [[29]](#ref-29) | >1M trajectories / 2,976.4 h；217 tasks；100+ scenarios / 5 domains | HF `AgiBotWorld-Beta` gated release，含媒体、proprioception 与 action | 多 embodiment、灵巧手、视觉触觉 | CC-BY-NC-SA-4.0，且 gate 要求联系方式；Beta 版本需随结果记录 | 研究真实机器人数据 scaling |
 | Action100M [[30]](#ref-30) | 1.2M instructional source videos；14.6 years；$O(100\mathrm{M})$ hierarchical action segments | 官方 HF 当前仅 120,000 个 video-level rows（10% preview）；YouTube ID、metadata 与嵌套 nodes，媒体不在同库 | hierarchical temporal segments、Tree-of-Captions | FAIR Noncommercial Research License；CVPRW 2026 正式论文 | 大规模开放词汇 action representation；不是标定 robot control |
 
@@ -258,7 +244,7 @@ p(s_{t+1}\mid s_{\le t}, a_t, e, \Delta t),
 
 ---
 
-## 9. 合成物理数据：窄，但可证伪
+## 9. 物理与因果数据
 
 | 数据 | 可控监督 | 适合证明 | 不能外推为 |
 |---|---|---|---|
@@ -269,11 +255,11 @@ p(s_{t+1}\mid s_{\le t}, a_t, e, \Delta t),
 | PHYRE [[33]](#ref-33) | 2D 物理任务、动作与成功判定 | 交互规划、样本效率、跨模板泛化 | photorealistic generation |
 | NewtonBench-60K [[34]](#ref-34) | 50K train + 10K test，五类 Newtonian primitives | physics reward / post-training 的可验证任务 | 一般真实世界定律；该名称还有另一套 LLM benchmark |
 
-合成数据的优势不是“像真实视频”，而是知道初态、参数、边界、干预和 ground-truth trajectory。它应与真实视频互补：真实数据测分布覆盖，合成数据测可证伪的规律。更多证据层级见[物理一致性](../docs/physical-consistency.md)和[评测指南](../docs/evaluation.md)。
+表中 BAIR 是真实机器人采集数据；Moving MNIST、CLEVRER、Physion 和 PHYRE 等使用程序或仿真环境。合成数据的主要优势是可记录初态、参数、边界、干预和真实轨迹。它应与真实视频互补：真实数据测分布覆盖，合成数据测可证伪的规律。更多证据层级见[物理一致性](../docs/physical-consistency.md)和[评测指南](../docs/evaluation.md)。
 
 ---
 
-## 10. 第一人称、驾驶、音频、空间与多视角
+## 10. 多模态与多传感器数据
 
 | 分支 | 代表资源 | 必须保留的字段 | 常见误用 |
 |---|---|---|---|
@@ -297,7 +283,7 @@ sync:
 
 ---
 
-## 11. Data Engine 的关键技术，不是“下载后直接训练”
+## 11. 数据处理方法
 
 ### 11.1 来源与权利预筛
 
@@ -373,7 +359,7 @@ source record
 p_i=\frac{w_iN_i^\alpha}{\sum_j w_jN_j^\alpha},\qquad 0\le\alpha\le1,
 ```
 
-其中 $N_i$ 是符合条件的样本或 token 量，$`\alpha\lt1`$ 防止最大来源垄断，$w_i$ 表示任务覆盖、质量、权利完备度和失败反馈。不要把 $w_i$ 简化成审美分数。
+其中 $N_i$ 是符合条件的样本或 token 量，$\alpha\lt1$ 防止最大来源垄断，$w_i$ 表示任务覆盖、质量、权利完备度和失败反馈。不要把 $w_i$ 简化成审美分数。
 
 同时披露：
 
@@ -385,7 +371,7 @@ p_i=\frac{w_iN_i^\alpha}{\sum_j w_jN_j^\alpha},\qquad 0\le\alpha\le1,
 
 ---
 
-## 12. Train / Eval Firewall：去重后再划分
+## 12. 去重与数据划分
 
 ### 12.1 正确的顺序
 
@@ -427,15 +413,17 @@ manifest 版本，更新派生数据和 checkpoint 台账；若来源需撤回�
 
 ---
 
-## 13. 权利、provenance、removal 与版本治理
+## 13. 许可、来源与版本管理
 
-### 13.1 三个必须保留的冲突案例
+### 13.1 数据许可案例
 
-- **OpenVid-1M：** 当前卡片写 `CC-BY-4.0`，同时写 research/non-commercial，并要求遵守 Panda、ChronoMagic、Open-Sora 与许可未知来源。安全结论是“条款分层且需逐源核验”，不是“可商用”。
+- **OpenVid-1M：** 官方发布包含多个上游来源，需分别记录媒体许可、使用限制和来源信息。下载入口与描述文件可用，不意味着上游视频具有统一的商业使用授权。
 - **MiraData：** 会议 supplemental 写“除非另有协议，不授予复制、修改、发布、分发或商业化权利”；仓库/卡片又出现 GPL 与商业表述。安全结论是 `rights_status: unresolved`。
 - **LAION-BVD：** URL-only 变体公开不代表 80M raw videos 公开，更不代表 URL 指向内容可用于任意训练。必须分别记录 `url_index_access`、`media_access`、`use_scope`。
 
-### 13.2 Removal 不是 `rm file`
+<a id="132-removal-rm-file"></a>
+
+### 13.2 数据撤回与派生版本更新
 
 一个可审计删除流程应：
 
@@ -451,7 +439,7 @@ FineVideo [[11]](#ref-11) 的版本更新与 opt-out 是比“README 留一个�
 
 ---
 
-## 14. 最小可复现 Manifest
+## 14. 数据清单示例
 
 下面不是万能 schema，而是能避免常见误导的最小骨架：
 
@@ -542,7 +530,7 @@ governance:
 
 ---
 
-## 15. 怎样证明一个数据集更好
+## 15. 数据质量与训练效果评测
 
 ### 15.1 数据自身指标
 
@@ -584,7 +572,7 @@ governance:
 
 ---
 
-## 16. 按研究问题选择数据，而不是追最大数字
+## 16. 按任务选择数据
 
 | 研究目标 | 首选数据属性 | 可用代表 | 不足时的补充 |
 |---|---|---|---|
@@ -599,7 +587,7 @@ governance:
 
 ---
 
-## 17. 当前前沿与尚未解决的问题
+## 17. 开放问题
 
 1. **从 caption 到 grounded event graph：** 文本应绑定 track、time、camera、contact、audio 和 state transition，而不是只变长。
 2. **从公开视频到可证明的 rights lineage：** 技术社区仍缺跨数据集统一的逐项权利、takedown 和派生传播标准。
@@ -613,7 +601,7 @@ governance:
 
 ---
 
-## 18. 数据卡与实验的提交前检查表
+## 18. 数据发布检查表
 
 ### 统计与版本
 
@@ -654,7 +642,7 @@ governance:
 
 ---
 
-## 19. 推荐阅读路线
+## 19. 延伸阅读
 
 1. 先读 WebVid [[2]](#ref-2) 与 HD-VILA [[3]](#ref-3)，理解 Web-scale URL/弱文本范式及其治理债务。
 2. 再读 InternVid [[4]](#ref-4)、Panda-70M [[6]](#ref-6) 与 CogVideoX [[18]](#ref-18)，比较多尺度 caption、多教师选择和私有 data engine。
@@ -667,7 +655,12 @@ governance:
 
 ---
 
-## 参考文献与官方发布面
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-29。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
+
+## 参考文献与官方发布内容
 
 <a id="ref-1"></a>[1] Miech et al. [HowTo100M: Learning a Text-Video Embedding by Watching Hundred Million Narrated Video Clips](https://openaccess.thecvf.com/content_ICCV_2019/papers/Miech_HowTo100M_Learning_a_Text-Video_Embedding_by_Watching_Hundred_Million_Narrated_ICCV_2019_paper.pdf). ICCV, 2019.
 
@@ -687,7 +680,7 @@ governance:
 
 <a id="ref-9"></a>[9] Xiong et al. [LVD-2M: A Long-take Video Dataset with Temporally Dense Captions](https://proceedings.neurips.cc/paper_files/paper/2024/hash/1df493ec1c2530c038d94d7300b5b368-Abstract-Datasets_and_Benchmarks_Track.html). NeurIPS Datasets & Benchmarks, 2024. [Official release](https://github.com/SilentView/LVD-2M).
 
-<a id="ref-10"></a>[10] Nan et al. [OpenVid-1M: A Large-Scale High-Quality Dataset for Text-to-video Generation](https://proceedings.iclr.cc/paper_files/paper/2025/hash/0396ca5a4c628936609aa819bfbca916-Abstract-Conference.html). ICLR, 2025. [Current media card](https://huggingface.co/datasets/nkp37/OpenVid-1M).
+<a id="ref-10"></a>[10] Nan et al. [OpenVid-1M: A Large-Scale High-Quality Dataset for Text-to-video Generation](https://proceedings.iclr.cc/paper_files/paper/2025/hash/0396ca5a4c628936609aa819bfbca916-Abstract-Conference.html). ICLR, 2025. [Official repository and download instructions](https://github.com/NJU-PCALab/OpenVid-1M). 核验日期：2026-09-20.
 
 <a id="ref-11"></a>[11] Hugging Face. [FineVideo dataset card, provenance, terms and removal/version policy](https://huggingface.co/datasets/HuggingFaceFV/finevideo). Snapshot checked 2026-08-29.
 
@@ -701,7 +694,7 @@ governance:
 
 <a id="ref-16"></a>[16] Yang et al. [ViMix-14M: A Curated Multi-Source Video-Text Dataset with Long-Form, High-Quality Captions and Crawl-Free Access](https://arxiv.org/abs/2511.18382). 2025 preprint. [Official card](https://huggingface.co/datasets/TimingYang/ViMix-14M) and [file tree](https://huggingface.co/datasets/TimingYang/ViMix-14M/tree/main).
 
-<a id="ref-17"></a>[17] Hochlehnert et al. [LAION-BVD: A 10-Million-Hour Open Video Dataset for Multimodal Pre-training](https://arxiv.org/abs/2608.24845). arXiv v1, 2026-08-25. [Official release surfaces](https://projects.laion.ai/bvd/download.html), [current BVD-V-55M card](https://huggingface.co/datasets/laion/BVD-V-55M) and [BVD Terms of Use](https://github.com/LAION-AI/BVD/blob/main/assets/bvd_terms_of_use.pdf).
+<a id="ref-17"></a>[17] Hochlehnert et al. [LAION-BVD: A 10-Million-Hour Open Video Dataset for Multimodal Pre-training](https://arxiv.org/abs/2608.24845). arXiv v1, 2026-08-25. [Official releases](https://projects.laion.ai/bvd/download.html), [current BVD-V-55M card](https://huggingface.co/datasets/laion/BVD-V-55M) and [BVD Terms of Use](https://github.com/LAION-AI/BVD/blob/main/assets/bvd_terms_of_use.pdf).
 
 <a id="ref-18"></a>[18] Yang et al. [CogVideoX: Text-to-Video Diffusion Models with An Expert Transformer](https://proceedings.iclr.cc/paper_files/paper/2025/hash/ce31378e9f41d8907e97dab172b6c559-Abstract-Conference.html). ICLR, 2025.
 

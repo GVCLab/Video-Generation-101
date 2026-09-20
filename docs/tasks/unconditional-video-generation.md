@@ -1,21 +1,26 @@
-# 无条件视频生成：从边际分布到可审计的动态先验
+# 无条件视频生成
 
-> 本章冻结于 **2026-08-30（Asia/Shanghai）**。这里把“无条件”限定为：部署采样时没有样本特定的外生语义、图像、视频前缀、动作或状态输入，模型独立采样完整视频 $X$。数据集范围、训练条件、首帧来源和评测协议都必须显式声明；只把 condition 置空，不足以证明模型学的是严格边际分布 $p(X)$。
+介绍不使用外部语义或观测条件的视频分布建模及评价。
+
+**前置知识：** 概率生成模型。
+
+**使用步骤：** 明确训练分布与采样接口 → 在固定资源下生成足量样本 → 分别评价质量、覆盖、运动和记忆化。
+
 
 检索式、纳排记录、逐项证据等级、官方代码核查和排除项见[配套研究记录](../../sources/research_20260830_unconditional_video.md)。
 
-## 🎯 学习目标
+## 学习目标
 
 读完本章，应能完成六件事：
 
 1. 根据部署 API 区分纯 $p(X)$、类别/域条件、自条件、T2V、I2V、视频预测和 world model；
-2. 写出包含数据策略、随机源、训练目标、采样器、解码器和停止规则的训练/采样合同；
+2. 写出包含数据策略、随机源、训练目标、采样器、解码器和停止规则的训练/采样规格；
 3. 用“能力发生了什么可验证变化”组织 Video Textures、GAN、token、masked、diffusion、DiT 与 flow 路线；
 4. 解释 FVD、IS、precision/recall、density/coverage 分别测什么、漏掉什么；
 5. 识别数据重复、域标签、首帧泄漏、tokenizer 上限、clip/FPS 不一致和长尾记忆化；
 6. 设计一个不依赖精选样片、能够被第三方复跑的无条件视频生成实验。
 
-## 📐 1. 严格任务边界：先看部署时“喂了什么”
+## 1. 任务定义
 
 设一段 RGB 视频为
 
@@ -39,12 +44,12 @@ $T,H,W,\mathrm{fps}$ 是全局采样规格，不是样本语义条件。若用�
 
 ### 1.1 相邻任务的判定表
 
-| 任务 | 部署时样本特定输入 | 概率合同 | 本章如何处理 |
+| 任务 | 部署时样本特定输入 | 概率规格 | 本章如何处理 |
 |---|---|---|---|
 | **Pure unconditional** | 独立噪声/随机 token；固定 BOS；全局长度和分辨率 | $p_\theta(X)$ | 核心任务 |
 | **Domain-restricted generation** | 运行时可不再输入域名，但训练集已固定为域 $D=d$ | $p_\theta(X\mid D=d)$ | 可称“该域内操作无条件”，不可外推为开放世界 $p(X)$ |
 | **Class conditional** | 类别 $c$ 或可选择的域 token | $p_\theta(X\mid c)$ | 相邻任务；指标不得冒充纯无条件结果 |
-| **Self-conditioned generation** | 仅模型先前生成的帧/token/state | $`p(X)=\prod_t p(x_t\mid x_{\lt t})`$ | 若历史也源自同一随机采样，仍是联合分布的一种分解 |
+| **Self-conditioned generation** | 仅模型先前生成的帧/token/state | $p(X)=\prod_t p(x_t\mid x_{\lt t})$ | 若历史也源自同一随机采样，仍是联合分布的一种分解 |
 | **Learned-token conditional** | 从参考样本、身份、轨迹或检索结果推得的 token | $p_\theta(X\mid u)$ | token 名字再抽象，也仍是外生条件 |
 | **Text-to-video** | 文本、语言 embedding | $p_\theta(X\mid y_{\text{text}})$ | T2V，不是无条件 |
 | **Image-to-video / prediction** | 首帧、视频前缀或未来边界 | $p_\theta(x_{2:T}\mid x_1)$ 或 $p_\theta(Y\mid X_{\text{past}})$ | I2V/预测；除非另有可独立采样的 $p(x_1)$ 并联合报告 |
@@ -56,9 +61,9 @@ $T,H,W,\mathrm{fps}$ 是全局采样规格，不是样本语义条件。若用�
 - **token 是否“条件”取决于来源。** 每个样本都重新从固定 prior 抽取的 latent 是随机变量；从目标视频优化/编码得到、或由用户选择的 token 是条件。一个跨样本固定的可训练 BOS/null embedding 只是实现常量。
 - **classifier-free guidance 的 null 分支不是自动等价。** 条件模型采样 $p_\theta(X\mid\varnothing)$，是否等价于专门训练的边际 $p_\theta(X)$ 取决于 condition dropout、数据混合和 guidance；必须单独验证，不能只改提示词就换任务标签。
 
-![无条件视频生成从无外部条件、学习视频边际分布、采样动态片段、统一输出合同到多维评测；一旦出现文本、首帧或动作，任务边界已经改变。](../../assets/diagrams/unconditional-video-evidence-chain.png)
+![无条件视频生成从无外部条件、学习视频边际分布、采样动态片段、统一输出规格到多维评测；一旦出现文本、首帧或动作，任务边界已经改变。](../../assets/diagrams/unconditional-video-evidence-chain.png)
 
-**图 1：从任务定义到证据的最短链。** “无外部条件”约束部署输入；统一输出合同之后，质量、覆盖、长尾与未复制必须分开评测，并固定特征、时长和随机种子。下方判定树进一步区分类别、文本、图像前缀、动作和自条件。
+**图 1：从任务定义到证据的最短链。** “无外部条件”约束部署输入；统一输出规格之后，质量、覆盖、长尾与未复制必须分开评测，并固定特征、时长和随机种子。下方判定树进一步区分类别、文本、图像前缀、动作和自条件。
 
 ![图 066：无条件视频生成的部署输入判定树](../../assets/imagegen-diagrams/066/diagram.png)
 **顺序化文字替代：**
@@ -73,11 +78,11 @@ $T,H,W,\mathrm{fps}$ 是全局采样规格，不是样本语义条件。若用�
 
 Sora 的官方技术报告把系统描述为接受文本以及图像/视频条件的 video generation model；它对时空 patch、大规模视频表示和 scaling 的讨论可启发无条件模型，但公开接口与证据不是一项受控的 pure $p(X)$ benchmark [[34]](#ref-34)。Cosmos 则是面向 physical AI 的 world foundation model 平台/家族，服务于条件生成、世界建模和下游适配；“预训练时看过大量视频”不等于“公开证明了无条件边际采样” [[35]](#ref-35)。二者应放在**邻接技术与可迁移组件**一栏，而非直接里程碑表。
 
-## 🧾 2. 训练与采样合同：模型名不能代替实验定义
+## 2. 训练与采样
 
 一项可复现结果至少要同时冻结下面六组字段。
 
-| 合同层 | 必填字段 | 缺失后的歧义 |
+| 规格层 | 必填字段 | 缺失后的歧义 |
 |---|---|---|
 | 数据 $\Pi$ | 数据版本、许可、source-level split、去重、域/标签是否使用 | 训练-测试重复、把类别条件当无条件 |
 | clip | $T,H,W$、原始/目标 FPS、stride、crop、色彩范围 | 同名数据集实际不是同一任务 |
@@ -138,12 +143,12 @@ x_\tau=(1-\tau)\epsilon+\tau X,
 **顺序化文字替代：**
 
 1. 原始视频先按 source ID 去重和划分，再按固定 $T,H,W,$ FPS 与 crop 生成 clip。
-2. 同一数据合同分别训练 GAN、AR/masked token、diffusion/DiT 或 flow 模型。
+2. 同一数据规格分别训练 GAN、AR/masked token、diffusion/DiT 或 flow 模型。
 3. 冻结 checkpoint 后，只用预先登记的独立 seeds 和采样规则生成全部样本。
 4. 生成视频与固定 held-out real set 一起计算分布指标和置信区间。
 5. 生成视频还要对训练集做时空近邻与复制审计；两条证据都通过，才形成有边界的结论。
 
-## 🧭 3. 里程碑不是模型清单：每次转折改变了什么
+## 3. 代表方法
 
 ### 3.1 从“重排一段素材”到“学习可采样动态源”
 
@@ -159,7 +164,7 @@ DIGAN 以时空坐标驱动的隐式神经表示生成连续视频，并设计 d
 
 ### 3.3 离散 token：从可数似然到并行 masked 解码
 
-VideoGPT 把 3D 卷积/轴向注意力 VQ-VAE 与 GPT 式时空自回归 prior 组合；官方代码把 `n_cond_frames=0` 与可选 `class_cond` 分开，因而能明确实例化非帧条件的 token 合同 [[13]](#ref-13)。TATS 用 3D-VQGAN 和 time-sensitive Transformer，将短 clip 训练扩展到很长的 token 续写；“能产生数千帧”仍需与长期身份、事件和非周期运动正确性分开评价 [[14]](#ref-14)。可验证转折是：**生成对象从像素张量变为离散时空词表，显式 likelihood 与 KV cache 成为可能**；代价是 tokenizer 失真、token 数量和串行采样。
+VideoGPT 把 3D 卷积/轴向注意力 VQ-VAE 与 GPT 式时空自回归 prior 组合；官方代码把 `n_cond_frames=0` 与可选 `class_cond` 分开，因而能明确实例化非帧条件的 token 规格 [[13]](#ref-13)。TATS 用 3D-VQGAN 和 time-sensitive Transformer，将短 clip 训练扩展到很长的 token 续写；“能产生数千帧”仍需与长期身份、事件和非周期运动正确性分开评价 [[14]](#ref-14)。可验证转折是：**生成对象从像素张量变为离散时空词表，显式 likelihood 与 KV cache 成为可能**；代价是 tokenizer 失真、token 数量和串行采样。
 
 MAGVIT 用 3D tokenizer 和 masked generator 统一多种视频任务，以迭代填 mask 代替逐 token 串行生成 [[15]](#ref-15)。但其 UCF generation 使用类别条件，Kinetics 结果又主要是 frame prediction，因此不能把整张任务表当 pure unconditional 证据。MAGVIT-v2 的 lookup-free quantization 说明 tokenizer 设计能显著改变后续视觉生成上限，但其核心比较并不是一项独立的无条件视频里程碑 [[16]](#ref-16)。
 
@@ -167,11 +172,11 @@ MAGI 在帧内采用 masked 建模、帧间保持因果自回归，并用 Comple
 
 ### 3.4 Diffusion、latent、DiT 与 flow：稳定训练不等于任务边界消失
 
-Video Diffusion Models 把 factorized space–time U-Net diffusion 用于无条件 UCF-101/Kinetics，也展示从无条件模型用 reconstruction guidance 改做视频预测，清楚分开边际模型与条件适配 [[19]](#ref-19)。MCVD 通过 mask past/future 统一预测、插值和无条件分支，说明**同一参数化可以覆盖多任务，但每个 mask 合同仍是不同分布** [[20]](#ref-20)。
+Video Diffusion Models 把 factorized space–time U-Net diffusion 用于无条件 UCF-101/Kinetics，也展示从无条件模型用 reconstruction guidance 改做视频预测，清楚分开边际模型与条件适配 [[19]](#ref-19)。MCVD 通过 mask past/future 统一预测、插值和无条件分支，说明**同一参数化可以覆盖多任务，但每个 mask 规格仍是不同分布** [[20]](#ref-20)。
 
 PVDM 先把视频投影为多个 2D latent，再在 latent 空间扩散，从而降低视频去噪成本并做无条件长片段生成 [[21]](#ref-21)。DiT 在图像 latent patch 上证明 Transformer 可随计算规模扩展 [[22]](#ref-22)；Latte 再系统比较视频空间—时间 Transformer 分解，并公开类别条件与无条件配置/代码 [[23]](#ref-23)。因此“DiT”应理解为 denoiser 骨架转折，不能仅凭架构名把一个 T2V checkpoint 改写成无条件结果。
 
-Generative Video Bi-flow 用双向 ODE 学帧间流，正式论文展示从首帧推进的生成；官方代码采样脚本明确从测试集提供首帧。严格合同因此是 $p(x_{2:T}\mid x_1)$，若没有另一个可独立采样并联合评估的 $p(x_1)$，它不是完整 pure $p(X)$ 系统 [[25]](#ref-25)。这也是“论文实验标签”和“部署 API 审计”可能不同的实例。
+Generative Video Bi-flow 用双向 ODE 学帧间流，正式论文展示从首帧推进的生成；官方代码采样脚本明确从测试集提供首帧。严格规格因此是 $p(x_{2:T}\mid x_1)$，若没有另一个可独立采样并联合评估的 $p(x_1)$，它不是完整 pure $p(X)$ 系统 [[25]](#ref-25)。这也是“论文实验标签”和“部署 API 审计”可能不同的实例。
 
 2026 年 SSM Meets Video Diffusion Models 用双向 temporal state-space module 替代时间注意力，在 MineRL、GQN、CARLA 等低分辨率窄域研究 256 帧无条件生成；它提供了长序列内存/计算的正式证据，同时论文也承认长无条件数据稀缺与超长 FVD 可靠性不足 [[26]](#ref-26)。这是有价值的**架构探针**，不是开放域高分辨率 foundation milestone。
 
@@ -188,10 +193,10 @@ Generative Video Bi-flow 用双向 ODE 学帧间流，正式论文展示从首�
 | AR → masked 并行填充 | MAGVIT、MAGI | MAGVIT 相关表多为条件；MAGI 有 UCF 无条件实验 | 任务表和较长条件样例不能混算 |
 | 像素 diffusion → projected latent | VDM、PVDM | 是 | clip/FPS、autoencoder 和 sampler 决定可比性 |
 | U-Net → factorized video Transformer | DiT 机制、Latte 视频验证 | Latte 有无条件配置 | DiT 名称本身不是任务证据 |
-| diffusion path → flow/ODE | Flow Matching、Video Bi-flow | 通用机制是；Bi-flow 系统需首帧 | 首帧来源必须进入合同 |
+| diffusion path → flow/ODE | Flow Matching、Video Bi-flow | 通用机制是；Bi-flow 系统需首帧 | 首帧来源必须进入规格 |
 | 时间注意力 → temporal SSM | SSM Meets VDM | 是，低分辨率窄域 | 256 帧效率证据不可外推到开放域 |
 
-## 📊 4. 评价：一个平均距离不能同时证明质量、覆盖和未复制
+## 4. 评测方法
 
 ### 4.1 FVD：先冻结 feature 与 clip，再谈数字
 
@@ -239,7 +244,7 @@ Inception Score 为
 
 每个生成样本都应在训练库与 held-out 库中检索最近邻，至少分别比较：单帧外观、短时运动片段、整 clip embedding，以及速度改变/轻微裁切后的匹配。WACV 2025 的研究表明，视频 diffusion 可同时发生空间和时间复制，无条件设置也不能豁免 [[33]](#ref-33)。复制率阈值不应事后为某模型调节；top-$k$ 匹配要连同时间对齐和原视频 ID 公开。
 
-## ⚠️ 5. 数据与协议陷阱
+## 5. 数据与划分
 
 | 陷阱 | 它如何制造“进步” | 最低防线 |
 |---|---|---|
@@ -255,7 +260,7 @@ Inception Score 为
 | 长视频只评短窗口 | 周期循环和后段崩坏不可见 | 同时报完整长度、前/中/后段与跨段一致性 |
 | 只用一种 feature | feature 盲区被当真实改进 | 至少一项时间敏感 feature + corruption sanity check |
 
-## 🧯 6. 失败分析：从症状回到可证伪原因
+## 6. 故障诊断
 
 | 症状 | 候选原因 | 最有信息量的检查 | 可操作修正 |
 |---|---|---|---|
@@ -270,7 +275,9 @@ Inception Score 为
 | diffusion/flow 采样闪烁 | 时空噪声/速度场与少步 solver 不匹配 | 步数 sweep、局部截断误差、帧间高频 | temporal parameterization、蒸馏后重新训练/校准 |
 | 长尾动作消失 | 训练曝光少且平均损失主导 | exposure 分桶的 recall/coverage | 去重后重采样、组鲁棒目标、尾部验证集 |
 
-## 🔭 7. 2025–2026 边界与当前研究价值
+<a id="7-20252026"></a>
+
+## 7. 适用范围与开放问题
 
 截至冻结日，本次检索没有发现一个同时满足“正式发表、开放域高分辨率、长视频、部署 API 为 pure $p(X)$、协议公开且有充分记忆化审计”的单一 foundation milestone。可核的进展更具体：MAGI（CVPR 2025）验证 masked-frame/causal-time 组合；RAVEN（ICIP 2025）继续压低窄域长视频 GAN 成本；Video Bi-flow（ICCV 2025）探索 ODE 路线但仍需首帧；2026 temporal SSM 工作把无条件序列延到 256 帧低分辨率模拟域 [[10]](#ref-10), [[17]](#ref-17), [[25]](#ref-25), [[26]](#ref-26)。预印本可以提示方向，不能与 formal proceeding 合并成同一证据等级。
 
@@ -283,11 +290,13 @@ Inception Score 为
 
 它不直接证明物理因果、可控编辑或闭环规划。若研究问题需要动作干预、目标完成或反事实，就应转入 world model/interactive generation 协议，而不是继续提高一个无条件平均分。
 
-## 🧪 8. 一个可复跑的最小实验
+## 8. 实验设计示例
+
+本节是可按任务调整的实验设计示例，尚未在本仓库运行；参数与阈值是示例设置，不是已发布基准或实测结果。
 
 下面给出 UCF-101 上的**标签丢弃、source-level split** 实验模板。它不是新的 SOTA 声明，而是用来比较三种生成范式的审计基线。
 
-### 8.1 预注册合同
+### 8.1 预注册规格
 
 ```yaml
 task: pure_unconditional_video_generation
@@ -337,7 +346,12 @@ artifacts: [config, environment, checkpoint_hash, clip_manifest, seed_manifest, 
 6. 长度测试复用同一 seed 的前缀，分别生成 16/64/256 帧；报告失败率和后段退化，不只截取最好的 16 帧。
 7. 只有在质量、coverage、复制率、效率和不确定区间共同改善时，才写“总体进步”；单一 FVD 改善只能写成该协议下的局部结果。
 
-## 📚 参考文献
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
+
+## 参考文献
 
 <a id="ref-1"></a>[1] [Video Textures](https://doi.org/10.1145/344779.345012). Arno Schödl, Richard Szeliski, David H. Salesin, Irfan Essa. SIGGRAPH. 2000.
 

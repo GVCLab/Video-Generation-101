@@ -1,6 +1,11 @@
-# 多视角与 4D 视频生成：相机 × 时间、可渲染状态与几何证据
+# 多视角与 4D 生成
 
-> 一手来源复核截至 **2026-08-30**。本章把动态场景重建、多视角视频生成、相机控制视频与 4D 场景生成放进同一坐标系，但不把它们误写成同一个任务。检索、纳排、状态核验和图像验收记录见[研究日志](../../sources/research_20260830_multiview_4d_generation.md)。
+介绍相机与时间联合条件下的视频生成、动态表示和可渲染状态。
+
+**前置知识：** 多视角几何、视频生成。
+
+**使用步骤：** 区分相机运动和世界状态变化 → 组织相机时间采样及监督 → 通过新视角、新时间和几何一致性检验表示。
+
 
 ## 学习目标
 
@@ -12,7 +17,9 @@
 4. 为跨视角、跨时间、遮挡、几何、生成先验和系统成本建立分开的证据账本；
 5. 按“首次公开 / 正式发表 / 工件状态”阅读 2021–2026 的里程碑，不把作者演示当成独立复现。
 
-## 1. 最低任务要求：4D 不是“更长的视频”
+<a id="1-4d"></a>
+
+## 1. 任务定义
 
 把动态场景写成可查询函数：
 
@@ -32,11 +39,11 @@ I_{v,t}=\mathcal R(S_t,K_v),
 
 系统可以直接预测目标像素，也可以先构建可渲染状态 $\hat S_t$ 再查询。二者的输出外观可能相似，证据强度却不同。
 
-![相机视角与世界时间的二维合同。普通视频只覆盖固定视角下的一条时间线，多视角图像只覆盖固定时刻的多视点，相机控制视频每个时刻只选择一个视角；多视角视频或 4D 合同覆盖视角与时间网格，并可进一步形成接受任意视角时间查询的可渲染状态。底部警告说明一条看似合理的对角视频不能证明一致的 4D 世界。](../../assets/diagrams/multiview-4d-camera-time-contract.png)
+![相机视角与世界时间的二维规格。普通视频只覆盖固定视角下的一条时间线，多视角图像只覆盖固定时刻的多视点，相机控制视频每个时刻只选择一个视角；多视角视频或 4D 规格覆盖视角与时间网格，并可进一步形成接受任意视角时间查询的可渲染状态。底部警告说明一条看似合理的对角视频不能证明一致的 4D 世界。](../../assets/diagrams/multiview-4d-camera-time-contract.png)
 
 **图 1：相机轴与时间轴必须拆开。** 图中的纸鸟与立方体只是教学场景，不代表某一模型的结果。行、列、对角线和完整网格同时使用线型与形状编码，灰度下仍可区分。图像生成提示、SHA-256 和视觉检查见[研究日志](../../sources/research_20260830_multiview_4d_generation.md)。
 
-| 合同 | 覆盖的 $(v,t)$ | 最小输出 | 不能自动推出 |
+| 规格 | 覆盖的 $(v,t)$ | 最小输出 | 不能自动推出 |
 |---|---|---|---|
 | 普通视频 | 一个视角或一条未知相机轨迹，多个时间 | 一段 2D 帧序列 | 任意新视角、几何一致、可回访世界 |
 | 多视角静态图像 | 多个视角，一个时间 | 同时刻的视图集合 | 动态、时间插值、运动一致性 |
@@ -44,7 +51,7 @@ I_{v,t}=\mathcal R(S_t,K_v),
 | 多视角视频 | 多个视角 × 多个时间 | 稠密或稀疏 $V\times T$ 帧网格 | 已存在显式、可编辑、精确一致的 4D 状态 |
 | 可渲染 4D 状态 | 任意允许的 $(v,t)$ 查询 | 动态 radiance / surface / Gaussian / point 状态 | 动作因果、物理可交互或长期持久世界 |
 
-### 1.1 三种“4D”主张必须分级
+### 1.1 三类 4D 表示与能力
 
 1. **4D-conditioned pixels**：模型接收相机和时间，直接生成像素。
 2. **4D-consistent observations**：多个查询之间通过重投影、轨迹、遮挡和时间循环测试。
@@ -62,7 +69,7 @@ I_{v,t}=\mathcal R(S_t,K_v),
 
 平均 PSNR 会把三类混在一起。可靠报告必须单独标出生成区域，否则“新视角质量”可能只是输入视角附近的插值。
 
-## 2. 为什么这个问题特别难
+## 2. 建模难点
 
 ### 2.1 相机运动与物体运动存在分解歧义
 
@@ -94,14 +101,14 @@ Full-4D 明确把 single-view video-to-4D 写成“先生成多视角视频，�
 
 canonical deformation 假设某个持久点可被追踪；物体出现、消失、断裂、流体或布料自接触时，该假设会失效。显式 Gaussian 的 opacity/lifespan、分段 anchor 或局部 canonical space 可以缓解，但不能凭渲染清晰就证明拓扑正确。MoRel 用 anchor relay 处理长序列显隐与内存，4DSurf 用分段与 surface-flow 约束处理大形变 [[23]](#ref-23), [[24]](#ref-24)。
 
-### 2.5 生成先验会把错误“修漂亮”
+### 2.5 生成先验的几何偏差
 
 视频 diffusion 能补细节，却可能让同一物体在不同视角拥有不同背面、让遮挡关系翻转，或把相机运动误当对象运动。CAT4D 的关键不是只生成好看的视图，而是把 camera 和 time 作为联合查询，并把生成网格提升为 deformable 3D Gaussian [[13]](#ref-13)。即使如此，提升后的显式状态只保证对该表示优化目标的一致性，不等于真实几何。
 
-## 3. 五条技术路线不是一条升级链
+## 3. 方法分类
 
 ![图 056：多视角与4D生成的五条技术路线](../../assets/imagegen-diagrams/056/diagram.png)
-顺序化文字替代：先冻结相机、时间与已见/未见区域合同，再选择动态重建、生成式提升、直接视角时间扩散、显式 4D 生成或长时多视角路线；所有路线最终都必须通过同一组几何、遮挡、时间、系统成本和不确定性检查。
+顺序化文字替代：先冻结相机、时间与已见/未见区域规格，再选择动态重建、生成式提升、直接视角时间扩散、显式 4D 生成或长时多视角路线；所有路线最终都必须通过同一组几何、遮挡、时间、系统成本和不确定性检查。
 
 ### 3.1 路线 A：观测驱动的动态场景重建
 
@@ -146,7 +153,7 @@ K^{\mathrm{tar}},t^{\mathrm{tar}}
 
 ### 3.4 路线 D：从文字或图像直接生成显式 4D 资产
 
-MAV3D 首次把 text-to-video diffusion 的 score distillation 用于 dynamic NeRF，输出可从任意相机渲染的动态 3D 场景 [[3]](#ref-3)。Align Your Gaussians 改用 dynamic 3D Gaussians 与组合 diffusion priors，4Real 用视频模型生成参考、freeze-time 视频和形变，增强场景级照片真实感 [[6]](#ref-6), [[7]](#ref-7)。EG4D 尝试绕开昂贵 SDS，4K4DGen 则把全景 4D 推到作者报告的 4K 360° 渲染合同 [[11]](#ref-11), [[12]](#ref-12)。
+MAV3D 首次把 text-to-video diffusion 的 score distillation 用于 dynamic NeRF，输出可从任意相机渲染的动态 3D 场景 [[3]](#ref-3)。Align Your Gaussians 改用 dynamic 3D Gaussians 与组合 diffusion priors，4Real 用视频模型生成参考、freeze-time 视频和形变，增强场景级照片真实感 [[6]](#ref-6), [[7]](#ref-7)。EG4D 尝试绕开昂贵 SDS，4K4DGen 则把全景 4D 推到作者报告的 4K 360° 渲染规格 [[11]](#ref-11), [[12]](#ref-12)。
 
 这里最常见的误读是把 **renderable** 当成 **reconstructed**。文字生成的 4D 资产没有真实场景真值；其证据应是多视角一致、时间一致、语义、多样性、可编辑性与独立渲染稳定性，而不是“恢复精度”。
 
@@ -161,9 +168,9 @@ MAV3D 首次把 text-to-video diffusion 的 score distillation 用于 dynamic Ne
 
 这些截至冻结日均是预印本。作者报告的任意长度、20 FPS 或固定显存不等于独立确认；仍需区分 TTFF、steady-state latency、解码、负载、外部状态和 deadline miss。
 
-驾驶场景把同一组机制放进更严格的 metric geometry 与多相机合同。DriveDreamer4D 用视频 world-model prior 扩充 4D driving representation，DiST-4D 则显式分离空间与时间 diffusion 并加入 metric depth [[15]](#ref-15), [[20]](#ref-20)。它们的域内几何与合成数据价值不能直接外推到开放场景，也不能只凭下游 perception 增益证明每个生成视图都几何正确。
+驾驶场景把同一组机制放进更严格的 metric geometry 与多相机规格。DriveDreamer4D 用视频 world-model prior 扩充 4D driving representation，DiST-4D 则显式分离空间与时间 diffusion 并加入 metric depth [[15]](#ref-15), [[20]](#ref-20)。它们的域内几何与合成数据价值不能直接外推到开放场景，也不能只凭下游 perception 增益证明每个生成视图都几何正确。
 
-## 4. 表示层：像素一致与状态一致的差别
+## 4. 动态表示
 
 ### 4.1 Canonical state + deformation
 
@@ -192,11 +199,15 @@ g_i(t)=
 
 多视角视频 diffusion 可以只保存 latent/KV/state，而不输出 mesh/field/Gaussian。它仍可能在固定 query 分布上很一致。必须如实称为**多视角时序生成器**；只有当状态能被稳定、可重复地查询或导出，才升级为 renderable-state claim。
 
-### 4.4 3D bridge 不是完整 4D state
+<a id="44-3d-bridge-4d-state"></a>
+
+### 4.4 三维中间表示与四维状态
 
 MV-Forcing 的 reconstruction bridge 在视图之间传递几何先验。桥可以降低跨视图漂移，却可能随时间重建不同的 3D 状态，并不自动形成全局可编辑 4D 资产。应分别报告 bridge 的深度/pose 误差和最终视频的跨视图误差。
 
-## 5. 数据：采样单元是 camera-time graph
+<a id="5-camera-time-graph"></a>
+
+## 5. 数据与相机时间采样
 
 ### 5.1 最小 manifest
 
@@ -220,11 +231,15 @@ MV-Forcing 的 reconstruction bridge 在视图之间传递几何先验。桥可�
 
 CAT4D 与 4DiM 都显式混合这些数据类型；GenXD 还通过 CamVid-30K 的相机/运动挖掘扩展真实视频监督 [[8]](#ref-8), [[10]](#ref-10), [[13]](#ref-13)。混合训练必须保留 source type mask，否则模型可能用静态数据学相机、用视频学运动，却在真正同时变化时失败。
 
-### 5.3 Split 必须按场景、主体与捕获源隔离
+<a id="53-split"></a>
+
+### 5.3 按场景、主体与捕获来源划分数据
 
 相邻帧或同一对象的不同相机不能跨 train/test。生成模型还应检查底座预训练集泄漏；若无法审计，就把结果标成 open-world generalization，而不是严格 unseen-scene 测试。
 
-## 6. 评测：从一条漂亮视频升级到 4D 证据
+<a id="6-4d"></a>
+
+## 6. 评测方法
 
 ![图 057：多视角4D生成的六道独立证据门](../../assets/imagegen-diagrams/057/diagram.png)
 顺序化文字替代：固定场景、相机、时间和已见/未见 mask 后，依次检查观测保真、跨视角、跨时间、几何、生成区域与系统代价；任一硬门失败就降低能力主张，不能用其他分数平均掉。
@@ -242,7 +257,9 @@ CAT4D 与 4DiM 都显式混合这些数据类型；GenXD 还通过 CamVid-30K �
 
 FV4D、FVD 或论文自定义 learned metric 可以做诊断，但必须给出 extractor、版本、输入采样和与人类 Gold Set 的校准。SV4D 2.0 报告的相对 FV4D/LPIPS 改善属于其协议，不是跨数据集通用常数 [[17]](#ref-17)。
 
-### 6.2 必须覆盖的 query slices
+<a id="62-query-slices"></a>
+
+### 6.2 查询条件的覆盖范围
 
 - **in-view / in-time**：相机与时间都在训练覆盖内；
 - **novel-view / seen-time**：同一时刻换相机；
@@ -255,7 +272,7 @@ FV4D、FVD 或论文自定义 learned metric 可以做诊断，但必须给出 e
 
 若只测对角 camera-time path，就无法定位错误来自相机、对象运动还是二者耦合。
 
-### 6.3 速度必须拆成构建与查询
+### 6.3 构建成本与查询成本
 
 ```math
 T_{\mathrm{end\mbox{-}to\mbox{-}end}}
@@ -267,7 +284,7 @@ T_{\mathrm{end\mbox{-}to\mbox{-}end}}
 
 4D-GS 的实时结果是训练后渲染；4DStreamCtrl 的 20 FPS 是作者协议下的流式视频生成；二者不是同一 SLO [[5]](#ref-5), [[29]](#ref-29)。报告应同时给出首次可见结果、scene build time、单查询/批查询延迟、分辨率、硬件、包含/排除的解码步骤和长尾。
 
-## 7. 重点论文：问题、机制、证据与边界
+## 7. 代表方法
 
 ### 7.1 D-NeRF / Nerfies：动态场景先被写成可查询坐标场
 
@@ -316,9 +333,9 @@ T_{\mathrm{end\mbox{-}to\mbox{-}end}}
 - **SpaceTimePilot**：用生成式 renderer 在空间与时间查询之间补充动态场景 [[25]](#ref-25)；
 - **MV-Forcing / Stream4D / 4DStreamCtrl**：分别把多视角、4D reward 和在线 3D point-track control 接到流式视频路线 [[27]](#ref-27)–[[29]](#ref-29)。
 
-这里的共同变化不是“所有系统都成了 world model”，而是 camera-time consistency 开始进入训练、推理状态和系统合同。
+这里的共同变化不是“所有系统都成了 world model”，而是 camera-time consistency 开始进入训练、推理状态和系统规格。
 
-## 8. 里程碑：按合同变化收录
+## 8. 技术发展
 
 | 首次公开 / 正式发表 | 工作 | 改变了什么 | 当时仍未解决 |
 |---|---|---|---|
@@ -343,7 +360,7 @@ T_{\mathrm{end\mbox{-}to\mbox{-}end}}
 
 里程碑表不收录纯产品演示，也不把“作者说已接收”替代官方 proceedings。预印本如果后来正式发表，应保留首次公开日期并另填正式状态。
 
-## 9. 相邻方向：必须交叉链接，也必须守边界
+## 9. 相关专题
 
 | 相邻方向 | 共享部分 | 4D 专属追加门 |
 |---|---|---|
@@ -356,7 +373,9 @@ T_{\mathrm{end\mbox{-}to\mbox{-}end}}
 
 GEN3C 使用增量 3D cache 支持精确相机控制，WorldForge 在不训练底座的情况下把视频模型用于 3D/4D 生成，BulletTime 显式解耦 world time 与 camera pose [[30]](#ref-30), [[31]](#ref-31), [[32]](#ref-32)。它们是这张边界表的关键接口，但“相机遵循准确”仍低于“完整 4D 状态正确”。
 
-## 10. GridFork-1：一套可证伪的最小复现实验
+<a id="10-gridfork-1"></a>
+
+## 10. 实验设计示例
 
 > **状态：仅提出，尚未运行。** 本节不是实验结果。
 
@@ -384,7 +403,7 @@ GEN3C 使用增量 3D cache 支持精确相机控制，WorldForge 在不训练�
 3. **遮挡测试**：对象出画再重现时，深度顺序与身份必须保持；
 4. **未见区域标注**：所有指标按 seen / reprojected / hallucinated 三个 mask 分开。
 
-### 10.4 必须交付
+### 10.4 实验输出
 
 - camera-time manifest 与坐标变换脚本；
 - 原始/生成视图、4D state 和 renderer 版本；
@@ -394,7 +413,7 @@ GEN3C 使用增量 3D cache 支持精确相机控制，WorldForge 在不训练�
 
 若方案 4 只提高训练视图 PSNR，却降低 novel-view/novel-time 或 loop closure，就不能报告“显式状态使 4D 更一致”。
 
-## 11. 常见误区与快速纠正
+## 11. 故障诊断
 
 1. **把相机控制当 4D。** 一条相机路径只采样对角线；至少补 freeze-time 多视角与 loop closure。
 2. **把多视角视频当显式状态。** 先问输出能否被独立 renderer 任意查询、重复查询是否稳定。
@@ -407,7 +426,7 @@ GEN3C 使用增量 3D cache 支持精确相机控制，WorldForge 在不训练�
 9. **混用 camera time、world time 与 diffusion time。** 三者单位、调度和干预位置必须独立记录。
 10. **把 2026 预印本速度写成已复现事实。** 标作者协议、硬件、包含项、工件状态与冻结日期。
 
-## 12. 仍值得研究的问题
+## 12. 开放问题
 
 1. 怎样在 topology change 下保留可追踪身份，而不强迫全局 canonical correspondence？
 2. 怎样让生成模型对未见表面输出校准分布，而不是单一高置信纹理？
@@ -418,7 +437,7 @@ GEN3C 使用增量 3D cache 支持精确相机控制，WorldForge 在不训练�
 7. 怎样把构建、更新、压缩、传输与渲染纳入同一端到端 SLO？
 8. 怎样在多主体、透明/反射、流体和大范围显隐中维持空间—时间一致？
 
-## 13. 最小阅读顺序
+## 13. 延伸阅读
 
 1. **先学动态表示**：D-NeRF → Nerfies → 4D-GS。
 2. **再学生成先验提升**：MAV3D → Consistent4D → 4Real。
@@ -427,6 +446,11 @@ GEN3C 使用增量 3D cache 支持精确相机控制，WorldForge 在不训练�
 5. **最后读 2026 前沿**：4C4D / DGGT / MoRel → Full-4D → MV-Forcing → Stream4D → 4DStreamCtrl。
 
 每读一篇只回答五个问题：输入观测是什么、输出是像素还是状态、相机与时间怎样进入、未见区域由谁生成、哪项独立测量可以证伪主张。
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 

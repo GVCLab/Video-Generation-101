@@ -1,10 +1,16 @@
-# 视频生成后训练、偏好对齐与少步适配
+# 视频后训练与对齐
 
-> 检索截至 **2026-08-30（Asia/Shanghai）**。本章把“后训练”视为多个可组合但互不等价的优化合同，而不是一种算法。除可由论文机制直接核对的定义外，质量、效率与胜率均标为作者自报；本章没有独立训练这些大模型。完整检索、证据分级与图像审计见[研究记录](../../sources/research_20260830_video_posttraining.md)。
+介绍监督微调、奖励模型、偏好优化和强化学习的目标及使用条件。
+
+**前置知识：** 生成模型训练、基础优化。
+
+**使用步骤：** 明确要改善的行为及反馈来源 → 选择训练目标并记录成本 → 使用独立评价检查收益、偏差和多样性。
+
+> 检索截至 **2026-08-30（Asia/Shanghai）**。本章把“后训练”视为多个可组合但互不等价的优化规格，而不是一种算法。除可由论文机制直接核对的定义外，质量、效率与胜率均标为作者自报；本章没有独立训练这些大模型。完整检索、证据分级与图像审计见[研究记录](../../sources/research_20260830_video_posttraining.md)。
 
 在全仓库的分类中，后训练属于**能力获得方式**，不与物理一致性、时间一致或推理并列；若要讨论基础模型是否容易获得新行为，应使用“可适配性 / 可对齐性”这一元能力。统一定义与 C1–C9 能力族见[基础模型能力地图](../foundation-model-capabilities.md)。
 
-## 1. 先问两个问题：改偏好，还是改采样成本？
+## 1. 后训练目标
 
 视频生成的基础训练通常在大规模视频上学习条件分布；后训练则在已有生成器上追加数据、偏好、奖励、在线 rollout、推理时搜索或教师蒸馏。它们可能共享同一个 checkpoint，却改变不同对象：
 
@@ -27,13 +33,13 @@
 
 同名尤其危险：ICLR 2026 的 **Dual-IPO** 中 IPO 指 *Dual-Iterative Preference Optimization*，是交替更新视频 reward model 与生成器的框架 [[24]](#ref-24)，不是 AISTATS 2024 的 Identity Preference Optimization。
 
-## 2. 五条并行路线，而不是一条流水线
+## 2. 方法分类
 
 下图把五种选择画成并行分支。它是**决策地图**，不表示必须先 SFT、再 DPO、再 RL、再测试时引导、最后蒸馏。
 
 ![视频生成后训练的五条并行路线：预训练视频生成器分别接入数据或 SFT、成对偏好、奖励或强化学习、测试时搜索，以及教师蒸馏；右侧分别标出能力、偏好、训练成本、推理成本、采样步数与教师依赖。](../../assets/diagrams/video-posttraining-evidence-map.png)
 
-**图的证据边界：** `STEPS SAME` 只表示该路线本身不压缩基础 sampler 的 NFE；`PREFERENCE UP` 是优化意图，不是对所有提示词的保证；测试时搜索常增加而非减少端到端推理成本；蒸馏常依赖教师，但并非逻辑上永远需要外部教师。只有显式加入偏好或 reward 的蒸馏，才同时承担“对齐”和“加速”两份合同。
+**图的证据边界：** `STEPS SAME` 只表示该路线本身不压缩基础 sampler 的 NFE；`PREFERENCE UP` 是优化意图，不是对所有提示词的保证；测试时搜索常增加而非减少端到端推理成本；蒸馏常依赖教师，但并非逻辑上永远需要外部教师。只有显式加入偏好或 reward 的蒸馏，才同时承担“对齐”和“加速”两份规格。
 
 ![图 033：视频生成后训练的五条并行决策路线](../../assets/imagegen-diagrams/033/diagram.png)
 **顺序化文字替代：**
@@ -45,13 +51,15 @@
 5. test-time 分支保持基础权重冻结或仅优化临时小参数，用搜索、引导或适配改善当次输出，通常增加推理成本。
 6. distillation 分支把多步教师压成少步 student，直接减少 NFE；若未加入 reward 或偏好监督，它不自动改变人类偏好。
 
-## 3. 数据路线：continued pretraining、SFT 与 preference pair 不可混写
+<a id="3-continued-pretrainingsft-preference-pair"></a>
 
-### 3.1 Continued pretraining 与 SFT 的合同
+## 3. 训练数据
+
+### 3.1 Continued pretraining 与 SFT 的规格
 
 Continued pretraining（CPT）通常继续使用 denoising、flow matching 或 autoregressive next-token 目标，让模型吸收新的领域分布；SFT 则用较精选、条件更清楚的数据强化 prompt adherence、镜头语言、人物/风格或特定接口。二者都可能提升主观质量，但监督信号仍来自“这个样本应被拟合”，而不是“样本 A 比 B 更好”。SkyReels-V2 的技术报告把多阶段预训练、概念均衡 SFT、运动强化学习与最终高质量 SFT分开列为不同阶段，正说明同一配方中也应逐段审计 [[30]](#ref-30)。该项截至检索日仍是预印本，结果仅为作者自报。
 
-VideoUFO 的数据集论文报告收集 1291 个用户导向主题、约 109 万个短视频，可为 CPT/SFT 的 prompt 与内容覆盖提供数据证据 [[29]](#ref-29)；它不是 preference-pair 数据集。相反，VideoFeedback/VideoScore 由 37.6K 个生成视频和多维人工分数组成 [[7]](#ref-7)，VideoAlign 则显式收集 pairwise tie 与 1–5 分数 [[13]](#ref-13)。训练样本都叫“视频数据”，优化合同却不同。
+VideoUFO 的数据集论文报告收集 1291 个用户导向主题、约 109 万个短视频，可为 CPT/SFT 的 prompt 与内容覆盖提供数据证据 [[29]](#ref-29)；它不是 preference-pair 数据集。相反，VideoFeedback/VideoScore 由 37.6K 个生成视频和多维人工分数组成 [[7]](#ref-7)，VideoAlign 则显式收集 pairwise tie 与 1–5 分数 [[13]](#ref-13)。训练样本都叫“视频数据”，优化规格却不同。
 
 ### 3.2 Pair 的构造决定模型学到什么
 
@@ -68,9 +76,13 @@ VideoRM/VideoPrefer 使用 MLLM 生成 135K 条两维偏好标注，并训练直
 
 CVPR 2026 的 DynamicsBoost 让不同长度的真实参考前缀续写到同一总长度，以“参考更多、生成更少”的 continuation 作为较优样本，并从 DPO 损失中排除共享条件前缀 [[22]](#ref-22)。它确实不需要人工标签或外部 RM，但“排序无标注”不代表“排序无假设”。
 
-## 4. Reward model 与 reward shaping：先测什么，再决定奖给谁
+<a id="4-reward-model-reward-shaping"></a>
 
-### 4.1 Reward model 是测量器，不是更新器
+## 4. 奖励模型与奖励设计
+
+<a id="41-reward-model"></a>
+
+### 4.1 奖励模型与策略更新的分工
 
 给 prompt $c$ 与视频 $v$，reward model 可写成 $r_\phi(c,v)$。只训练或部署 $r_\phi$ 不会自动改变生成器 $p_\theta(v\mid c)$；它必须进入数据筛选、RWR、DPO、policy gradient、guidance 或 best-of-$N$ 才产生行为变化。
 
@@ -97,7 +109,9 @@ VideoScore 的人工数据以多个维度训练自动评价器，并由作者在
 
 InstructVideo 把视频 reward 接入部分 DDIM 链，并用随时间衰减的 frame/segment 信号进行作者所称的 human-feedback fine-tuning [[6]](#ref-6)。DenseDPO 使用 segment-level pair [[14]](#ref-14)。ICLR 2026 的 Consistent Noisy Latent Rewards 训练可在噪声 latent 上评价的 reward model，再用 TAPO 在多个 diffusion 时间点检查排序一致性 [[25]](#ref-25)。BranchGRPO 共享早期 trajectory prefix，在分叉深度融合优势并剪枝，作者在一个 WanX 视频设置报告训练迭代时间与混合任务效率改善 [[26]](#ref-26)。这些工作共同把 credit 从“一个终态标量”移向“segment、噪声时间点与分支深度”，但尚未证明可恢复真实的逐步因果贡献。
 
-## 5. 四类偏好更新：离线 direct、online direct、RWR 与 policy gradient
+<a id="5-directonline-directrwr-policy-gradient"></a>
+
+## 5. 偏好优化
 
 ### 5.1 离线 DPO/IPO/ORPO 类
 
@@ -155,7 +169,9 @@ A_i
 
 截至本章截点，一篇名为 *A Systematic Post-Training Framework for Video Generation* 的工作把 SFT、GRPO-RLHF、prompt enhancement 与推理优化组合起来，但仍是 2026 预印本 [[31]](#ref-31)。它可说明配方趋于系统化，不可升级为正式会议共识。
 
-## 6. Verifiable reward 与 test-time adaptation：验证器也可能只是估计器
+<a id="6-verifiable-reward-test-time-adaptation"></a>
+
+## 6. 可验证奖励与推理时适配
 
 “Verifiable” 应按可核验对象分层：
 
@@ -173,13 +189,15 @@ Align-A-Video 则在一致视频编辑任务中固定随机性并做确定性 re
 
 因此部署报告必须把 base-model NFE、CFG 双前向、decoder、reward/VLM 调用、best-of-$N$、梯度反传与临时适配迭代全部计入，不能只写 sampler steps。
 
-## 7. DMD、consistency 与蒸馏：减少 NFE，不自动等于对齐
+<a id="7-dmdconsistency-nfe"></a>
+
+## 7. 蒸馏与采样成本
 
 Consistency Models 学习从轨迹任意点直接映射到数据端，可独立训练或从预训练扩散模型蒸馏 [[9]](#ref-9)。DMD 让一步 student 的输出分布匹配教师分布 [[10]](#ref-10)，DMD2 进一步处理训练不稳定和分布覆盖 [[12]](#ref-12)。这些机制首先回答“怎样少调用网络”，不是“人更喜欢什么”。详见[Flow、Consistency 与 Few-Step 生成](flow-consistency-models.md)。
 
-视频方法可以把两份合同合并：
+视频方法可以把两份规格合并：
 
-- T2V-Turbo 在 consistency distillation 中加入 reward feedback，作者报告四步生成与质量改善 [[15]](#ref-15)，且提供了官方实现作为可检查的发布面 [[20]](#ref-20)；
+- T2V-Turbo 在 consistency distillation 中加入 reward feedback，作者报告四步生成与质量改善 [[15]](#ref-15)，且提供了官方实现作为可检查的发布内容 [[20]](#ref-20)；
 - T2V-Turbo-v2 结合精选数据、多 reward、条件与运动 guidance，作者同时报告质量和少步结果，但也指出教师、文本编码器和 reward 上下文长度限制 [[16]](#ref-16)；
 - DOLLAR 把 variational score distillation、consistency distillation 与 latent reward optimization 组合，作者报告 1/4-step 视频结果 [[17]](#ref-17)。
 
@@ -187,7 +205,9 @@ Consistency Models 学习从轨迹任意点直接映射到数据端，可独立�
 
 教师依赖也要拆成四层：teacher 生成伪数据、teacher 提供 score/trajectory、teacher 充当 reward、teacher 决定 architecture/decoder。少步 student 可能继承教师的内容盲区和模式，同时因容量与一步映射进一步丢失尾部模式。Reward-Forcing 预印本尝试为自回归视频用 reward 直接训练少步模型、降低强教师依赖，但结论仍是作者自报 [[36]](#ref-36)。
 
-## 8. 风险：reward hacking、模式坍塌与 evaluator–generator 共谋
+<a id="8-reward-hacking-evaluatorgenerator"></a>
+
+## 8. 训练失效模式
 
 ### 8.1 常见 hacking 路径
 
@@ -204,7 +224,7 @@ VideoAlign 对时间权重导致伪影的报告提供了正式反例 [[13]](#ref
 
 多维 reward 可暴露 trade-off，但加权和仍会把价值选择藏进权重。应报告 Pareto 变化：运动提高时清晰度、身份和语义是否下降。DPP-GRPO 用 determinantal point process 的 log-determinant 奖励候选集合的相关性与多样性 [[28]](#ref-28)，但它优化的是向黑盒视频生成器提交的 **LLM prompt policy**，不是视频 backbone 权重。它能缓解候选 prompt 集合的重复，不能直接证明生成器分布不坍塌。
 
-## 9. 训练与部署成本：统一记账
+## 9. 训练与部署成本
 
 一项对齐实验至少报告：
 
@@ -219,7 +239,9 @@ VideoAlign 对时间权重导致伪影的报告提供了正式反例 [[13]](#ref
 
 少步模型也不能只报 “4 steps”。应报告 NFE、CFG 是否双倍 forward、是否需要 reward-gradient、VAE decode、首帧延迟、完整视频延迟、吞吐和峰值显存。若服务目标是连续视频，还要另看 causal factorization、chunking 与 KV cache；少步不是 streaming。相关部署轴见[因果/流式生成](causal-streaming-generation.md)。
 
-## 10. 评测：训练 RM 不能兼任唯一裁判
+<a id="10-rm"></a>
+
+## 10. 独立评价
 
 ### 10.1 Reward model 评测
 
@@ -242,7 +264,9 @@ VideoAlign 对时间权重导致伪影的报告提供了正式反例 [[13]](#ref
 
 VideoDPO 使用多个视觉模型构造 OmniScore，论文补充材料也承认计算开销 [[11]](#ref-11)；VideoAlign 既报告自动分数也做盲人评 [[13]](#ref-13)。即便如此，若训练 pair 与最终自动分数共享同一 RM，仍须把它标成潜在循环评价，而不能用人评样本替代全量 OOD 审计。
 
-## 11. 里程碑与 2025–2026 frontier
+<a id="11-20252026-frontier"></a>
+
+## 11. 代表工作
 
 | 时间 | 里程碑 | 主要优化增量 | 边界 |
 |---|---|---|---|
@@ -257,11 +281,13 @@ VideoDPO 使用多个视觉模型构造 OmniScore，论文补充材料也承认�
 
 最值得跟踪的三条演进是：**offline $\rightarrow$ online feedback**、**terminal scalar $\rightarrow$ multi-dimensional / segment / noisy-latent / branch / set-level reward**、**只改 generator 权重 $\rightarrow$ inference guidance 与临时适配**。同时，偏好对齐与少步生成开始共训，但评测必须继续拆分“人更喜欢”与“更少 NFE”。
 
-## 12. 不在本章证据范围：视频推理 RL
+<a id="12-rl"></a>
+
+## 12. 视频推理任务的适用范围
 
 “视频生成模型用于推理”与“让视频生成器更符合人类偏好”不是同一任务。Wan-R1 等工作训练或评估的是视频理解/推理模型的 reasoning 行为 [[37]](#ref-37)；VLM 作为 test-time teacher 的工作也主要改善视频语言推理 [[38]](#ref-38)。除非论文明确更新生成器、输出生成视频并以生成质量/偏好评测，否则不能把 reasoning benchmark 的增益写成视频生成对齐证据。相关路线见[视频推理](../video-reasoning.md)。
 
-## 13. 一份可执行的选择清单
+## 13. 方法选择
 
 面对一个新方法，依次填写：
 

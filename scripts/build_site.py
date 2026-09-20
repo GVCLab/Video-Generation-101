@@ -47,7 +47,7 @@ def stage() -> None:
             linked += 1
             continue
         for path in src.rglob("*"):
-            if any(part in SKIP_DIRS for part in path.parts):
+            if any(part in SKIP_DIRS for part in path.parts) or path.is_relative_to(ROOT / "docs" / "plans"):
                 continue
             if path.is_dir():
                 continue
@@ -62,6 +62,20 @@ def stage() -> None:
 
 
 def _place(src: Path, dst: Path) -> bool:
+    # Historical research notes remain linkable, but do not dominate manual search.
+    # Write a copy: changing a staged hard link would also modify the source file.
+    if src.suffix == ".md" and src.is_relative_to(ROOT / "sources"):
+        content = src.read_text(encoding="utf-8")
+        if content.startswith("---\n"):
+            import yaml
+            _, front, body = content.split("---", 2)
+            metadata = yaml.safe_load(front) or {}
+            metadata["search"] = {"exclude": True}
+            content = "---\n" + yaml.safe_dump(metadata, allow_unicode=True) + "---" + body
+        else:
+            content = "---\nsearch:\n  exclude: true\n---\n\n" + content
+        dst.write_text(content, encoding="utf-8")
+        return False
     try:
         os.link(src, dst)
         return True

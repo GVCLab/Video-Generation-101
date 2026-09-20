@@ -1,13 +1,18 @@
-# 视频虚拟试衣：服装—人物—场景的时序守恒
+# 视频虚拟试衣
 
-> 本章冻结于 **2026-08-30（Asia/Shanghai）**。它讨论的不是“逐帧把衣服贴上去”，而是把**目标服装作为新的保真对象**，同时守住人物、体型、动作、相机、背景、遮挡关系和时间轴。检索、纳排、代码/数据状态、逐篇反证、流程图验收和未复现边界见[研究日志](../../sources/research_20260830_video_virtual_try_on.md)。
+介绍服装条件、人物视频、遮挡关系和时序合成的建模方法。
+
+**前置知识：** 图像虚拟试衣、条件视频生成。
+
+**使用步骤：** 区分源视频换装和姿态驱动动画 → 确定服装细节、人物和背景保持项 → 检查动态遮挡、服装一致性与时序稳定性。
+
 
 ## 学习目标
 
 读完本章，应当能够：
 
 1. 区分 source-video VVT、pose-driven try-on animation、image VTON、通用 V2V、人物动画与 3D 试衣；
-2. 写出人物视频、目标服装、多视图、动态编辑域、姿态/解析/指令与输出时间轴都不含糊的 tensor 合同；
+2. 写出人物视频、目标服装、多视图、动态编辑域、姿态/解析/指令与输出时间轴都不含糊的 张量规格；
 3. 用人物/体型、目标服装、场景、时序交互和系统五本账解释“什么必须保持、什么允许变化”；
 4. 解释 flow/warp、图像模型加视频引导、latent diffusion、video DiT、pose/3D/detail、长视频 memory、MLLM/reward 与交互控制八条路线；
 5. 按“首次公开—正式发表—工件实际开放”而不是宣传顺序提取 2019–2026 里程碑；
@@ -15,7 +20,9 @@
 7. 设计服装、人物、背景、遮挡/重现、窗口 seam、长程漂移和端到端延迟的可证伪评测；
 8. 说明视觉试衣为什么不能证明真实尺码、舒适度、压力、面料物理或退货率下降。
 
-## 1. 先区分两类任务，只有一种是严格 V2V
+<a id="1-v2v"></a>
+
+## 1. 任务分类
 
 ### 1.1 Source-video VVT：源视频定义时间轴
 
@@ -64,7 +71,7 @@ Y\sim p_\theta(Y\mid x_{person},G,P_{1:T}),
 |---|---|---|---|---:|
 | image VTON | 人物图 + 服装图 | 单帧目标服装 | 单帧人物与背景 | 否；不能证明时序 |
 | pose/audio 人物动画 | 人物图/视频 + driving | 原人物/原服饰的动画 | 身份、pose/audio 同步 | 邻接；不必迁移新服装 |
-| generic video inpainting | 视频 + mask/文本 | 缺失内容 | mask 外区域 | 邻接；没有服装/体型合同 |
+| generic video inpainting | 视频 + mask/文本 | 缺失内容 | mask 外区域 | 邻接；没有服装/体型规格 |
 | 视频个性化 | 主体参考 + 新 prompt | 人物/对象身份 | 新场景中的主体绑定 | 邻接；服装通常是可编辑属性 |
 | 3D cloth simulation | 体型/布料/碰撞/物理参数 | 可计算布料状态 | 力学与接触 | 邻接；视觉 VVT 不等于物理求解 |
 | story/multishot | 跨镜头角色与服装状态 | 叙事事实 | 镜头间 outfit state | 邻接；单镜头落地归 VVT |
@@ -74,7 +81,7 @@ Y\sim p_\theta(Y\mid x_{person},G,P_{1:T}),
 ![图 076：视频虚拟试衣任务边界决策树](../../assets/imagegen-diagrams/076/diagram.png)
 **顺序化文字替代：** 先检查是否给出目标服装；没有目标服装时，通常是人物动画、个性化或通用编辑。有完整人物源视频并要求同一时间轴换装时，进入 source-video VVT；只有人物图和姿态/驱动序列时，进入 pose-driven VVT；只有单帧输出则是 image VTON。任何关于真实尺码、舒适度或物理布料的主张，还必须增加测量、规格、物理模拟或实穿证据。
 
-### 1.4 最小 tensor 与时钟合同
+### 1.4 最小 tensor 与时钟规格
 
 | 字段 | 示例形状 | 必须冻结的语义 |
 |---|---|---|
@@ -90,7 +97,7 @@ Y\sim p_\theta(Y\mid x_{person},G,P_{1:T}),
 
 如果方法在内部使用时间压缩率 $r_t$ 的 VAE，RGB 第 $t$ 帧与 latent 第 $\lfloor t/r_t\rfloor$ 个 token 的对齐、窗口边界和重复/平均规则都必须公开。否则“64 帧”可能是 RGB 帧、latent 帧或重复解码后的显示帧，系统比较会失真。
 
-## 2. 五本守恒账：平均好看不等于换装成功
+## 2. 内容保持要求
 
 ### 2.1 人物与体型账
 
@@ -144,15 +151,17 @@ TTFF=t_{decode\ input}+t_{parse/pose/mask}+t_{lookahead}
 
 只报 denoiser FPS，会漏掉解析、DensePose、mask smoothing、关键帧试衣、前视缓冲和视频编解码。
 
-## 3. 一张图读懂“对应—遮挡—传播—合成”
+## 3. 处理流程
 
 ![视频虚拟试衣守恒契约流程图。人物源视频、目标服装与可选姿态或遮罩进入对应、遮挡推理、时序传播和合成四步；人物与体型、目标服装、场景三本独立账本共同约束输出；最终分别检查贴合、服装细节、人物、背景与时序。下方展示细节涂抹、身体漂移、背景泄漏、接缝闪烁和遮挡失败五类反例。](../../assets/diagrams/video-virtual-try-on-conservation-contract.png)
 
-**图 1：VVT 不是一条平均损失，而是多账本硬合同。** `CORRESPOND` 负责把参考服装结构映射到每帧人体；`OCCLUDE` 决定手、头发、包与衣物的前后层次；`PROPAGATE` 在转身、遮挡和窗口间维持状态；`SYNTHESIZE` 只在动态支持域内产生合理像素。蓝/橙/绿三本账分别记录人物/体型、目标服装和场景；右侧五道门不可互相抵消。生成/修正意图、尺寸、SHA-256 与灰度验收见[研究日志](../../sources/research_20260830_video_virtual_try_on.md#11-teaching-visual-record)。
+**图 1：VVT 不是一条平均损失，而是多账本硬规格。** `CORRESPOND` 负责把参考服装结构映射到每帧人体；`OCCLUDE` 决定手、头发、包与衣物的前后层次；`PROPAGATE` 在转身、遮挡和窗口间维持状态；`SYNTHESIZE` 只在动态支持域内产生合理像素。蓝/橙/绿三本账分别记录人物/体型、目标服装和场景；右侧五道门不可互相抵消。生成/修正意图、尺寸、SHA-256 与灰度验收见[研究日志](../../sources/research_20260830_video_virtual_try_on.md#11-teaching-visual-record)。
 
 **顺序化文字替代：** 人物视频和目标服装先与可选 pose/mask 一起进入对应估计；系统再判断每帧可见区域与遮挡顺序，把服装状态跨帧和窗口传播，最后在动态编辑域合成。输出依次检查贴合、服装细节、人物/体型、背景和时序；出现细节模糊、身体重绘、背景泄漏、接缝闪烁或遮挡顺序错误，任何一项都判失败。
 
-## 4. 为什么逐帧 image VTON 必然不够
+<a id="4-image-vton"></a>
+
+## 4. 逐帧方法的限制
 
 逐帧模型优化的是：
 
@@ -172,7 +181,7 @@ TTFF=t_{decode\ input}+t_{parse/pose/mask}+t_{lookahead}
 
 WildVidFit 说明图像网络可以借助 VideoMAE、相邻 latent 对齐和 co-denoising 获得时序改善，但它在 VVT 上并未全面超过 ClothFormer；这个结果正好说明“图像质量强 + 视频先验”是一条路线，不是对 video-native 建模的普遍替代 [[7]](#ref-7)。
 
-## 5. 四个核心机制：对应、可见性、记忆与生成
+## 5. 对应、可见性与记忆
 
 ### 5.1 对应不是一个 flow
 
@@ -223,7 +232,7 @@ WildVidFit 说明图像网络可以借助 VideoMAE、相邻 latent 对齐和 co-
 
 把条件接进去不等于条件被正确使用。最小消融要分别移除 garment、source、pose/mask、temporal module、memory 和 reward，并观察每本账，而不是只报一个平均 VFID。
 
-## 6. 八条技术路线
+## 6. 生成方法
 
 ### 6.1 A：显式 flow/warp + GAN
 
@@ -273,7 +282,9 @@ FashionChameleon 研究实时切换多件服装及 KV cache refresh/withdraw/dis
 
 任务面扩大后，不能用一个总分掩盖对象差异：鞋需要脚部接触，包需要背带/手部层次，脸部替换涉及生物身份与同意，相机控制需要视角可见性和新表面一致性。
 
-## 7. 2019–2026：里程碑不是一张排行榜
+<a id="7-20192026"></a>
+
+## 7. 代表工作
 
 | 年份 | 里程碑 | 技术增量 | 最重要的证据边界 |
 |---:|---|---|---|
@@ -293,7 +304,9 @@ FashionChameleon 研究实时切换多件服装及 KV cache refresh/withdraw/dis
 
 一个工作可以是机制里程碑，却没有开放代码；也可以开放 inference，却没有训练或数据；还可以在 preprint 首发后才正式发表。教材必须把这三条时间线分开。
 
-## 8. 重点 paper review：读贡献，也读表格反证
+<a id="8-paper-review"></a>
+
+## 8. 方法比较
 
 ### 8.1 ViViD：数据规模是增量，评测闭环仍旧窄
 
@@ -339,7 +352,7 @@ LiveVVT 的 active window 含四个不同 noise level 的 chunk，每个 chunk �
 
 作者在 512x384 报告首块 1.56 秒、持续 22.39 FPS、每次更新约 0.5 秒；但论文只明确训练用八张 A100-80GB，没有清楚绑定 timing hardware，也未证明 mask、DensePose、agnostic frame、A-pose keyframe 和编解码全部计入。全 memory 将 FPS 从 26.74 降到 22.39、LPIPS 从 0.088 变差到 0.099，同时改善 VFID/SSIM。这是典型质量—效率 Pareto，不应只取最好听的一边。
 
-## 9. 数据集：先问监督是怎样构造的
+## 9. 数据集
 
 VITON-HD 与 DressCode 是高分辨率 image VTON 数据祖先，适合学习单帧服装细节，却不能凭逐帧测试证明 video temporal consistency [[30]](#ref-30), [[31]](#ref-31)。视频数据又有四种本质不同的监督：
 
@@ -377,7 +390,7 @@ group=(person\ identity, capture\ session, garment/SKU).
 
 CatV2TON 的 ViViD-S 主动保留正面连续帧；DPIDM 也删除 ViViD 背身测试片段但未报告剩余数。这样可减少 agnostic mask 错误，却同时删除了最能检验背面、重现和大形变的样本。两者数值不能与原始完整 split 直接横排。
 
-## 10. 评测：每项能力声明对应一组难作弊的证据
+## 10. 评测方法
 
 ### 10.1 先分 paired 与 unpaired
 
@@ -414,7 +427,11 @@ CLIP 更适合粗语义，不足以验证小字/logo；DINOv2 对局部结构更
 
 至少公开：参与者数量、样本数量、每人比较数、方法 shortlist、随机顺序、是否可暂停/逐帧/放大、评分 rubric、冲突处理、置信区间和原始匿名统计。InstructVVT 的 79.4% 只来自四方法 shortlist；不在 shortlist 的方法标 `–`，不能被解释为输了。
 
-## 11. `TryOnLedger-1`：一个可执行的 matched protocol
+<a id="11-tryonledger-1-matched-protocol"></a>
+
+## 11. 实验设计示例
+
+本节是可按任务调整的实验设计示例，尚未在本仓库运行；参数与阈值是示例设置，不是已发布基准或实测结果。
 
 ### 11.1 两条 track
 
@@ -495,7 +512,9 @@ evaluator_versions: ...
 
 每本账先设**校准阈值**，不是凭经验写死一个万能数值。安全/身份/暴露/目标人物错误为 hard reject；其他指标报告分层均值、中位数、P5/P95、failure rate 和 person/session/SKU-cluster bootstrap 置信区间。不要把每帧当独立样本，否则置信区间会虚假变窄。
 
-## 12. 工件与可复现性：`有 GitHub` 不是一个等级
+<a id="12-github"></a>
+
+## 12. 公开实现
 
 | 等级 | 最低定义 | VVT 中的典型例子 |
 |---|---|---|
@@ -510,7 +529,7 @@ evaluator_versions: ...
 
 工件开放度不是质量分，但决定一个 claim 能否独立复核。项目页动图、`Code coming soon` 和 inference-only release 不能写成“完整开源”。
 
-## 13. 真实物理、产品与安全边界
+## 13. 物理与应用限制
 
 ### 13.1 视觉 plausibility 不等于 fit
 
@@ -550,7 +569,7 @@ VVT 安全边界至少包括：
 
 生成结果不能暗示某商品真实具有未观测的背面、材质或垂坠，也不能把错误 logo/文字当作品牌展示。电商使用应保留 SKU/参考图版本、模型版本、人工批准和“视觉模拟”标记。
 
-## 14. 十五个常见误解
+## 14. 常见问题
 
 1. **“每帧 image VTON 都好看，所以视频成功。”** 没测遮挡、重现、运动和 seam。
 2. **“SSIM 高说明目标衣服更准。”** 背景和源复制可能主导。
@@ -568,7 +587,7 @@ VVT 安全边界至少包括：
 14. **“相邻帧越像，时序越好。”** 静态/过平滑也会变像。
 15. **“视觉试衣证明真实合身。”** 没有人体测量、SKU 尺码和 cloth physics 证据。
 
-## 15. 仍值得研究的问题
+## 15. 开放问题
 
 1. 如何学习 garment-centric canonical state，使 logo、文字、缝线和材质在大形变/遮挡后可恢复？
 2. 如何联合估计 garment surface correspondence、visibility 和不确定性，而不是把它们都藏进 attention？
@@ -586,7 +605,7 @@ VVT 安全边界至少包括：
 14. 如何验证视觉输出与真实尺码/舒适/材料之间的相关性，而不越过证据边界？
 15. 如何证明删除人物/服装素材后，训练索引、cache、embedding、输出和衍生状态都被清除？
 
-## 16. 最小阅读顺序
+## 16. 延伸阅读
 
 1. **边界与显式对应：** FW-GAN → MV-TON → ClothFormer。
 2. **图像先验与 diffusion：** WildVidFit → GPD-VVTO → ViViD → Fashion-VDM。
@@ -595,7 +614,12 @@ VVT 安全边界至少包括：
 5. **数据与语义：** TripVVT → UniVVT → InstructVVT。
 6. **长视频与交互：** VFR → FashionChameleon / iTryOn → TryOnCrafter → LiveVVT。
 
-每读一篇只回答十个问题：输入合同是什么、源时间轴是否必须保持、编辑域怎样得到、目标 garment token/geometry 从哪里来、遮挡怎样处理、跨帧/跨窗口状态在哪里、训练 pair 是否泄漏、paired/unpaired 如何分、速度包含什么、代码/权重/数据/评测实际开放到哪一层。
+每读一篇只回答十个问题：输入规格是什么、源时间轴是否必须保持、编辑域怎样得到、目标 garment token/geometry 从哪里来、遮挡怎样处理、跨帧/跨窗口状态在哪里、训练 pair 是否泄漏、paired/unpaired 如何分、速度包含什么、代码/权重/数据/评测实际开放到哪一层。
+
+
+## 资料版本
+
+手册结构修订：2026-09-20。原资料覆盖日期：2026-08-30。动态资源状态以条目日期和官方入口为准；未标注本仓库复现的实验数字均按其引用来源理解。
 
 ## 参考文献
 
