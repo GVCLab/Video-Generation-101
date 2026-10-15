@@ -1,5 +1,7 @@
 # Test-Time Scaling 章节调研与证据记录
 
+> 链接维护：2026-10-15 校正一手入口；除明确注明的链接解析状态外，正文研究结论与发布状态仍按原记录日期理解。
+
 > 调研快照：**2026-09-02（Asia/Shanghai）**
 > 对应正文：[`docs/generative-models/test-time-scaling.md`](../docs/generative-models/test-time-scaling.md)
 
@@ -88,7 +90,7 @@
 | 16 | TANGO | 2026-07；预印本 | 自诊断、测试时 LoRA | B/C | [arXiv](https://arxiv.org/abs/2607.15849) · [项目页](https://mever-team.github.io/tango/) |
 | 17 | VISTA | CVPR 2026 | 黑盒 Agent 规划—生成—批评—重写 | A | [CVF](https://openaccess.thecvf.com/content/CVPR2026/html/Long_VISTA_A_Test-Time_Self-Improving_Video_Generation_Agent_CVPR_2026_paper.html) |
 | 18 | CachedSearch | 2026-07；预印本 | 低成本缓存探索、完整重生成赢家 | B/C | [arXiv](https://arxiv.org/abs/2607.23159) · [项目页](https://shreshthsaini.github.io/CachedSearch/) |
-| 19 | GEARS | ACM TOG / SIGGRAPH Asia 2026 | 诊断、修复、淘汰与候选回收 | A | [DOI](https://doi.org/10.1145/3842526) · [arXiv](https://arxiv.org/abs/2608.29322) |
+| 19 | GEARS | ACM TOG / SIGGRAPH Asia 2026 | 诊断、修复、淘汰与候选回收 | A | [arXiv](https://arxiv.org/abs/2608.29322)；相关 DOI `10.1145/3842526` 保留，2026-10-15 解析返回 404；作者稿注明已接收 |
 | 20 | NoisEasier | 2026-08；预印本 | 可微 reward 引导的完整噪声轨迹优化 | B | [arXiv](https://arxiv.org/abs/2608.30194) |
 
 ## 5. 关键综合结论

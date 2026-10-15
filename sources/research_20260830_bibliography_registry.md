@@ -1,5 +1,7 @@
 # 核心 bibliography 注册表审计与刷新记录
 
+> 链接维护：2026-10-15 校正一手入口；除明确注明的链接解析状态外，正文研究结论与发布状态仍按原记录日期理解。
+
 ## 1. 任务、冻结时间与证据边界
 
 - 审计日期：2026-08-30（Asia/Shanghai）。
@@ -101,7 +103,7 @@ arXiv:YYMM.NNNNN
 
 ## 6. 元数据、年份与类型修正
 
-1. arXiv metadata 按 40 个 ID 一批刷新，避免 96 个 ID 放在单个长请求中；题名、作者、首次年份、primary class、DOI 和 journal reference 均来自 [arXiv API](https://export.arxiv.org/api/query)。
+1. arXiv metadata 按 40 个 ID 一批刷新，避免 96 个 ID 放在单个长请求中；题名、作者、首次年份、primary class、DOI 和 journal reference 均来自 [arXiv API 文档](https://info.arxiv.org/help/api/index.html)；实际请求端点为 `https://export.arxiv.org/api/query`，需附查询参数。
 2. 4 个 DOI 条目从 [Crossref REST API](https://api.crossref.org/) fresh-fetch；不使用搜索摘要补作者或年份。
 3. `World Models` 的 arXiv feed 提供 Zenodo DOI `10.5281/zenodo.1207631`。更新器现在不会仅因 arXiv feed 含 DOI 就把预印本强制写成 `@article`；arXiv source 保持 `@misc`，DOI 仍作为可解析标识输出。
 4. 对 arXiv 中的机构作者作最小 BibTeX 保护：NVIDIA、Sand.ai、Wan Team 与 Seedance Team 使用大括号保持团体作者语义；不删减其后个人作者。

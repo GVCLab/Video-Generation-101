@@ -1,0 +1,102 @@
+{
+  "date": "2026-10-15",
+  "replacement_http": [
+    {
+      "url": "https://openaccess.thecvf.com/content/CVPR2026/html/Wang_BulletTime_Decoupled_Control_of_Time_and_Camera_Pose_for_Video_CVPR_2026_paper.html",
+      "status": 200,
+      "final_url": "https://openaccess.thecvf.com/content/CVPR2026/html/Wang_BulletTime_Decoupled_Control_of_Time_and_Camera_Pose_for_Video_CVPR_2026_paper.html",
+      "title": "CVPR 2026 Open Access Repository",
+      "bytes": 6529
+    },
+    {
+      "url": "https://github.com/Aoko955/Omni-LiveAvatar",
+      "status": 200,
+      "final_url": "https://github.com/Aoko955/Omni-LiveAvatar",
+      "title": "GitHub - Aoko955/Omni-LiveAvatar: Official codebase for &quot;Omni-LiveAvatar: Minute-Level Real-Time Streaming Joint Audio-Video Avatar Generation&quot; · GitHub",
+      "bytes": 277496
+    },
+    {
+      "url": "https://github.com/uniBruce/Mead",
+      "status": 200,
+      "final_url": "https://github.com/uniBruce/Mead",
+      "title": "GitHub - uniBruce/Mead: MEAD: A Large-scale Audio-visual Dataset for Emotional Talking-face Generation [ECCV2020] · GitHub",
+      "bytes": 297946
+    },
+    {
+      "url": "https://github.com/meituan-longcat/LongCat-Video",
+      "status": 200,
+      "final_url": "https://github.com/meituan-longcat/LongCat-Video",
+      "title": "GitHub - meituan-longcat/LongCat-Video · GitHub",
+      "bytes": 404704
+    },
+    {
+      "url": "https://openaccess.thecvf.com/content/CVPR2023/html/Zhang_SadTalker_Learning_Realistic_3D_Motion_Coefficients_for_Stylized_Audio-Driven_Single_CVPR_2023_paper.html",
+      "status": 200,
+      "final_url": "https://openaccess.thecvf.com/content/CVPR2023/html/Zhang_SadTalker_Learning_Realistic_3D_Motion_Coefficients_for_Stylized_Audio-Driven_Single_CVPR_2023_paper.html",
+      "title": "CVPR 2023 Open Access Repository",
+      "bytes": 6739
+    },
+    {
+      "url": "https://github.com/bbldCVer/EDEN",
+      "status": 200,
+      "final_url": "https://github.com/bbldCVer/EDEN",
+      "title": "GitHub - bbldCVer/EDEN: [CVPR2025] Official PyTorch implementation of &quot;EDEN: Enhanced Diffusion for High-quality Large-motion Video Frame Interpolation.&quot; · GitHub",
+      "bytes": 301514
+    },
+    {
+      "url": "https://github.com/xypeng9903/LDF-VFI",
+      "status": 200,
+      "final_url": "https://github.com/xypeng9903/LDF-VFI",
+      "title": "GitHub - xypeng9903/LDF-VFI: [CVPR 2026] Towards Holistic Modeling for Video Frame Interpolation with Auto-regressive Diffusion Transformers · GitHub",
+      "bytes": 323773
+    },
+    {
+      "url": "https://github.com/bdd100k/bdd100k",
+      "status": 200,
+      "final_url": "https://github.com/bdd100k/bdd100k",
+      "title": "GitHub - bdd100k/bdd100k: Toolkit of BDD100K Dataset for Heterogeneous Multitask Learning - CVPR 2020 Oral Paper · GitHub",
+      "bytes": 272254
+    },
+    {
+      "url": "https://arxiv.org/abs/2608.29322",
+      "status": 200,
+      "final_url": "https://arxiv.org/abs/2608.29322",
+      "title": "[2608.29322] Test-Time Scaling for Video Diffusion Models via Diagnosis-Guided Candidate Recycling",
+      "bytes": 45550
+    },
+    {
+      "url": "https://info.arxiv.org/help/api/index.html",
+      "status": 200,
+      "final_url": "https://info.arxiv.org/help/api/index.html",
+      "title": "arXiv API Access - arXiv info",
+      "bytes": 81413
+    }
+  ],
+  "lychee": {
+    "total": 5785,
+    "unique": 2161,
+    "successful": 5785,
+    "unknown": 0,
+    "unsupported": 0,
+    "timeouts": 0,
+    "excludes": 0,
+    "errors": 0
+  },
+  "citations": {
+    "mode": "online",
+    "scope": "published",
+    "files": 56,
+    "links": 2233,
+    "arxiv_requested": 416,
+    "arxiv_queried": 416,
+    "arxiv_returned": 416,
+    "arxiv_unverified": 0,
+    "online_complete": true,
+    "errors": 0,
+    "warnings": 0
+  },
+  "strict_build": "passed",
+  "manual_local_links": 14696,
+  "manual_issues": 0,
+  "regression_tests_passed": 7
+}

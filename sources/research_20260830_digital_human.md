@@ -1,5 +1,7 @@
 # 数字人视频生成研究日志（冻结于 2026-08-30）
 
+> 链接维护：2026-10-15 校正一手入口；除明确注明的链接解析状态外，正文研究结论与发布状态仍按原记录日期理解。
+
 对应正文：[数字人视频生成：任务边界、条件契约与可审计评测](../docs/tasks/digital-human.md)
 
 ## 1. 审计目标与边界
@@ -63,7 +65,7 @@ arXiv 五个主查询共返回 344 个“query slots”，存在大量重叠，�
 
 | 工作 | v1 首次公开 | 正式记录（冻结日） | release surface 读法 | 证据 |
 |---|---:|---|---|---|
-| **SadTalker** | 2022-11-22 | CVPR 2023 | 官方仓库含推理、256/512 检查点及训练相关资源；Apache-2.0 | [CVF](https://openaccess.thecvf.com/content/CVPR2023/html/Zhang_SadTalker_Learning_Realistic_3D_Motion_Coefficients_for_Stylized_Audio-Driven_Single_Image_CVPR_2023_paper.html), [arXiv](https://arxiv.org/abs/2211.12194), [repo](https://github.com/OpenTalker/SadTalker) |
+| **SadTalker** | 2022-11-22 | CVPR 2023 | 官方仓库含推理、256/512 检查点及训练相关资源；Apache-2.0 | [CVF](https://openaccess.thecvf.com/content/CVPR2023/html/Zhang_SadTalker_Learning_Realistic_3D_Motion_Coefficients_for_Stylized_Audio-Driven_Single_CVPR_2023_paper.html), [arXiv](https://arxiv.org/abs/2211.12194), [repo](https://github.com/OpenTalker/SadTalker) |
 | **VASA-1** | 2024-04-16 | NeurIPS 2024 Main, Oral | 微软项目/论文有演示；未定位到官方研究代码、权重或 API | [NeurIPS](https://proceedings.neurips.cc/paper_files/paper/2024/hash/014fe398da515cd552fa6e1f33e0565e-Abstract-Conference.html), [arXiv](https://arxiv.org/abs/2404.10667), [project](https://www.microsoft.com/en-us/research/project/vasa-1/) |
 | **Hallo v1** | 2024-06-13 | 未定位到 Hallo v1 的正式 proceedings | README 记录 2024-06-15 权重/推理、2024-06-28 训练代码；MIT；训练数据局限写为 English-only | [arXiv](https://arxiv.org/abs/2406.08801), [repo](https://github.com/fudan-generative-vision/hallo) |
 | **OmniHuman-1** | 2025-02-03 | ICCV 2025 | 正式论文、项目页与 demos；项目页未链接研究代码或权重 | [CVF](https://openaccess.thecvf.com/content/ICCV2025/html/Lin_OmniHuman-1_Rethinking_the_Scaling-Up_of_One-Stage_Conditioned_Human_Animation_Models_ICCV_2025_paper.html), [arXiv](https://arxiv.org/abs/2502.01061), [project](https://omnihuman-lab.github.io/) |
@@ -87,9 +89,9 @@ arXiv 五个主查询共返回 344 个“query slots”，存在大量重叠，�
 | 工作 | 首次公开 | 冻结日结论 | 证据 |
 |---|---:|---|---|
 | Hallo-Live | 2026-04-26 | 预印本；仓库含 inference/training、合成 prompts、阶段权重；仓库自称 ACM MM 2026 accepted，但未以正式 proceedings 升级 | [arXiv](https://arxiv.org/abs/2604.23632), [repo](https://github.com/fudan-generative-vision/hallo-live) |
-| LongCat-Video-Avatar 1.5 | 2026 | 预印本；官方仓库可见 code、weights 与少步配置，MIT | [arXiv](https://arxiv.org/abs/2605.26486), [repo](https://github.com/meituan-longcat/LongCat-Video-Avatar) |
+| LongCat-Video-Avatar 1.5 | 2026 | 预印本；官方仓库可见 code、weights 与少步配置，MIT | [arXiv](https://arxiv.org/abs/2605.26486), [repo](https://github.com/meituan-longcat/LongCat-Video) |
 | AptAvatar | 2026-07-27 | 预印本；README checklist 与正文矛盾、命令有占位符，保守记为代码可见但完整权重不可确认 | [arXiv](https://arxiv.org/abs/2607.24013), [repo](https://github.com/TaoLiveAIGC/AptAvatar) |
-| Omni-LiveAvatar | 2026-08-07 | 摘要称 code available，但仓库 code/checkpoints 仍为 TODO；按 paper/project only | [arXiv](https://arxiv.org/abs/2608.13602), [repo](https://github.com/Omni-LiveAvatar/Omni-LiveAvatar) |
+| Omni-LiveAvatar | 2026-08-07 | 摘要称 code available，但仓库 code/checkpoints 仍为 TODO；按 paper/project only | [arXiv](https://arxiv.org/abs/2608.13602), [repo](https://github.com/Aoko955/Omni-LiveAvatar) |
 | OmniMate | 2026-07 | 临近冻结日预印本，只作候选，不把摘要结果升级为稳定主线 | [arXiv](https://arxiv.org/abs/2607.23023) |
 | DynaForcing | 2026-08 | 临近冻结日预印本，只作候选 | [arXiv](https://arxiv.org/abs/2608.17707) |
 | EfficientSync | 2026-08 | 临近冻结日预印本，只作候选 | [arXiv](https://arxiv.org/abs/2608.18832) |
@@ -112,7 +114,7 @@ arXiv 五个主查询共返回 344 个“query slots”，存在大量重叠，�
 ### 6.1 方法主线
 
 - 2D warp/keypoint：[FOMM, NeurIPS 2019](https://proceedings.neurips.cc/paper/2019/hash/31c0b36aef265d9221af80872ceb62f9-Abstract.html)。
-- 3DMM/motion coefficient：[SadTalker, CVPR 2023](https://openaccess.thecvf.com/content/CVPR2023/html/Zhang_SadTalker_Learning_Realistic_3D_Motion_Coefficients_for_Stylized_Audio-Driven_Single_Image_CVPR_2023_paper.html)。
+- 3DMM/motion coefficient：[SadTalker, CVPR 2023](https://openaccess.thecvf.com/content/CVPR2023/html/Zhang_SadTalker_Learning_Realistic_3D_Motion_Coefficients_for_Stylized_Audio-Driven_Single_CVPR_2023_paper.html)。
 - NeRF avatar：[AD-NeRF, ICCV 2021](https://openaccess.thecvf.com/content/ICCV2021/html/Guo_AD-NeRF_Audio_Driven_Neural_Radiance_Fields_for_Talking_Head_Synthesis_ICCV_2021_paper.html)。
 - GAN/expert sync：[Wav2Lip, ACM MM 2020](https://doi.org/10.1145/3394171.3413532)。
 - diffusion：[DiffTalk, CVPR 2023](https://openaccess.thecvf.com/content/CVPR2023/html/Shen_DiffTalk_Crafting_Diffusion_Models_for_Generalized_Audio-Driven_Portraits_Animation_CVPR_2023_paper.html)、[Hallo](https://arxiv.org/abs/2406.08801)、[VASA-1](https://proceedings.neurips.cc/paper_files/paper/2024/hash/014fe398da515cd552fa6e1f33e0565e-Abstract-Conference.html)。
@@ -124,7 +126,7 @@ arXiv 五个主查询共返回 344 个“query slots”，存在大量重叠，�
 
 | 项目 | 一手来源 | 本文只采用什么 |
 |---|---|---|
-| MEAD | [官方项目页](https://wywu.github.io/projects/MEAD/MEAD.html) | 受控情绪表演数据；不把标签当真实心理状态 |
+| MEAD | [官方仓库与数据说明](https://github.com/uniBruce/Mead) | 受控情绪表演数据；不把标签当真实心理状态 |
 | LRS3 | [论文](https://arxiv.org/abs/1809.00496) | 视听语音数据代表；提醒来源/许可/语言差异 |
 | VoxCeleb | [VGG 官方页](https://www.robots.ox.ac.uk/~vgg/data/voxceleb/) | 身份数据代表；提醒身份和节目来源重叠 |
 | HDTF | [CVF](https://openaccess.thecvf.com/content/CVPR2021/html/Zhang_Flow-Guided_One-Shot_Talking_Face_Generation_With_a_High-Resolution_Audio-Visual_Dataset_CVPR_2021_paper.html) | 高分辨率 talking-face 数据代表 |

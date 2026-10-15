@@ -1,5 +1,7 @@
 # 视频帧插值（VFI）研究记录：检索、证据与图像审计
 
+> 链接维护：2026-10-15 校正一手入口；除明确注明的链接解析状态外，正文研究结论与发布状态仍按原记录日期理解。
+
 > 检索冻结日：**2026-08-30（Asia/Shanghai）**
 > 对应章节：[`docs/tasks/frame-interpolation.md`](../docs/tasks/frame-interpolation.md)
 > 记录目的：让方法归类、首发年份、数据协议、生成图片和验收结果可以被逐项复核，而不是把作者摘要或排行榜直接当成结论。
@@ -183,9 +185,9 @@ BVI-VFI 与 FloLPIPS 说明动态纹理和时间伪影会改变方法排序；20
 - FILM：<https://github.com/google-research/frame-interpolation>
 - VFIformer：<https://github.com/JIA-Lab-research/VFIformer>
 - AMT：<https://github.com/MCG-NKU/AMT>
-- EDEN：<https://github.com/MCG-NJU/EDEN>
+- EDEN：<https://github.com/bbldCVer/EDEN>
 - BiM-VFI：<https://github.com/KAIST-VICLab/BiM-VFI>
-- LDF-VFI：<https://github.com/Xinyu-Peng/LDF-VFI>
+- LDF-VFI：<https://github.com/xypeng9903/LDF-VFI>
 - LDMVFI：<https://github.com/danier97/LDMVFI>
 - XVFI：<https://github.com/JihyongOh/XVFI>
 

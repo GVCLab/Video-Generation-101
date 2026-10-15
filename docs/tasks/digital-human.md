@@ -304,13 +304,13 @@ LRS3、VoxCeleb 与 HDTF 分别代表大规模视听语音、说话人身份和�
 
 <a id="ref-37"></a>[37] Omni-LiveAvatar authors. [Omni-LiveAvatar](https://arxiv.org/abs/2608.13602). arXiv:2608.13602, first submitted 2026-08-07.
 
-<a id="ref-38"></a>[38] Omni-LiveAvatar authors. Omni-LiveAvatar official repository [![GitHub: Omni-LiveAvatar/Omni-LiveAvatar](https://img.shields.io/github/stars/Omni-LiveAvatar/Omni-LiveAvatar?style=social)](https://github.com/Omni-LiveAvatar/Omni-LiveAvatar).
+<a id="ref-38"></a>[38] Omni-LiveAvatar authors. Omni-LiveAvatar official repository [![GitHub: Aoko955/Omni-LiveAvatar](https://img.shields.io/github/stars/Aoko955/Omni-LiveAvatar?style=social)](https://github.com/Aoko955/Omni-LiveAvatar).
 
 <a id="ref-39"></a>[39] LongCat team. [LongCat-Video-Avatar 1.5](https://arxiv.org/abs/2605.26486). arXiv:2605.26486, 2026.
 
 <a id="ref-40"></a>[40] Meituan. LongCat-Video official repository (includes Avatar) [![GitHub: meituan-longcat/LongCat-Video](https://img.shields.io/github/stars/meituan-longcat/LongCat-Video?style=social)](https://github.com/meituan-longcat/LongCat-Video).
 
-<a id="ref-41"></a>[41] Wang et al. [MEAD: A Large-Scale Audio-Visual Dataset for Emotional Talking-Face Generation](https://wywu.github.io/projects/MEAD/MEAD.html). ECCV, 2020.
+<a id="ref-41"></a>[41] Wang et al. [MEAD: A Large-Scale Audio-Visual Dataset for Emotional Talking-Face Generation](https://www.ecva.net/papers/eccv_2020/papers_ECCV/papers/123660698.pdf). ECCV, 2020. [官方仓库与数据说明](https://github.com/uniBruce/Mead).
 
 <a id="ref-42"></a>[42] Afouras et al. [LRS3-TED: A Large-Scale Dataset for Visual Speech Recognition](https://arxiv.org/abs/1809.00496). arXiv:1809.00496, 2018.
 

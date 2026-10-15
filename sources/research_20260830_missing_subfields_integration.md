@@ -1,5 +1,7 @@
 # Structural gap audit for the next Video Generation 101 expansion
 
+> 链接维护：2026-10-15 校正一手入口；除明确注明的链接解析状态外，正文研究结论与发布状态仍按原记录日期理解。
+
 > Audit date: **2026-08-30 (Asia/Shanghai)**. This record explains why three new chapters were added and how they must be integrated without erasing task or evidence boundaries.
 
 ## 1. Review question
@@ -57,7 +59,7 @@ The purpose of this table is to verify that each proposed chapter is anchored in
 | Controllability | [Motion Prompting](https://openaccess.thecvf.com/content/CVPR2025/html/Geng_Motion_Prompting_Controlling_Video_Generation_with_Motion_Trajectories_CVPR_2025_paper.html) | Treats sparse or dense motion trajectories as a general motion prompt | CVPR 2025 formal publication |
 | Controllability | [GEN3C](https://openaccess.thecvf.com/content/CVPR2025/html/Ren_GEN3C_3D-Informed_World-Consistent_Video_Generation_with_Precise_Camera_Control_CVPR_2025_paper.html) | Renders an incrementally updated 3D cache under a target camera path before conditioning generation | CVPR 2025 formal publication |
 | Controllability | [LAMP](https://openaccess.thecvf.com/content/CVPR2026/html/Kizil_LAMP_Language-Assisted_Motion_Planning_for_Controllable_Video_Generation_CVPR_2026_paper.html) | Translates cinematography language into deterministic object/camera trajectory programs | CVPR 2026 formal publication |
-| Controllability | [BulletTime](https://openaccess.thecvf.com/content/CVPR2026/html/Wang_BulletTime_Decoupled_Control_of_Time_and_Camera_Pose_for_Video_Generation_CVPR_2026_paper.html) | Explicitly decouples world time from camera pose | CVPR 2026 formal publication |
+| Controllability | [BulletTime](https://openaccess.thecvf.com/content/CVPR2026/html/Wang_BulletTime_Decoupled_Control_of_Time_and_Camera_Pose_for_Video_CVPR_2026_paper.html) | Explicitly decouples world time from camera pose | CVPR 2026 formal publication |
 | Controllability | [FlashMotion](https://openaccess.thecvf.com/content/CVPR2026/html/Li_FlashMotion_Few-Step_Controllable_Video_Generation_with_Trajectory_Guidance_CVPR_2026_paper.html) | Shows that distilling a base generator does not preserve a control adapter automatically and adds post-distillation adapter tuning | CVPR 2026 formal publication |
 | Controllability | [4DStreamCtrl](https://arxiv.org/abs/2608.25479) | Combines camera and object control with online streaming and long rollout | 2026-08-26 preprint; real-time and long-run numbers are author-reported |
 

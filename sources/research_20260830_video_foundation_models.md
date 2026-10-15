@@ -1,5 +1,7 @@
 # 视频基础模型系统综述：检索、筛选与 release-surface 证据账本
 
+> 链接维护：2026-10-15 校正一手入口；除明确注明的链接解析状态外，正文研究结论与发布状态仍按原记录日期理解。
+
 ## 1. 任务、范围与冻结规则
 
 - 检索与核验日期：2026-08-30（Asia/Shanghai）。
@@ -39,7 +41,7 @@
 
 API 共同参数：
 
-- endpoint：<https://export.arxiv.org/api/query>
+- endpoint：`https://export.arxiv.org/api/query`（需附 `search_query` 或 `id_list`；[官方接口说明](https://info.arxiv.org/help/api/index.html)）
 - start=0
 - max_results=50
 - sortBy=submittedDate

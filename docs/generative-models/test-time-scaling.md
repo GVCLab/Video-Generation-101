@@ -245,7 +245,7 @@ q_{\mathrm{ind}}(c,\hat v_B).
 | 2026-06 | PRISM [[15]](#ref-15) | 带噪 latent reward，提前排序 | 预印本 |
 | 2026-07 | TANGO [[16]](#ref-16) | 自诊断与测试时 LoRA 优化 | 预印本；作者注明 ECCV 2026 |
 | 2026-07 | CachedSearch [[18]](#ref-18) | 缓存近似探索、完整重生成赢家 | 预印本 |
-| 2026-08 | GEARS [[19]](#ref-19) | 诊断、阶段决策、候选修复与回收 | ACM TOG / SIGGRAPH Asia 2026；DOI 可核验 |
+| 2026-08 | GEARS [[19]](#ref-19) | 诊断、阶段决策、候选修复与回收 | 作者稿注明 ACM TOG / SIGGRAPH Asia 2026 已接收；见 arXiv，相关 DOI 暂未解析 |
 | 2026-08 | NoisEasier [[20]](#ref-20) | 可微多目标 reward 优化完整随机轨迹 | 预印本；作者注明 ECCV 2026 |
 
 这条时间线显示了三个变化：从“完整生成后选一个”走向“中间状态就决策”；从统一加预算走向按难度和诊断分配；从丢弃失败候选走向修复、缓存与复用。但它还没有证明一个跨模型、跨任务稳定的通用 scaling law。
@@ -414,6 +414,6 @@ CachedSearch 将这一思想落实为“低成本缓存探索，再以完整计�
 
 <a id="ref-18"></a>[18] [CachedSearch: Training-Free Cached Exploration for Test-Time Search in Video Diffusion](https://arxiv.org/abs/2607.23159). Shreshth Saini et al. arXiv preprint. 2026.
 
-<a id="ref-19"></a>[19] [Test-Time Scaling for Video Diffusion Models via Diagnosis-Guided Candidate Recycling](https://doi.org/10.1145/3842526). Hangzhou He et al. ACM Transactions on Graphics / SIGGRAPH Asia. 2026. [Test-Time Scaling for Video Diffusion Models via Diagnosis-Guided Candidate Recycling (arXiv)](https://arxiv.org/abs/2608.29322).
+<a id="ref-19"></a>[19] [Test-Time Scaling for Video Diffusion Models via Diagnosis-Guided Candidate Recycling](https://arxiv.org/abs/2608.29322). Hangzhou He et al. 2026. 作者稿注明 ACM Transactions on Graphics / SIGGRAPH Asia 2026 已接收；arXiv 元数据给出相关 DOI `10.1145/3842526`，截至 2026-10-15 解析返回 404，保留标识并以同篇 arXiv 为可访问入口。
 
 <a id="ref-20"></a>[20] [NoisEasier: Test-Time Noise Optimization for Text-to-Video Generation](https://arxiv.org/abs/2608.30194). Yujiang Pu and Yu Kong. arXiv preprint; manuscript notes ECCV 2026. 2026.

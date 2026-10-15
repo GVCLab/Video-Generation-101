@@ -268,7 +268,7 @@ p(s_{t+1}\mid s_{\le t}, a_t, e, \Delta t),
 | 分支 | 代表资源 | 必须保留的字段 | 常见误用 |
 |---|---|---|---|
 | egocentric | [Ego4D](https://ego4d-data.org/)、[EPIC-KITCHENS](https://epic-kitchens.github.io/) | wearer、视线/手、narration、长时 episode、privacy | 把 understanding label 当生成许可 |
-| driving | [Waymo Open](https://waymo.com/open/)、[nuScenes](https://www.nuscenes.org/)、[BDD100K](https://www.bdd100k.com/) | 标定多相机、LiDAR/radar、ego pose、地图、control/trajectory | 只用 RGB 视频却声称闭环驾驶 world model |
+| driving | [Waymo Open](https://waymo.com/open/)、[nuScenes](https://www.nuscenes.org/)、[BDD100K](https://github.com/bdd100k/bdd100k) | 标定多相机、LiDAR/radar、ego pose、地图、control/trajectory | 只用 RGB 视频却声称闭环驾驶 world model |
 | spatial / 3D | SpatialVID [[15]](#ref-15)、multiview/4D 数据 | intrinsics、extrinsics、pose convention、depth scale、dynamic mask | 把估计 pose/depth 当真实测量且不报置信度 |
 | audio-video | Vript voiceover、FineVideo、LAION-BVD audio branch | audio codec、sample rate、offset、ASR、事件边界、rights | 把音乐版权或 ASR 文本许可与视频许可合并 |
 | simulation | Habitat、Procgen、robot digital twins | simulator/asset version、physics parameters、seed、renderer | 不披露 sim domain 就报告“真实世界泛化” |
