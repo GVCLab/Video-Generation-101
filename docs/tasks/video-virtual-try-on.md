@@ -7,6 +7,8 @@
 **使用步骤：** 区分源视频换装和姿态驱动动画 → 确定服装细节、人物和背景保持项 → 检查动态遮挡、服装一致性与时序稳定性。
 
 
+**快速阅读：** [入门：任务分类](#route-1) · [实现：处理流程](#route-2) · [研究：评测方法](#route-3)。
+
 ## 学习目标
 
 读完本章，应当能够：
@@ -21,6 +23,8 @@
 8. 说明视觉试衣为什么不能证明真实尺码、舒适度、压力、面料物理或退货率下降。
 
 <a id="1-v2v"></a>
+
+<a id="route-1"></a>
 
 ## 1. 任务分类
 
@@ -150,6 +154,8 @@ TTFF=t_{decode\ input}+t_{parse/pose/mask}+t_{lookahead}
 ```
 
 只报 denoiser FPS，会漏掉解析、DensePose、mask smoothing、关键帧试衣、前视缓冲和视频编解码。
+
+<a id="route-2"></a>
 
 ## 3. 处理流程
 
@@ -389,6 +395,8 @@ group=(person\ identity, capture\ session, garment/SKU).
 ### 9.3 正面筛选不是无害清洗
 
 CatV2TON 的 ViViD-S 主动保留正面连续帧；DPIDM 也删除 ViViD 背身测试片段但未报告剩余数。这样可减少 agnostic mask 错误，却同时删除了最能检验背面、重现和大形变的样本。两者数值不能与原始完整 split 直接横排。
+
+<a id="route-3"></a>
 
 ## 10. 评测方法
 

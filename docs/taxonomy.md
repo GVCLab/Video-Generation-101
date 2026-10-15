@@ -334,6 +334,8 @@ DreamGen 的价值不在“生成机器人视频”本身，而在把生成、�
 | 同一历史产生多个概率可信未来 | [视频预测](tasks/video-prediction.md)、[变分随机生成](generative-models/variational-generation.md) | 普通条件生成 |
 | 研究动作后的未来 | [动作条件预测](tasks/action-conditioned-prediction.md) | [交互世界](tasks/interactive-world-generation.md) |
 | 逐轮动作—观测反馈 | [交互世界](tasks/interactive-world-generation.md) | 离线动作序列、仅流式输出 |
+| 让未来预测参与动作选择 | [WAM](world-action-model.md) | 环境模拟器本身不一定是 policy |
+| 用代码维护世界规则并生成视觉观测 | [Coding World Model](coding-world-models.md) | 制作工具脚本、程序执行推理 |
 | 控制相机、轨迹、姿态或几何 | [细粒度可控生成](tasks/controllable-video-generation.md) | 环境动作、多视角与 4D |
 | 同时刻多相机或可查询动态状态 | [多视角与 4D](tasks/multiview-4d-generation.md) | 一条相机路径 |
 | 同步生成画面和声音 | [原生音视频](tasks/native-audio-video-generation.md) | 视频后配音 |

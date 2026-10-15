@@ -10,6 +10,10 @@
 
 本章讨论的不是“哪一个视频模型看起来最像世界”，而是一个更严格的问题：**模型能否在动作干预下维护状态、预测多种可能未来，并让真实环境中的决策变得更好？** 资料检索与发布状态核验截止到 **2026-08-30**；检索式、纳排规则、证据等级和图稿记录见[研究日志](../sources/research_20260830_video_world_action_models.md)。
 
+## 章节分工
+
+本章负责状态表示、动力学与规划的共同基础。[WAM](world-action-model.md)负责预测与动作耦合；[动作条件预测](tasks/action-conditioned-prediction.md)负责条件预测与时间规格；[交互式世界生成](tasks/interactive-world-generation.md)负责持续观测流、回访与环境接口；[Coding World Model](coding-world-models.md)负责程序化状态及视觉接口；详细报告集中于[世界模型评测协议](evaluation/world-models.md)。
+
 ## 学习目标
 
 读完本章，应当能够：
@@ -111,6 +115,10 @@ _图 1：RSSM 的“先验想象—后验校正”结构。实线表示有观测
 
 因此，world model 没有唯一正确的输出空间。若用途是控制，只需保留 reward-relevant state；若用途是人可检查的交互环境，就还要生成视觉与声音；若用途是训练通用机器人，动作、接触、对象状态和语言目标都可能是必要变量。
 
+### 2.5 可执行程序状态
+
+状态也可以存储为实体表、事件和规则，由程序执行转移，而非全部编码在神经 latent 中。程序可被学习、检验和修正；视频模型则可以充当条件观测生成器。这一混合结构的机制、代表方法和评测见 [Coding World Model](coding-world-models.md)。它扩展本章的表示选择，不取代随机状态、观测校正和规划验证。
+
 ## 3. 主要技术路线
 
 ### 3.1 动作条件预测：先回答“做了之后会怎样”
@@ -145,73 +153,15 @@ GameNGen、DIAMOND 和 Oasis 的意义不只是“会玩游戏”。它们把 **
 
 ## 4. 预测与动作生成
 
-WAM 不是给普通 policy 加一个“world”名字。最低条件是：**未来预测在推理阶段参与动作产生或选择** [[1]](#ref-1)。按耦合位置，可以得到四种范式：
+预测在推理时怎样参与动作产生或选择、四种耦合范式及其验收，集中见 [WAM：预测与动作生成](world-action-model.md#action-coupling)。本章继续负责状态与动力学、搜索与校正的共同基础。
 
-| 范式 | 推理路径 | 典型用途 | 关键验收 |
-|---|---|---|---|
-| Imagine then execute | 候选动作 → rollout → 评分 → 执行 | MPC、规划、风险筛选 | rollout ranking 与真实结果一致 |
-| Video-feature-conditioned action | 预测未来的特征 → action decoder | 将动作免费的视频预训练迁移到机器人 | 特征变化与可执行 action chunk 对齐 |
-| Joint video–action modeling | 一个 backbone 联合预测未来与动作 | 端到端闭环 policy | 视频、动作、状态三者一致，且真机收益成立 |
-| Auxiliary video prediction | policy 训练时附加未来预测损失 | 改善表示和数据效率 | 去掉辅助头后的消融与真实成功率 |
-
-实践中还可按系统拓扑归并为两条主路线：**级联路线**让预测器、planner/verifier、policy 保持模块化；**联合路线**在共享模型中同时预测未来和动作。
+<a id="51-aplannerpolicy-video-generator"></a>
+<a id="52-bjoint-actionvideo-model"></a>
+<a id="53"></a>
 
 ## 5. 级联与联合建模
 
-![一张双路线科学示意图。左侧是级联路线：观测与目标进入世界或视频预测器，产生多个候选未来，经 planner、reward、inverse-dynamics 与 verifier 选择动作块；预测器还可离线生成轨迹供 policy 训练。右侧是联合路线：观测、目标与本体感觉进入共享 video-action backbone，同时输出未来状态或视频和可执行动作块。两条路线都进入底部 receding-horizon 回路，只执行首个动作块，再用真实观测校正近期上下文、实体/空间记忆与不确定性。](../assets/diagrams/world-action-model-dual-route.png)
-
-_图 2：World–Action Modeling 的两条系统路线。AI-generated scientific schematic；生成提示、迭代记录、SHA-256、尺寸与视觉检查见[研究日志](../sources/research_20260830_video_world_action_models.md)。_
-
-顺序化文字替代：
-
-1. 左侧级联系统先从当前观测与目标预测 $K$ 个候选未来。
-2. planner/reward/IDM 和 action verifier 分别检查任务价值、状态合理性与动作可达性，再选出动作块；同一预测器也可离线产生合成轨迹训练 policy。
-3. 右侧联合系统用一个共享 video–action backbone 同时产生未来状态/视频与动作块，用共同预测目标约束二者对齐。
-4. 两条路线都只执行动作块的第一部分，读取真实环境新观测，更新近期上下文、实体/空间记忆与不确定性，然后重新规划。
-
-### 5.1 路线 A：planner/policy + video generator
-
-级联路线有两种常被混在一起的用法。
-
-**在线 imagine–evaluate–act。** 世界模型针对候选动作生成 future rollouts；reward/value、约束、IDM 或 verifier 对候选打分；MPC 只执行第一个动作或短 action chunk。PlaNet、TD-MPC2、DINO-WM 与 V-JEPA 2-AC 都可放在这条谱系中，尽管它们预测 pixel、feature 或 task latent 的方式不同 [[5]](#ref-5) [[9]](#ref-9) [[17]](#ref-17) [[18]](#ref-18)。
-
-**离线 imagine–label–train。** DreamGen 先后训练可由机器人动作控制的 video world model，用它生成大量新颖交互视频，再通过 inverse dynamics/latent pseudo-action 标注轨迹，最后训练通用 policy [[19]](#ref-19)。它的主证据是**合成数据改善 policy**，不是在线 planner 延迟。官方代码现已公开 world-model finetune、视频生成、动作恢复和 policy 训练四阶段；这比只有演示视频的发布内容更强，但仍需分别核对所用 checkpoint、真实数据比例和任务成功率。
-
-World Action Verifier（WAV）提供了一个可插入这两种级联系统的验证器 [[20]](#ref-20)。其核心不是问整段视频“像不像”，而是把转移检查拆成：
-
-```math
-\underbrace{p(s'\mid s)}_{\text{state plausibility}}
-\quad\text{与}\quad
-\underbrace{p(a\mid s,s')}_{\text{action reachability}}.
-```
-
-论文用 action-free video 产生多样 subgoal、稀疏 inverse model 恢复动作，并通过 forward rollout cycle 检查可达性。作者在 9 个 MiniGrid、RoboMimic 与 ManiSkill 任务上报告约 2 倍 sample efficiency 和超过 22% 的下游提升。这里的正确结论是“分解 verifier 可改善指定任务的数据筛选/学习”，不是“WAV 已成为通用实时安全证书”；它的 ICLR 2026 证据来自 World Models workshop 与 Recursive Self-Improvement workshop，而不是 ICLR 主会录用。
-
-### 5.2 路线 B：joint action–video model
-
-联合路线希望同一个预测 backbone 在学习“世界将怎样变化”时也学会“我应该怎样行动”。
-
-- **ViPRA** 联合预测 future visual observation 与 motion-centric latent action，再用 flow-based decoder 输出连续 action chunks [[21]](#ref-21)。论文把“最高 22 Hz 的系统能力”与实验实际闭环设置区分开：评测最高限制在约 3.5 Hz，有效 action chunk 长 14、执行 7 步后重规划。报告时不能只摘最高频率。
-- **DreamZero / World Action Model** 用 14B autoregressive video diffusion backbone 联合建模未来视频与机器人动作，并把新观测回写 KV cache 形成闭环 [[22]](#ref-22)。作者报告通过推理优化达到约 7 Hz 和 38 倍加速；“zero-shot”只适用于论文指定的任务、机器人和数据设定，不能外推为任意现实任务。
-
-联合路线省去多个模块之间的格式转换，并可能让 action token 与 visual dynamics 共享表示；代价是更难定位错误。一个动作成功，可能来自视觉先验、动作头、训练数据偏置或外部控制器；一个视频合理，也不代表 action 可执行。必须做拆头、冻结 backbone、移除预测损失、扰动 proprioception 等消融。
-
-### 5.3 设计取舍
-
-| 维度 | 级联路线 | 联合路线 |
-|---|---|---|
-| 模块可替换性 | 高；generator、planner、verifier、policy 可分别升级 | 低到中；接口少，但内部耦合强 |
-| 错误定位 | 可按预测、评分、IDM、控制逐段检查 | 需要结构化 probe 和消融 |
-| 离线数据扩展 | 强；可批量生成再过滤 | 也可生成，但常以在线 policy 为主 |
-| 在线延迟 | 多候选 rollout 与评分较贵 | 一次前向可直接给动作，但大 backbone 仍可能慢 |
-| 不确定性 | 容易通过多模型、多样采样和 verifier 组合 | 需防共享错误让未来与动作“共同自信” |
-| 动作空间迁移 | 可更换 IDM/action decoder | 共享 action token 时可能需要重新对齐 |
-| 安全插桩 | 外部约束、shield、verifier 较自然 | 需要显式输出或外部 safety layer |
-| 最合适的证据 | 每模块校准 + 端到端真实效用 | joint objective 消融 + 闭环真机效用 |
-
-二者不是互斥终局。实际系统可以用 joint model 提议 action chunks，再用独立 verifier 和 model ensemble 复核；也可以用级联 world model 生成数据，训练一个低延迟 joint policy。
-
-图 2 中的 IDM 不是 planner 的同义词：在 DreamGen 类离线管线中，它主要把合成视觉变化恢复成伪动作；在部分在线级联系统中，它可检查候选转移是否能由某个动作解释。候选搜索、任务价值优化与约束处理仍由 planner/reward/verifier 承担。
+架构图、在线 imagine–evaluate–act 与离线 imagine–label–train、WAV、ViPRA、DreamZero 及设计取舍，见 [WAM：级联与联合架构](world-action-model.md#cascade-joint)。该专题保留相关原文、公式、实验条件和引用。
 
 ## 6. 规划系统组成
 
@@ -276,7 +226,7 @@ _图 3：带 verifier、不确定性和 persistent state 的 receding-horizon �
 
 ## 7. 长期状态
 
-长期交互需要至少三种状态：
+长期交互需要区分以下状态职责：
 
 ```math
 m_{t+1}=\mathrm{Update}\!\left(m_t,o_{t+1},a_t,
@@ -295,13 +245,7 @@ m_{t+1}=\mathrm{Update}\!\left(m_t,o_{t+1},a_t,
 
 ### 7.1 2025–2026 的三种长时机制
 
-| 工作 | 核心机制 | 作者报告 | 当前边界 |
-|---|---|---|---|
-| WorldPack [[23]](#ref-23) | trajectory packing + 视野/位姿几何选择；不同时间尺度动态压缩帧 | 以 4 帧 token 预算暴露 22 帧历史（5.5 倍）；LoopNav/RECON 长上下文实验 | trajectory packing 约增加 16% diffusion inference time，几何选择还有额外成本；是压缩记忆，不是显式对象状态 |
-| Infinite-World [[24]](#ref-24) | hierarchical pose-free memory compressor；tri-state uncertainty-aware action label；revisit-dense finetune | 作者报告 1000+ frame 的一致交互 | 主要是一手论文/项目展示，未发现等价完整公开代码与权重 |
-| ReWorld（长时记忆） [[25]](#ref-25) | 多尺度 attention window + random routing；固定 KV cache + pose-indexed landmark bank；chunk-drop training | 作者报告 704×1280 streaming，并在固定 12-chunk cache 下生成 64 秒/384 latents | repo 有 inference code，但截至检索日 weights 标为 “Coming soon”，不能称端到端可复现 |
-
-WorldPack 当前 arXiv v3 的标题是 _Dynamic Frame Compression for Long-context Video World Modeling_，不应沿用早期标题。ReWorld 还存在同名歧义：另一篇 _ReWorld: Multi-Dimensional Reward Modeling for Embodied World Models_ 提出 235K+ 多维偏好数据与 HERO reward heads，用于 physical realism、embodiment plausibility、task completion、visual quality 评分 [[26]](#ref-26)。它是 reward modeling 工作，不是上述 long-horizon memory system；引用时必须带副标题或 arXiv ID。
+压缩历史、无位姿层级记忆和固定 KV 加地标检索的机制、作者条件与发布边界，集中见[交互式世界生成的记忆案例](tasks/interactive-world-generation.md#memory-case-comparison)。本章保留上述通用状态职责及下面的 probe 定义。
 
 ### 7.2 长时评测不能只报“生成了多少秒”
 
@@ -316,113 +260,38 @@ WorldPack 当前 arXiv v3 的标题是 _Dynamic Frame Compression for Long-conte
 
 <a id="8-wm"></a>
 
+<a id="wm0"></a>
+<a id="wm1"></a>
+<a id="wm2open-loop-perceptual-quality"></a>
+<a id="wm3state-action-fidelity"></a>
+<a id="wm4counterfactual"></a>
+<a id="wm5planning-decision-utility"></a>
+<a id="wm6real-world-transfer"></a>
+<a id="81"></a>
+
 ## 8. 系统与能力报告
 
-单个总分会掩盖“画面好但动作错”或“短时准但规划会利用漏洞”。建议按层报告，上一层通过不代表下一层通过。这里使用 **WM0–WM6** 作为本章的局部报告栈，避免与[评测指南](evaluation.md)中面向能力主张的全局 **L0–L7 证据阶梯**混淆：WM0–WM1 是发布与系统前提，不是能力等级；WM2–WM6 才逐步对应全局证据。
-
-| 本章 WM 报告栈 | 对应的全局 L0–L7 | 解释 |
-|---|---|---|
-| WM0 发布内容 | 不对应能力等级 | 只说明结论来自哪里、artifact 是否可得 |
-| WM1 系统规格 | 不对应能力等级 | 只说明速度、延迟、动作频率与内存边界 |
-| WM2 open-loop 感知 | L0–L2 | 从渲染质量到时间、语义与物理诊断 |
-| WM3 状态与动作 | L3 | 给定动作后的状态转移是否正确 |
-| WM4 反事实与不确定性 | L4 | 换动作时是否产生正确且校准的分支 |
-| WM5 规划与决策 | L5–L6 | 先验证闭环 rollout，再验证策略排序与决策收益 |
-| WM6 现实迁移 | L7 | 是否在独立真实系统中改善成功率、安全或数据效率 |
-
-### WM0：发布内容与证据来源
-
-对每一个结论记录：
-
-- paper 版本、venue 状态、项目页更新日期；
-- code、weights、data、evaluation script 是否公开；
-- 论文 checkpoint 是否等同公开 checkpoint，公开小模型是否等同在线大 demo；
-- 数字来自 peer-reviewed paper、arXiv、作者项目、代码 README 还是厂商发布。
-
-### WM1：系统与运行规格
-
-| 字段 | 统一报告方式 | 常见误读 |
-|---|---|---|
-| FPS | 生成帧数 / wall-clock second；注明硬件、batch、采样步数 | 把离线吞吐当交互速度 |
-| 分辨率 | 模型实际输出，不把后处理上采样混入 | 分辨率更高就更物理 |
-| Rollout horizon | 同时报 frames、seconds、decision steps 与首次失效点 | 只报最好样片长度 |
-| Action rate | 每秒接受/执行多少次新 action；注明 action chunk | 与 video FPS 混为一谈 |
-| Memory | context frames/tokens、KV 大小、landmark/entity store、增长率 | “支持长视频”等于有 persistent state |
-| Latency | p50/p95 sense-to-act、first-frame、replan latency | 用平均 FPS 掩盖长尾卡顿 |
-
-### WM2：open-loop perceptual quality
-
-在 teacher-forced 或固定动作序列下报告 FVD/LPIPS/SSIM、human preference、temporal artifacts，并把 camera motion、对象运动、接触和遮挡分层。此层只回答“未来看起来怎样”，不能回答“动作是否正确”。
-
-### WM3：state 与 action fidelity
-
-- 从生成视频提取对象 pose、速度、接触、关节状态和任务事件，与真值轨迹比较；
-- 计算 action-conditioned transition error、action recognizability、inverse-dynamics consistency；
-- 对 no-op、相反动作、无效动作和边界动作分别报告；
-- 检查 visual action、proprioception 与真实控制命令是否时序对齐。
-
-### WM4：counterfactual 与不确定性
-
-- 同初态、多动作、多随机种子成对比较；
-- 测 causal effect error、branch coverage、calibration error、negative log-likelihood 或 risk–coverage curve；
-- 设计 OOD 动作组合、未见对象关系和接触条件；
-- 对“高价值但高 uncertainty”的候选，验证 conservative scoring 是否降低灾难失败。
-
-### WM5：planning / decision utility
-
-世界模型必须在独立真值环境中接受考试：
-
-- policy ranking correlation：模型中的 policy 排名与真实环境排名是否一致；
-- planning regret：world-model planner 与 oracle/真实 rollout planner 的收益差；
-- model exploitation gap：在模型内高分、真实环境低分的差距；
-- data efficiency：加入世界模型或合成数据后，达到同一成功率需要多少真实样本；
-- safety utility：碰撞、违规、失败恢复和 constraint violation 是否改善。
-
-WorldGym 把 action-conditioned video model 当作 policy evaluation environment，用 Monte Carlo rollouts 与视觉语言模型 reward 评估 VLA policy；作者报告模型内成功率与真机成功率高度相关，并能保留不同版本、规模和 checkpoint 的相对排序 [[28]](#ref-28)。论文同时明确指出真实物体交互仍难生成，因此“ranking 可用”与“绝对转移可信”仍是两个问题。
-
-### WM6：real-world transfer
-
-最后报告冻结/微调设置、真实机器人与相机、任务数、重复次数、成功率置信区间、干预次数、故障类别和 sim-to-real gap。若只在生成器自身 rollout 中评估 planner，不应记为通过 WM5，更不能据此支持全局 L7 的现实效用主张。
-
-### 8.1 新评测集各自补哪块证据
-
-| 工作 | 主要补充 | 仍需搭配 |
-|---|---|---|
-| WorldEval [[27]](#ref-27) | 用 Policy2Vec 构造 latent-action world simulator，在线比较 policy 与 checkpoint 排名 | 独立环境的绝对成功率、广泛失败类别 |
-| WorldGym [[28]](#ref-28) | 从真实初始帧做 Monte Carlo rollout，以 VLM reward 评估 policy 排名和新任务泛化 | 更可靠的物体交互、绝对校准和安全 |
-| MiraBench [[29]](#ref-29) | physical adherence、action-following fidelity 与 optimism bias | 真实闭环 transfer |
-| RoboWM-Bench [[30]](#ref-30) | 将生成的人手/机器人操作视频恢复为 embodied action，并在物理约束仿真中执行，暴露空间、接触与非物理形变错误 | 真机 transfer、更广任务、长期 memory 与成本报告 |
-
-推荐最小报告矩阵：
-
-| 层级 | 指标 | 短 horizon | 长 horizon | In-distribution | OOD |
-|---|---|---:|---:|---:|---:|
-| WM1 系统 | FPS、action Hz、p95 latency、memory | ✓ | ✓ | ✓ | ✓ |
-| WM2 感知 | perceptual/temporal quality | ✓ | ✓ | ✓ | ✓ |
-| WM3 状态动作 | pose/contact/event/action fidelity | ✓ | ✓ | ✓ | ✓ |
-| WM4 反事实 | paired intervention、calibration | ✓ | ✓ | ✓ | ✓ |
-| WM5 决策 | ranking、regret、exploitation gap | ✓ | ✓ | ✓ | ✓ |
-| WM6 现实 | success、safety、transfer gap | ✓ | ✓ | ✓ | ✓ |
+详细的 WM0–WM6 字段、与 L0–L7 的映射、感知/状态/反事实/决策指标、WorldEval/WorldGym/MiraBench/RoboWM-Bench 比较及最小报告矩阵，集中见[世界模型报告与评测协议](evaluation/world-models.md)。报告应分别注明来源、系统运行条件和被实验支持的能力。
 
 <a id="9-20252026"></a>
 
 ## 9. 代表方法
 
-| 工作 | 在本章中的角色 | Paper | Project / code | 截止 2026-08-30 的证据等级 |
+| 工作 | 在本章中的角色 | Paper | Project / code | 来源与发布内容（2026-08-30 快照） |
 |---|---|---|---|---|
-| WAM concise tutorial [[1]](#ref-1) | 定义与四范式 | arXiv v7 | 作者论文页 | B：最新教程，非基准结论 |
-| World Model for Robot Learning survey [[2]](#ref-2) | policy-centric taxonomy | arXiv | 论文入口 | B：最新综述，非原始实验 |
-| DreamGen [[19]](#ref-19) | 级联式离线合成数据 | CoRL 2025 / PMLR | [Project](https://research.nvidia.com/labs/gear/dreamgen/) · Code [![GitHub: NVIDIA/GR00T-Dreams](https://img.shields.io/github/stars/NVIDIA/GR00T-Dreams?style=social)](https://github.com/NVIDIA/GR00T-Dreams) | A：正式论文 + 四阶段代码 |
-| World Action Verifier [[20]](#ref-20) | state plausibility + action reachability | arXiv v2 | [Project](https://world-action-verifier.github.io/) · Code [![GitHub: world-action-verifier/wav_robot](https://img.shields.io/github/stars/world-action-verifier/wav_robot?style=social)](https://github.com/world-action-verifier/wav_robot) | B：论文 + 代码；workshop 荣誉，不是主会 |
-| ViPRA [[21]](#ref-21) | latent action 与 future feature 联合预训练 | ICLR 2026 OpenReview | [Project](https://vipra-project.github.io/) · Code [![GitHub: sroutray/vipra](https://img.shields.io/github/stars/sroutray/vipra?style=social)](https://github.com/sroutray/vipra) | A：官方会议记录 + code/weights |
-| LPWM | object-particle + latent-action 的相邻变分桥接支线 | [ICLR 2026 Oral](https://openreview.net/forum?id=lTaPtGiUUc) | [Project](https://taldatech.github.io/lpwm-web/) · Code [![GitHub: taldatech/lpwm](https://img.shields.io/github/stars/taldatech/lpwm?style=social)](https://github.com/taldatech/lpwm) | A：正式会议记录 + code/data/weights；对象化场景与相机运动仍是边界 |
-| DreamZero [[22]](#ref-22) | joint video–action 闭环 policy | arXiv | [Project](https://dreamzero0.github.io/) · Code [![GitHub: dreamzero0/dreamzero](https://img.shields.io/github/stars/dreamzero0/dreamzero?style=social)](https://github.com/dreamzero0/dreamzero) | B：论文 + 项目 + 代码 |
-| WorldPack [[23]](#ref-23) | 动态帧压缩与几何检索 | arXiv v3 | 论文入口 | B：论文；开放面需逐项核对 |
-| Infinite-World [[24]](#ref-24) | pose-free hierarchical memory | arXiv v2 | [Project](https://rq-wu.github.io/projects/infinite-world/) | B/C：论文 + demo；未见等价完整代码 |
-| ReWorld—long-horizon memory [[25]](#ref-25) | 固定 KV + landmark bank | arXiv v1 | Code [![GitHub: zhifeichen097/ReWorld](https://img.shields.io/github/stars/zhifeichen097/ReWorld?style=social)](https://github.com/zhifeichen097/ReWorld) | B-：inference code，weights 未发布 |
-| ReWorld—reward modeling [[26]](#ref-26) | 多维 embodied reward | arXiv | 论文入口 | B：同名不同工作 |
+| WAM concise tutorial [[1]](#ref-1) | 定义与四范式 | arXiv v7 | 作者论文页 | 预印本入口：最新教程，非基准结论 |
+| World Model for Robot Learning survey [[2]](#ref-2) | policy-centric taxonomy | arXiv | 论文入口 | 预印本入口：最新综述，非原始实验 |
+| DreamGen [[19]](#ref-19) | 级联式离线合成数据 | CoRL 2025 / PMLR | [Project](https://research.nvidia.com/labs/gear/dreamgen/) · Code [![GitHub: NVIDIA/GR00T-Dreams](https://img.shields.io/github/stars/NVIDIA/GR00T-Dreams?style=social)](https://github.com/NVIDIA/GR00T-Dreams) | 正式入口：正式论文 + 四阶段代码 |
+| World Action Verifier [[20]](#ref-20) | state plausibility + action reachability | arXiv v2 | [Project](https://world-action-verifier.github.io/) · Code [![GitHub: world-action-verifier/wav_robot](https://img.shields.io/github/stars/world-action-verifier/wav_robot?style=social)](https://github.com/world-action-verifier/wav_robot) | 预印本入口：论文 + 代码；workshop 荣誉，不是主会 |
+| ViPRA [[21]](#ref-21) | latent action 与 future feature 联合预训练 | ICLR 2026 OpenReview | [Project](https://vipra-project.github.io/) · Code [![GitHub: sroutray/vipra](https://img.shields.io/github/stars/sroutray/vipra?style=social)](https://github.com/sroutray/vipra) | 正式入口：官方会议记录 + code/weights |
+| LPWM | object-particle + latent-action 的相邻变分桥接支线 | [ICLR 2026 Oral](https://openreview.net/forum?id=lTaPtGiUUc) | [Project](https://taldatech.github.io/lpwm-web/) · Code [![GitHub: taldatech/lpwm](https://img.shields.io/github/stars/taldatech/lpwm?style=social)](https://github.com/taldatech/lpwm) | 正式入口：正式会议记录 + code/data/weights；对象化场景与相机运动仍是边界 |
+| DreamZero [[22]](#ref-22) | joint video–action 闭环 policy | arXiv | [Project](https://dreamzero0.github.io/) · Code [![GitHub: dreamzero0/dreamzero](https://img.shields.io/github/stars/dreamzero0/dreamzero?style=social)](https://github.com/dreamzero0/dreamzero) | 预印本入口：论文 + 项目 + 代码 |
+| WorldPack [[23]](#ref-23) | 动态帧压缩与几何检索 | arXiv v3 | 论文入口 | 预印本入口：论文；开放面需逐项核对 |
+| Infinite-World [[24]](#ref-24) | pose-free hierarchical memory | arXiv v2 | [Project](https://rq-wu.github.io/projects/infinite-world/) | 论文/展示：论文 + demo；未见等价完整代码 |
+| ReWorld—long-horizon memory [[25]](#ref-25) | 固定 KV + landmark bank | arXiv v1 | Code [![GitHub: zhifeichen097/ReWorld](https://img.shields.io/github/stars/zhifeichen097/ReWorld?style=social)](https://github.com/zhifeichen097/ReWorld) | 部分发布：inference code，weights 未发布 |
+| ReWorld—reward modeling [[26]](#ref-26) | 多维 embodied reward | arXiv | 论文入口 | 预印本入口：同名不同工作 |
 
-等级定义：A = 正式同行评审入口 + 可定位的一手 artifact；B = arXiv + 作者项目或代码；C = 机构发布/demo；D = 二手发现线索。等级描述的是**可核查面**，不是模型质量排名。
+此列只记录来源与发布内容，不赋予能力等级。正式发表入口、预印本、机构展示和 artifact 可得性分别理解；能力结论由相应 L0–L7 实验支持。旧记录中的 A/B/C/D 分别指正式入口与 artifact、预印本与作者入口、机构展示、二手线索，保留这一解释供历史记录对照。
 
 ## 10. 使用限制
 
@@ -446,13 +315,17 @@ WorldGym 把 action-conditioned video model 当作 policy evaluation environment
 1. 从 World Models、PlaNet、Dreamer、MuZero 理解“完整像素”与“对决策充分”的区别。
 2. 从 TD-MPC2、DINO-WM、V-JEPA 2 理解 latent planning 与 receding horizon。
 3. 从 Genie、GameNGen、DIAMOND、Oasis 理解 latent action、实时交互与 model exploitation。
-4. 从 DreamGen、WAV、ViPRA、DreamZero 比较级联和联合 WAM。
-5. 从 WorldPack、Infinite-World、两篇 ReWorld 理解 compression、persistent state 与 reward/verifier 的不同职责。
-6. 最后用 WM0–WM6 报告栈审查每个新发布，再映射到全局 L0–L7；不要把产品 demo、paper 和 checkpoint 混为一种证据。
+4. 到 [WAM](world-action-model.md#cascade-joint) 从 DreamGen、WAV、ViPRA、DreamZero 比较级联和联合架构。
+5. 到[交互世界的记忆案例](tasks/interactive-world-generation.md#memory-case-comparison)从 WorldPack、Infinite-World、两篇 ReWorld 理解 compression、persistent state 与 reward/verifier 的不同职责。
+6. 最后用[世界模型协议](evaluation/world-models.md)的 WM0–WM6 字段审查每个新发布，再映射到全局 L0–L7；不要把产品 demo、paper 和 checkpoint 混为一种证据。
 
 相邻章节：[动作条件预测](tasks/action-conditioned-prediction.md)、[交互式世界生成](tasks/interactive-world-generation.md)、[循环预测](generative-models/recurrent-prediction.md)、[JEPA](jepa.md)、[物理一致性](physical-consistency.md)与[评测指南](evaluation.md)。
 
-## 参考文献
+## 资料版本 {#source-version}
+
+结构调整：2026-10-15。架构、记忆案例和详细报告已按章节职责整理；本章及迁入页面保留原技术内容与 2026-08-30 来源快照。本次未刷新模型发布状态或开展模型复现。
+
+## 参考文献 {#_4}
 
 <a id="ref-1"></a>[1] [From World Models to World Action Models: A Concise Tutorial for Robotics](https://arxiv.org/abs/2607.00836). arXiv:2607.00836, v7. 2026.
 

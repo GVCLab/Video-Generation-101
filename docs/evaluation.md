@@ -200,6 +200,12 @@ WorldModelBench 主要位于视觉与物理诊断层 [[32]](#ref-32)；Genie 推
 
 **对声称服务决策的 World Model，最高层判据是策略价值。** 对候选策略比较模型预测回报 $\hat J(\pi)$ 与真实环境或独立 simulator 回报 $J(\pi)$ 的排序、regret 和 return gap。若 planner 只在 learned simulator 中找到高回报、在真实环境中失败，就构成 model exploitation；更好的视觉分数无法消除这一风险 [[35]](#ref-35)。观察预测器若不作决策声明，则不必承担这一证据要求。
 
+详细发布字段、运行规格、能力映射、指标与 benchmark 适用范围见[世界模型报告与评测协议](evaluation/world-models.md)。总览在本节维护统一 L0–L7 定义，专题页展开具体报告。
+
+### 5.4 代码世界模型的组件隔离
+
+[代码世界模型](coding-world-models.md#5)需要分别测程序转移正确性、proxy 编译与视觉条件遵循、长期事件保持、独立环境中的规划收益。用已知正确程序替换学习程序，再固定程序替换视觉后端，可定位错误来源。程序测试通过不等于画面忠实，画面忠实也不等于隐藏规则正确。
+
 ## 6. 评测执行与结果报告
 
 ![视频生成评测证据链：先声明能力与任务，再选择自动指标、人类校准、任务测试及安全和部署证据；World Model 若作动作或决策声明，还需动作干预与闭环决策。](../assets/diagrams/video-evaluation-evidence-chain.png)

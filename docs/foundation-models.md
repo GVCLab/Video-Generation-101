@@ -13,6 +13,8 @@
 
 智能体如何在生成工具之上组织规划、检查和返工，见 [Agentic Video Generation](agentic-video-generation.md)；该章区分制作系统收益与基础模型能力。
 
+**章节接口：** 本章负责训练到服务的组件集成与能力归因。数据规则见[数据处理](../resources/datasets.md)，表示见[Tokenizer](generative-models/video-tokenizers.md)，优化目标见[后训练](generative-models/video-post-training-alignment.md)，算子与并行见[执行系统](generative-models/inference-acceleration/systems.md)。下文保留系统所需接口及实例，不重复这些专题的完整推导。
+
 ## 1. 模型与系统边界
 
 同一产品名常同时指模型、模型家族和服务。比较之前必须先固定实体，否则“支持 2K”“原生音频”或“已开源”都可能错误落到一个 checkpoint 上。

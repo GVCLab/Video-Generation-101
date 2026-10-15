@@ -12,6 +12,8 @@
 
 <a id="1-video-models-are-zero-shot-learners-and-reasoners"></a>
 
+**快速阅读：** [入门：技术问题与方法概览](#route-1) · [实现：评测与实验要求](#route-2) · [研究：生成过程的机制分析](#route-3)。
+
 ## 1. 零样本视觉任务案例
 
 <a id="11-gpt-3-moment"></a>
@@ -84,6 +86,8 @@ Wiedemer 等人的核心问题是：大语言模型从任务专用系统演变�
 ![视频推理研究成熟度路线图](../assets/zh/video-reasoning-roadmap.png)
 
 > 图中表示的是证据与系统能力的成熟度，而非严格年份。历史时间线以本节的 zero-shot 发现为原点，在后文分别向前追溯、向后展开。
+
+<a id="route-1"></a>
 
 ## 2. 技术问题与方法概览
 
@@ -384,6 +388,8 @@ VLMs are Good Teachers 走另一条闭环：从 VLM 判断中提取奖励，对 
 
 <a id="10-chain-of-frames"></a>
 
+<a id="route-3"></a>
+
 ## 10. 生成过程的机制分析
 
 ### 10.1 Chain-of-Frames 与内部计划的关系
@@ -577,6 +583,8 @@ VBVR 的直接背景并不是单一论文，而是四股工作在 2025 年末汇
 - **“内部 probe 可读就证明那是思维。”** 相关性 probe 需要由干预、移植和行为变化建立因果性。
 
 ---
+
+<a id="route-2"></a>
 
 ## 14. 评测与实验要求
 

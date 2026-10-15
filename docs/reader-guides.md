@@ -129,7 +129,7 @@
 ### 必读顺序
 
 1. [技术时间线](timeline.md) —— 先理解不同路线如何并行演化，而不是把新模型简单看成替代旧模型。
-2. [论文阅读课程](reading-list.md) 的“先修诊断、共同主干与怎样选主修分支” —— 建立术语、证据等级与阅读问题。
+2. [论文阅读课程](reading-list.md) 的“先修诊断、共同主干与怎样选主修分支” —— 建立术语、来源类型与能力证据的区分。
 3. [生成模型路线](generative-models.md) 与 [评测指南](evaluation.md) —— 将论文放进统一技术轴，并建立证据判断习惯。
 4. 选定一条**主修分支**和一条**交叉分支**：
    - 表示与压缩： [视频 Tokenizer](generative-models/video-tokenizers.md)
@@ -152,11 +152,13 @@
 
 ### 建议产出与下一跳
 
-输出一张 claim card：`问题 / 方法改变的层 / 对比对象 / 证据等级 / 失败条件 / 最小复现实验`。如果研究涉及物理、动作或决策，请继续路线 E；如果需要实现原型与量化性能，请回到路线 C。
+输出一张 claim card：`问题 / 方法改变的层 / 对比对象 / 来源类型 / 能力证据 / 失败条件 / 最小复现实验`。如果研究涉及物理、动作或决策，请继续路线 E；如果需要实现原型与量化性能，请回到路线 C。
 
 ---
 
 ## E. 世界模型与具身智能读者
+
+本路线按状态与动力学、行动耦合、环境接口和验证组织；程序状态路线在基础后进入 [Coding World Model](coding-world-models.md)。
 
 **适合谁**：关注物理一致性、动作条件预测、交互环境、机器人或把视频模型用于规划与决策的读者。
 
@@ -165,11 +167,11 @@
 ### 必读顺序
 
 1. [零基础入门](getting-started.md) 中“视频模型就是 world model 吗？” —— 先避免概念混淆。
-2. [World Model](world-models.md) —— 明确 observation、state、action、reward、open-loop rollout 与 closed-loop control。
+2. [World Model](world-models.md) —— 明确状态、动力学、规划与观测校正；再到 [WAM](world-action-model.md) 比较预测与行动的耦合、级联与联合架构。
 3. [Video Reasoning](video-reasoning.md) —— 分清视频理解、时序推理与生成预测。
 4. [物理一致性](physical-consistency.md) —— 从视觉合理性进入可干预、可测量的物理主张。
 5. [动作条件预测](tasks/action-conditioned-prediction.md) 与 [交互式世界生成](tasks/interactive-world-generation.md) —— 检查动作接口、状态延续和反馈闭环。
-6. [评测指南](evaluation.md) —— 将演示视频替换为 action-conditioned、counterfactual、closed-loop 的证据协议。
+6. [评测指南](evaluation.md) → [世界模型报告协议](evaluation/world-models.md) —— 固定能力主张，再记录动作、反事实、持续交互与独立决策证据。
 
 ### 读法提示
 

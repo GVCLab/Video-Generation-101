@@ -9,6 +9,8 @@
 
 检索日期、纳排规则、逐条一手来源、发布内容和图像验收见[配套研究记录](../../sources/research_20260902_long_video_generation.md)。本章负责长时域生成的横向总览；在线提交、future leak、TTFF、deadline 和 backpressure 由[因果、流式与实时专章](causal-streaming-generation.md)负责；显式切镜、故事事实与跨镜头回滚由[故事与多镜头专章](../tasks/story-multishot.md)负责。
 
+**章节接口：** 本章维护长度外推、状态传递与随时长退化的定义；因果提交、首帧延迟、在线条件变更及服务时限见[因果与流式](causal-streaming-generation.md)。交互环境的动作接受与状态回访见[交互式世界生成](../tasks/interactive-world-generation.md)。
+
 ## 学习目标
 
 读完本章，应能完成六件事：

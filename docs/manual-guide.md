@@ -19,6 +19,33 @@
 
 示例设置用于说明实验如何设计。标为“实验设计示例”“尚未运行”的内容，不是公开数据集、标准协议或本仓库的实验结果。参数与通过阈值需根据具体任务确定，并在测试前固定。
 
+<a id="chapter-ownership"></a>
+
+### 2.1 分类轴与主责章节
+
+| 问题或共用内容 | 主责章节 | 相邻章节保留的内容 |
+|---|---|---|
+| 任务的输入、输出、条件与保持项 | [任务分类](taxonomy.md) | 任务专章展开张量、数据与失败条件 |
+| C1–C9 能力的定义 | [能力地图](foundation-model-capabilities.md) | 任务、后训练、系统与评测表引用 C 编号 |
+| 表示、分解、目标、骨干与部署五轴 | [生成原理总览](generative-models.md) | 分章展开对应轴；同一系统可跨轴组合 |
+| latent、离散 code、压缩预算与 codec | [Tokenizer](generative-models/video-tokenizers.md) | 系统章保留接口和成本，变分章保留概率模型 |
+| 时空网络、注意力、位置与条件融合 | [Video DiT](generative-models/video-dit-backbones.md) | 系统优化章保留硬件执行和端到端性能 |
+| SFT、偏好、RL 与独立验收 | [后训练](generative-models/video-post-training-alignment.md) | 蒸馏章负责 teacher–student 目标与加速取舍 |
+| 增加推理预算与执行一次的成本 | [推理时扩展](generative-models/test-time-scaling.md) / [推理优化](generative-models/inference-acceleration.md) | 前者比较预算—质量，后者分解每次执行成本 |
+| 长度外推与长期漂移 | [长视频](generative-models/long-video-generation.md) | [流式](generative-models/causal-streaming-generation.md)负责因果输出、提交、时限；长视频无需实时 |
+| 角色、道具、镜头边界与叙事状态 | [故事与多镜头](tasks/story-multishot.md) | [智能体制作](agentic-video-generation.md)负责工具调度、资产、预算和局部返工 |
+| 预测状态、动力学、规划与观测校正 | [世界模型](world-models.md) | [动作条件预测](tasks/action-conditioned-prediction.md)负责动作/观测张量、时间轴与预测协议 |
+| 预测如何参与动作产生与选择 | [WAM](world-action-model.md) | 级联、联合、在线/离线用途与消融集中维护 |
+| 持续接收动作的生成环境 | [交互式世界生成](tasks/interactive-world-generation.md) | 动作接受、状态权威性、回访、记忆案例与交互故障 |
+| 可执行规则与视觉接口 | [Coding World Model](coding-world-models.md) | 与制作脚本、潜在状态和程序执行推理分别比较 |
+| 表征预测、约束正确与任务求解 | [JEPA](jepa.md) / [物理一致性](physical-consistency.md) / [视觉推理](video-reasoning.md) | 三者分别回答表示、约束和计算问题，不作为世界模型的升级顺序 |
+| L0–L7 与通用评测口径 | [评测总览](evaluation.md) | [世界模型协议](evaluation/world-models.md)维护报告字段，任务章补专项实验 |
+| 数据来源、切分、标注与版本 | [数据处理](../resources/datasets.md) | [基础模型系统](foundation-models.md)保留训练管线的组合及系统实例 |
+
+### 2.2 章节复用规则
+
+共用定义、完整推导和通用协议只在主责章节展开；邻章保留理解本任务所需的简短说明与可点击入口。相同论文可出现在多个任务中，但实验条件、数值和来源必须明确；重复的背景介绍不能代替任务差异。旧页面和锚点保留为入口，转移技术段落时连同公式、图注、实验条件和引文一起处理。
+
 ## 3. 术语和符号
 
 | 术语或符号 | 含义及使用规则 |
@@ -31,6 +58,7 @@
 | 帧率 | 区分视频播放 FPS、模型生成吞吐 FPS 和用户实际收到视频的速率 |
 | 实时 | 在指定硬件、并发和时限内满足响应要求；高平均 FPS 本身不足以证明实时 |
 | 开放 | 分别注明论文、代码、权重、数据索引、标注和媒体是否发布 |
+| 来源可核查性与能力证据 | 来源用发表入口、预印本、机构展示及 artifact 状态描述；L0–L7 描述实验支持的行为。历史 A–D 仅表示可核查面；WM、VP、IW 是协议字段编号，不是能力排名 |
 | L0–L7 | [评测章节](evaluation.md)的手册内部报告约定，不是社区标准或统一排名 |
 
 章节中的英文论文名、模型名和指标名保留官方拼写。同一符号在不同论文中可能具有不同含义，引用公式时必须连同其定义阅读。

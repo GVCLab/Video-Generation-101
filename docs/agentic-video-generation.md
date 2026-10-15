@@ -42,6 +42,12 @@
 
 尤其要区分同名工作：Soni 等人的 **VideoAgent: Self-Improving Video Generation** 面向视频计划与具身控制 [[1]](#ref-1)；Liang 等人的 **VideoAgent: Personalized Synthesis of Scientific Videos** 面向科学讲解视频 [[5]](#ref-5)。只写“VideoAgent”会混淆任务、输入和成功标准。
 
+### 1.2 与代码世界模型的边界
+
+[编码世界模型](coding-world-models.md)维护实体、规则和事件后果，本章维护制作计划与素材。判断一个 coding agent 属于哪一类，要看它更新的是被描绘世界的状态，还是生成视频的工作流程；二者的反馈、记忆和成功标准不能互换。
+
+**状态分工：** 本章的计划、资产与执行账本用于制作调度；叙事事实的定义和跨镜头一致性见[故事与多镜头](tasks/story-multishot.md#2)，持续执行的世界规则及状态权威性见[Coding World Model](coding-world-models.md)。
+
 ## 2. 系统状态与处理流程
 
 下面是综合多类方法得到的**参考架构**，不是某篇论文完整实现的复述。实际系统可以省略其中一些组件，但应说明省略后的能力边界。

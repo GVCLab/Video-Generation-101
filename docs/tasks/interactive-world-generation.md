@@ -115,6 +115,8 @@ Oasis 正是典型分层案例：项目页同时展示更大在线 demo，并开
 6. Candidate Future A/B、Predicted Outputs 与 Actual Observation 都以点线进入 `EVIDENCE & POST-HOC AUDIT`，依次检查 Action Validity、Counterfactual、Uncertainty 与 `POST-HOC SAFETY AUDIT`；这条带只审计已产生的候选/轨迹，不冒充执行前互锁。
 7. 系统最后分别记录 FPS、accepted-action Hz 与 input-to-first-affected-frame Latency；图上的通用 `Action Hz` 必须按这里的 accepted-action 口径实现，三者不能互相代替。
 
+代码驱动的补充路线见 [Coding World Model](../coding-world-models.md)：可执行状态经 proxy 接入视频生成。可执行世界与可实时接收动作的视觉系统需要分别验收。
+
 ## 3. 建模方法
 
 <a id="41-latent-action"></a>
@@ -154,21 +156,33 @@ Vid2World 给出一条更可迁移的 ICLR 2026 路线：它对预训练视频�
 | **检索式空间记忆** | WorldPlay reconstituted context、Matrix-Game 3.0 camera-aware retrieval、ReWorld landmark bank | 与当前视点相关的旧视图 | 位姿漂移、错误检索、相似地点混淆 |
 | **事件/对象状态记忆** | ActWorld event-update 与 object-identity tokens | 交互发生过什么、哪个对象变了 | 写入错误会长期污染；像素仍可能与状态脱节 |
 
-WorldPack 在固定 token budget 中用 trajectory packing 与 FoV/pose 几何选择，把有效上下文从 4 帧扩展到 22 帧；作者报告 packing 使 diffusion inference time 增加 16%，几何选择另有开销 [[17]](#ref-17)。这是空间相关的**压缩视觉记忆**，不是实体数据库；且冻结日只按 arXiv v3 记录，不预先把页面上晚于冻结日的期刊月份写成已发生 venue。
+<a id="memory-case-comparison"></a>
 
-Infinite-World 的 HPMC 在固定预算中递归压缩历史，不要求显式 pose；tri-state uncertainty-aware action label 处理真实视频中的噪声轨迹，再用 30 分钟 revisit-dense 数据激活 loop closure。其 ICML 2026 正式论文报告 1000+ frame coherent memory [[18]](#ref-18)，但该数字仍需与分辨率、动作频率、回访难度和开放 artifact 一起看。
+#### 压缩、层级记忆与地标检索的条件比较
+
+下表合并原世界模型章的案例条件。数字与开放状态保留各条目的原资料快照，不作为统一性能排名。
+
+| 工作 | 核心机制 | 作者报告 | 当前边界 |
+|---|---|---|---|
+| WorldPack [[17]](#ref-17) | trajectory packing + 视野/位姿几何选择；不同时间尺度动态压缩帧 | 以 4 帧 token 预算暴露 22 帧历史（5.5 倍）；LoopNav/RECON 长上下文实验 | trajectory packing 约增加 16% diffusion inference time，几何选择还有额外成本；是压缩记忆，不是显式对象状态 |
+| Infinite-World [[18]](#ref-18) | hierarchical pose-free memory compressor；tri-state uncertainty-aware action label；revisit-dense finetune | 作者报告 1000+ frame 的一致交互 | 原来源快照未见等价完整代码与权重；本章另保留 ICML 2026 会议入口 [[18]](#ref-18) |
+| ReWorld（长时记忆） [[22]](#ref-22) | 多尺度 attention window + random routing；固定 KV cache + pose-indexed landmark bank；chunk-drop training | 作者报告 704×1280 streaming，并在固定 12-chunk cache 下生成 64 秒/384 latents | repo 有 inference code，但截至检索日 weights 标为 “Coming soon”，不能称端到端可复现 |
+
+WorldPack 的 4→22 帧即 5.5 倍有效上下文，packing 的 16% 时延之外还需计入几何选择；它保存压缩视觉证据，不能替代实体数据库。其 arXiv v3 标题为 _Dynamic Frame Compression for Long-context Video World Modeling_，不沿用早期标题，也不把晚于冻结日的期刊月份写成当时已发表。
+
+Infinite-World 的 HPMC 不要求显式 pose；tri-state uncertainty-aware action label 处理真实视频中的噪声轨迹，并使用 30 分钟 revisit-dense 数据激活 loop closure。其 ICML 2026 论文所报 1000+ frame coherent memory 仍需结合分辨率、动作频率、回访难度与 artifact 解释 [[18]](#ref-18)。
 
 WorldPlay 以 Dual Action Representation、Reconstituted Context Memory、temporal reframing 和 Context Forcing 蒸馏兼顾动作、旧视图与速度；其 ICML 2026 正式论文报告 720p、24 FPS [[14]](#ref-14)。Matrix-Game 3.0 进一步结合误差回灌、自纠错、camera-aware memory、DMD、INT8 与轻量 VAE；项目说明 720p 40 FPS 是 5B 模型在 8 张 DiT GPU 加 1 张 VAE GPU 上的作者结果，不能只摘“40 FPS” [[19]](#ref-19)。冻结日官方仓库已有 inference code，并发布面向 Unreal 第一人称场景的两个 5B 权重（base 与 distilled）；mixed Unreal+real-world 模型和 28B 大模型仍标注为将来发布 [[38]](#ref-38)。
 
 2026-07 的 Matrix-Game 3.5 是更新的 project/technical-report frontier，但不应回写成 Matrix-Game 3.0 的正式论文里程碑。其仓库提出 Patch Memory + Warped PRoPE、静态/动态解耦和 few-step causal distillation，已开放代码、first/third-person 两个 5B base 权重与 three-step first-person distilled checkpoint；但这些仍是 repo/project 自报，依赖 Wan2.2-TI2V-5B 与 Depth-Anything-3，建议至少 40 GB VRAM，没有正式 venue 或本教程的独立速度/长程复现 [[39]](#ref-39)。
 
-ReWorld 把多数 attention heads 限在短窗口、少数 heads 访问全历史，并用 random routing 与 chunk dropping 训练稀疏历史；推理时固定 KV cache 后接 pose-indexed landmark bank，作者报告在 64 秒/384 latent 回访中仍恢复起始视图 [[22]](#ref-22)。截至冻结日，repo 已有 inference code，但 ReWorld generator 与 4-step LoRA 权重均标为 “Coming soon”，不能称端到端可复现 [[23]](#ref-23)。
+ReWorld 的多尺度窗口让多数 attention heads 访问短历史、少数访问全历史；random routing 与 chunk dropping 训练稀疏历史。推理时使用上表的固定 KV 与 pose-indexed landmark bank；冻结日 inference code 已有，但 generator 与 4-step LoRA 权重仍标为 “Coming soon” [[22]](#ref-22) [[23]](#ref-23)。另一篇同名 _ReWorld: Multi-Dimensional Reward Modeling for Embodied World Models_ 提出 235K+ 多维偏好数据和 HERO reward heads，评价 physical realism、embodiment plausibility、task completion、visual quality，属于奖励建模；须用副标题或 arXiv ID 消歧 [[40]](#ref-40)。
 
 <a id="44-joint-videoaction-policy-backbone"></a>
 
 ### 3.4 Joint video–action：环境模型与 policy 在同一 backbone 中相邻，但不相同
 
-DreamZero 以 14B autoregressive video diffusion 同时建模未来视频与机器人动作，作者报告真机 7 Hz 闭环与跨 embodiment 迁移 [[26]](#ref-26)。它更接近 WAM/policy：输出动作是核心产品；本章的 interactive generator 则以“给定动作，环境怎样响应”为核心。联合模型可以共享视觉动力学，但评测必须拆成两栏：
+DreamZero 的联合视频—动作架构、14B backbone、作者所报 7 Hz 闭环及跨 embodiment 设定见 [WAM 联合路线](../world-action-model.md#43-bjoint-actionvideo-model) [[26]](#ref-26)。本章只区分两种接口：
 
 - **environment fidelity**：给定动作后，预测的下一状态是否正确；
 - **policy quality**：模型选择的动作是否完成任务且安全。
@@ -472,3 +486,5 @@ UniSim、DIAMOND、DreamZero、GeniWorld、WorldGym 与 World-In-World 分别从
 <a id="ref-38"></a>[38] Matrix-Game 3.0 code and checkpoints [![GitHub: SkyworkAI/Matrix-Game](https://img.shields.io/github/stars/SkyworkAI/Matrix-Game?style=social)](https://github.com/SkyworkAI/Matrix-Game/tree/main/Matrix-Game-3). Skywork AI. Official repository and 发布内容. 2026.
 
 <a id="ref-39"></a>[39] Matrix-Game 3.5: Enhancing Real-Time Streaming Interactive World Models with Patch Memory [![GitHub: Riemann-Dynamics/Matrix-Game-3.5](https://img.shields.io/github/stars/Riemann-Dynamics/Matrix-Game-3.5?style=social)](https://github.com/Riemann-Dynamics/Matrix-Game-3.5). Riemann Dynamics. Official code, checkpoints and project/technical-report repository. 2026.
+
+<a id="ref-40"></a>[40] [ReWorld: Multi-Dimensional Reward Modeling for Embodied World Models](https://arxiv.org/abs/2601.12428). arXiv:2601.12428. 2026.

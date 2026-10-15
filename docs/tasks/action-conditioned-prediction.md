@@ -9,6 +9,8 @@
 
 检索式、纳排规则、证据等级、逐项来源、仓库版本、负面核验与验证命令见[配套研究记录](../../sources/research_20260830_action_conditioned_prediction.md)。被动未来预测见[视频预测](video-prediction.md)，实时交互系统见[交互式世界生成](interactive-world-generation.md)，更广义的决策模型见[World Model](../world-models.md)。
 
+**章节接口：** 本章负责条件预测的张量、动作语义、时间对齐与干预实验；状态空间与规划原理见[世界模型](../world-models.md)，预测—行动耦合架构见[WAM](../world-action-model.md)，持续接收动作的运行协议见[交互式世界生成](interactive-world-generation.md)。
+
 ## 学习目标
 
 读完本章，应能完成六件事：

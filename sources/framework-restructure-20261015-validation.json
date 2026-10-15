@@ -1,0 +1,228 @@
+{
+  "date": "2026-10-15",
+  "baseline": "working tree at start of framework restructuring, including previous coding chapter and pre-existing edits",
+  "preservation": {
+    "math_fences": {
+      "before_unique": 294,
+      "before_occurrences": 296,
+      "after_unique": 294,
+      "missing": 0
+    },
+    "reference_entries": {
+      "before_unique": 1449,
+      "before_occurrences": 1454,
+      "after_unique": 1450,
+      "missing": 0
+    },
+    "external_urls": {
+      "before_unique": 1626,
+      "before_occurrences": 2636,
+      "after_unique": 1626,
+      "missing": 0
+    },
+    "local_images": {
+      "before_unique": 121,
+      "missing": 0
+    }
+  },
+  "legacy_content_anchors": {
+    "checked": 3744,
+    "missing": {},
+    "new_duplicate_ids_on_changed_pages": {}
+  },
+  "navigation": {
+    "top_level_groups": 6,
+    "before_pages": 60,
+    "after_pages": 61,
+    "removed_pages": [],
+    "duplicate_page_entries": 0
+  },
+  "citations": {
+    "mode": "online",
+    "scope": "published",
+    "files": 56,
+    "links": 2328,
+    "arxiv_requested": 425,
+    "arxiv_queried": 425,
+    "arxiv_returned": 425,
+    "arxiv_unverified": 0,
+    "online_complete": true,
+    "errors": 0,
+    "warnings": 0
+  },
+  "strict_build": "passed",
+  "manual_checks": {
+    "source_files": 61,
+    "rendered_pages": 63,
+    "local_links": 14696,
+    "issues": 0
+  },
+  "tests": {
+    "manual": 6,
+    "math": 1,
+    "result": "passed in documentation environment"
+  },
+  "browser": {
+    "desktop_width": 1280,
+    "mobile_width": 390,
+    "spotchecks": [
+      "WAM headings and nested navigation",
+      "moved image loaded",
+      "7 MathJax containers and 0 math errors on WAM",
+      "instant navigation to world-model evaluation protocol",
+      "mobile page has no horizontal overflow; menu opens"
+    ],
+    "full_site_visual_audit": false
+  },
+  "changed_markdown_files": [
+    {
+      "path": "README.md",
+      "before_sha256": "4995c2dbbbce52e1b8e7c2773aa90c3eaaf4863293f6cffe1968d927a77fa9b0",
+      "after_sha256": "c506103be42bdc58fc204debd06d671d2bae3e2863532e33ffe7dfcc6b44372e",
+      "before_lines": 79,
+      "after_lines": 70
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "before_sha256": "edfd1d5f91a05658adbb01cc0b89b039dd72ce324a11771e43caaf47a27b65ec",
+      "after_sha256": "62f9b53679286bc117e1bb11c797213cfa5948b3b75f44738db94a642ad08205",
+      "before_lines": 88,
+      "after_lines": 94
+    },
+    {
+      "path": "resources/datasets.md",
+      "before_sha256": "afa70998affc6c8e536d0b12a8e248fe45af81e4db195834aa90df83c9458733",
+      "after_sha256": "a9fa959eba2971efb625fc5fe4777657152b010cebeadba2faa9cbcc688b7471",
+      "before_lines": 739,
+      "after_lines": 747
+    },
+    {
+      "path": "docs/foundation-model-capabilities.md",
+      "before_sha256": "197443d1d9bc483c4dde5bcd76e417eefa296aeac06241f1f677ac51d45a4bec",
+      "after_sha256": "ca37c3af7e207edcfa999c20c5ea2bf44d0e921876b7f5ec9548daf2a4e229da",
+      "before_lines": 200,
+      "after_lines": 202
+    },
+    {
+      "path": "docs/reader-guides.md",
+      "before_sha256": "7b4d9f19ffab39b91abc6315001ac3939edd8061da6292f16a08422bfe9a5998",
+      "after_sha256": "19b09ff0835fe0a7fb9cb1d40201bde9be82d7eedd95131030faf2c2c2bb9eb7",
+      "before_lines": 240,
+      "after_lines": 240
+    },
+    {
+      "path": "docs/taxonomy.md",
+      "before_sha256": "f38eb144c2e8f3d77a187ec612ec2584b4e681f63a96c79ae6e53c0b27ce783d",
+      "after_sha256": "4cc30fb8ed04e6efd32f489e6b44859f5a7e5940d3064924e17a2571b0d1859f",
+      "before_lines": 383,
+      "after_lines": 385
+    },
+    {
+      "path": "docs/world-models.md",
+      "before_sha256": "5fa7e20331d658897bff92fe4e8bb13e535e2255caa8048e7353650666fe57cd",
+      "after_sha256": "7ca8a24f20ef0488be8eca540898f39b842a6a1dbcb617fa4434c672e584f847",
+      "before_lines": 529,
+      "after_lines": 394
+    },
+    {
+      "path": "docs/manual-guide.md",
+      "before_sha256": "6e99e6b602ac799ff28d18baf3d023c850baf38f0cc05f8ab51a926a74eca3ca",
+      "after_sha256": "91821b6933cb8b20606f0b174920bf8ae75876c1cc26525d9f4787d6e3b8e0fd",
+      "before_lines": 64,
+      "after_lines": 91
+    },
+    {
+      "path": "docs/reading-list.md",
+      "before_sha256": "761e281a1918504e024106c28ff64fa32eefb0eb44a7abb28acc02e8f916eb40",
+      "after_sha256": "153c574a2ebc2796e5fdc0112e412f8dde7a250dba7205824b82126b3de5616a",
+      "before_lines": 599,
+      "after_lines": 601
+    },
+    {
+      "path": "docs/agentic-video-generation.md",
+      "before_sha256": "7af916607090478756d9a1ac745aa67f635d7ee83566caae0105d505aba0ad4e",
+      "after_sha256": "9a144a958be314da644695ae37124b208b111ac52ddefaf7b4ef550bacdc134b",
+      "before_lines": 216,
+      "after_lines": 218
+    },
+    {
+      "path": "docs/foundation-models.md",
+      "before_sha256": "3bc12102403a3adc4036f35f3b39c3c4bbc2daca67dbfb4d44fbd826f0df545e",
+      "after_sha256": "5c1c6ac08479e0c682626750d7c4777a95c29bea0e1ce9e2cf51b7ea1453a3af",
+      "before_lines": 340,
+      "after_lines": 342
+    },
+    {
+      "path": "docs/generative-models.md",
+      "before_sha256": "a90348820774a898f341cb35dfd963dc3c5907fce899352feb0eef978b7ad9a0",
+      "after_sha256": "250a68f55a6625e16706c4248433ceec6d46b0fea721b2fa41eaee2c6abc0609",
+      "before_lines": 443,
+      "after_lines": 445
+    },
+    {
+      "path": "docs/world-action-model.md",
+      "before_sha256": "e09b3a984a980cbfe75fe70665d8433bed9d905a768db0af315af5046676cf0d",
+      "after_sha256": "1e0b927bdfe65f1f70ea06288af55211043ff840863c7c6e6ccac35e2164db88",
+      "before_lines": 144,
+      "after_lines": 218
+    },
+    {
+      "path": "docs/video-reasoning.md",
+      "before_sha256": "246101110e1774ca86ca2a9ab594c393a05d33b38ad9ad3c6042d3684b287090",
+      "after_sha256": "fd194fdac801309330ac0354b471ccc4ada9935016d54e289d9de703c9e6b79d",
+      "before_lines": 820,
+      "after_lines": 828
+    },
+    {
+      "path": "docs/evaluation.md",
+      "before_sha256": "41cabd3ec281a8e7c66f8533601d5d912ac03d894d5a8bb665616a1b49e1db23",
+      "after_sha256": "afceceb406b884923db8ab4de11e96bfd62ba3e5a5364ce4cc51c671d01229df",
+      "before_lines": 424,
+      "after_lines": 426
+    },
+    {
+      "path": "docs/tasks/story-multishot.md",
+      "before_sha256": "5d14a292bba11459bddd27505167ca55452b3cd4fd60a73ba0fca02bff6a86ac",
+      "after_sha256": "dd8398bbbba5bc325615aa09bae47fe1e6c56fb15fa977b4d26d49ca29787029",
+      "before_lines": 371,
+      "after_lines": 373
+    },
+    {
+      "path": "docs/tasks/interactive-world-generation.md",
+      "before_sha256": "7a93208938a04e7afed4db503c3e1a8287d0511e20457b9e23dcb3e99cbda513",
+      "after_sha256": "81dd314833ef5ddef845ec595f4bfca4c816a472628e5bb2887349b7c4f785bc",
+      "before_lines": 476,
+      "after_lines": 490
+    },
+    {
+      "path": "docs/tasks/video-virtual-try-on.md",
+      "before_sha256": "00d5299af26867fde123394b897a98af1d6e2e42c70dd62af8802d3bc62348df",
+      "after_sha256": "0417bda99ba09668fdfcbf74141a477ebb491bc74485c6d37227a6c583e418d9",
+      "before_lines": 698,
+      "after_lines": 706
+    },
+    {
+      "path": "docs/tasks/action-conditioned-prediction.md",
+      "before_sha256": "381b74a551c13b3d3da364893a9ce63a42c5869e9600d6e9681d59fc1c4c3926",
+      "after_sha256": "a66eae2faa9c3aa78f64dafa196bc0155cb8abc4e1241938a70e01276b5f82a4",
+      "before_lines": 400,
+      "after_lines": 402
+    },
+    {
+      "path": "docs/generative-models/causal-streaming-generation.md",
+      "before_sha256": "924e625dc621862803c287350abf5c0b68911b015a6eb75b6fcf9b436bfec757",
+      "after_sha256": "f3971b26e1b6fafa76ef89b908e6007f34893a4cbc5e86f2de23c61b1e63edfc",
+      "before_lines": 538,
+      "after_lines": 540
+    },
+    {
+      "path": "docs/generative-models/long-video-generation.md",
+      "before_sha256": "ca53f7da76df77a1ab3cf8049652f811e7cd4eb59ca4652d1437fe6783f883a5",
+      "after_sha256": "d9da3d3054a987fb45ed18739b5c82c1ad16ac4592264800746b1aea3b81178b",
+      "before_lines": 419,
+      "after_lines": 421
+    }
+  ],
+  "new_chapter": "docs/evaluation/world-models.md",
+  "published": false
+}

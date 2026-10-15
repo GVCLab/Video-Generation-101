@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-15",
+  "citations": {
+    "mode": "online",
+    "scope": "published",
+    "files": 54,
+    "links": 2314,
+    "arxiv_requested": 425,
+    "arxiv_queried": 425,
+    "arxiv_returned": 425,
+    "arxiv_unverified": 0,
+    "online_complete": true,
+    "errors": 0,
+    "warnings": 0
+  },
+  "strict_build": "passed",
+  "manual": {
+    "source_files": 60,
+    "rendered_pages": 62,
+    "local_links": 14474,
+    "issues": 0
+  },
+  "manual_tests": {
+    "run": 6,
+    "result": "passed"
+  },
+  "browser_spotcheck": "coding-world-models page title, navigation, contents and tables observed",
+  "model_reproduction": false,
+  "published": false
+}
