@@ -21,6 +21,8 @@ window.MathJax = {
 document$.subscribe(() => {
   if (!window.MathJax?.startup?.promise) return;
   MathJax.startup.promise = MathJax.startup.promise.then(() => {
+    // Instant navigation can replace the stylesheet; regenerate adaptive CSS.
+    MathJax.startup.output.clearCache();
     MathJax.typesetClear();
     MathJax.texReset();
     return MathJax.typesetPromise();
